@@ -22,7 +22,6 @@ const mainLinks = [
   { href: "/", label: "Нүүр" },
   { href: "/about", label: "Миний тухай" },
   { href: "/tools", label: "Миний хэрэгслүүд" },
-  { href: "/tools/pomodoro", label: "Pomodoro" },
 ];
 
 const CORRECT_PASSWORD = "Bataa2480";
