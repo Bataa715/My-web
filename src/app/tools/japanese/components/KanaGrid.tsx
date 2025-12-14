@@ -37,13 +37,13 @@ export default function KanaGrid({ kana, title, storageKey }: KanaGridProps) {
               variant="outline"
               onClick={() => toggleMemorized(k.character)}
               className={cn(
-                "h-20 flex flex-col transition-all duration-200",
+                "h-20 flex flex-col transition-all duration-200 font-jp",
                 memorized.includes(k.character)
                   ? "bg-primary/20 text-primary-foreground border-primary"
                   : "bg-card"
               )}
             >
-              <span className="text-3xl font-jp">{k.character}</span>
+              <span className="text-3xl">{k.character}</span>
               <span className="text-xs text-muted-foreground">{k.romaji}</span>
             </Button>
           ))}
