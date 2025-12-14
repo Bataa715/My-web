@@ -195,7 +195,7 @@ const Header = () => {
                 </Dialog>
             )}
 
-            {isAboutPage && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
+            {(isAboutPage || isHomePage) && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
                 if (!open) {
                     setPassword("");
                     setPasswordError("");
