@@ -30,7 +30,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background font-body antialiased">
-        <AppThemeProvider>
+        <AppThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
           <FirebaseClientProvider>
             <div className="relative flex min-h-screen flex-col">
               <Header />
