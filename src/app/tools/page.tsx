@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -75,9 +74,9 @@ export default function ToolsPage() {
     }, [user, firestore, isUserLoading]);
 
   return (
-    <div className="relative min-h-[calc(100vh-57px-81px)]">
-      {heroImage && (
-        <div className="absolute bottom-0 left-0 w-full h-[60vh] z-0">
+    <div className="relative">
+       {heroImage && (
+        <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
           <Image
             src={heroImage}
             alt="Abstract technology background"
@@ -85,10 +84,10 @@ export default function ToolsPage() {
             className="object-cover"
             data-ai-hint="abstract technology"
           />
-          <div className="absolute inset-0 z-1 bg-gradient-to-t from-background to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
         </div>
       )}
-      <div className="relative z-10 space-y-8">
+      <div className="space-y-8">
         <BackButton />
         <div className="text-center">
           <p className="text-muted-foreground">
