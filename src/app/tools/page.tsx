@@ -109,7 +109,7 @@ export default function ToolsPage() {
           </div>
        </div>
 
-        <div className="relative mt-auto w-full z-0 h-[40vh]">
+        <div className="absolute bottom-0 left-0 w-full z-0 h-[40vh]">
             <div className="absolute -top-16 left-0 w-full z-10">
               <WavyLine />
             </div>
@@ -128,6 +128,7 @@ export default function ToolsPage() {
                   />
                   <div 
                     className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"
+                    style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }}
                   ></div>
               </div>
             )}
