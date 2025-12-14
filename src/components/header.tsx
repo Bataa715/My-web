@@ -232,7 +232,7 @@ const Header = () => {
                 </Dialog>
             )}
 
-            {(isAboutPage || isHomePage) && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
+            {(isAboutPage || isHomePage || isToolsPage) && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
                 if (!open) {
                     setPassword("");
                     setPasswordError("");
