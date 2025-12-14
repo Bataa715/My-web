@@ -19,27 +19,6 @@ import Image from "next/image";
 import { useFirebase, updateDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
-
-const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
-const defaultProfileImage = avatarPlaceholder?.imageUrl || "https://picsum.photos/seed/avatar/400/400";
-const defaultName = "Б.Батмягмар";
-const defaultBio = "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.";
-const defaultGithub = "https://github.com/batmyagmar";
-const defaultInstagram = "https://instagram.com/batmyagmar";
-const defaultEmail = "batmyagmar.b@gmail.com";
-
-const defaultOrbitInfo: OrbitInfo[] = [
-    { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Улаанбаатар, Монгол', type: 'info' },
-    { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.', type: 'info' },
-    { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн хэмжээний програм хангамжийн компанид ажиллах.', type: 'info' },
-    { id: 'user', icon: 'User', title: 'Тухай', content: 'Би програмчлалд дуртай.', type: 'info' },
-    { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Дуртай дууг сонсох.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
-    { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', type: 'info', backgroundImage: 'https://images.unsplash.com/photo-1536440136628-849c177E76a1?w=800' },
-    { id: 'quote', icon: 'Quote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay', type: 'info' },
-    { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.', type: 'info' },
-];
-
-
 const getIcon = (iconName: string) => {
     const LucideIcon = (require('lucide-react') as any)[iconName];
     return LucideIcon ? <LucideIcon className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6 text-destructive" />;
@@ -151,8 +130,25 @@ export default function Hero() {
         }
         return;
     };
+
     const fetchUserInfo = async () => {
       setLoading(true);
+      
+      const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
+      const defaultProfileImage = avatarPlaceholder?.imageUrl || "https://picsum.photos/seed/avatar/400/400";
+      const defaultName = "Б.Батмягмар";
+      const defaultBio = "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.";
+      const defaultOrbitInfo: OrbitInfo[] = [
+          { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Улаанбаатар, Монгол', type: 'info' },
+          { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.', type: 'info' },
+          { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн хэмжээний програм хангамжийн компанид ажиллах.', type: 'info' },
+          { id: 'user', icon: 'User', title: 'Тухай', content: 'Би програмчлалд дуртай.', type: 'info' },
+          { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Дуртай дууг сонсох.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
+          { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', type: 'info', backgroundImage: 'https://images.unsplash.com/photo-1536440136628-849c177E76a1?w=800' },
+          { id: 'quote', icon: 'Quote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay', type: 'info' },
+          { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.', type: 'info' },
+      ];
+
       try {
         const docSnap = await getDoc(userInfoDocRef);
         if (docSnap.exists()) {
@@ -166,12 +162,14 @@ export default function Hero() {
           setOrbitInfo(data.orbitInfo || defaultOrbitInfo);
         } else {
           // If doc doesn't exist, create it with default data. Non-blocking.
-          setDocumentNonBlocking(userInfoDocRef, {
+          const defaultData = {
             name: defaultName,
             bio: defaultBio,
             profileImage: defaultProfileImage,
             orbitInfo: defaultOrbitInfo
-          }, { merge: false });
+          };
+          setDocumentNonBlocking(userInfoDocRef, defaultData, { merge: false });
+          
           // Set local state to default values immediately.
           setBio(defaultBio);
           setEditedBio(defaultBio);
@@ -183,13 +181,6 @@ export default function Hero() {
       } catch (error) {
         console.error("Error fetching user info:", error);
         toast({ title: "Алдаа", description: "Хэрэглэгчийн мэдээлэл татахад алдаа гарлаа.", variant: "destructive" });
-        // Fallback to default in case of error
-        setBio(defaultBio);
-        setEditedBio(defaultBio);
-        setName(defaultName);
-        setProfileImage(defaultProfileImage);
-        setEditedImage(defaultProfileImage);
-        setOrbitInfo(defaultOrbitInfo);
       } finally {
         setLoading(false);
       }
@@ -315,6 +306,11 @@ export default function Hero() {
       setSelectedOrbit(null);
     }
   };
+  
+  const defaultGithub = "https://github.com/Bataa715";
+  const defaultInstagram = "https://www.instagram.com/ka1__zen/";
+  const defaultEmail = "batmyagmar715@gmail.com";
+
 
   return (
     <section id="home" className="w-full min-h-[calc(100vh-57px)] flex items-center">
@@ -323,7 +319,7 @@ export default function Hero() {
           <div className="flex flex-col justify-center space-y-6">
             <div className="space-y-4">
               <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                {name || defaultName}
+                {name}
               </h1>
               <div className="relative">
                 {isEditingBio ? (
@@ -346,7 +342,7 @@ export default function Hero() {
                 ) : (
                   <>
                     <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                      {bio || defaultBio}
+                      {bio}
                     </p>
                     {isEditMode && (
                       <Button
@@ -489,7 +485,7 @@ export default function Hero() {
                              <div className="avatar-glow-wrapper w-48 h-48 md:w-56 md:h-56">
                                 <Avatar className="w-full h-full border-4 border-primary/50 relative">
                                     <AvatarImage src={profileImage} alt={name} />
-                                    <AvatarFallback>{(name || defaultName).charAt(0)}</AvatarFallback>
+                                    <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
                                      {isEditMode && (
                                         <button 
                                             onClick={() => setIsEditingImage(true)}
@@ -504,12 +500,12 @@ export default function Hero() {
                     )}
                 </AnimatePresence>
 
-                {(orbitInfo.length > 0 ? orbitInfo : defaultOrbitInfo).map((item, index) => (
+                {orbitInfo.map((item, index) => (
                    <OrbitItem 
                      key={item.id}
                      item={item}
                      index={index}
-                     total={(orbitInfo.length > 0 ? orbitInfo : defaultOrbitInfo).length}
+                     total={orbitInfo.length}
                      selectedOrbit={selectedOrbit}
                      onItemClick={orbitItemClick}
                    />
@@ -555,5 +551,3 @@ export default function Hero() {
     </section>
   );
 }
-
-    
