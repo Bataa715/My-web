@@ -18,9 +18,8 @@ export default function ProgressTracker({ initialItems }: ProgressTrackerProps) 
   const [items, setItems] = useState<ProgressItem[]>(initialItems);
 
   useEffect(() => {
-    // Merge initial items with user's progress
     if (!user || !firestore) {
-        setItems(initialItems);
+        setItems(initialItems.map(i => ({...i, learned: false, practicing: false})));
         return;
     };
 
@@ -31,11 +30,12 @@ export default function ProgressTracker({ initialItems }: ProgressTrackerProps) 
         const userProgress = docSnap.data().items as { [id: string]: { learned: boolean, practicing: boolean } };
         const mergedItems = initialItems.map(item => ({
           ...item,
-          ...userProgress[item.id!]
+          learned: userProgress[item.id!]?.learned || false,
+          practicing: userProgress[item.id!]?.practicing || false,
         }));
         setItems(mergedItems);
       } else {
-        setItems(initialItems);
+        setItems(initialItems.map(i => ({...i, learned: false, practicing: false})));
       }
     };
     fetchProgress();

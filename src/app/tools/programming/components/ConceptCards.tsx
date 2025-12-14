@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { ProgrammingConcept } from '@/lib/types';
 
 interface ConceptCardsProps {
@@ -11,6 +11,7 @@ export default function ConceptCards({ concepts }: ConceptCardsProps) {
     <Card>
       <CardHeader>
         <CardTitle>Core Concepts</CardTitle>
+        <CardDescription>Програмчлалын үндсэн ойлголтууд.</CardDescription>
       </CardHeader>
       <CardContent className="grid md:grid-cols-3 gap-4">
         {concepts.map((concept) => (
