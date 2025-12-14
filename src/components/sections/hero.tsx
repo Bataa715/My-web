@@ -36,8 +36,8 @@ interface OrbitItemProps {
 const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick, isEditing }) => {
     const angle = (index / total) * 2 * Math.PI;
     
-    const baseRadius = 140;
-    const mdBaseRadius = 180;
+    const baseRadius = 150;
+    const mdBaseRadius = 190;
     const editingRadius = 170;
     const mdEditingRadius = 210;
 
@@ -527,7 +527,7 @@ export default function Hero() {
                             transition={{ duration: 0.6, ease: "easeInOut" }}
                             className="absolute inset-0 flex flex-col items-center justify-center"
                         >
-                             <div className="avatar-glow-wrapper w-48 h-48 md:w-52 md:h-52">
+                             <div className="avatar-glow-wrapper w-52 h-52 md:w-64 md:h-64">
                                 <Avatar className="w-full h-full border-4 border-primary/50 relative">
                                     <AvatarImage src={profileImage} alt={name} />
                                     <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
