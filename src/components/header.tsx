@@ -13,7 +13,10 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { usePathname } from 'next/navigation';
-import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-images';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useFirebase } from '@/firebase';
+import type { UserProfile } from '@/lib/types';
+
 
 const mainLinks = [
   { href: "/", label: "Нүүр" },
@@ -33,19 +36,26 @@ const Header = () => {
     const pathname = usePathname();
     const isAboutPage = pathname === '/about';
     const isHomePage = pathname === '/';
+    const { firestore, user } = useFirebase();
 
     const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
     const [editedImageUrl, setEditedImageUrl] = useState('');
-    const [heroImage, setHeroImage] = useState<ImagePlaceholder | undefined>(undefined);
     const [saving, setSaving] = useState(false);
 
-    useEffect(() => {
-        const image = PlaceHolderImages.find(p => p.id === 'hero-background');
-        setHeroImage(image);
-        if (image) {
-        setEditedImageUrl(image.imageUrl);
-        }
-    }, []);
+     useEffect(() => {
+        if (!user || !firestore || !isImageEditingOpen) return;
+
+        const fetchCurrentImage = async () => {
+            const userDocRef = doc(firestore, 'users', user.uid);
+            const docSnap = await getDoc(userDocRef);
+            if (docSnap.exists()) {
+                const data = docSnap.data() as UserProfile;
+                setEditedImageUrl(data.heroImage || '');
+            }
+        };
+        fetchCurrentImage();
+    }, [user, firestore, isImageEditingOpen]);
+
 
     const handleEditClick = () => {
       if (isEditMode) {
@@ -70,24 +80,32 @@ const Header = () => {
       }
     };
 
-    const handleSaveImage = () => {
-        if (heroImage) {
-            setSaving(true);
-            setTimeout(() => {
-                const updatedImage = { ...heroImage, imageUrl: editedImageUrl };
-                const imageIndex = PlaceHolderImages.findIndex(p => p.id === 'hero-background');
-                if (imageIndex !== -1) {
-                    PlaceHolderImages[imageIndex] = updatedImage;
-                }
-                setSaving(false);
-                setIsImageEditingOpen(false);
-                toast({
-                    title: 'Амжилттай',
-                    description: 'Арын зураг шинэчлэгдлээ.',
-                });
-                // Force a reload to see the change as we can't directly update the page's state
-                window.location.reload();
-            }, 1000);
+    const handleSaveImage = async () => {
+        if (!user || !firestore) {
+             toast({ title: "Алдаа", description: "Нэвтэрч орно уу.", variant: "destructive" });
+             return;
+        }
+        setSaving(true);
+        try {
+            const userDocRef = doc(firestore, 'users', user.uid);
+            await updateDoc(userDocRef, { heroImage: editedImageUrl });
+            
+            setSaving(false);
+            setIsImageEditingOpen(false);
+            toast({
+                title: 'Амжилттай',
+                description: 'Арын зураг шинэчлэгдлээ.',
+            });
+             // Force a reload to see the change on the page
+             window.location.reload();
+        } catch (error) {
+            console.error("Error saving hero image:", error);
+            setSaving(false);
+            toast({
+                title: 'Алдаа',
+                description: 'Арын зураг хадгалахад алдаа гарлаа.',
+                variant: 'destructive',
+            });
         }
     };
 
