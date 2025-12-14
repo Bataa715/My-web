@@ -430,6 +430,9 @@ export default function Hero() {
                                                   className={cn("h-8 text-base bg-transparent border-primary/50 focus-visible:ring-primary", selectedOrbit.type !== 'audio' && 'text-white')}
                                                   placeholder="Lucide Icon"
                                                 />
+                                                 <p className="text-xs text-muted-foreground pt-1">
+                                                    <a href="https://lucide.dev/" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">Lucide</a>-аас icon хайх
+                                                </p>
                                             </div>
                                         </div>
                                         <div>
