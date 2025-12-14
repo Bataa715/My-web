@@ -1,0 +1,214 @@
+/**
+ * @file firestore.rules
+ * @description Firestore security rules for a multi-faceted learning and portfolio application.
+ *
+ * ## Core Philosophy
+ * This ruleset enforces a strict user-ownership model. All data is considered private to the user who created it. There is no public or shared data access between users. The rules ensure that a user can only ever read or write data that exists within their own dedicated data tree.
+ *
+ * ## Data Structure
+ * The entire data model is structured hierarchically under a top-level `users` collection. All user-specific content, such as language learning materials, programming concepts, projects, and skills, is stored in subcollections within that user's specific document path (e.g., `/users/{userId}/projects/{projectId}`). This strict segregation is the foundation of the security model.
+ *
+ * ## Key Security Decisions
+ * - **Strict Data Isolation:** By nesting all data under `/users/{userId}`, we guarantee that users can never access, or even be aware of, another user's data. This prevents accidental data leaks and simplifies security logic.
+ * - **Path-Based Authorization:** Ownership is determined exclusively by the `userId` in the document path. This is highly performant as it avoids the need for extra database reads (`get()` calls) to check ownership fields within a document.
+ * - **No User Listing:** Direct access to the top-level `/users` collection is denied to prevent malicious actors from enumerating all the users in the system.
+ * - **Default Deny:** Any operation not explicitly granted is denied by default, ensuring a secure-by-default posture.
+ *
+ * ## Denormalization for Authorization
+ * This ruleset primarily relies on path-based authorization, which is a form of structural denormalization. By placing a user's data within their own document path (`/users/{userId}/...`), the ownership information (`userId`) is inherently part of the request, eliminating the need for extra document reads or denormalized `ownerId` fields for authorization checks.
+ *
+ * ## Structural Segregation
+ * The data model perfectly implements structural segregation by using the `/users/{userId}` path to create a private workspace for each user. This is the most secure and performant way to handle user-owned data, especially for list operations.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for reusable logic
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user is the owner of the document
+     * based on the `userId` wildcard from the path.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Checks if the document already exists and if the requester is the owner.
+     * CRITICAL for secure update and delete operations.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Prevents anyone from reading or listing user documents. This protects user privacy by making it impossible to enumerate all users of the app.
+     * @path /users/{userId}
+     * @allow (none) - No operations are permitted.
+     * @deny (get) - A user tries to read another user's profile document.
+     * @deny (list) - A client SDK tries to query the entire `/users` collection.
+     * @principle Prevents user enumeration and protects the top-level namespace.
+     */
+    match /users/{userId} {
+      allow get: if false;
+      allow list: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Secures a user's private collection of English words.
+     * @path /users/{userId}/englishWords/{englishWordId}
+     * @allow (create) - An authenticated user adds a new word to their own collection.
+     * @deny (get) - A user attempts to read a word from another user's collection.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId}/englishWords/{englishWordId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures a user's private collection of English grammar rules.
+     * @path /users/{userId}/englishGrammarRules/{englishGrammarRuleId}
+     * @allow (create) - An authenticated user adds a new grammar rule to their own collection.
+     * @deny (update) - A user attempts to modify a rule in another user's collection.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId}/englishGrammarRules/{englishGrammarRuleId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures a user's private collection of Japanese characters.
+     * @path /users/{userId}/japaneseCharacters/{japaneseCharacterId}
+     * @allow (create) - An authenticated user adds a new character to their own collection.
+     * @deny (delete) - A user attempts to delete a character from another user's collection.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId}/japaneseCharacters/{japaneseCharacterId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures a user's private collection of Japanese words.
+     * @path /users/{userId}/japaneseWords/{japaneseWordId}
+     * @allow (list) - An authenticated user lists all words in their own collection.
+     * @deny (list) - A user attempts to list words from another user's collection.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId}/japaneseWords/{japaneseWordId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures a user's private collection of Japanese grammar rules.
+     * @path /users/{userId}/japaneseGrammarRules/{japaneseGrammarRuleId}
+     * @allow (create) - An authenticated user adds a new grammar rule to their own collection.
+     * @deny (get) - An unauthenticated user attempts to read a grammar rule.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId}/japaneseGrammarRules/{japaneseGrammarRuleId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures a user's private collection of programming concepts.
+     * @path /users/{userId}/programmingConcepts/{programmingConceptId}
+     * @allow (get) - An authenticated user reads a concept from their own collection.
+     * @deny (get) - A user attempts to read a concept from another user's collection.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId}/programmingConcepts/{programmingConceptId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures a user's private collection of code snippets.
+     * @path /users/{userId}/codeSnippets/{codeSnippetId}
+     * @allow (create) - An authenticated user adds a new code snippet to their own collection.
+     * @deny (update) - A user attempts to modify a snippet in another user's collection.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId}/codeSnippets/{codeSnippetId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures a user's private collection of programming progress trackers.
+     * @path /users/{userId}/programmingProgress/{programmingProgressId}
+     * @allow (create) - An authenticated user adds a new progress entry to their own collection.
+     * @deny (delete) - A user attempts to delete an entry from another user's collection.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId}/programmingProgress/{programmingProgressId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures a user's private collection of portfolio projects.
+     * @path /users/{userId}/projects/{projectId}
+     * @allow (create) - An authenticated user adds a new project to their own collection.
+     * @deny (list) - A user attempts to list projects from another user's collection.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId}/projects/{projectId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures a user's private collection of skills.
+     * @path /users/{userId}/skills/{skillId}
+     * @allow (create) - An authenticated user adds a new skill to their own collection.
+     * @deny (get) - An unauthenticated user attempts to read a skill.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId}/skills/{skillId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+  }
+}
