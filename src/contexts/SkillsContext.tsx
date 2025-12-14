@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import type { Skill } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { useFirebase, useMemoFirebase } from '@/firebase';
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, Timestamp, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, Timestamp, serverTimestamp, writeBatch } from "firebase/firestore";
 import { addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 interface SkillsContextType {
@@ -16,6 +16,13 @@ interface SkillsContextType {
 }
 
 const SkillsContext = createContext<SkillsContextType | undefined>(undefined);
+
+const initialSkillsData: Omit<Skill, 'id' | 'createdAt'>[] = [
+    { name: "Frontend", icon: "Code", items: ["HTML", "CSS", "JavaScript", "React", "Next.js", "Tailwind CSS"] },
+    { name: "Backend", icon: "Database", items: ["Node.js", "Express", "Firebase"] },
+    { name: "Програмчлалын хэл", icon: "Laptop", items: ["JavaScript", "TypeScript", "Python"] },
+    { name: "Бусад", icon: "GanttChartSquare", items: ["Git", "Docker", "Figma"] }
+];
 
 export function SkillsProvider({ children }: { children: ReactNode }) {
   const { firestore, user } = useFirebase();
@@ -42,15 +49,37 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
       try {
         const q = query(skillsCollectionRef, orderBy("createdAt", "asc"));
         const skillsSnapshot = await getDocs(q);
-        const skillsList = skillsSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return { 
-                id: doc.id, 
-                ...data,
-                createdAt: (data.createdAt as Timestamp)?.toDate() 
-            } as Skill;
-        });
-        setSkills(skillsList);
+
+        if (skillsSnapshot.empty) {
+            console.log("No skills found, seeding initial skills...");
+            const batch = writeBatch(firestore);
+            initialSkillsData.forEach(skill => {
+                const docRef = doc(skillsCollectionRef);
+                batch.set(docRef, { ...skill, createdAt: serverTimestamp() });
+            });
+            await batch.commit();
+
+            const newSnapshot = await getDocs(q);
+            const skillsList = newSnapshot.docs.map(doc => {
+                const data = doc.data();
+                return { 
+                    id: doc.id, 
+                    ...data,
+                    createdAt: (data.createdAt as Timestamp)?.toDate() 
+                } as Skill;
+            });
+            setSkills(skillsList);
+        } else {
+            const skillsList = skillsSnapshot.docs.map(doc => {
+                const data = doc.data();
+                return { 
+                    id: doc.id, 
+                    ...data,
+                    createdAt: (data.createdAt as Timestamp)?.toDate() 
+                } as Skill;
+            });
+            setSkills(skillsList);
+        }
 
       } catch (error) {
         console.error("Error fetching skills: ", error);
@@ -67,7 +96,7 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
     try {
       const newGroup = { ...group, createdAt: serverTimestamp() };
       const docRef = await addDocumentNonBlocking(skillsCollectionRef, newGroup);
-      setSkills(prev => [...prev, { ...group, id: docRef.id, createdAt: new Date() }]);
+      setSkills(prev => [...prev, { ...group, id: docRef.id, createdAt: new Date() } as Skill]);
       toast({ title: "Амжилттай", description: "Шинэ ур чадварын бүлэг нэмэгдлээ." });
     } catch (error) {
       console.error("Error adding skill group: ", error);

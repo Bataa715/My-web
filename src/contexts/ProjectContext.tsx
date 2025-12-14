@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import type { Project } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { useFirebase } from '@/firebase';
-import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, Timestamp, serverTimestamp, setDoc } from "firebase/firestore";
+import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, Timestamp, serverTimestamp, writeBatch } from "firebase/firestore";
 import { addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 interface ProjectContextType {
@@ -15,6 +15,31 @@ interface ProjectContextType {
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
+
+const initialProjects: Omit<Project, 'id' | 'createdAt'>[] = [
+    {
+      name: "Хувийн вебсайт",
+      description: "Миний ур чадвар, туршлага, хийсэн төслүүдийг нэгтгэсэн вебсайт.",
+      technologies: ["Next.js", "React", "Tailwind CSS", "Firebase"],
+      category: "Web",
+      link: "https://github.com/Bataa715",
+      live: "https://www.ka1zen.me",
+    },
+    {
+      name: "Зургийн танигч",
+      description: "TensorFlow ашиглан зураг таних, ангилах модель хөгжүүлсэн.",
+      technologies: ["Python", "TensorFlow", "OpenCV"],
+      category: "AI",
+      link: "https://github.com/Bataa715",
+    },
+    {
+      name: "Чат аппликейшн",
+      description: "Real-time чатлах боломжтой, энгийн мессенжер.",
+      technologies: ["Node.js", "Socket.IO", "React"],
+      category: "Web",
+      link: "https://github.com/Bataa715",
+    },
+];
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const { firestore, user } = useFirebase();
@@ -36,15 +61,38 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         const q = query(projectsCollectionRef, orderBy("createdAt", "desc"));
         const projectSnapshot = await getDocs(q);
 
-        const projectList = projectSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return { 
-                id: doc.id, 
-                ...data,
-                createdAt: (data.createdAt as Timestamp)?.toDate() 
-            } as Project;
-        });
-        setProjects(projectList);
+        if (projectSnapshot.empty) {
+            console.log("No projects found, seeding initial projects...");
+            const batch = writeBatch(firestore);
+            initialProjects.forEach(project => {
+                const docRef = doc(projectsCollectionRef);
+                batch.set(docRef, { ...project, createdAt: serverTimestamp() });
+            });
+            await batch.commit();
+            
+            // Re-fetch after seeding
+            const newSnapshot = await getDocs(q);
+            const projectList = newSnapshot.docs.map(doc => {
+                 const data = doc.data();
+                return { 
+                    id: doc.id, 
+                    ...data,
+                    createdAt: (data.createdAt as Timestamp)?.toDate() 
+                } as Project;
+            });
+            setProjects(projectList);
+
+        } else {
+            const projectList = projectSnapshot.docs.map(doc => {
+                const data = doc.data();
+                return { 
+                    id: doc.id, 
+                    ...data,
+                    createdAt: (data.createdAt as Timestamp)?.toDate() 
+                } as Project;
+            });
+            setProjects(projectList);
+        }
 
       } catch (error) {
         console.error("Error fetching projects: ", error);
