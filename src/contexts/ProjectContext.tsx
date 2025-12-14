@@ -7,31 +7,6 @@ import { useFirebase } from '@/firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, Timestamp, serverTimestamp, setDoc } from "firebase/firestore";
 import { addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
-const initialProjects: Omit<Project, 'id' | 'createdAt'>[] = [
-    {
-        name: 'Хувийн вебсайт',
-        description: 'Миний ур чадвар, туршлага, хийсэн төслүүдийг харуулсан вебсайт.',
-        technologies: ['Next.js', 'React', 'Tailwind CSS', 'TypeScript', 'Framer Motion'],
-        link: 'https://github.com/Bataa715/kaizen-portfolio',
-        live: 'https://kaizen-protfolio.web.app',
-        category: 'Web Development',
-    },
-    {
-        name: 'E-commerce',
-        description: 'Онлайн худалдааны цогц систем. Хэрэглэгчийн бүртгэл, барааны ангилал, сагс, төлбөрийн системтэй.',
-        technologies: ['React', 'Node.js', 'Express', 'MongoDB'],
-        link: 'https://github.com/Bataa715/E-commerce',
-        live: '#',
-        category: 'Web Development',
-    },
-    {
-        name: 'Цаг агаарын апп',
-        description: 'Хэрэглэгчийн байршлаас хамааран цаг агаарын мэдээллийг харуулдаг энгийн аппликейшн.',
-        technologies: ['React Native', 'Expo', 'OpenWeatherMap API'],
-        category: 'Mobile App',
-    },
-];
-
 interface ProjectContextType {
   projects: Project[];
   addProject: (project: Omit<Project, 'id' | 'createdAt'>) => Promise<void>;
@@ -60,32 +35,16 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         const q = query(projectsCollectionRef, orderBy("createdAt", "desc"));
         const projectSnapshot = await getDocs(q);
 
-        if (projectSnapshot.empty) {
-          // If no projects, add initial ones
-          const batch = initialProjects.map(p => addDocumentNonBlocking(projectsCollectionRef, { ...p, createdAt: serverTimestamp() }));
-          await Promise.all(batch);
-
-           const newSnapshot = await getDocs(q);
-           const projectList = newSnapshot.docs.map(doc => {
+        const projectList = projectSnapshot.docs.map(doc => {
             const data = doc.data();
             return { 
                 id: doc.id, 
                 ...data,
                 createdAt: (data.createdAt as Timestamp)?.toDate() 
             } as Project;
-          });
-          setProjects(projectList);
-        } else {
-          const projectList = projectSnapshot.docs.map(doc => {
-              const data = doc.data();
-              return { 
-                  id: doc.id, 
-                  ...data,
-                  createdAt: (data.createdAt as Timestamp)?.toDate() 
-              } as Project;
-          });
-          setProjects(projectList);
-        }
+        });
+        setProjects(projectList);
+
       } catch (error) {
         console.error("Error fetching projects: ", error);
         toast({

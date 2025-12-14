@@ -17,13 +17,6 @@ interface SkillsContextType {
 
 const SkillsContext = createContext<SkillsContextType | undefined>(undefined);
 
-const initialSkillsData: Omit<Skill, 'id' | 'createdAt'>[] = [
-    { name: 'Програмчлалын хэл', icon: 'Code', items: ['JavaScript (ES6+)', 'TypeScript', 'Python', 'HTML/CSS'] },
-    { name: 'Framework & Libraries', icon: 'Library', items: ['React', 'Next.js', 'Node.js', 'Express', 'Tailwind CSS'] },
-    { name: 'Багж хэрэгсэл', icon: 'Terminal', items: ['Git & GitHub', 'Docker', 'VS Code', 'Figma', 'Firebase'] },
-    { name: 'Мэдээллийн сан', icon: 'Database', items: ['MongoDB', 'PostgreSQL', 'MySQL', 'Firestore'] },
-];
-
 export function SkillsProvider({ children }: { children: ReactNode }) {
   const { firestore, user } = useFirebase();
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -46,31 +39,16 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
       try {
         const q = query(skillsCollectionRef, orderBy("createdAt", "asc"));
         const skillsSnapshot = await getDocs(q);
-        if (skillsSnapshot.empty) {
-          
-          const batch = initialSkillsData.map(s => addDocumentNonBlocking(skillsCollectionRef, { ...s, createdAt: serverTimestamp() }));
-          await Promise.all(batch);
-          const newSnapshot = await getDocs(q);
-          const skillsList = newSnapshot.docs.map(doc => {
+        const skillsList = skillsSnapshot.docs.map(doc => {
             const data = doc.data();
             return { 
                 id: doc.id, 
                 ...data,
                 createdAt: (data.createdAt as Timestamp)?.toDate() 
             } as Skill;
-          });
-          setSkills(skillsList);
-        } else {
-            const skillsList = skillsSnapshot.docs.map(doc => {
-                const data = doc.data();
-                return { 
-                    id: doc.id, 
-                    ...data,
-                    createdAt: (data.createdAt as Timestamp)?.toDate() 
-                } as Skill;
-            });
-            setSkills(skillsList);
-        }
+        });
+        setSkills(skillsList);
+
       } catch (error) {
         console.error("Error fetching skills: ", error);
         toast({ title: "Алдаа", description: "Ур чадваруудыг дуудахад алдаа гарлаа.", variant: "destructive" });
