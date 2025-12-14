@@ -41,9 +41,9 @@ interface OrbitItemProps {
 const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick, isEditing }) => {
     const angle = (index / total) * 2 * Math.PI;
     
-    const baseRadius = 140;
+    const baseRadius = 160;
     const mdBaseRadius = 180;
-    const editingRadius = 170;
+    const editingRadius = 190;
     const mdEditingRadius = 210;
 
     const [currentRadius, setCurrentRadius] = useState(baseRadius);
@@ -398,7 +398,7 @@ export default function Hero() {
             </div>
           </div>
           <div className="relative flex items-center justify-center w-full max-w-[400px] aspect-square mx-auto">
-             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-64 h-64 md:w-64 md:h-64")}>
+             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-72 h-72 md:w-72 md:h-72")}>
                 <AnimatePresence>
                     {selectedOrbit ? (
                         <motion.div
