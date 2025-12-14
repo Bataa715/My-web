@@ -8,6 +8,7 @@ import ProgressTracker from './components/ProgressTracker';
 import type { ProgrammingConcept, CheatSheetItem, ProgressItem } from '@/lib/types';
 import { useFirebase } from '@/firebase';
 import { collection, getDocs, query, orderBy, writeBatch, doc } from 'firebase/firestore';
+import BackButton from '@/components/shared/BackButton';
 
 const initialProgrammingConceptsData: Omit<ProgrammingConcept, 'id'>[] = [
     { title: 'Variable', emoji: '📦', explanation: 'Utga hadgalah sav.' },
@@ -97,6 +98,7 @@ export default function ProgrammingPage() {
 
     return (
         <div className="space-y-8">
+            <BackButton />
             <div className="text-center">
                 <h1 className="text-3xl font-bold font-headline">Программчлал</h1>
                 <p className="text-muted-foreground">Үндсэн ойлголт, хэрэгтэй кодууд, болон ахицаа хянах хэсэг.</p>

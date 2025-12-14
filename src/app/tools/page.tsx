@@ -1,3 +1,4 @@
+import BackButton from "@/components/shared/BackButton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { ArrowRight, Timer } from "lucide-react";
@@ -29,6 +30,7 @@ const tools = [
 export default function ToolsPage() {
   return (
     <div className="space-y-8">
+       <BackButton />
       <div className="text-center">
         <h1 className="text-3xl font-bold font-headline">Хэрэгслүүд</h1>
         <p className="text-muted-foreground">

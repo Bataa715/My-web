@@ -8,6 +8,7 @@ import KanaGrid from './components/KanaGrid';
 import type { JapaneseWord, Kana, GrammarRule } from '@/lib/types';
 import { useFirebase } from '@/firebase';
 import { collection, getDocs, query, orderBy, writeBatch, doc } from 'firebase/firestore';
+import BackButton from '@/components/shared/BackButton';
 
 const japaneseColumns = [
     { key: 'word' as keyof JapaneseWord, header: 'Japanese Word' },
@@ -112,6 +113,7 @@ export default function JapanesePage() {
 
     return (
         <div className="space-y-8">
+            <BackButton />
             <div className="text-center">
                 <h1 className="text-3xl font-bold font-headline">Япон хэл</h1>
                 <p className="text-muted-foreground">Үсэг, үг, дүрмээ давтан суралцаарай.</p>

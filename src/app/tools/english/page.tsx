@@ -7,6 +7,7 @@ import type { EnglishWord, GrammarRule } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import { useFirebase } from '@/firebase';
 import { collection, getDocs, query, orderBy, writeBatch, doc } from 'firebase/firestore';
+import BackButton from '@/components/shared/BackButton';
 
 const englishColumns = [
     { key: 'word' as keyof EnglishWord, header: 'English Word' },
@@ -92,6 +93,7 @@ export default function EnglishPage() {
 
     return (
         <div className="space-y-8">
+            <BackButton />
             <div className="text-center">
                 <h1 className="text-3xl font-bold font-headline">Англи хэл</h1>
                 <p className="text-muted-foreground">Үгсийн сан болон дүрмээ бататгаарай.</p>

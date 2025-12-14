@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Play, Pause, RotateCcw, Settings } from 'lucide-react';
@@ -16,6 +16,7 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
+import BackButton from '@/components/shared/BackButton';
 
 const PomodoroTimer = () => {
   const [workMinutes, setWorkMinutes] = useState(25);
@@ -81,7 +82,10 @@ const PomodoroTimer = () => {
   const progress = (1 - elapsedSeconds / totalSeconds) * 100;
   
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-4">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-140px)] p-4 space-y-8">
+        <div className="absolute top-24 left-4 sm:left-6 lg:left-8">
+            <BackButton />
+        </div>
         <audio ref={audioRef} src="/sounds/timer-end.mp3" preload="auto" />
       <Card
         className={cn(
