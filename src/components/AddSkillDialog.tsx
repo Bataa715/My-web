@@ -7,8 +7,11 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useSkills } from "@/contexts/SkillsContext";
 import IconPicker from "./shared/IconPicker";
-import { Badge } from "./ui/badge";
 import * as LucideIcons from 'lucide-react';
+
+interface AddSkillDialogProps {
+    children: ReactNode;
+}
 
 export function AddSkillDialog({ children }: AddSkillDialogProps) {
     const { addSkillGroup } = useSkills();
@@ -29,7 +32,7 @@ export function AddSkillDialog({ children }: AddSkillDialogProps) {
             setItems('');
         }
     };
-
+    
     const getIcon = (iconName: string) => {
         const LucideIcon = (LucideIcons as any)[iconName];
         return LucideIcon ? <LucideIcon className="h-5 w-5" /> : null;
