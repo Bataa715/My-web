@@ -121,7 +121,7 @@ export default function Hero() {
   
   const { toast } = useToast();
   
-  const userInfoDocRef = user ? doc(firestore, "userInfo", user.uid) : null;
+  const userInfoDocRef = user ? doc(firestore, "users", user.uid) : null;
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -138,7 +138,7 @@ export default function Hero() {
         setLoading(true);
       try {
         const docSnap = await getDoc(userInfoDocRef);
-        if (docSnap.exists()) {
+        if (docSnap.exists() && docSnap.data().name) { // Check if doc exists and has data
           const data = docSnap.data();
           setBio(data.bio || '');
           setEditedBio(data.bio || '');
@@ -169,7 +169,7 @@ export default function Hero() {
             profileImage: defaultProfileImage,
             orbitInfo: defaultOrbitInfo
           };
-          setDocumentNonBlocking(userInfoDocRef, defaultData, { merge: false });
+          setDocumentNonBlocking(userInfoDocRef, defaultData, { merge: true });
           
           setBio(defaultBio);
           setEditedBio(defaultBio);

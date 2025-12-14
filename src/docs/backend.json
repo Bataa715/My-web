@@ -57,11 +57,12 @@
       "description": "Represents a skill category and a list of skills within it.",
       "type": "object",
       "properties": {
-        "category": { "type": "string" },
-        "skills": { "type": "array", "items": { "type": "string" } },
+        "name": { "type": "string" },
+        "icon": { "type": "string" },
+        "items": { "type": "array", "items": { "type": "string" } },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["category", "skills", "createdAt"]
+      "required": ["name", "icon", "items", "createdAt"]
     },
     "EnglishWord": {
       "title": "English Word",
@@ -71,7 +72,7 @@
         "meaning": { "type": "string" },
         "memorized": { "type": "boolean" }
       },
-      "required": ["word", "meaning", "memorized"]
+      "required": ["word", "meaning"]
     },
     "JapaneseWord": {
       "title": "Japanese Word",
@@ -82,7 +83,7 @@
         "meaning": { "type": "string" },
         "memorized": { "type": "boolean" }
       },
-      "required": ["word", "romaji", "meaning", "memorized"]
+      "required": ["word", "romaji", "meaning"]
     },
     "GrammarRule": {
       "title": "Grammar Rule",
@@ -151,7 +152,7 @@
     "providers": ["password", "anonymous"]
   },
   "firestore": {
-    "/userInfo/{userId}": {
+    "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserProfile" },
       "description": "Stores user profile information."
     },

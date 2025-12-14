@@ -12,12 +12,12 @@ service cloud.firestore {
       return request.auth.uid == userId;
     }
 
-    // Rules for userInfo collection
-    match /userInfo/{userId} {
+    // Rules for users collection
+    match /users/{userId} {
       allow read, write: if isSignedIn() && isOwner(userId);
     }
-
-    // Rules for user-specific data (projects, skills, etc.)
+    
+    // Rules for user-specific sub-collections
     match /users/{userId}/{collection}/{docId} {
       allow read, write: if isSignedIn() && isOwner(userId);
     }
