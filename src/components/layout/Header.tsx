@@ -60,12 +60,12 @@ export function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className={cn("text-sm font-medium transition-colors hover:text-primary focus-visible:ring-0", pathname.startsWith('/tools') ? "text-primary font-semibold" : "text-muted-foreground")}>
-                  Хэрэгслүүд <ChevronDown className="relative top-[1px] ml-1 h-4 w-4" />
+                  Tools <ChevronDown className="relative top-[1px] ml-1 h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                  <DropdownMenuItem asChild>
-                  <Link href="/tools">Бүх хэрэгслүүд</Link>
+                  <Link href="/tools">All Tools</Link>
                 </DropdownMenuItem>
                 {toolsLinks.map((link) => (
                   <DropdownMenuItem key={link.href} asChild>
@@ -101,7 +101,7 @@ export function Header() {
                 {mainLinks.map((link) => (
                   <NavLink key={link.href} {...link} className="text-lg" />
                 ))}
-                 <h3 className="pt-4 font-semibold text-lg">Хэрэгслүүд</h3>
+                 <h3 className="pt-4 font-semibold text-lg">Tools</h3>
                 {toolsLinks.map((link) => (
                    <NavLink key={link.href} href={link.href} label={link.label} className="text-lg pl-2" />
                 ))}
