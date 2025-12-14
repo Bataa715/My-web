@@ -43,3 +43,20 @@ export interface ProgressItem {
   learned: boolean;
   practicing: boolean;
 }
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  tags: string[];
+  imageUrl: string;
+  link: string;
+  createdAt: Date;
+}
+
+export interface Skill {
+    id: string;
+    category: string;
+    skills: string[];
+    createdAt: Date;
+}

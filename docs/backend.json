@@ -240,6 +240,75 @@
         "learned",
         "practicing"
       ]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Represents a project in the portfolio.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the project."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the project."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of tags associated with the project."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "The URL of an image for the project."
+        },
+        "link": {
+          "type": "string",
+          "description": "A link to the project."
+        },
+        "createdAt": {
+            "type": "string",
+            "format": "date-time"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "tags",
+        "imageUrl",
+        "link",
+        "createdAt"
+      ]
+    },
+    "Skill": {
+      "title": "Skill",
+      "description": "Represents a skill category and a list of skills within it.",
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "description": "The category of the skills (e.g., 'Programming Languages')."
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of skills in this category."
+        },
+        "createdAt": {
+            "type": "string",
+            "format": "date-time"
+        }
+      },
+      "required": [
+        "category",
+        "skills",
+        "createdAt"
+      ]
     }
   },
   "auth": {
@@ -249,168 +318,17 @@
     ]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/users/{userId}/englishWords/{englishWordId}",
-        "definition": {
-          "entityName": "EnglishWord",
-          "schema": {
-            "$ref": "#/backend/entities/EnglishWord"
-          },
-          "description": "Stores English words and their Mongolian meanings for a specific user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The ID of the user."
-            },
-            {
-              "name": "englishWordId",
-              "description": "The ID of the English word."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/englishGrammarRules/{englishGrammarRuleId}",
-        "definition": {
-          "entityName": "EnglishGrammarRule",
-          "schema": {
-            "$ref": "#/backend/entities/EnglishGrammarRule"
-          },
-          "description": "Stores English grammar rules with explanations and example sentences for a specific user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The ID of the user."
-            },
-            {
-              "name": "englishGrammarRuleId",
-              "description": "The ID of the English grammar rule."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/japaneseCharacters/{japaneseCharacterId}",
-        "definition": {
-          "entityName": "JapaneseCharacter",
-          "schema": {
-            "$ref": "#/backend/entities/JapaneseCharacter"
-          },
-          "description": "Stores Japanese characters (Hiragana or Katakana) and their memorization status for a specific user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The ID of the user."
-            },
-            {
-              "name": "japaneseCharacterId",
-              "description": "The ID of the Japanese character."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/japaneseWords/{japaneseWordId}",
-        "definition": {
-          "entityName": "JapaneseWord",
-          "schema": {
-            "$ref": "#/backend/entities/JapaneseWord"
-          },
-          "description": "Stores Japanese words with Romaji, Mongolian meaning, and memorization status for a specific user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The ID of the user."
-            },
-            {
-              "name": "japaneseWordId",
-              "description": "The ID of the Japanese word."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/jlptGrammar/{jlptGrammarId}",
-        "definition": {
-          "entityName": "JLPTGrammar",
-          "schema": {
-            "$ref": "#/backend/entities/JLPTGrammar"
-          },
-          "description": "Stores JLPT grammar points with explanations and example sentences for a specific user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The ID of the user."
-            },
-            {
-              "name": "jlptGrammarId",
-              "description": "The ID of the JLPT grammar point."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/programmingConcepts/{programmingConceptId}",
-        "definition": {
-          "entityName": "ProgrammingConcept",
-          "schema": {
-            "$ref": "#/backend/entities/ProgrammingConcept"
-          },
-          "description": "Stores programming concepts with short explanations for a specific user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The ID of the user."
-            },
-            {
-              "name": "programmingConceptId",
-              "description": "The ID of the programming concept."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/codeSnippets/{codeSnippetId}",
-        "definition": {
-          "entityName": "CodeSnippet",
-          "schema": {
-            "$ref": "#/backend/entities/CodeSnippet"
-          },
-          "description": "Stores code snippets with syntax for a specific user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The ID of the user."
-            },
-            {
-              "name": "codeSnippetId",
-              "description": "The ID of the code snippet."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/learningProgress/{learningProgressId}",
-        "definition": {
-          "entityName": "LearningProgress",
-          "schema": {
-            "$ref": "#/backend/entities/LearningProgress"
-          },
-          "description": "Stores learning progress for specific programming concepts for a specific user.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The ID of the user."
-            },
-            {
-              "name": "learningProgressId",
-              "description": "The ID of the learning progress entry."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "The data structure is designed to store user-specific learning data (English words, grammar rules, Japanese characters/words/grammar, programming concepts, code snippets, and learning progress).  Authorization independence is achieved by using path-based ownership; each user's data is stored under their `userId`, removing the need for `get()` calls in security rules to determine ownership. QAPs are achieved through structural segregation; each collection stores data with the same access needs (private to the user)."
+    "/users/{userId}/projects/{projectId}": {
+        "schema": {
+            "$ref": "#/entities/Project"
+        },
+        "description": "Stores user projects."
+    },
+    "/users/{userId}/skills/{skillId}": {
+        "schema": {
+            "$ref": "#/entities/Skill"
+        },
+        "description": "Stores user skills."
+    }
   }
 }

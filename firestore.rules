@@ -1,185 +1,19 @@
-/**
- * Core Philosophy: This ruleset enforces a strict user-ownership model. All data is
- * considered private and is only accessible by the user who created it. There is no
- * public or shared data.
- *
- * Data Structure: The data is organized hierarchically. All user-specific content,
- * such as language learning materials and programming notes, is stored in various
- * subcollections nested under a main `/users/{userId}` path. This structure ensures
- * that a user's data is logically and securely segregated.
- *
- * Key Security Decisions:
- * - Strict Ownership: A user can only read or write data within their own
- *   `/users/{userId}` document tree. Cross-user access is explicitly denied.
- * - Path-Based Security: Ownership is determined by the `userId` in the document path,
- *   making rules fast and efficient without needing extra database reads (`get` calls).
- * - No User Listing: The top-level `/users` collection is not readable, preventing
- *   the enumeration of all application users.
- * - Default Deny: Any path not explicitly matched is inaccessible.
- *
- * Denormalization for Authorization: This ruleset relies on the path structure itself
- * as a form of denormalization. By placing all of a user's data under their unique
- * `/users/{userId}` path, we avoid the need to store a `userId` field on every single
- * subcollection document for authorization checks.
- *
- * Structural Segregation: Each type of learning data (e.g., `englishWords`, `codeSnippets`)
- * is stored in its own dedicated subcollection. This clean separation simplifies rules,
- * as all documents within a given subcollection share the same access control pattern:
- * they are private to the parent user.
- */
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // ------------------------------------------------------------------------
-    // Helper Functions
-    // ------------------------------------------------------------------------
-
-    /**
-     * Checks if the user is authenticated.
-     */
+    // Helper functions
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * Checks if the authenticated user's ID matches the owner ID from the path.
-     */
     function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+      return request.auth.uid == userId;
     }
 
-    /**
-     * Checks for ownership AND ensures the document already exists.
-     * Crucial for preventing modification of non-existent documents.
-     */
-    function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
+    // Rules for user-specific data
+    match /users/{userId}/{document=**} {
+      allow read, write: if isSignedIn() && isOwner(userId);
     }
-
-    // ------------------------------------------------------------------------
-    // Collection Rules
-    // ------------------------------------------------------------------------
-
-    /**
-     * @description Secures a user's private collection of English words.
-     * @path        /users/{userId}/englishWords/{englishWordId}
-     * @allow       (create) An authenticated user ('user123') can add a new word to their own collection at `/users/user123/englishWords/new_word`.
-     * @deny        (get) A different authenticated user ('user456') is blocked from reading a word at `/users/user123/englishWords/any_word`.
-     * @principle   Restricts access to a user's own data tree.
-     */
-    match /users/{userId}/englishWords/{englishWordId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Secures a user's private collection of English grammar rules.
-     * @path        /users/{userId}/englishGrammarRules/{englishGrammarRuleId}
-     * @allow       (update) The owner ('user123') can modify a grammar rule they created at `/users/user123/englishGrammarRules/rule_abc`.
-     * @deny        (list) An unauthenticated user cannot list any grammar rules from `/users/user123/englishGrammarRules`.
-     * @principle   Restricts access to a user's own data tree.
-     */
-    match /users/{userId}/englishGrammarRules/{englishGrammarRuleId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Secures a user's private collection of Japanese characters.
-     * @path        /users/{userId}/japaneseCharacters/{japaneseCharacterId}
-     * @allow       (list) The owner ('user123') can list all characters in their collection at `/users/user123/japaneseCharacters`.
-     * @deny        (create) A different user ('user456') is blocked from adding a character to another user's collection at `/users/user123/japaneseCharacters/new_char`.
-     * @principle   Restricts access to a user's own data tree.
-     */
-    match /users/{userId}/japaneseCharacters/{japaneseCharacterId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Secures a user's private collection of Japanese words.
-     * @path        /users/{userId}/japaneseWords/{japaneseWordId}
-     * @allow       (delete) The owner ('user123') can delete a word document from `/users/user123/japaneseWords/word_to_delete`.
-     * @deny        (update) The owner ('user123') cannot update a non-existent document at `/users/user123/japaneseWords/fake_word_id`.
-     * @principle   Restricts access to a user's own data tree and ensures document existence for state changes.
-     */
-    match /users/{userId}/japaneseWords/{japaneseWordId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Secures a user's private collection of JLPT grammar points.
-     * @path        /users/{userId}/jlptGrammar/{jlptGrammarId}
-     * @allow       (get) The owner ('user123') can read a specific grammar point at `/users/user123/jlptGrammar/n5_grammar_1`.
-     * @deny        (delete) A different user ('user456') cannot delete a grammar point from `/users/user123/jlptGrammar/n5_grammar_1`.
-     * @principle   Restricts access to a user's own data tree.
-     */
-    match /users/{userId}/jlptGrammar/{jlptGrammarId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Secures a user's private collection of programming concepts.
-     * @path        /users/{userId}/programmingConcepts/{programmingConceptId}
-     * @allow       (create) The owner ('user123') can create a new concept at `/users/user123/programmingConcepts/js_closures`.
-     * @deny        (list) An unauthenticated user cannot list concepts from `/users/user123/programmingConcepts`.
-     * @principle   Restricts access to a user's own data tree.
-     */
-    match /users/{userId}/programmingConcepts/{programmingConceptId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Secures a user's private collection of code snippets.
-     * @path        /users/{userId}/codeSnippets/{codeSnippetId}
-     * @allow       (update) The owner ('user123') can update their snippet at `/users/user123/codeSnippets/react_hook_example`.
-     * @deny        (get) A different user ('user456') cannot read the snippet at `/users/user123/codeSnippets/react_hook_example`.
-     * @principle   Restricts access to a user's own data tree.
-     */
-    match /users/{userId}/codeSnippets/{codeSnippetId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    /**
-     * @description Secures a user's private learning progress trackers.
-     * @path        /users/{userId}/learningProgress/{learningProgressId}
-     * @allow       (get) The owner ('user123') can read their progress at `/users/user123/learningProgress/progress_tracker_1`.
-     * @deny        (create) An unauthenticated user cannot create a progress tracker.
-     * @principle   Restricts access to a user's own data tree.
-     */
-    match /users/{userId}/learningProgress/{learningProgressId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
   }
 }
