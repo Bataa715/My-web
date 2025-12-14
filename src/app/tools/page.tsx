@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -75,7 +76,7 @@ export default function ToolsPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-57px-81px)]">
-       {heroImage && (
+      {heroImage && (
         <div className="absolute bottom-0 left-0 w-full h-[60vh] z-0">
           <Image
             src={heroImage}
@@ -84,39 +85,38 @@ export default function ToolsPage() {
             className="object-cover"
             data-ai-hint="abstract technology"
           />
-           <div className="absolute inset-0 z-10 bg-gradient-to-t from-background to-transparent"></div>
+          <div className="absolute inset-0 z-1 bg-gradient-to-t from-background to-transparent"></div>
         </div>
       )}
-       <div className="relative z-10 space-y-8">
-          <BackButton />
-          <div className="text-center">
-            <h1 className="text-3xl font-bold font-headline">Хэрэгслүүд</h1>
-            <p className="text-muted-foreground">
-              Суралцах үйл явцад тань туслах хэрэгслүүдийн цуглуулга.
-            </p>
-          </div>
+      <div className="relative z-10 space-y-8">
+        <BackButton />
+        <div className="text-center">
+          <p className="text-muted-foreground">
+            Суралцах үйл явцад тань туслах хэрэгслүүдийн цуглуулга.
+          </p>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
-            {tools.map((tool) => (
-              <Link href={tool.href} key={tool.title} className="group">
-                <Card className="h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span className="flex items-center gap-2">
-                        {tool.icon}
-                        {tool.title}
-                      </span>
-                      <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription>{tool.description}</CardDescription>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-       </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
+          {tools.map((tool) => (
+            <Link href={tool.href} key={tool.title} className="group">
+              <Card className="h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1">
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      {tool.icon}
+                      {tool.title}
+                    </span>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>{tool.description}</CardDescription>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
