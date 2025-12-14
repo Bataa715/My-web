@@ -308,7 +308,6 @@ export default function VocabularyManager<T extends Word>({
                 <Dialog open={isAlphabetModalOpen} onOpenChange={setIsAlphabetModalOpen}>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
-                      <Pilcrow className="h-4 w-4 mr-2" />
                       Үсгээр шүүх
                       {alphabetFilter !== 'all' && <span className="ml-2 font-bold text-primary">{alphabetFilter}</span>}
                     </Button>
@@ -378,7 +377,7 @@ export default function VocabularyManager<T extends Word>({
                             variant="ghost"
                             size="icon"
                             className="text-destructive hover:text-destructive"
-                            disabled={!user}
+                            disabled={!user || initialWords.some(initialWord => initialWord.word === word.word && initialWord.meaning === word.meaning)}
                           >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -411,5 +410,3 @@ export default function VocabularyManager<T extends Word>({
     </Card>
   );
 }
-
-    
