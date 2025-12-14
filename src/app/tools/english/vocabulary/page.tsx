@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -78,12 +79,8 @@ export default function EnglishVocabularyPage() {
   return (
     <div className="space-y-8">
       <BackButton />
-      <div className="text-center pt-8">
-        <h1 className="text-4xl font-bold font-headline">English Vocabulary</h1>
-        <p className="mt-2 text-muted-foreground">Таны сурч буй үгсийн сан.</p>
-      </div>
        {loading ? (
-        <div className="space-y-4">
+        <div className="space-y-4 pt-8">
             <div className="flex justify-between items-center">
                 <Skeleton className="h-10 w-48" />
                 <Skeleton className="h-10 w-24" />
