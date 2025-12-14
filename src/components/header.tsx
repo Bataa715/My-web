@@ -33,11 +33,6 @@ const Header = () => {
     const [passwordError, setPasswordError] = useState("");
     const { toast } = useToast();
     const pathname = usePathname();
-    const [isClient, setIsClient] = useState(false);
-
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
     
     const isAboutPage = pathname === '/about';
     const isHomePage = pathname === '/';
@@ -237,7 +232,7 @@ const Header = () => {
                 </Dialog>
             )}
 
-            {isClient && (isAboutPage || isHomePage || isToolsPage) && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
+            {(isAboutPage || isHomePage || isToolsPage) && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
                 if (!open) {
                     setPassword("");
                     setPasswordError("");
@@ -305,3 +300,5 @@ const Header = () => {
 };
 
 export default Header;
+
+    
