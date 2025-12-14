@@ -40,7 +40,7 @@ const Projects = () => {
             <CardFooter>
               <Skeleton className="h-10 w-32" />
             </CardFooter>
-          </Card>>
+          </Card>
         ))}
 
         {!loading && projects.map((project) => (
@@ -53,7 +53,7 @@ const Projects = () => {
             <CardHeader>
               <div className="relative h-64 w-full overflow-hidden rounded-t-lg">
                 <Image
-                  src={project.imageUrl}
+                  src={`https://picsum.photos/seed/${project.id}/600/400`}
                   alt={project.name}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -64,19 +64,28 @@ const Projects = () => {
             <CardContent className="flex-1">
               <CardDescription>{project.description}</CardDescription>
               <div className="mt-4 flex flex-wrap gap-2">
-                {project.tags.map((tag) => (
+                {project.technologies.map((tag) => (
                   <Badge key={tag} variant="secondary">
                     {tag}
                   </Badge>
                 ))}
               </div>
             </CardContent>
-            <CardFooter>
-              <Button asChild variant="outline">
-                <Link href={project.link} target="_blank">
-                  Дэлгэрэнгүй <ArrowRight className="ml-2" />
-                </Link>
-              </Button>
+            <CardFooter className="flex-wrap gap-2">
+              {project.link && (
+                <Button asChild variant="outline">
+                  <Link href={project.link} target="_blank">
+                    Дэлгэрэнгүй <ArrowRight className="ml-2" />
+                  </Link>
+                </Button>
+              )}
+               {project.live && (
+                <Button asChild >
+                  <Link href={project.live} target="_blank">
+                    Live хувилбар
+                  </Link>
+                </Button>
+              )}
             </CardFooter>
           </Card>
         ))}

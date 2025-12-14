@@ -48,9 +48,10 @@ export interface Project {
   id: string;
   name: string;
   description: string;
-  tags: string[];
-  imageUrl: string;
-  link: string;
+  technologies: string[];
+  link?: string;
+  live?: string;
+  category: string;
   createdAt: Date;
 }
 
