@@ -393,7 +393,7 @@ export default function Hero() {
             </div>
           </div>
           <div className="relative flex items-center justify-center w-full max-w-[400px] aspect-square mx-auto">
-             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-72 h-72 md:w-96 md:h-96" : "w-64 h-64 md:w-80 md:h-80")}>
+             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-64 h-64 md:w-80 md:h-80")}>
                 <AnimatePresence>
                     {selectedOrbit ? (
                         <motion.div
