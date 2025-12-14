@@ -98,7 +98,7 @@ const getYoutubeVideoId = (url: string): string | null => {
 
 export default function Hero() {
   const { isEditMode } = useEditMode();
-  const { firestore, user } = useFirebase();
+  const { firestore, user, isUserLoading } = useFirebase();
   const [profileImage, setProfileImage] = useState<string>('');
   const [bio, setBio] = useState('');
   const [name, setName] = useState('');
@@ -124,18 +124,18 @@ export default function Hero() {
   const userInfoDocRef = user ? doc(firestore, "userInfo", user.uid) : null;
 
   useEffect(() => {
-    if (!userInfoDocRef) {
-        if (!user) { // Not logged in, can't fetch data.
-            setLoading(false);
-        }
-        return;
-    };
-
     const fetchUserInfo = async () => {
-      setLoading(true);
-      
-      const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
-      
+        if (isUserLoading) {
+            setLoading(true);
+            return;
+        }
+
+        if (!user || !userInfoDocRef) {
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
       try {
         const docSnap = await getDoc(userInfoDocRef);
         if (docSnap.exists()) {
@@ -149,6 +149,7 @@ export default function Hero() {
           setOrbitInfo(data.orbitInfo || []);
         } else {
           // If doc doesn't exist, create it with default data. Non-blocking.
+          const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
           const defaultName = "Б.Батмягмар";
           const defaultBio = "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.";
           const defaultProfileImage = avatarPlaceholder?.imageUrl || "https://picsum.photos/seed/avatar/400/400";
@@ -170,7 +171,6 @@ export default function Hero() {
           };
           setDocumentNonBlocking(userInfoDocRef, defaultData, { merge: false });
           
-          // Set local state to default values immediately.
           setBio(defaultBio);
           setEditedBio(defaultBio);
           setName(defaultName);
@@ -186,8 +186,8 @@ export default function Hero() {
       }
     };
     fetchUserInfo();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, firestore]);
+  }, [user, isUserLoading, userInfoDocRef, toast]);
+
 
   const handleSaveOrbitInfo = async () => {
     if (!selectedOrbit || !userInfoDocRef) return;
@@ -551,3 +551,5 @@ export default function Hero() {
     </section>
   );
 }
+
+    
