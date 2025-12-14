@@ -33,6 +33,11 @@ const Header = () => {
     const [passwordError, setPasswordError] = useState("");
     const { toast } = useToast();
     const pathname = usePathname();
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
     
     const isAboutPage = pathname === '/about';
     const isHomePage = pathname === '/';
@@ -232,29 +237,31 @@ const Header = () => {
                 </Dialog>
             )}
 
-            {(isAboutPage || isHomePage || isToolsPage) && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
+            {isClient && (isAboutPage || isHomePage || isToolsPage) && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
                 if (!open) {
                     setPassword("");
                     setPasswordError("");
                 }
                 setIsPasswordDialogOpen(open);
             }}>
-                <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleEditClick}
-                    className={cn(
-                    "transition-all",
-                    isEditMode && "ring-2 ring-primary ring-offset-2 ring-offset-background"
-                    )}
-                >
-                    {isEditMode ? (
-                    <Eye className="h-4 w-4" />
-                    ) : (
-                    <PencilRuler className="h-4 w-4" />
-                    )}
-                    <span className="sr-only">{isEditMode ? "Харах" : "Засварлах"}</span>
-                </Button>
+                <DialogTrigger asChild>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleEditClick}
+                        className={cn(
+                        "transition-all",
+                        isEditMode && "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                        )}
+                    >
+                        {isEditMode ? (
+                        <Eye className="h-4 w-4" />
+                        ) : (
+                        <PencilRuler className="h-4 w-4" />
+                        )}
+                        <span className="sr-only">{isEditMode ? "Харах" : "Засварлах"}</span>
+                    </Button>
+                </DialogTrigger>
                 <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Засварлах горим</DialogTitle>
