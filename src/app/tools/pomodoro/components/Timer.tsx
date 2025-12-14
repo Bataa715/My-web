@@ -134,16 +134,6 @@ export default function Timer() {
                                         className="col-span-3"
                                     />
                                 </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="long-break-time" className="text-right">Long Break</Label>
-                                    <Input
-                                        id="long-break-time"
-                                        type="number"
-                                        value={tempSettings.longBreak}
-                                        onChange={(e) => setTempSettings({...tempSettings, longBreak: Number(e.target.value)})}
-                                        className="col-span-3"
-                                    />
-                                </div>
                             </div>
                             <DialogFooter>
                                 <DialogClose asChild>
