@@ -36,8 +36,8 @@ interface OrbitItemProps {
 const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick, isEditing }) => {
     const angle = (index / total) * 2 * Math.PI;
     
-    const baseRadius = 130;
-    const mdBaseRadius = 160;
+    const baseRadius = 140;
+    const mdBaseRadius = 180;
     const editingRadius = 170;
     const mdEditingRadius = 210;
 
