@@ -6,6 +6,8 @@ import "./globals.css";
 import { FirebaseClientProvider } from "@/firebase/client-provider";
 import Footer from "@/components/footer";
 import { EditModeProvider } from "@/contexts/EditModeContext";
+import { ProjectProvider } from "@/contexts/ProjectContext";
+import { SkillsProvider } from "@/contexts/SkillsContext";
 
 export const metadata: Metadata = {
   title: "Kaizen",
@@ -39,18 +41,22 @@ export default function RootLayout({
         >
           <FirebaseClientProvider>
             <EditModeProvider>
-              <div className="relative flex min-h-screen flex-col">
-                <Header />
-                <main className="flex-1">
-                  <div className="page-container-wrapper rounded-lg">
-                    <div className="page-container p-4 sm:p-6 lg:p-8 rounded-lg">
-                      {children}
-                    </div>
+              <ProjectProvider>
+                <SkillsProvider>
+                  <div className="relative flex min-h-screen flex-col">
+                    <Header />
+                    <main className="flex-1">
+                      <div className="page-container-wrapper rounded-lg">
+                        <div className="page-container p-4 sm:p-6 lg:p-8 rounded-lg">
+                          {children}
+                        </div>
+                      </div>
+                    </main>
+                    <Footer />
                   </div>
-                </main>
-                <Footer />
-              </div>
-              <Toaster />
+                  <Toaster />
+                </SkillsProvider>
+              </ProjectProvider>
             </EditModeProvider>
           </FirebaseClientProvider>
         </AppThemeProvider>
