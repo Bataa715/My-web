@@ -8,7 +8,7 @@ export default function Home() {
   const heroImage = PlaceHolderImages.find(p => p.id === 'hero-background');
 
   return (
-    <div className="flex flex-col items-center justify-center text-center py-16 md:py-24">
+    <div className="flex flex-col items-center justify-center text-center py-16 md:py-24 min-h-[calc(100vh-120px)]">
        {heroImage && (
         <Image
           src={heroImage.imageUrl}
