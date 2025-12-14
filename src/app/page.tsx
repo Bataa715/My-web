@@ -18,17 +18,6 @@ export default function Home() {
           priority
         />
       )}
-      <div className="relative z-10 p-8 bg-background/50 dark:bg-background/60 backdrop-blur-sm rounded-xl shadow-lg border">
-        <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight text-primary animate-fade-in-down">
-          Kaizen
-        </h1>
-        <p className="mt-4 text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto">
-          Англи • Япон • Программчлал сурах хувийн систем
-        </p>
-        <Button asChild size="lg" className="mt-8 transform transition-transform hover:scale-105">
-          <Link href="/tools">Суралцаж эхлэх</Link>
-        </Button>
-      </div>
     </div>
   );
 }
