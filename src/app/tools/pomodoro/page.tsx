@@ -85,14 +85,10 @@ const PomodoroTimer = () => {
         <audio ref={audioRef} src="/sounds/timer-end.mp3" preload="auto" />
       <Card
         className={cn(
-          "w-full max-w-md text-center transition-colors duration-500",
+          "w-full max-w-md text-center transition-colors duration-500 pt-6",
           isBreak ? "bg-accent/10 dark:bg-accent/10 border-accent/20" : "bg-primary/10 dark:bg-primary/10 border-primary/20"
         )}
       >
-        <CardHeader>
-          <CardTitle className="text-4xl font-bold font-headline">{isBreak ? 'Завсарлага' : 'Хичээллэх'}</CardTitle>
-          <CardDescription>Төвлөрч, үр бүтээлтэй ажиллаарай.</CardDescription>
-        </CardHeader>
         <CardContent className="space-y-8">
           <div className="relative flex items-center justify-center">
              <svg className="transform -rotate-90 w-72 h-72">
