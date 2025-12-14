@@ -70,10 +70,13 @@ export default function VocabularyManager<T extends Word>({
 
   useEffect(() => {
     const fetchWords = async () => {
-        if (!firestore) return;
+        if (!firestore || !publicWordsCollection) {
+            setWords(initialWords.map(w => ({ ...w, memorized: false } as T)));
+            return;
+        };
         
         // 1. Fetch public words
-        const publicWordsQuery = query(publicWordsCollection!);
+        const publicWordsQuery = query(publicWordsCollection);
         const publicWordsSnapshot = await getDocs(publicWordsQuery);
         const publicWords = publicWordsSnapshot.docs.map(d => ({ ...d.data(), id: d.id, memorized: false } as T));
 
@@ -93,15 +96,17 @@ export default function VocabularyManager<T extends Word>({
 
         // 3. Merge public words with user's memorized status
         const mergedWords = publicWords.map(publicWord => {
-            const userWord = userWordMap.get(publicWord.id!);
-            if (userWord) {
-                userWordMap.delete(publicWord.id!); // Remove from map to leave only user-added words
-                return { ...publicWord, memorized: userWord.memorized };
+            const userWordStatus = userWordMap.get(publicWord.id!);
+            if (userWordStatus) {
+                // This is a public word that the user has interacted with (e.g., memorized).
+                // We remove it from the map because it's not a purely user-created word.
+                userWordMap.delete(publicWord.id!);
+                return { ...publicWord, memorized: userWordStatus.memorized };
             }
-            return publicWord; // User hasn't interacted with this public word
+            return publicWord;
         });
 
-        // 4. Add user-created words
+        // 4. The remaining words in the map are purely user-created words.
         const userAddedWords = Array.from(userWordMap.values());
         
         setWords([...mergedWords, ...userAddedWords]);
@@ -167,42 +172,48 @@ export default function VocabularyManager<T extends Word>({
     setCurrentWord(null);
   };
 
-  const handleDelete = async (id: string) => {
-      if (!user || !userWordsCollection) {
-          toast({ title: "Алдаа", description: "Устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
-          return;
-      };
+const handleDelete = async (id: string) => {
+    if (!user || !userWordsCollection) {
+        toast({ title: "Алдаа", description: "Устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
+        return;
+    };
 
-      const wordToDelete = words.find(w => w.id === id);
-      if (!wordToDelete) return;
+    const wordToDelete = words.find(w => w.id === id);
+    if (!wordToDelete) return;
+    
+    // Check if the word is part of the original public list.
+    // We check the initialWords prop which holds the original public words.
+    const isPublicWord = initialWords.some(initialWord => initialWord.word === wordToDelete.word);
+    
+    if (isPublicWord && publicWordsCollection) {
+        // Also check if it exists in the main public collection
+         const publicSnapshot = await getDocs(query(publicWordsCollection));
+         if (publicSnapshot.docs.some(doc => doc.id === id)) {
+              toast({
+                  title: "Боломжгүй",
+                  description: "Анхдагч үгийг устгах боломжгүй.",
+                  variant: "destructive"
+              });
+              return;
+         }
+    }
 
-      // Check if the word is an initial/public word.
-      // We can't delete from the public collection, so we prevent this.
-      const isPublicWord = initialWords.some(initialWord => initialWord.id === id);
-      if (isPublicWord) {
-          toast({
-              title: "Боломжгүй",
-              description: "Анхдагч үгийг устгах боломжгүй.",
-              variant: "destructive"
-          });
-          return;
-      }
 
-      // Optimistic UI update
-      const originalWords = words;
-      setWords(words.filter(w => w.id !== id));
+    // Optimistic UI update
+    const originalWords = words;
+    setWords(words.filter(w => w.id !== id));
 
-      try {
-          const docRef = doc(userWordsCollection, id);
-          await deleteDoc(docRef);
-          toast({ title: "Амжилттай устгалаа", variant: "destructive" });
-      } catch (e) {
-          // Rollback on error
-          setWords(originalWords);
-          toast({ title: "Алдаа гарлаа", description: "Үг устгахад алдаа гарлаа.", variant: "destructive" });
-          console.error("Error deleting word: ", e);
-      }
-  };
+    try {
+        const docRef = doc(userWordsCollection, id);
+        await deleteDoc(docRef);
+        toast({ title: "Амжилттай устгалаа", variant: "destructive" });
+    } catch (e) {
+        // Rollback on error
+        setWords(originalWords);
+        toast({ title: "Алдаа гарлаа", description: "Үг устгахад алдаа гарлаа.", variant: "destructive" });
+        console.error("Error deleting word: ", e);
+    }
+};
 
   const toggleMemorized = async (id: string, checked: boolean) => {
     if (!user || !userWordsCollection) {
@@ -325,7 +336,7 @@ export default function VocabularyManager<T extends Word>({
                             variant="ghost"
                             size="icon"
                             className="text-destructive hover:text-destructive"
-                            disabled={!user || initialWords.some(iw => iw.id === word.id)}
+                            disabled={!user}
                           >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -358,3 +369,5 @@ export default function VocabularyManager<T extends Word>({
     </Card>
   );
 }
+
+    
