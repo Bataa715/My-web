@@ -76,16 +76,18 @@ export default function ToolsPage() {
   return (
     <div className="relative min-h-[calc(100vh-57px-81px)]">
        {heroImage && (
-          <div className="absolute bottom-0 left-0 w-full h-[60vh] z-0">
-              <Image
-                  src={heroImage}
-                  alt="Abstract learning background"
-                  fill
-                  className="object-cover"
-                  data-ai-hint="abstract technology"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
-          </div>
+          <>
+            <div className="absolute bottom-0 left-0 w-full h-[60vh] z-0">
+                <Image
+                    src={heroImage}
+                    alt="Abstract learning background"
+                    fill
+                    className="object-cover"
+                    data-ai-hint="abstract technology"
+                />
+            </div>
+            <div className="absolute bottom-0 left-0 w-full h-[60vh] bg-gradient-to-t from-background to-transparent z-0"></div>
+          </>
         )}
        <div className="relative z-10 space-y-8 pt-8">
           <BackButton />
