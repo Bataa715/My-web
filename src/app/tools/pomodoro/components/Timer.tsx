@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -12,17 +12,15 @@ import { Play, Pause, RotateCw, Settings } from 'lucide-react';
 const defaultTimeSettings = {
     pomodoro: 25,
     shortBreak: 5,
-    longBreak: 15,
 };
 
-type Mode = 'pomodoro' | 'shortBreak' | 'longBreak';
+type Mode = 'pomodoro' | 'shortBreak';
 
 export default function Timer() {
     const [settings, setSettings] = useState(defaultTimeSettings);
     const [mode, setMode] = useState<Mode>('pomodoro');
     const [time, setTime] = useState(settings.pomodoro * 60);
     const [isActive, setIsActive] = useState(false);
-    const [pomodoroCount, setPomodoroCount] = useState(0);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [tempSettings, setTempSettings] = useState(settings);
 
@@ -35,6 +33,7 @@ export default function Timer() {
     }, [settings]);
 
     useEffect(() => {
+        // Reset timer to the current mode's time when settings change
         switchMode(mode);
     }, [settings, switchMode, mode]);
 
@@ -45,18 +44,16 @@ export default function Timer() {
                 setTime((prevTime) => prevTime - 1);
             }, 1000);
         } else if (isActive && time === 0) {
+            // Timer finished
             if (audioRef.current) {
                 audioRef.current.play();
             }
+            // Switch to the next mode
             if (mode === 'pomodoro') {
-                const newPomodoroCount = pomodoroCount + 1;
-                setPomodoroCount(newPomodoroCount);
-                if (newPomodoroCount % 4 === 0) {
-                    switchMode('longBreak');
-                } else {
-                    switchMode('shortBreak');
-                }
+                // If it was a pomodoro session, switch to break
+                switchMode('shortBreak');
             } else {
+                // If it was a break, switch back to pomodoro
                 switchMode('pomodoro');
             }
         }
@@ -66,7 +63,7 @@ export default function Timer() {
                 clearInterval(interval);
             }
         };
-    }, [isActive, time, mode, pomodoroCount, switchMode]);
+    }, [isActive, time, mode, switchMode]);
 
     const toggleTimer = () => {
         setIsActive(!isActive);
