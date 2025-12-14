@@ -3,10 +3,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import VocabularyManager from '@/components/shared/VocabularyManager';
 import GrammarList from '@/components/shared/GrammarList';
-import { getEnglishWords, getEnglishGrammar } from '@/lib/data';
 import type { EnglishWord, GrammarRule } from '@/lib/types';
 import { useEffect, useState } from 'react';
-import { useUser } from '@/firebase';
+import { useUser, useFirebase } from '@/firebase';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
 const englishColumns = [
     { key: 'word' as keyof EnglishWord, header: 'English Word' },
@@ -14,24 +14,37 @@ const englishColumns = [
 ];
 
 export default function EnglishPage() {
-    const { user } = useUser();
+    const { firestore } = useFirebase();
     const [initialEnglishWords, setInitialEnglishWords] = useState<EnglishWord[]>([]);
     const [englishGrammar, setEnglishGrammar] = useState<GrammarRule[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        async function getCollectionData<T>(collectionName: string, orderByField: string): Promise<T[]> {
+            try {
+                const colRef = collection(firestore, collectionName);
+                const q = query(colRef, orderBy(orderByField, 'asc'));
+                const snapshot = await getDocs(q);
+                if (snapshot.empty) return [];
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
+            } catch (error) {
+                console.error(`Error fetching ${collectionName}:`, error);
+                return [];
+            }
+        }
+
         async function fetchData() {
             setLoading(true);
             const [words, grammar] = await Promise.all([
-                getEnglishWords(),
-                getEnglishGrammar()
+                getCollectionData<EnglishWord>('englishWords', 'word'),
+                getCollectionData<GrammarRule>('englishGrammar', 'title')
             ]);
             setInitialEnglishWords(words);
             setEnglishGrammar(grammar);
             setLoading(false);
         }
         fetchData();
-    }, []);
+    }, [firestore]);
 
 
     if (loading) {

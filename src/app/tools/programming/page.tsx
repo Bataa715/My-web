@@ -5,22 +5,37 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ConceptCards from './components/ConceptCards';
 import CheatSheet from './components/CheatSheet';
 import ProgressTracker from './components/ProgressTracker';
-import { getProgrammingConcepts, getCheatSheetItems, getInitialProgressItems } from '@/lib/data';
 import type { ProgrammingConcept, CheatSheetItem, ProgressItem } from '@/lib/types';
+import { useFirebase } from '@/firebase';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
 export default function ProgrammingPage() {
+    const { firestore } = useFirebase();
     const [programmingConcepts, setProgrammingConcepts] = useState<ProgrammingConcept[]>([]);
     const [cheatSheetItems, setCheatSheetItems] = useState<CheatSheetItem[]>([]);
     const [initialProgressItems, setInitialProgressItems] = useState<ProgressItem[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        async function getCollectionData<T>(collectionName: string, orderByField: string): Promise<T[]> {
+            try {
+                const colRef = collection(firestore, collectionName);
+                const q = query(colRef, orderBy(orderByField, 'asc'));
+                const snapshot = await getDocs(q);
+                if (snapshot.empty) return [];
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
+            } catch (error) {
+                console.error(`Error fetching ${collectionName}:`, error);
+                return [];
+            }
+        }
+        
         async function fetchData() {
             setLoading(true);
             const [concepts, cheats, progress] = await Promise.all([
-                getProgrammingConcepts(),
-                getCheatSheetItems(),
-                getInitialProgressItems()
+                getCollectionData<ProgrammingConcept>('programmingConcepts', 'title'),
+                getCollectionData<CheatSheetItem>('cheatSheetItems', 'title'),
+                getCollectionData<ProgressItem>('progressItems', 'label')
             ]);
             setProgrammingConcepts(concepts);
             setCheatSheetItems(cheats);
@@ -28,7 +43,7 @@ export default function ProgrammingPage() {
             setLoading(false);
         }
         fetchData();
-    }, []);
+    }, [firestore]);
 
     if (loading) {
         return <div>Loading...</div>
