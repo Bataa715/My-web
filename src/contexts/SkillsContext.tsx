@@ -7,13 +7,6 @@ import { useFirebase } from '@/firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, Timestamp, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
-const initialSkills: Omit<Skill, 'id' | 'createdAt'>[] = [
-    { name: 'Програмчлалын хэл', icon: 'Code', items: ['JavaScript (ES6+)', 'TypeScript', 'Python', 'HTML/CSS'] },
-    { name: 'Framework & Libraries', icon: 'Library', items: ['React', 'Next.js', 'Node.js', 'Express', 'Tailwind CSS'] },
-    { name: 'Багж хэрэгсэл', icon: 'Terminal', items: ['Git & GitHub', 'Docker', 'VS Code', 'Figma', 'Firebase'] },
-    { name: 'Мэдээллийн сан', icon: 'Database', items: ['MongoDB', 'PostgreSQL', 'MySQL', 'Firestore'] },
-];
-
 interface SkillsContextType {
   skills: Skill[];
   loading: boolean;
@@ -43,7 +36,13 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
         const q = query(skillsCollectionRef, orderBy("createdAt", "asc"));
         const skillsSnapshot = await getDocs(q);
         if (skillsSnapshot.empty) {
-          const batch = initialSkills.map(s => addDocumentNonBlocking(skillsCollectionRef, { ...s, createdAt: serverTimestamp() }));
+          const initialSkillsData: Omit<Skill, 'id' | 'createdAt'>[] = [
+              { name: 'Програмчлалын хэл', icon: 'Code', items: ['JavaScript (ES6+)', 'TypeScript', 'Python', 'HTML/CSS'] },
+              { name: 'Framework & Libraries', icon: 'Library', items: ['React', 'Next.js', 'Node.js', 'Express', 'Tailwind CSS'] },
+              { name: 'Багж хэрэгсэл', icon: 'Terminal', items: ['Git & GitHub', 'Docker', 'VS Code', 'Figma', 'Firebase'] },
+              { name: 'Мэдээллийн сан', icon: 'Database', items: ['MongoDB', 'PostgreSQL', 'MySQL', 'Firestore'] },
+          ];
+          const batch = initialSkillsData.map(s => addDocumentNonBlocking(skillsCollectionRef, { ...s, createdAt: serverTimestamp() }));
           await Promise.all(batch);
           const newSnapshot = await getDocs(q);
           const skillsList = newSnapshot.docs.map(doc => {

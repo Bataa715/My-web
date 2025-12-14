@@ -20,7 +20,7 @@ export function AddSkillDialog({ children }: AddSkillDialogProps) {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const skillItems = items.split(",").map(skill => skill.trim());
+        const skillItems = items.split(",").map(skill => skill.trim()).filter(skill => skill.length > 0);
 
         if (name && icon && skillItems.length > 0) {
             addSkillGroup({ name, icon, items: skillItems });
