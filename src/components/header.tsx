@@ -16,8 +16,12 @@ import { usePathname } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { UserProfile } from '@/lib/types';
-import { mainLinks } from '@/lib/site-navigation';
 
+const mainLinks = [
+  { href: "/", label: "Нүүр" },
+  { href: "/about", label: "Миний тухай" },
+  { href: "/tools", label: "Хэрэгсэл" },
+];
 
 const CORRECT_PASSWORD = "Bataa2480";
 
@@ -274,5 +278,3 @@ const Header = () => {
 };
 
 export default Header;
-
-    
