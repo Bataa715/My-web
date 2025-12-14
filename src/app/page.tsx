@@ -35,14 +35,17 @@ export default function Home() {
   return (
     <div className="relative flex flex-col items-center justify-center text-center h-[calc(100vh-57px-81px)] -m-4 sm:-m-6 lg:-m-8">
       {heroImage && (
-        <Image
-          src={heroImage}
-          alt="Abstract learning background"
-          fill
-          className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-10 dark:opacity-5"
-          data-ai-hint="abstract library"
-          priority
-        />
+        <>
+          <Image
+            src={heroImage}
+            alt="Abstract learning background"
+            fill
+            className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-25 dark:opacity-15"
+            data-ai-hint="abstract library"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10"></div>
+        </>
       )}
     </div>
   );
