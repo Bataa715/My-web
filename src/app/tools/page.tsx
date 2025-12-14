@@ -26,7 +26,7 @@ const tools = [
   },
   {
     title: "Code",
-    description: "Code surah",
+    description: "Code сурах",
     href: "/tools/programming",
     icon: <CodeIcon className="h-6 w-6" />
   },
@@ -75,18 +75,18 @@ export default function ToolsPage() {
 
   return (
     <div className="relative">
-      <div className="absolute top-0 left-0 w-full h-3/4 -z-10">
-         {heroImage && (
-            <Image
-                src={heroImage}
-                alt="Abstract technology background"
-                fill
-                className="object-cover"
-                data-ai-hint="abstract technology"
-            />
-         )}
-         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
-      </div>
+      {heroImage && (
+          <div className="absolute top-0 left-0 w-full h-3/4 -z-10">
+              <Image
+                  src={heroImage}
+                  alt="Abstract technology background"
+                  fill
+                  className="object-cover"
+                  data-ai-hint="abstract technology"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+          </div>
+      )}
       
       <div className="relative space-y-8 pt-16">
         <BackButton />
