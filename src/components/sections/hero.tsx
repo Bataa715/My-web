@@ -17,6 +17,7 @@ import type { OrbitInfo } from "@/lib/types";
 import { useEditMode } from "@/contexts/EditModeContext";
 import Image from "next/image";
 import { useFirebase } from "@/firebase";
+import { initialOrbitInfo as dataOrbitInfo } from "@/lib/data";
 
 const { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, LinkIcon, AlertTriangle, Pencil, Upload } = Icons;
 
@@ -27,13 +28,6 @@ const staticPersonalInfo = {
     instagram: "https://instagram.com/batmyagmar",
     email: "batmyagmar.b@gmail.com",
 };
-
-const initialOrbitInfo: OrbitInfo[] = [
-    { id: 'about', icon: 'User', title: 'Миний тухай', content: 'Би 20 настай, Мэдээллийн технологийн инженер мэргэжлээр суралцдаг. Вэб болон програм хангамж хөгжүүлэлтээр дагнаж, сүүлийн үеийн технологиудыг судлах сонирхолтой.' },
-    { id: 'hobbies', icon: 'GameController', title: 'Хобби', content: 'Чөлөөт цагаараа би код бичих, шинэ технологи судлах, мөн уран зөгнөлт ном унших дуртай.' },
-    { id: 'song', icon: 'Music', title: 'Дуу', content: 'Одоогоор сонсож буй дуртай дуу.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
-];
-
 
 const defaultProfileImage = "https://images.unsplash.com/photo-1607878111648-75872a0a0736?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NjU1Mjc1NTN8MA&ixlib=rb-4.1.0&q=80&w=1080";
 
@@ -120,7 +114,7 @@ export default function Hero() {
   const [profileImage, setProfileImage] = useState<string>('');
   const [bio, setBio] = useState(staticPersonalInfo.bio);
   const [name, setName] = useState(staticPersonalInfo.name);
-  const [orbitInfo, setOrbitInfo] = useState<OrbitInfo[]>(initialOrbitInfo);
+  const [orbitInfo, setOrbitInfo] = useState<OrbitInfo[]>(dataOrbitInfo);
 
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [editedBio, setEditedBio] = useState(bio);
@@ -149,7 +143,7 @@ export default function Hero() {
             setName(staticPersonalInfo.name);
             setProfileImage(defaultProfileImage);
             setEditedImage(defaultProfileImage);
-            setOrbitInfo(initialOrbitInfo);
+            setOrbitInfo(dataOrbitInfo);
             setLoading(false);
         }
         return;
@@ -167,7 +161,7 @@ export default function Hero() {
           setProfileImage(imageUrl);
           setEditedImage(imageUrl);
           
-          const fetchedOrbitInfo = (data.orbitInfo || initialOrbitInfo).map((item: any) => {
+          const fetchedOrbitInfo = (data.orbitInfo || dataOrbitInfo).map((item: any) => {
             if (item.id === 'song' && !item.type) {
               return { ...item, type: 'audio' };
             }
@@ -183,14 +177,14 @@ export default function Hero() {
             name: staticPersonalInfo.name,
             bio: staticPersonalInfo.bio,
             profileImage: defaultProfileImage,
-            orbitInfo: initialOrbitInfo
+            orbitInfo: dataOrbitInfo
           });
           setBio(staticPersonalInfo.bio);
           setEditedBio(staticPersonalInfo.bio);
           setName(staticPersonalInfo.name);
           setProfileImage(defaultProfileImage);
           setEditedImage(defaultProfileImage);
-          setOrbitInfo(initialOrbitInfo);
+          setOrbitInfo(dataOrbitInfo);
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
@@ -200,7 +194,7 @@ export default function Hero() {
         setName(staticPersonalInfo.name);
         setProfileImage(defaultProfileImage);
         setEditedImage(defaultProfileImage);
-        setOrbitInfo(initialOrbitInfo);
+        setOrbitInfo(dataOrbitInfo);
       } finally {
         setLoading(false);
       }
@@ -555,3 +549,5 @@ export default function Hero() {
     </section>
   );
 }
+
+    
