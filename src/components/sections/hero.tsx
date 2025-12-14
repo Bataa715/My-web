@@ -30,22 +30,32 @@ interface OrbitItemProps {
   total: number;
   selectedOrbit: OrbitInfo | null;
   onItemClick: (item: OrbitInfo) => void;
+  isEditing: boolean;
 }
 
-const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick }) => {
+const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick, isEditing }) => {
     const angle = (index / total) * 2 * Math.PI;
-    const radius = 130;
-    const mdRadius = 160;
-    const [currentRadius, setCurrentRadius] = useState(radius);
+    
+    const baseRadius = 130;
+    const mdBaseRadius = 160;
+    const editingRadius = 140;
+    const mdEditingRadius = 180;
+
+    const [currentRadius, setCurrentRadius] = useState(baseRadius);
 
     useEffect(() => {
         const updateRadius = () => {
-            setCurrentRadius(window.innerWidth < 768 ? radius : mdRadius);
+            const isMd = window.innerWidth >= 768;
+            if (isEditing) {
+                setCurrentRadius(isMd ? mdEditingRadius : editingRadius);
+            } else {
+                setCurrentRadius(isMd ? mdBaseRadius : baseRadius);
+            }
         };
         window.addEventListener('resize', updateRadius);
         updateRadius();
         return () => window.removeEventListener('resize', updateRadius);
-    }, []);
+    }, [isEditing]);
 
     const xPos = Math.cos(angle) * currentRadius;
     const yPos = Math.sin(angle) * currentRadius;
@@ -57,15 +67,13 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
             style={{
                 top: '50%',
                 left: '50%',
-                x: `${xPos}px`,
-                y: `${yPos}px`,
-                translateX: '-50%',
-                translateY: '-50%',
             }}
-            initial={{ opacity: 0, scale: 0 }}
+            initial={{ opacity: 0, scale: 0, x: '-50%', y: '-50%' }}
             animate={{
                 opacity: 1,
                 scale: 1,
+                x: `calc(-50% + ${xPos}px)`,
+                y: `calc(-50% + ${yPos}px)`,
             }}
             transition={{ duration: 0.5, delay: 0.5 + index * 0.1, type: "spring", stiffness: 120 }}
         >
@@ -548,6 +556,7 @@ export default function Hero() {
                      total={orbitInfo.length}
                      selectedOrbit={selectedOrbit}
                      onItemClick={orbitItemClick}
+                     isEditing={isEditingOrbit}
                    />
                 ))}
                 
