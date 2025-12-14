@@ -1,9 +1,10 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { ArrowRight, Timer, Code, BookOpen } from "lucide-react";
+import { ArrowRight, Timer, Code as CodeIcon, BookOpen } from "lucide-react";
 import BackButton from "@/components/shared/BackButton";
 import { useFirebase } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -25,10 +26,10 @@ const tools = [
     icon: <BookOpen className="h-6 w-6" />
   },
   {
-    title: "Программчлал",
+    title: "Code",
     description: "Үндсэн ойлголтууд, cheat sheets, ахиц хянагч.",
     href: "/tools/programming",
-    icon: <Code className="h-6 w-6" />
+    icon: <CodeIcon className="h-6 w-6" />
   },
   {
     title: "Pomodoro Timer",
@@ -74,9 +75,9 @@ export default function ToolsPage() {
     }, [user, firestore, isUserLoading]);
 
   return (
-    <div className="relative">
+    <div className="relative min-h-[calc(100vh-57px-81px)]">
        {heroImage && (
-        <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
+        <div className="absolute bottom-0 left-0 w-full h-[60vh] -z-0">
           <Image
             src={heroImage}
             alt="Abstract technology background"
@@ -84,10 +85,10 @@ export default function ToolsPage() {
             className="object-cover"
             data-ai-hint="abstract technology"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+           <div className="absolute inset-0 z-10 bg-gradient-to-t from-background to-transparent"></div>
         </div>
       )}
-       <div className="relative space-y-8">
+       <div className="relative z-20 space-y-8">
           <BackButton />
           <div className="text-center">
             <h1 className="text-3xl font-bold font-headline">Хэрэгслүүд</h1>
