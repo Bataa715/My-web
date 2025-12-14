@@ -132,8 +132,3 @@
   animation: rotate-glow-circle 3s linear infinite;
   transform-origin: center center;
 }
-
-.avatar-glow-wrapper > * {
-    position: relative;
-    z-index: 1;
-}
