@@ -74,22 +74,20 @@ export default function ToolsPage() {
     }, [user, firestore, isUserLoading]);
 
   return (
-    <div className="relative min-h-[calc(100vh-57px-81px)]">
+    <div className="relative">
        {heroImage && (
-          <>
-            <div className="absolute bottom-0 left-0 w-full h-[60vh] z-0">
-                <Image
-                    src={heroImage}
-                    alt="Abstract learning background"
-                    fill
-                    className="object-cover"
-                    data-ai-hint="abstract technology"
-                />
-            </div>
-            <div className="absolute bottom-0 left-0 w-full h-[60vh] bg-gradient-to-t from-background to-transparent z-10"></div>
-          </>
-        )}
-       <div className="relative z-20 space-y-8 pt-8">
+        <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
+          <Image
+            src={heroImage}
+            alt="Abstract technology background"
+            fill
+            className="object-cover"
+            data-ai-hint="abstract technology"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+        </div>
+      )}
+       <div className="relative space-y-8">
           <BackButton />
           <div className="text-center">
             <h1 className="text-3xl font-bold font-headline">Хэрэгслүүд</h1>
@@ -98,7 +96,7 @@ export default function ToolsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
             {tools.map((tool) => (
               <Link href={tool.href} key={tool.title} className="group">
                 <Card className="h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1">
