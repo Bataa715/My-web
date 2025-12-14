@@ -168,25 +168,40 @@ export default function VocabularyManager<T extends Word>({
   };
 
   const handleDelete = async (id: string) => {
-    if (!user || !userWordsCollection) return;
+      if (!user || !userWordsCollection) {
+          toast({ title: "Алдаа", description: "Устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
+          return;
+      };
 
-    if (initialWords.some(iw => iw.id === id)) {
-      toast({ title: "Анхааруулга", description: "Анхдагч үгийг устгах боломжгүй.", variant: "destructive" });
-      return;
-    }
-    
-    const originalWords = words;
-    setWords(words.filter(w => w.id !== id));
-    
-    try {
-        const docRef = doc(userWordsCollection, id);
-        await deleteDoc(docRef);
-        toast({ title: "Амжилттай устгалаа", variant: "destructive" });
-    } catch(e) {
-        setWords(originalWords); // rollback
-        toast({ title: "Алдаа гарлаа", description: "Үг устгахад алдаа гарлаа.", variant: "destructive" });
-        console.error("Error deleting word: ", e);
-    }
+      const wordToDelete = words.find(w => w.id === id);
+      if (!wordToDelete) return;
+
+      // Check if the word is an initial/public word.
+      // We can't delete from the public collection, so we prevent this.
+      const isPublicWord = initialWords.some(initialWord => initialWord.id === id);
+      if (isPublicWord) {
+          toast({
+              title: "Боломжгүй",
+              description: "Анхдагч үгийг устгах боломжгүй.",
+              variant: "destructive"
+          });
+          return;
+      }
+
+      // Optimistic UI update
+      const originalWords = words;
+      setWords(words.filter(w => w.id !== id));
+
+      try {
+          const docRef = doc(userWordsCollection, id);
+          await deleteDoc(docRef);
+          toast({ title: "Амжилттай устгалаа", variant: "destructive" });
+      } catch (e) {
+          // Rollback on error
+          setWords(originalWords);
+          toast({ title: "Алдаа гарлаа", description: "Үг устгахад алдаа гарлаа.", variant: "destructive" });
+          console.error("Error deleting word: ", e);
+      }
   };
 
   const toggleMemorized = async (id: string, checked: boolean) => {
