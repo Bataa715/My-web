@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, LockKeyhole } from 'lucide-react';
+import { Menu, PencilRuler, Eye, LockKeyhole, Image as ImageIcon, Save, Loader2 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -12,9 +12,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { AddProjectDialog } from './AddProjectDialog';
-import { AddSkillDialog } from './AddSkillDialog';
 import { usePathname } from 'next/navigation';
+import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-images';
 
 const mainLinks = [
   { href: "/", label: "Нүүр" },
@@ -33,7 +32,21 @@ const Header = () => {
     const { toast } = useToast();
     const pathname = usePathname();
     const isAboutPage = pathname === '/about';
-    
+    const isHomePage = pathname === '/';
+
+    const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
+    const [editedImageUrl, setEditedImageUrl] = useState('');
+    const [heroImage, setHeroImage] = useState<ImagePlaceholder | undefined>(undefined);
+    const [saving, setSaving] = useState(false);
+
+    useEffect(() => {
+        const image = PlaceHolderImages.find(p => p.id === 'hero-background');
+        setHeroImage(image);
+        if (image) {
+        setEditedImageUrl(image.imageUrl);
+        }
+    }, []);
+
     const handleEditClick = () => {
       if (isEditMode) {
         setIsEditMode(false);
@@ -55,6 +68,27 @@ const Header = () => {
       } else {
         setPasswordError("Нууц үг буруу байна.");
       }
+    };
+
+    const handleSaveImage = () => {
+        if (heroImage) {
+            setSaving(true);
+            setTimeout(() => {
+                const updatedImage = { ...heroImage, imageUrl: editedImageUrl };
+                const imageIndex = PlaceHolderImages.findIndex(p => p.id === 'hero-background');
+                if (imageIndex !== -1) {
+                    PlaceHolderImages[imageIndex] = updatedImage;
+                }
+                setSaving(false);
+                setIsImageEditingOpen(false);
+                toast({
+                    title: 'Амжилттай',
+                    description: 'Арын зураг шинэчлэгдлээ.',
+                });
+                // Force a reload to see the change as we can't directly update the page's state
+                window.location.reload();
+            }, 1000);
+        }
     };
 
   return (
@@ -120,6 +154,47 @@ const Header = () => {
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-2">
+             {isEditMode && isHomePage && (
+                <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" size="icon">
+                            <ImageIcon className="h-4 w-4" />
+                            <span className="sr-only">Арын зураг солих</span>
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Арын зургийн холбоос</DialogTitle>
+                            <DialogDescription>
+                            Шинэ зургийнхаа URL хаягийг энд буулгана уу.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="image-url" className="text-right">
+                                URL
+                            </Label>
+                            <Input
+                                id="image-url"
+                                value={editedImageUrl}
+                                onChange={(e) => setEditedImageUrl(e.target.value)}
+                                className="col-span-3"
+                                placeholder="https://example.com/image.png"
+                            />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <DialogClose asChild>
+                            <Button type="button" variant="secondary">Цуцлах</Button>
+                            </DialogClose>
+                            <Button type="button" onClick={handleSaveImage} disabled={saving}>
+                            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />} Хадгалах
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+            )}
+
             {isAboutPage && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
                 if (!open) {
                     setPassword("");
