@@ -33,18 +33,11 @@ const Skills = () => {
     };
 
     return (
-        <section id="skills" className="py-12 md:py-24 lg:py-32 bg-muted/50">
+        <section id="skills" className="py-12 md:py-24 lg:py-32">
             <div className="container">
                 <div className="mb-12 text-center space-y-4">
-                    <h2 className="text-4xl font-bold font-headline">Миний ур чадварууд</h2>
-                    <p className="mt-2 text-muted-foreground max-w-[900px] mx-auto md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">Би ямар технологиуд дээр ажилладаг вэ?</p>
-                    {isEditMode && (
-                        <AddSkillDialog>
-                            <Button>
-                                <PlusCircle className="mr-2 h-4 w-4" /> Шинэ бүлэг нэмэх
-                            </Button>
-                        </AddSkillDialog>
-                    )}
+                    <h2 className="text-4xl font-bold font-headline">Ур чадвар &amp; Технологиуд</h2>
+                    <p className="mt-2 text-muted-foreground max-w-[900px] mx-auto md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">Миний эзэмшсэн програмчлалын хэл, фрэймворк, багажууд.</p>
                 </div>
 
                 {loading && (
@@ -70,7 +63,7 @@ const Skills = () => {
                 {!loading && (
                      <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                         {skills.map((skillGroup) => (
-                            <Card key={skillGroup.id} className="hover:shadow-md transition-shadow duration-300 relative group">
+                            <Card key={skillGroup.id} className="hover:shadow-lg transition-shadow duration-300 relative group bg-muted/30">
                                 {isEditMode && (
                                     <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <EditSkillDialog skillGroup={skillGroup}>
@@ -107,7 +100,7 @@ const Skills = () => {
                                 <CardContent>
                                     <div className="flex flex-wrap gap-2">
                                         {skillGroup.items.map((item, index) => (
-                                            <Badge key={index} variant="outline" className="text-sm font-medium">
+                                            <Badge key={index} variant="secondary" className="text-sm font-medium">
                                                 {item}
                                             </Badge>
                                         ))}

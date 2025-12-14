@@ -3,17 +3,17 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, LockKeyhole } from 'lucide-react';
+import { Menu, PencilRuler, Eye, LockKeyhole, PlusCircle } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from './ui/dialog';
-import AddProject from './sections/add-project';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { AddProjectDialog } from './AddProjectDialog';
+import { AddSkillDialog } from './AddSkillDialog';
 
 const navLinks = [
   { href: "#home", label: "Нүүр" },
@@ -61,7 +61,7 @@ const Header = () => {
         <div className="mr-4 hidden md:flex">
             <Link href="/" className="mr-6 flex items-center space-x-2">
                 <span className="hidden font-bold sm:inline-block font-headline">
-                Б.Батмягмар
+                Ka1_zen
                 </span>
             </Link>
             <nav className="flex items-center gap-4 text-sm">
@@ -74,9 +74,16 @@ const Header = () => {
                     {link.label}
                 </Link>
                 ))}
-                <AddProjectDialog>
-                    <Button variant="ghost" className="transition-colors hover:text-foreground/80 text-foreground/60 px-0">Төсөл нэмэх</Button>
-                </AddProjectDialog>
+                {isEditMode && (
+                  <>
+                    <AddProjectDialog>
+                        <Button variant="ghost" className="transition-colors hover:text-foreground/80 text-foreground/60 px-0">Төсөл нэмэх</Button>
+                    </AddProjectDialog>
+                    <AddSkillDialog>
+                         <Button variant="ghost" className="transition-colors hover:text-foreground/80 text-foreground/60 px-0">Ур чадвар нэмэх</Button>
+                    </AddSkillDialog>
+                  </>
+                )}
             </nav>
         </div>
         <div className="flex-1 md:hidden">
@@ -96,7 +103,7 @@ const Header = () => {
                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               </SheetHeader>
               <Link href="/" className="mr-6 flex items-center space-x-2" onClick={() => setIsOpen(false)}>
-                <span className="font-bold font-headline">Б.Батмягмар</span>
+                <span className="font-bold font-headline">Ka1_zen</span>
               </Link>
               <nav className="flex flex-col space-y-4 mt-6">
                 {navLinks.map((link) => (
@@ -109,9 +116,16 @@ const Header = () => {
                     {link.label}
                   </Link>
                 ))}
-                 <AddProjectDialog>
-                    <Button variant="link" className="text-sm font-medium transition-colors hover:text-primary justify-start p-0">Төсөл нэмэх</Button>
-                </AddProjectDialog>
+                {isEditMode && (
+                  <>
+                    <AddProjectDialog>
+                        <Button variant="link" className="text-sm font-medium transition-colors hover:text-primary justify-start p-0">Төсөл нэмэх</Button>
+                    </AddProjectDialog>
+                    <AddSkillDialog>
+                        <Button variant="link" className="text-sm font-medium transition-colors hover:text-primary justify-start p-0">Ур чадвар нэмэх</Button>
+                    </AddSkillDialog>
+                  </>
+                )}
               </nav>
             </SheetContent>
           </Sheet>

@@ -22,7 +22,7 @@ const { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, LinkIcon, AlertTr
 
 const staticPersonalInfo = {
     name: "Б.Батмягмар",
-    bio: "Би програм хангамж хөгжүүлэлт, хиймэл оюун ухаан, өгөгдлийн шинжлэх ухааны чиглэлээр ажилладаг.",
+    bio: "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.",
     github: "https://github.com/batmyagmar",
     instagram: "https://instagram.com/batmyagmar",
     email: "batmyagmar.b@gmail.com",
@@ -207,7 +207,7 @@ export default function Hero() {
     };
     fetchUserInfo();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, firestore, userInfoDocRef]);
+  }, [user, firestore]);
 
   const handleSaveOrbitInfo = async () => {
     if (!selectedOrbit || !userInfoDocRef) return;
@@ -291,7 +291,7 @@ export default function Hero() {
   
   if (loading) {
     return (
-      <section id="home" className="py-12 md:py-24 lg:py-32 bg-card border-b">
+      <section id="home" className="w-full min-h-[calc(100vh-57px)] flex items-center justify-center">
         <div className="container px-4 md:px-6 flex items-center justify-center">
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </div>
@@ -328,7 +328,7 @@ export default function Hero() {
   };
 
   return (
-    <section id="home" className="py-12 md:py-24 lg:py-32 bg-card border-b">
+    <section id="home" className="w-full min-h-[calc(100vh-57px)] flex items-center">
       <div className="container px-4 md:px-6">
         <div className="grid items-center justify-center gap-10 lg:grid-cols-2 lg:gap-20">
           <div className="flex flex-col justify-center space-y-6">
@@ -342,7 +342,7 @@ export default function Hero() {
                     <Textarea
                       value={editedBio}
                       onChange={(e) => setEditedBio(e.target.value)}
-                      className="max-w-[600px] md:text-xl"
+                      className="max-w-[600px] md:text-xl bg-muted/50"
                       rows={4}
                     />
                     <div className="flex gap-2">
@@ -397,7 +397,7 @@ export default function Hero() {
                             animate={{ rotateY: 0, opacity: 1, scale: 1 }}
                             exit={{ rotateY: 180, opacity: 0, scale: 0.8 }}
                             transition={{ duration: 0.6, ease: "easeInOut" }}
-                            className="absolute inset-0 flex flex-col items-center justify-center bg-card rounded-full border-4 border-primary shadow-lg p-6 text-center overflow-hidden"
+                            className="absolute inset-0 flex flex-col items-center justify-center bg-muted rounded-full border-4 border-primary shadow-lg p-6 text-center overflow-hidden"
                             onClick={handleCloseContent}
                         >
                            {selectedOrbit.type !== 'audio' && selectedOrbit.backgroundImage && (
@@ -407,7 +407,7 @@ export default function Hero() {
                                     alt={selectedOrbit.title}
                                     fill
                                     objectFit="cover"
-                                    className="z-0"
+                                    className="z-0 opacity-20"
                                 />
                                  <div className="absolute inset-0 bg-black/50 z-10" />
                               </>
@@ -473,7 +473,7 @@ export default function Hero() {
                                                  <p className="text-lg text-foreground">{selectedOrbit.content}</p>
                                             )
                                         ) : (
-                                            <p className="text-lg text-white">{selectedOrbit.content}</p>
+                                            <p className="text-lg text-foreground">{selectedOrbit.content}</p>
                                         )}
                                         {isEditMode && (
                                             <Button
@@ -495,13 +495,10 @@ export default function Hero() {
                             animate={{ rotateY: 0, opacity: 1, scale: 1 }}
                             exit={{ rotateY: -180, opacity: 0, scale: 0.8 }}
                             transition={{ duration: 0.6, ease: "easeInOut" }}
-                            className="absolute inset-0"
+                            className="absolute inset-0 flex items-center justify-center"
                         >
-                            <div className="avatar-glow-wrapper p-1 h-full w-full">
-                                <Avatar className="h-full w-full border-2 border-primary/50 shadow-lg">
-                                    <AvatarImage src={profileImage} alt={name} data-ai-hint="man sunset" />
-                                    <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-                                </Avatar>
+                            <div className="w-full h-full rounded-full bg-muted flex items-center justify-center text-8xl font-bold text-primary opacity-50">
+                                {name.charAt(0)}
                             </div>
                         </motion.div>
                     )}
@@ -518,17 +515,6 @@ export default function Hero() {
                    />
                 ))}
                 
-                {isEditMode && (
-                  <Button
-                      variant="outline"
-                      size="icon"
-                      className="absolute bottom-4 right-4 h-12 w-12 rounded-full z-10"
-                      onClick={() => setIsEditingImage(true)}
-                  >
-                      <Edit className="h-6 w-6" />
-                      <span className="sr-only">Change Profile Picture</span>
-                  </Button>
-                )}
             </div>
           </div>
         </div>
