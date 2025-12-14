@@ -109,7 +109,10 @@ export default function ToolsPage() {
             </div>
             
             {heroImage && (
-              <div className="absolute inset-0 w-full h-full">
+              <div 
+                className="absolute inset-0 w-full h-full"
+                style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }}
+              >
                   <Image
                       src={heroImage}
                       alt="Abstract learning background"
@@ -117,7 +120,9 @@ export default function ToolsPage() {
                       className="object-cover"
                       data-ai-hint="abstract library"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"
+                  ></div>
               </div>
             )}
         </div>
