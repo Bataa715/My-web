@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Timer } from "lucide-react";
 
 const tools = [
   {
@@ -17,6 +17,12 @@ const tools = [
     title: "Программчлал",
     description: "Үндсэн ойлголтууд, cheat sheets, ахиц хянагч.",
     href: "/tools/programming",
+  },
+  {
+    title: "Pomodoro Timer",
+    description: "Хичээллэх, завсарлах хугацааг удирдах.",
+    href: "/tools/pomodoro",
+    icon: <Timer className="h-6 w-6" />
   },
 ];
 
@@ -36,7 +42,10 @@ export default function ToolsPage() {
             <Card className="h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>{tool.title}</span>
+                  <span className="flex items-center gap-2">
+                    {tool.icon}
+                    {tool.title}
+                  </span>
                   <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
                 </CardTitle>
               </CardHeader>
