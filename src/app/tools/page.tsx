@@ -90,9 +90,7 @@ export default function ToolsPage() {
       <div className="space-y-8">
         <BackButton />
         <div className="text-center">
-          <p className="text-muted-foreground">
-            Суралцах үйл явцад тань туслах хэрэгслүүдийн цуглуулга.
-          </p>
+          
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
