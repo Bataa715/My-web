@@ -9,16 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 const mainLinks = [
   { href: "/", label: "Нүүр" },
   { href: "/about", label: "My CV" },
+  { href: "/tools", label: "Tools" },
 ];
 
 const toolsLinks = [
@@ -37,7 +32,7 @@ export function Header() {
       onClick={() => setIsMobileMenuOpen(false)}
       className={cn(
         "transition-colors hover:text-primary",
-        pathname === href ? "text-primary font-semibold" : "text-muted-foreground",
+        pathname.startsWith(href) && href !== '/' || pathname === href ? "text-primary font-semibold" : "text-muted-foreground",
         className
       )}
     >
@@ -57,23 +52,6 @@ export function Header() {
             {mainLinks.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className={cn("text-sm font-medium transition-colors hover:text-primary focus-visible:ring-0", pathname.startsWith('/tools') ? "text-primary font-semibold" : "text-muted-foreground")}>
-                  Tools <ChevronDown className="relative top-[1px] ml-1 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                 <DropdownMenuItem asChild>
-                  <Link href="/tools">All Tools</Link>
-                </DropdownMenuItem>
-                {toolsLinks.map((link) => (
-                  <DropdownMenuItem key={link.href} asChild>
-                    <Link href={link.href}>{link.label}</Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </nav>
         </div>
         
