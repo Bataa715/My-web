@@ -35,13 +35,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { PlusCircle, Edit, Trash2, X } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, X, Pilcrow } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
 import { useFirebase } from '@/firebase';
 import { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, setDoc, query } from "firebase/firestore";
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from './scroll-area';
 
 type Word = EnglishWord | JapaneseWord;
 
@@ -63,6 +64,7 @@ export default function VocabularyManager<T extends Word>({
   const { firestore, user } = useFirebase();
   const [words, setWords] = useState<T[]>(initialWords);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAlphabetModalOpen, setIsAlphabetModalOpen] = useState(false);
   const [currentWord, setCurrentWord] = useState<T | null>(null);
   const [filter, setFilter] = useState<'all' | 'memorized' | 'not-memorized'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -157,18 +159,11 @@ export default function VocabularyManager<T extends Word>({
     });
 
     try {
-      if (currentWord?.id) { 
+      if (currentWord?.id) {
+        // This is a user-created word, update all fields
         const docRef = doc(userWordsCollection, currentWord.id);
-        
-        if (initialWords.some(w => w.id === currentWord.id)) {
-            // This is a public word, only update memorized status
-            await setDoc(docRef, { memorized: currentWord.memorized }, { merge: true });
-        } else {
-            // This is a user-created word, update all fields
-            await updateDoc(docRef, newWordData);
-            setWords(words.map(w => w.id === currentWord.id ? { ...w, ...newWordData } as T : w));
-        }
-
+        await updateDoc(docRef, newWordData);
+        setWords(words.map(w => w.id === currentWord.id ? { ...w, ...newWordData } as T : w));
         toast({ title: "Амжилттай заслаа", description: "Үгийн мэдээлэл шинэчлэгдлээ." });
       } else {
         const docRef = await addDoc(userWordsCollection, newWordData);
@@ -192,29 +187,14 @@ export default function VocabularyManager<T extends Word>({
     }
 
     const originalWords = words;
-    // Optimistic UI update
     setWords(words.filter(w => w.id !== wordId));
 
     try {
         const wordDocRef = doc(userWordsCollection, wordId);
         await deleteDoc(wordDocRef);
-        
-        // Also attempt to delete from the public collection if it exists there and you have permission
-        if (publicWordsCollection) {
-            try {
-                const publicWordDocRef = doc(publicWordsCollection, wordId);
-                await deleteDoc(publicWordDocRef);
-            } catch (publicError) {
-                // This might fail if the user doesn't have permissions or if it doesn't exist, which is okay.
-                // We don't need to inform the user about this part.
-                console.log(`Could not delete from public collection (this might be expected): ${publicError}`);
-            }
-        }
-        
         toast({ title: "Амжилттай устгагдлаа", variant: "destructive" });
 
     } catch (error) {
-        // Rollback on error
         setWords(originalWords);
         toast({
             title: "Алдаа гарлаа",
@@ -247,6 +227,11 @@ export default function VocabularyManager<T extends Word>({
   const openDialog = (word: T | null = null) => {
     setCurrentWord(word);
     setIsDialogOpen(true);
+  };
+  
+  const handleAlphabetSelect = (letter: string) => {
+    setAlphabetFilter(letter);
+    setIsAlphabetModalOpen(false);
   };
 
   return (
@@ -289,9 +274,7 @@ export default function VocabularyManager<T extends Word>({
                                     name={col.key as string}
                                     defaultValue={currentWord ? currentWord[col.key] as string : ''}
                                     required
-                                    disabled={isPublicAndEditing}
                                 />
-                                {isPublicAndEditing && <p className="text-xs text-muted-foreground pt-1">Анхдагч үгийн мэдээллийг засах боломжгүй.</p>}
                                 </div>
                             );
                             }
@@ -321,27 +304,46 @@ export default function VocabularyManager<T extends Word>({
                 <ToggleGroupItem value="memorized">Цээжилсэн</ToggleGroupItem>
                 <ToggleGroupItem value="not-memorized">Цээжлээгүй</ToggleGroupItem>
             </ToggleGroup>
-        </div>
-         <div className="flex flex-wrap gap-1 justify-center">
-            <Button 
-                variant={alphabetFilter === 'all' ? 'default' : 'outline'} 
-                size="sm"
-                className="h-8 w-8 px-2"
-                onClick={() => setAlphabetFilter('all')}
-            >
-                All
-            </Button>
-            {ALPHABET.map(letter => (
-                <Button 
-                    key={letter}
-                    variant={alphabetFilter === letter ? 'default' : 'outline'}
-                    size="sm"
-                    className="h-8 w-8 px-2"
-                    onClick={() => setAlphabetFilter(letter)}
-                >
-                    {letter}
-                </Button>
-            ))}
+             <div className="flex items-center gap-2">
+                <Dialog open={isAlphabetModalOpen} onOpenChange={setIsAlphabetModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Pilcrow className="h-4 w-4 mr-2" />
+                      Үсгээр шүүх
+                      {alphabetFilter !== 'all' && <span className="ml-2 font-bold text-primary">{alphabetFilter}</span>}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Үсгээр шүүх</DialogTitle>
+                    </DialogHeader>
+                    <ScrollArea className="h-72">
+                      <div className="grid grid-cols-6 gap-2 pr-4">
+                        <Button
+                          variant={alphabetFilter === 'all' ? 'default' : 'outline'}
+                          onClick={() => handleAlphabetSelect('all')}
+                        >
+                          All
+                        </Button>
+                        {ALPHABET.map(letter => (
+                          <Button
+                            key={letter}
+                            variant={alphabetFilter === letter ? 'default' : 'outline'}
+                            onClick={() => handleAlphabetSelect(letter)}
+                          >
+                            {letter}
+                          </Button>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </DialogContent>
+                </Dialog>
+                {alphabetFilter !== 'all' && (
+                  <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => setAlphabetFilter('all')}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
         </div>
 
       </CardHeader>
@@ -409,8 +411,3 @@ export default function VocabularyManager<T extends Word>({
     </Card>
   );
 }
-
-    
-    
-
-    
