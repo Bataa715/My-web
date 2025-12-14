@@ -25,6 +25,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user) {
         setLoading(false);
+        setProjects([]);
         return;
     };
     const projectsCollectionRef = collection(firestore, `users/${user.uid}/projects`);

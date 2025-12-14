@@ -31,7 +31,10 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!skillsCollectionRef) {
-        if (!user) setLoading(false);
+        if (!user) {
+            setLoading(false);
+            setSkills([]);
+        }
         return;
     };
     const fetchSkills = async () => {

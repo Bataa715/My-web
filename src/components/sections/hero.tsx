@@ -135,33 +135,33 @@ export default function Hero() {
       setLoading(true);
       
       const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
-      const defaultProfileImage = avatarPlaceholder?.imageUrl || "https://picsum.photos/seed/avatar/400/400";
-      const defaultName = "Б.Батмягмар";
-      const defaultBio = "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.";
-      const defaultOrbitInfo: OrbitInfo[] = [
-          { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Улаанбаатар, Монгол', type: 'info' },
-          { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.', type: 'info' },
-          { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн хэмжээний програм хангамжийн компанид ажиллах.', type: 'info' },
-          { id: 'user', icon: 'User', title: 'Тухай', content: 'Би програмчлалд дуртай.', type: 'info' },
-          { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Дуртай дууг сонсох.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
-          { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', type: 'info', backgroundImage: 'https://images.unsplash.com/photo-1536440136628-849c177E76a1?w=800' },
-          { id: 'quote', icon: 'Quote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay', type: 'info' },
-          { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.', type: 'info' },
-      ];
-
+      
       try {
         const docSnap = await getDoc(userInfoDocRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setBio(data.bio || defaultBio);
-          setEditedBio(data.bio || defaultBio);
-          setName(data.name || defaultName);
-          const imageUrl = data.profileImage || defaultProfileImage;
+          setBio(data.bio || '');
+          setEditedBio(data.bio || '');
+          setName(data.name || '');
+          const imageUrl = data.profileImage || '';
           setProfileImage(imageUrl);
           setEditedImage(imageUrl);
-          setOrbitInfo(data.orbitInfo || defaultOrbitInfo);
+          setOrbitInfo(data.orbitInfo || []);
         } else {
           // If doc doesn't exist, create it with default data. Non-blocking.
+          const defaultName = "Б.Батмягмар";
+          const defaultBio = "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.";
+          const defaultProfileImage = avatarPlaceholder?.imageUrl || "https://picsum.photos/seed/avatar/400/400";
+          const defaultOrbitInfo: OrbitInfo[] = [
+              { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Улаанбаатар, Монгол', type: 'info' },
+              { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.', type: 'info' },
+              { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн хэмжээний програм хангамжийн компанид ажиллах.', type: 'info' },
+              { id: 'user', icon: 'User', title: 'Тухай', content: 'Би програмчлалд дуртай.', type: 'info' },
+              { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Дуртай дууг сонсох.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
+              { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', type: 'info', backgroundImage: 'https://images.unsplash.com/photo-1536440136628-849c177E76a1?w=800' },
+              { id: 'quote', icon: 'Quote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay', type: 'info' },
+              { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.', type: 'info' },
+          ];
           const defaultData = {
             name: defaultName,
             bio: defaultBio,
