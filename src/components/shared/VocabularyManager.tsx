@@ -98,8 +98,6 @@ export default function VocabularyManager<T extends Word>({
         const mergedWords = publicWords.map(publicWord => {
             const userWordStatus = userWordMap.get(publicWord.id!);
             if (userWordStatus) {
-                // This is a public word that the user has interacted with (e.g., memorized).
-                // We remove it from the map because it's not a purely user-created word.
                 userWordMap.delete(publicWord.id!);
                 return { ...publicWord, memorized: userWordStatus.memorized };
             }
@@ -113,7 +111,7 @@ export default function VocabularyManager<T extends Word>({
     };
 
     fetchWords();
-  }, [firestore, user, collectionPath]);
+  }, [firestore, user, collectionPath, initialWords]);
 
   const filteredWords = useMemo(() => {
     switch (filter) {
@@ -148,10 +146,8 @@ export default function VocabularyManager<T extends Word>({
         const docRef = doc(userWordsCollection, currentWord.id);
         
         if (isPublicWord) {
-            // Only update the memorized status for public words in user's subcollection
             await setDoc(docRef, { memorized: currentWord.memorized }, { merge: true });
         } else {
-            // Update the whole user-created word
             await updateDoc(docRef, newWordData);
             setWords(words.map(w => w.id === currentWord.id ? { ...w, ...newWordData } as T : w));
         }
@@ -178,37 +174,25 @@ const handleDelete = async (id: string) => {
         return;
     };
 
-    const wordToDelete = words.find(w => w.id === id);
-    if (!wordToDelete) return;
-    
-    // Check if the word is part of the original public list.
-    // We check the initialWords prop which holds the original public words.
-    const isPublicWord = initialWords.some(initialWord => initialWord.word === wordToDelete.word);
-    
-    if (isPublicWord && publicWordsCollection) {
-        // Also check if it exists in the main public collection
-         const publicSnapshot = await getDocs(query(publicWordsCollection));
-         if (publicSnapshot.docs.some(doc => doc.id === id)) {
-              toast({
-                  title: "Боломжгүй",
-                  description: "Анхдагч үгийг устгах боломжгүй.",
-                  variant: "destructive"
-              });
-              return;
-         }
-    }
-
-
-    // Optimistic UI update
     const originalWords = words;
     setWords(words.filter(w => w.id !== id));
 
     try {
         const docRef = doc(userWordsCollection, id);
         await deleteDoc(docRef);
+
+        // Also try to delete from public collection if it exists there
+        if(publicWordsCollection) {
+           try {
+             const publicDocRef = doc(publicWordsCollection, id);
+             await deleteDoc(publicDocRef);
+           } catch(e) {
+            // Ignore error if it doesn't exist in public collection
+           }
+        }
+        
         toast({ title: "Амжилттай устгалаа", variant: "destructive" });
     } catch (e) {
-        // Rollback on error
         setWords(originalWords);
         toast({ title: "Алдаа гарлаа", description: "Үг устгахад алдаа гарлаа.", variant: "destructive" });
         console.error("Error deleting word: ", e);
@@ -226,7 +210,6 @@ const handleDelete = async (id: string) => {
     
     const docRef = doc(userWordsCollection, id);
     try {
-      // Use setDoc with merge to create or update the memorized status
       await setDoc(docRef, { memorized: checked }, { merge: true });
     } catch (e) {
       console.error("Error updating memorized status:", e);
@@ -370,4 +353,5 @@ const handleDelete = async (id: string) => {
   );
 }
 
+    
     
