@@ -569,7 +569,7 @@ export default function Hero() {
             <DialogDescription>
               Шинэ зургийнхаа URL хаягийг энд буулгана уу. Base64 форматтай зураг байж болно.
             </DialogDescription>
-          </Header>
+          </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="image-url" className="text-right">
