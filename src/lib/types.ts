@@ -82,7 +82,9 @@ export type UserProfile = {
     name: string;
     bio: string;
     profileImage: string;
-    heroImage?: string;
+    homeHeroImage?: string;
+    aboutHeroImage?: string;
+    toolsHeroImage?: string;
     orbitInfo: OrbitInfo[];
     github?: string;
     instagram?: string;

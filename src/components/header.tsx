@@ -33,27 +33,40 @@ const Header = () => {
     const [passwordError, setPasswordError] = useState("");
     const { toast } = useToast();
     const pathname = usePathname();
+    
     const isAboutPage = pathname === '/about';
     const isHomePage = pathname === '/';
+    const isToolsPage = pathname === '/tools';
+
     const { firestore, user } = useFirebase();
 
     const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
     const [editedImageUrl, setEditedImageUrl] = useState('');
     const [saving, setSaving] = useState(false);
+     
+    const getImageFieldForPage = (): keyof UserProfile | null => {
+        if (isHomePage) return 'homeHeroImage';
+        if (isAboutPage) return 'aboutHeroImage';
+        if (isToolsPage) return 'toolsHeroImage';
+        return null;
+    }
 
      useEffect(() => {
         if (!user || !firestore || !isImageEditingOpen) return;
 
         const fetchCurrentImage = async () => {
+            const imageField = getImageFieldForPage();
+            if (!imageField) return;
+
             const userDocRef = doc(firestore, 'users', user.uid);
             const docSnap = await getDoc(userDocRef);
             if (docSnap.exists()) {
                 const data = docSnap.data() as UserProfile;
-                setEditedImageUrl(data.heroImage || '');
+                setEditedImageUrl(data[imageField] as string || '');
             }
         };
         fetchCurrentImage();
-    }, [user, firestore, isImageEditingOpen]);
+    }, [user, firestore, isImageEditingOpen, pathname]);
 
 
     const handleEditClick = () => {
@@ -84,10 +97,17 @@ const Header = () => {
              toast({ title: "Алдаа", description: "Нэвтэрч орно уу.", variant: "destructive" });
              return;
         }
+
+        const imageField = getImageFieldForPage();
+        if (!imageField) {
+            toast({ title: "Алдаа", description: "Энэ хуудсанд зураг засах боломжгүй.", variant: "destructive" });
+            return;
+        }
+        
         setSaving(true);
         try {
             const userDocRef = doc(firestore, 'users', user.uid);
-            await updateDoc(userDocRef, { heroImage: editedImageUrl });
+            await updateDoc(userDocRef, { [imageField]: editedImageUrl });
             
             setSaving(false);
             setIsImageEditingOpen(false);
@@ -171,7 +191,7 @@ const Header = () => {
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-2">
-             {isEditMode && isHomePage && (
+             {isEditMode && (isHomePage || isAboutPage || isToolsPage) && (
                 <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
                     <DialogTrigger asChild>
                         <Button variant="outline" size="icon">

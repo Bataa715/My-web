@@ -46,9 +46,17 @@
           "type": "string",
           "description": "The user's email address."
         },
-        "heroImage": {
+        "homeHeroImage": {
             "type": "string",
-            "description": "URL of the hero image for the main page."
+            "description": "URL of the hero image for the home page."
+        },
+        "aboutHeroImage": {
+            "type": "string",
+            "description": "URL of the hero image for the about page."
+        },
+        "toolsHeroImage": {
+            "type": "string",
+            "description": "URL of the hero image for the tools page."
         }
       },
       "required": ["name", "bio"]

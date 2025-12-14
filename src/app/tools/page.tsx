@@ -53,8 +53,8 @@ export default function ToolsPage() {
                     const docSnap = await getDoc(userDocRef);
                     if (docSnap.exists()) {
                         const data = docSnap.data() as UserProfile;
-                        if (data.heroImage) {
-                            imageUrl = data.heroImage;
+                        if (data.toolsHeroImage) {
+                            imageUrl = data.toolsHeroImage;
                         }
                     }
                 } catch (error) {
@@ -63,7 +63,7 @@ export default function ToolsPage() {
             }
 
             if (!imageUrl) {
-                const placeholder = PlaceHolderImages.find(p => p.id === 'hero-background');
+                const placeholder = PlaceHolderImages.find(p => p.id === 'tools-hero-background');
                 imageUrl = placeholder?.imageUrl;
             }
             
@@ -76,19 +76,16 @@ export default function ToolsPage() {
   return (
     <div className="relative min-h-[calc(100vh-57px-81px)] flex flex-col overflow-hidden">
        {heroImage && (
-            <>
-                <div className="absolute bottom-0 left-0 w-full z-0 h-[60vh]">
-                    <Image
-                        src={heroImage}
-                        alt="Abstract learning background"
-                        fill
-                        className="object-cover"
-                        data-ai-hint="abstract library"
-                    />
-                     <div className="absolute inset-0 bg-gradient-to-t from-background/0 via-background/90 to-background"></div>
-                </div>
-               
-            </>
+          <div className="absolute bottom-0 left-0 w-full h-[60vh] z-0">
+              <Image
+                  src={heroImage}
+                  alt="Abstract learning background"
+                  fill
+                  className="object-cover"
+                  data-ai-hint="abstract technology"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+          </div>
         )}
        <div className="space-y-8 z-10 pt-8 flex-grow">
           <BackButton />

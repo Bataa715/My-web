@@ -26,8 +26,8 @@ export default function AboutPage() {
           const docSnap = await getDoc(userDocRef);
           if (docSnap.exists()) {
             const data = docSnap.data() as UserProfile;
-            if (data.heroImage) {
-              imageUrl = data.heroImage;
+            if (data.aboutHeroImage) {
+              imageUrl = data.aboutHeroImage;
             }
           }
         } catch (error) {
@@ -36,8 +36,8 @@ export default function AboutPage() {
       }
       
       if (!imageUrl) {
-        const placeholder = PlaceHolderImages.find(p => p.id === 'hero-background');
-        imageUrl = placeholder?.imageUrl || "https://images.unsplash.com/photo-1581533676255-4f26a768fc4a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhYnN0cmFjdCUyMGxpYnJhcnl8ZW58MHx8fHwxNzY1NjMyNDk3fDA&ixlib=rb-4.1.0&q=80&w=1080";
+        const placeholder = PlaceHolderImages.find(p => p.id === 'about-hero-background');
+        imageUrl = placeholder?.imageUrl;
       }
 
       setHeroImage(imageUrl);

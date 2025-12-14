@@ -178,11 +178,17 @@ export default function Hero() {
 
         } else {
           const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
-          const heroPlaceholder = PlaceHolderImages.find(p => p.id === 'hero-background');
+          const homeHeroPlaceholder = PlaceHolderImages.find(p => p.id === 'home-hero-background');
+          const aboutHeroPlaceholder = PlaceHolderImages.find(p => p.id === 'about-hero-background');
+          const toolsHeroPlaceholder = PlaceHolderImages.find(p => p.id === 'tools-hero-background');
+          
           const defaultName = "Б.Батмягмар";
           const defaultBio = "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.";
           const defaultProfileImage = avatarPlaceholder?.imageUrl || "https://picsum.photos/seed/avatar/400/400";
-          const defaultHeroImage = heroPlaceholder?.imageUrl || "https://images.unsplash.com/photo-1581533676255-4f26a768fc4a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhYnN0cmFjdCUyMGxpYnJhcnl8ZW58MHx8fHwxNzY1NjMyNDk3fDA&ixlib=rb-4.1.0&q=80&w=1080";
+          const defaultHomeHeroImage = homeHeroPlaceholder?.imageUrl;
+          const defaultAboutHeroImage = aboutHeroPlaceholder?.imageUrl;
+          const defaultToolsHeroImage = toolsHeroPlaceholder?.imageUrl;
+
           const defaultOrbitInfo: OrbitInfo[] = [
               { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Улаанбаатар, Монгол', type: 'info' },
               { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.', type: 'info' },
@@ -202,7 +208,9 @@ export default function Hero() {
             name: defaultName,
             bio: defaultBio,
             profileImage: defaultProfileImage,
-            heroImage: defaultHeroImage,
+            homeHeroImage: defaultHomeHeroImage,
+            aboutHeroImage: defaultAboutHeroImage,
+            toolsHeroImage: defaultToolsHeroImage,
             orbitInfo: defaultOrbitInfo,
             ...defaultLinks
           };
