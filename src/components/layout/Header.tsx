@@ -18,7 +18,7 @@ import {
 
 const mainLinks = [
   { href: "/", label: "Нүүр" },
-  { href: "/about", label: "Хувийн танилцуулга" },
+  { href: "/about", label: "My CV" },
 ];
 
 const toolsLinks = [
