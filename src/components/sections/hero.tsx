@@ -290,7 +290,8 @@ export default function Hero() {
 
   const orbitItemClick = (item: OrbitInfo) => {
     if (selectedOrbit && selectedOrbit.id === item.id) {
-        setSelectedOrbit(null); 
+        setSelectedOrbit(null);
+        setIsEditingOrbit(false); 
     } else {
         setSelectedOrbit(item);
         setEditedOrbitTitle(item.title);
@@ -384,7 +385,7 @@ export default function Hero() {
             </div>
           </div>
           <div className="relative flex items-center justify-center w-full max-w-[400px] aspect-square mx-auto">
-             <div className="relative w-64 h-64 md:w-80 md:h-80">
+             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-72 h-72 md:w-96 md:h-96" : "w-64 h-64 md:w-80 md:h-80")}>
                 <AnimatePresence>
                     {selectedOrbit ? (
                         <motion.div
@@ -396,7 +397,7 @@ export default function Hero() {
                             className="absolute inset-0 flex flex-col items-center justify-center bg-muted rounded-full border-4 border-primary shadow-lg text-center overflow-hidden"
                             onClick={handleCloseContent}
                         >
-                           {selectedOrbit.type !== 'audio' && selectedOrbit.backgroundImage && (
+                           {selectedOrbit.type !== 'audio' && selectedOrbit.backgroundImage && !isEditingOrbit && (
                               <>
                                 <Image
                                     src={selectedOrbit.backgroundImage}
@@ -414,20 +415,20 @@ export default function Hero() {
                                     <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20 p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                                         <div className="grid grid-cols-2 gap-2 items-start">
                                             <div>
-                                                <Label className={cn("text-left text-xs mb-1 block", selectedOrbit.type !== 'audio' && "text-white")}>Нэр</Label>
+                                                <Label className="text-left text-xs mb-1 block text-foreground">Нэр</Label>
                                                 <Input
                                                   value={editedOrbitTitle}
                                                   onChange={(e) => setEditedOrbitTitle(e.target.value)}
-                                                  className={cn("h-8 text-base bg-transparent border-primary/50 focus-visible:ring-primary", selectedOrbit.type !== 'audio' && 'text-white')}
+                                                  className="h-8 text-base bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
                                                   placeholder="Нэр..."
                                                 />
                                             </div>
                                              <div>
-                                                <Label className={cn("text-left text-xs mb-1 block", selectedOrbit.type !== 'audio' && "text-white")}>Icon</Label>
+                                                <Label className="text-left text-xs mb-1 block text-foreground">Icon</Label>
                                                 <Input
                                                   value={editedOrbitIcon}
                                                   onChange={(e) => setEditedOrbitIcon(e.target.value)}
-                                                  className={cn("h-8 text-base bg-transparent border-primary/50 focus-visible:ring-primary", selectedOrbit.type !== 'audio' && 'text-white')}
+                                                  className="h-8 text-base bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
                                                   placeholder="Lucide Icon"
                                                 />
                                                  <p className="text-[10px] text-muted-foreground pt-0.5">
@@ -435,33 +436,33 @@ export default function Hero() {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div>
-                                            <Label className={cn("text-left text-xs mb-1 block", selectedOrbit.type !== 'audio' && "text-white")}>Тайлбар</Label>
+                                        <div className="mt-2">
+                                            <Label className="text-left text-xs mb-1 block text-foreground">Тайлбар</Label>
                                             <Textarea 
                                                 value={editedOrbitContent}
                                                 onChange={(e) => setEditedOrbitContent(e.target.value)}
-                                                className={cn("text-sm bg-transparent border-primary/50 focus-visible:ring-primary", selectedOrbit.type !== 'audio' && "text-white")}
+                                                className="text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
                                                 rows={2}
                                                 placeholder="Тайлбар..."
                                             />
                                         </div>
                                         {selectedOrbit.type === 'audio' ? (
-                                             <div>
-                                                <Label className={cn("text-left text-xs mb-1 block", selectedOrbit.type === 'audio' && 'text-foreground')}>YouTube холбоос</Label>
+                                             <div className="mt-2">
+                                                <Label className="text-left text-xs mb-1 block text-foreground">YouTube холбоос</Label>
                                                 <Input
                                                   value={editedYoutubeUrl}
                                                   onChange={(e) => setEditedYoutubeUrl(e.target.value)}
-                                                  className={cn("h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground")}
+                                                  className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
                                                   placeholder="https://www.youtube.com/watch?v=..."
                                                 />
                                             </div>
                                         ) : (
-                                            <div>
-                                                <Label className={cn("text-left text-xs mb-1 block", selectedOrbit.type !== 'audio' && 'text-white')}>Арын зураг URL</Label>
+                                            <div className="mt-2">
+                                                <Label className="text-left text-xs mb-1 block text-foreground">Арын зураг URL</Label>
                                                 <Input
                                                   value={editedOrbitBgImage}
                                                   onChange={(e) => setEditedOrbitBgImage(e.target.value)}
-                                                  className={cn("h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary", selectedOrbit.type !== 'audio' && 'text-white')}
+                                                  className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
                                                   placeholder="https://example.com/image.png"
                                                 />
                                             </div>
