@@ -19,26 +19,31 @@ export default function ProgrammingPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (!firestore) return;
-
         const getProgrammingData = async () => {
             setLoading(true);
             try {
-                const conceptsRef = collection(firestore, "programmingConcepts");
-                const conceptsSnap = await getDocs(conceptsRef);
-                const conceptsData = conceptsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgrammingConcept));
-                setConcepts(conceptsData);
+                if (firestore) {
+                    const conceptsRef = collection(firestore, "programmingConcepts");
+                    const conceptsSnap = await getDocs(conceptsRef);
+                    const conceptsData = conceptsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgrammingConcept));
+                    setConcepts(conceptsData);
 
-                const cheatSheetRef = collection(firestore, "cheatSheetItems");
-                const cheatSheetSnap = await getDocs(cheatSheetRef);
-                const cheatSheetItemsData = cheatSheetSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as CheatSheetItem));
-                setCheatSheetItems(cheatSheetItemsData);
+                    const cheatSheetRef = collection(firestore, "cheatSheetItems");
+                    const cheatSheetSnap = await getDocs(cheatSheetRef);
+                    const cheatSheetItemsData = cheatSheetSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as CheatSheetItem));
+                    setCheatSheetItems(cheatSheetItemsData);
 
-                const progressItemsRef = collection(firestore, "progressItems");
-                const q = query(progressItemsRef, orderBy("label"));
-                const progressItemsSnap = await getDocs(q);
-                const progressItemsData = progressItemsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgressItem));
-                setProgressItems(progressItemsData);
+                    const progressItemsRef = collection(firestore, "progressItems");
+                    const q = query(progressItemsRef, orderBy("label"));
+                    const progressItemsSnap = await getDocs(q);
+                    const progressItemsData = progressItemsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgressItem));
+                    setProgressItems(progressItemsData);
+                } else {
+                    // Handle case where firestore is not available (e.g., logged out user)
+                    // You might want to show a message or default data.
+                    // For now, we'll just have empty arrays.
+                    console.log("Firestore not available. Cannot fetch programming data.");
+                }
 
             } catch (error) {
                 console.error("Error fetching programming data:", error);

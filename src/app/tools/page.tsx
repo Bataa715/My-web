@@ -14,25 +14,25 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 const tools = [
   {
     title: "Англи хэл",
-    description: "Англи хэл сурах",
+    description: "Англи хэл сурах хэрэгслүүд",
     href: "/tools/english",
     icon: <BookOpen className="h-6 w-6" />
   },
   {
     title: "Япон хэл",
-    description: "Япон хэл сурах",
+    description: "Япон хэл сурах хэрэгслүүд",
     href: "/tools/japanese",
     icon: <BookOpen className="h-6 w-6" />
   },
   {
-    title: "Code",
-    description: "Code сурах",
+    title: "Програмчлал",
+    description: "Код бичиж сурах хэрэгслүүд",
     href: "/tools/programming",
     icon: <CodeIcon className="h-6 w-6" />
   },
   {
-    title: "Timer",
-    description: "Time managment",
+    title: "Pomodoro Timer",
+    description: "Төвлөрлийг сайжруулах цаг",
     href: "/tools/pomodoro",
     icon: <Timer className="h-6 w-6" />
   },
@@ -74,9 +74,9 @@ export default function ToolsPage() {
     }, [user, firestore, isUserLoading]);
 
   return (
-    <div className="relative h-[calc(100vh-138px)]">
+    <div className="relative">
       {heroImage && (
-          <div className="absolute top-0 left-0 w-full h-3/4 -z-10">
+          <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
               <Image
                   src={heroImage}
                   alt="Abstract technology background"
@@ -88,20 +88,22 @@ export default function ToolsPage() {
           </div>
       )}
       
-      <div className="relative">
+      <div className="space-y-8">
         <BackButton />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
+        <div className="text-center pt-8">
+            <h1 className="text-4xl font-bold font-headline">Хэрэгслүүд</h1>
+            <p className="mt-2 text-muted-foreground">Суралцах үйл явцыг тань дэмжих хэрэгслүүд.</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
           {tools.map((tool) => (
             <Link href={tool.href} key={tool.title} className="group">
-              <Card className="h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      {tool.icon}
-                      {tool.title}
-                    </span>
+              <Card className="h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
+                <CardHeader className="flex-row items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        {tool.icon}
+                        <CardTitle>{tool.title}</CardTitle>
+                    </div>
                     <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
-                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription>{tool.description}</CardDescription>

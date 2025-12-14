@@ -58,18 +58,16 @@ export default function JapaneseToolsPage() {
         {japaneseTools.map((tool) => (
           <Link href={tool.href} key={tool.title} className="group">
             <Card className="h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="flex items-center gap-3">
-                    {tool.icon}
-                    <span className={tool.title === "Кана үсэг" ? "font-jp" : ""}>{tool.title}</span>
-                  </span>
-                  <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription>{tool.description}</CardDescription>
-              </CardContent>
+                <CardHeader className="flex-row items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        {tool.icon}
+                        <CardTitle className={tool.title === "Кана үсэг" ? "font-jp" : ""}>{tool.title}</CardTitle>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
+                </CardHeader>
+                <CardContent>
+                    <CardDescription>{tool.description}</CardDescription>
+                </CardContent>
             </Card>
           </Link>
         ))}
