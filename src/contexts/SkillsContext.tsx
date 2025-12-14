@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import type { Skill } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
-import { useFirebase } from '@/firebase';
+import { useFirebase, useMemoFirebase } from '@/firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, Timestamp, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
@@ -17,17 +17,28 @@ interface SkillsContextType {
 
 const SkillsContext = createContext<SkillsContextType | undefined>(undefined);
 
+const initialSkillsData: Omit<Skill, 'id' | 'createdAt'>[] = [
+    { name: 'Програмчлалын хэл', icon: 'Code', items: ['JavaScript (ES6+)', 'TypeScript', 'Python', 'HTML/CSS'] },
+    { name: 'Framework & Libraries', icon: 'Library', items: ['React', 'Next.js', 'Node.js', 'Express', 'Tailwind CSS'] },
+    { name: 'Багж хэрэгсэл', icon: 'Terminal', items: ['Git & GitHub', 'Docker', 'VS Code', 'Figma', 'Firebase'] },
+    { name: 'Мэдээллийн сан', icon: 'Database', items: ['MongoDB', 'PostgreSQL', 'MySQL', 'Firestore'] },
+];
+
 export function SkillsProvider({ children }: { children: ReactNode }) {
   const { firestore, user } = useFirebase();
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const skillsCollectionRef = user ? collection(firestore, `users/${user.uid}/skills`) : null;
+  
+  const skillsCollectionRef = useMemoFirebase(() => {
+    if (!user) return null;
+    return collection(firestore, `users/${user.uid}/skills`);
+  }, [user, firestore]);
 
 
   useEffect(() => {
     if (!skillsCollectionRef) {
-        setLoading(false);
+        if (!user) setLoading(false);
         return;
     };
     const fetchSkills = async () => {
@@ -36,12 +47,7 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
         const q = query(skillsCollectionRef, orderBy("createdAt", "asc"));
         const skillsSnapshot = await getDocs(q);
         if (skillsSnapshot.empty) {
-          const initialSkillsData: Omit<Skill, 'id' | 'createdAt'>[] = [
-              { name: 'Програмчлалын хэл', icon: 'Code', items: ['JavaScript (ES6+)', 'TypeScript', 'Python', 'HTML/CSS'] },
-              { name: 'Framework & Libraries', icon: 'Library', items: ['React', 'Next.js', 'Node.js', 'Express', 'Tailwind CSS'] },
-              { name: 'Багж хэрэгсэл', icon: 'Terminal', items: ['Git & GitHub', 'Docker', 'VS Code', 'Figma', 'Firebase'] },
-              { name: 'Мэдээллийн сан', icon: 'Database', items: ['MongoDB', 'PostgreSQL', 'MySQL', 'Firestore'] },
-          ];
+          
           const batch = initialSkillsData.map(s => addDocumentNonBlocking(skillsCollectionRef, { ...s, createdAt: serverTimestamp() }));
           await Promise.all(batch);
           const newSnapshot = await getDocs(q);
@@ -73,7 +79,7 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
       }
     };
     fetchSkills();
-  }, [skillsCollectionRef, toast]);
+  }, [skillsCollectionRef, toast, user]);
 
   const addSkillGroup = async (group: Omit<Skill, 'id' | 'createdAt'>) => {
     if (!skillsCollectionRef) return;
@@ -89,7 +95,7 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
   };
 
   const updateSkillGroup = async (id: string, updates: Partial<Omit<Skill, 'id'>>) => {
-    if (!skillsCollectionRef || !user) return;
+    if (!user) return;
     try {
       const skillDoc = doc(firestore, `users/${user.uid}/skills`, id);
       updateDocumentNonBlocking(skillDoc, updates);
@@ -102,7 +108,7 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteSkillGroup = async (id: string) => {
-    if (!skillsCollectionRef || !user) return;
+    if (!user) return;
     try {
       const skillDoc = doc(firestore, `users/${user.uid}/skills`, id);
       deleteDocumentNonBlocking(skillDoc);
