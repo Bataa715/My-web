@@ -84,7 +84,7 @@ export default function ToolsPage() {
                   className="object-cover"
                   data-ai-hint="abstract technology"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
           </div>
         )}
        <div className="relative z-10 space-y-8 pt-8">
