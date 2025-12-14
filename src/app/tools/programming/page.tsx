@@ -7,7 +7,27 @@ import CheatSheet from './components/CheatSheet';
 import ProgressTracker from './components/ProgressTracker';
 import type { ProgrammingConcept, CheatSheetItem, ProgressItem } from '@/lib/types';
 import { useFirebase } from '@/firebase';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, writeBatch, doc } from 'firebase/firestore';
+
+const initialProgrammingConceptsData: Omit<ProgrammingConcept, 'id'>[] = [
+    { title: 'Variable', emoji: '📦', explanation: 'Utga hadgalah sav.' },
+    { title: 'Function', emoji: '🛠️', explanation: 'Todorhoi uildel hiideg kodnii tsugluulga.' },
+    { title: 'Loop', emoji: '🔄', explanation: 'Todorhoi kodnii hesegig olon udaa davtan guitsetgene.' },
+];
+
+const initialCheatSheetItemsData: Omit<CheatSheetItem, 'id'>[] = [
+    { title: 'Create React Component', snippet: 'function MyComponent() {\n  return <div>Hello</div>;\n}' },
+    { title: 'CSS Center a Div', snippet: 'display: flex;\njustify-content: center;\nalign-items: center;' },
+];
+
+const initialProgressItemsData: Omit<ProgressItem, 'id' | 'learned' | 'practicing'>[] = [
+    { label: 'HTML' },
+    { label: 'CSS' },
+    { label: 'JavaScript' },
+    { label: 'React' },
+    { label: 'Next.js' },
+];
+
 
 export default function ProgrammingPage() {
     const { firestore } = useFirebase();
@@ -17,6 +37,26 @@ export default function ProgrammingPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!firestore) return;
+
+        async function seedCollection(collectionName: string, data: any[]) {
+            const collectionRef = collection(firestore, collectionName);
+            const snapshot = await getDocs(query(collectionRef));
+            if (snapshot.empty) {
+                console.log(`Seeding ${collectionName}...`);
+                const batch = writeBatch(firestore);
+                data.forEach(item => {
+                    const docRef = doc(collectionRef);
+                     if (collectionName === 'progressItems') {
+                        batch.set(docRef, {...item, learned: false, practicing: false });
+                    } else {
+                        batch.set(docRef, item);
+                    }
+                });
+                await batch.commit();
+            }
+        }
+
         async function getCollectionData<T>(collectionName: string, orderByField: string): Promise<T[]> {
             try {
                 const colRef = collection(firestore, collectionName);
@@ -32,6 +72,12 @@ export default function ProgrammingPage() {
         
         async function fetchData() {
             setLoading(true);
+            await Promise.all([
+                seedCollection('programmingConcepts', initialProgrammingConceptsData),
+                seedCollection('cheatSheetItems', initialCheatSheetItemsData),
+                seedCollection('progressItems', initialProgressItemsData)
+            ]);
+
             const [concepts, cheats, progress] = await Promise.all([
                 getCollectionData<ProgrammingConcept>('programmingConcepts', 'title'),
                 getCollectionData<CheatSheetItem>('cheatSheetItems', 'title'),
