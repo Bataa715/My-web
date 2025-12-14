@@ -420,14 +420,14 @@ export default function Hero() {
                            
                             <AnimatePresence mode="wait">
                                 {isEditingOrbit ? (
-                                    <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20 p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                                    <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20 p-4 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                                         <div className="grid grid-cols-2 gap-2 items-start">
                                             <div>
                                                 <Label className="text-left text-xs mb-1 block text-foreground">Нэр</Label>
                                                 <Input
                                                   value={editedOrbitTitle}
                                                   onChange={(e) => setEditedOrbitTitle(e.target.value)}
-                                                  className="h-8 text-base bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                  className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
                                                   placeholder="Нэр..."
                                                 />
                                             </div>
@@ -436,26 +436,23 @@ export default function Hero() {
                                                 <Input
                                                   value={editedOrbitIcon}
                                                   onChange={(e) => setEditedOrbitIcon(e.target.value)}
-                                                  className="h-8 text-base bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                  className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
                                                   placeholder="Lucide Icon"
                                                 />
-                                                 <p className="text-[10px] text-muted-foreground pt-0.5">
-                                                    <a href="https://lucide.dev/" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">Lucide</a>-аас icon хайх
-                                                </p>
                                             </div>
                                         </div>
-                                        <div className="mt-2">
+                                        <div className="mt-1">
                                             <Label className="text-left text-xs mb-1 block text-foreground">Тайлбар</Label>
                                             <Textarea 
                                                 value={editedOrbitContent}
                                                 onChange={(e) => setEditedOrbitContent(e.target.value)}
                                                 className="text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
-                                                rows={2}
+                                                rows={1}
                                                 placeholder="Тайлбар..."
                                             />
                                         </div>
                                         {selectedOrbit.type === 'audio' ? (
-                                             <div className="mt-2">
+                                             <div className="mt-1">
                                                 <Label className="text-left text-xs mb-1 block text-foreground">YouTube холбоос</Label>
                                                 <Input
                                                   value={editedYoutubeUrl}
@@ -465,7 +462,7 @@ export default function Hero() {
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="mt-2">
+                                            <div className="mt-1">
                                                 <Label className="text-left text-xs mb-1 block text-foreground">Арын зураг URL</Label>
                                                 <Input
                                                   value={editedOrbitBgImage}
@@ -527,23 +524,23 @@ export default function Hero() {
                             transition={{ duration: 0.6, ease: "easeInOut" }}
                             className="absolute inset-0 flex flex-col items-center justify-center"
                         >
-                             <div className="avatar-glow-wrapper w-52 h-52 md:w-64 md:h-64">
+                             <div className="avatar-glow-wrapper w-52 h-52 md:w-64 md:h-64 relative">
                                 <Avatar className="w-full h-full border-4 border-primary/50 relative">
                                     <AvatarImage src={profileImage} alt={name} />
                                     <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
                                 </Avatar>
+                                {isEditMode && (
+                                    <Button 
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => setIsEditingImage(true)}
+                                        className="absolute top-0 right-0 h-8 w-8 rounded-full"
+                                    >
+                                        <Edit className="h-4 w-4" />
+                                        <span className="sr-only">Зураг солих</span>
+                                    </Button>
+                                )}
                             </div>
-                            {isEditMode && (
-                                <Button 
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setIsEditingImage(true)}
-                                    className="mt-4"
-                                >
-                                    <Upload className="mr-2 h-4 w-4" />
-                                    Зураг солих
-                                </Button>
-                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
