@@ -77,3 +77,13 @@ export type OrbitInfo = {
   audioUrl?: string;
   youtubeVideoId?: string;
 };
+
+export type UserProfile = {
+    name: string;
+    bio: string;
+    profileImage: string;
+    orbitInfo: OrbitInfo[];
+    github?: string;
+    instagram?: string;
+    email?: string;
+};

@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import type { OrbitInfo } from "@/lib/types";
+import type { OrbitInfo, UserProfile } from "@/lib/types";
 import { useEditMode } from "@/contexts/EditModeContext";
 import Image from "next/image";
 import { useFirebase } from "@/firebase";
@@ -116,6 +116,7 @@ export default function Hero() {
   const [bio, setBio] = useState('');
   const [name, setName] = useState('');
   const [orbitInfo, setOrbitInfo] = useState<OrbitInfo[]>([]);
+  const [socialLinks, setSocialLinks] = useState({ github: '', instagram: '', email: '' });
 
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [editedBio, setEditedBio] = useState("");
@@ -133,6 +134,8 @@ export default function Hero() {
   const [editedOrbitContent, setEditedOrbitContent] = useState("");
   const [editedOrbitBgImage, setEditedOrbitBgImage] = useState("");
   const [editedYoutubeUrl, setEditedYoutubeUrl] = useState("");
+  const [isEditingLinks, setIsEditingLinks] = useState(false);
+  const [editedLinks, setEditedLinks] = useState({ github: '', instagram: '', email: '' });
   
   const { toast } = useToast();
   
@@ -153,7 +156,7 @@ export default function Hero() {
       try {
         const docSnap = await getDoc(userInfoDocRef);
         if (docSnap.exists() && docSnap.data().name) { 
-          const data = docSnap.data();
+          const data = docSnap.data() as UserProfile;
           setBio(data.bio || '');
           setEditedBio(data.bio || '');
           setName(data.name || '');
@@ -161,6 +164,14 @@ export default function Hero() {
           setProfileImage(imageUrl);
           setEditedImage(imageUrl);
           setOrbitInfo(data.orbitInfo || []);
+          const links = {
+            github: data.github || "https://github.com/Bataa715",
+            instagram: data.instagram || "https://www.instagram.com/ka1__zen/",
+            email: data.email || "batmyagmar715@gmail.com",
+          };
+          setSocialLinks(links);
+          setEditedLinks(links);
+
         } else {
           const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
           const defaultName = "Б.Батмягмар";
@@ -176,11 +187,17 @@ export default function Hero() {
               { id: 'quote', icon: 'MessageSquareQuote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay', type: 'info' },
               { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.', type: 'info' },
           ];
-          const defaultData = {
+          const defaultLinks = {
+            github: "https://github.com/Bataa715",
+            instagram: "https://www.instagram.com/ka1__zen/",
+            email: "batmyagmar715@gmail.com",
+          };
+          const defaultData: UserProfile = {
             name: defaultName,
             bio: defaultBio,
             profileImage: defaultProfileImage,
-            orbitInfo: defaultOrbitInfo
+            orbitInfo: defaultOrbitInfo,
+            ...defaultLinks
           };
           await setDoc(userInfoDocRef, defaultData, { merge: true });
           
@@ -190,6 +207,8 @@ export default function Hero() {
           setProfileImage(defaultProfileImage);
           setEditedImage(defaultProfileImage);
           setOrbitInfo(defaultOrbitInfo);
+          setSocialLinks(defaultLinks);
+          setEditedLinks(defaultLinks);
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
@@ -201,6 +220,26 @@ export default function Hero() {
     fetchUserInfo();
   }, [user, isUserLoading, firestore, toast]);
 
+    const handleSaveLinks = async () => {
+        if (!user || !firestore) return;
+        const userInfoDocRef = doc(firestore, "users", user.uid);
+        setSaving(true);
+        try {
+            await updateDoc(userInfoDocRef, { 
+                github: editedLinks.github,
+                instagram: editedLinks.instagram,
+                email: editedLinks.email,
+            });
+            setSocialLinks(editedLinks);
+            setIsEditingLinks(false);
+            toast({ title: "Амжилттай", description: "Холбоосууд шинэчлэгдлээ." });
+        } catch (error) {
+            console.error("Error updating links:", error);
+            toast({ title: "Алдаа", description: "Холбоос шинэчлэхэд алдаа гарлаа.", variant: "destructive" });
+        } finally {
+            setSaving(false);
+        }
+    };
 
   const handleSaveOrbitInfo = async () => {
     if (!user || !firestore || !selectedOrbit) return;
@@ -331,10 +370,6 @@ export default function Hero() {
       setSelectedOrbit(null);
     }
   };
-  
-  const defaultGithub = "https://github.com/Bataa715";
-  const defaultInstagram = "https://www.instagram.com/ka1__zen/";
-  const defaultEmail = "batmyagmar715@gmail.com";
 
 
   return (
@@ -385,16 +420,69 @@ export default function Hero() {
               </div>
             </div>
             
-            <div className="flex items-center gap-4 pt-2">
-              <Link href={defaultGithub} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-                <Github className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
-              </Link>
-              <Link href={defaultInstagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                <Instagram className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
-              </Link>
-              <Link href={`mailto:${defaultEmail}`} aria-label="Email">
-                <Mail className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
-              </Link>
+            <div className="relative pt-2">
+                {isEditingLinks ? (
+                    <div className="space-y-3 max-w-sm">
+                        <div className="flex items-center gap-2">
+                            <Github className="h-6 w-6 text-muted-foreground" />
+                            <Input 
+                                value={editedLinks.github} 
+                                onChange={(e) => setEditedLinks({...editedLinks, github: e.target.value})}
+                                placeholder="GitHub URL"
+                                className="h-8 text-sm"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Instagram className="h-6 w-6 text-muted-foreground" />
+                            <Input 
+                                value={editedLinks.instagram} 
+                                onChange={(e) => setEditedLinks({...editedLinks, instagram: e.target.value})}
+                                placeholder="Instagram URL"
+                                className="h-8 text-sm"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Mail className="h-6 w-6 text-muted-foreground" />
+                            <Input 
+                                value={editedLinks.email} 
+                                onChange={(e) => setEditedLinks({...editedLinks, email: e.target.value})}
+                                placeholder="Email address"
+                                className="h-8 text-sm"
+                            />
+                        </div>
+                        <div className="flex gap-2 pt-2">
+                            <Button onClick={handleSaveLinks} size="sm" disabled={saving}>
+                                {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />} Хадгалах
+                            </Button>
+                            <Button onClick={() => setIsEditingLinks(false)} size="sm" variant="ghost">
+                                <XCircle className="mr-2 h-4 w-4" /> Цуцлах
+                            </Button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-4">
+                        <Link href={socialLinks.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                            <Github className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
+                        </Link>
+                        <Link href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                            <Instagram className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
+                        </Link>
+                        <Link href={`mailto:${socialLinks.email}`} aria-label="Email">
+                            <Mail className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
+                        </Link>
+                         {isEditMode && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => setIsEditingLinks(true)}
+                            >
+                                <Edit className="h-4 w-4" />
+                                <span className="sr-only">Холбоос засах</span>
+                            </Button>
+                        )}
+                    </div>
+                )}
             </div>
           </div>
           <div className="relative flex items-center justify-center w-full max-w-[400px] aspect-square mx-auto">
@@ -613,6 +701,3 @@ export default function Hero() {
     </section>
   );
 }
-
-    
-    

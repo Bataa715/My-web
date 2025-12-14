@@ -33,6 +33,18 @@
             },
             "required": ["id", "icon", "title", "content"]
           }
+        },
+        "github": {
+          "type": "string",
+          "description": "URL of the user's GitHub profile."
+        },
+        "instagram": {
+          "type": "string",
+          "description": "URL of the user's Instagram profile."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address."
         }
       },
       "required": ["name", "bio"]
