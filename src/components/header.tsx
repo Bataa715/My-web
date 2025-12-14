@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose 
 import { Menu, PencilRuler, Eye, LockKeyhole, PlusCircle } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useEditMode } from '@/contexts/EditModeContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from './ui/dialog';
 import { Input } from './ui/input';
@@ -33,6 +33,11 @@ const Header = () => {
     const { toast } = useToast();
     const pathname = usePathname();
     const isAboutPage = pathname === '/about';
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
   
     const handleEditClick = () => {
       if (isEditMode) {
@@ -57,6 +62,9 @@ const Header = () => {
       }
     };
     
+    if (!isMounted) {
+      return null;
+    }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
