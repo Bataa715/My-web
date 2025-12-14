@@ -14,11 +14,18 @@ import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { AddProjectDialog } from './AddProjectDialog';
 import { AddSkillDialog } from './AddSkillDialog';
+import { usePathname } from 'next/navigation';
 
 const navLinks = [
   { href: "#home", label: "Нүүр" },
   { href: "#projects", label: "Төслүүд" },
   { href: "#skills", label: "Ур чадвар" },
+];
+
+const mainLinks = [
+  { href: "/", label: "Нүүр" },
+  { href: "/about", label: "My CV" },
+  { href: "/tools", label: "Tools" },
 ];
 
 const CORRECT_PASSWORD = "Bataa2480";
@@ -30,6 +37,8 @@ const Header = () => {
     const [password, setPassword] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const { toast } = useToast();
+    const pathname = usePathname();
+    const isAboutPage = pathname === '/about';
   
     const handleEditClick = () => {
       if (isEditMode) {
@@ -65,7 +74,7 @@ const Header = () => {
                 </span>
             </Link>
             <nav className="flex items-center gap-4 text-sm">
-                {navLinks.map((link) => (
+                {isAboutPage ? navLinks.map((link) => (
                 <Link
                     key={link.href}
                     href={link.href}
@@ -73,8 +82,19 @@ const Header = () => {
                 >
                     {link.label}
                 </Link>
+                )) : mainLinks.map((link) => (
+                   <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "transition-colors hover:text-primary",
+                      (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href ? "text-primary font-semibold" : "text-muted-foreground"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
                 ))}
-                {isEditMode && (
+                {isEditMode && isAboutPage && (
                   <>
                     <AddProjectDialog>
                         <Button variant="ghost" className="transition-colors hover:text-foreground/80 text-foreground/60 px-0">Төсөл нэмэх</Button>
@@ -106,7 +126,7 @@ const Header = () => {
                 <span className="font-bold font-headline">Ka1_zen</span>
               </Link>
               <nav className="flex flex-col space-y-4 mt-6">
-                {navLinks.map((link) => (
+                {(isAboutPage ? navLinks : mainLinks).map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
@@ -116,7 +136,7 @@ const Header = () => {
                     {link.label}
                   </Link>
                 ))}
-                {isEditMode && (
+                {isEditMode && isAboutPage && (
                   <>
                     <AddProjectDialog>
                         <Button variant="link" className="text-sm font-medium transition-colors hover:text-primary justify-start p-0">Төсөл нэмэх</Button>
@@ -132,7 +152,7 @@ const Header = () => {
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-2">
-            <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
+            {isAboutPage && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
                 if (!open) {
                     setPassword("");
                     setPasswordError("");
@@ -189,7 +209,7 @@ const Header = () => {
                     </Button>
                 </DialogFooter>
                 </DialogContent>
-            </Dialog>
+            </Dialog>}
             <ThemeToggle />
         </div>
       </div>

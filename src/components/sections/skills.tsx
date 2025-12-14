@@ -19,6 +19,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { motion } from 'framer-motion';
 
 
 const Skills = () => {
@@ -63,7 +64,7 @@ const Skills = () => {
                         {skills.map((skillGroup) => (
                             <Card key={skillGroup.id} className="hover:shadow-lg transition-shadow duration-300 relative group bg-muted/30">
                                 {isEditMode && (
-                                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="absolute top-2 right-2 flex gap-1 z-10">
                                         <EditSkillDialog skillGroup={skillGroup}>
                                             <Button variant="ghost" size="icon" className="h-7 w-7">
                                                 <Edit className="h-4 w-4" />
@@ -106,6 +107,16 @@ const Skills = () => {
                                 </CardContent>
                             </Card>
                         ))}
+                        {isEditMode && (
+                           <motion.div layout initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
+                                <AddSkillDialog>
+                                    <button className="flex h-full min-h-[150px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/20 text-muted-foreground transition-colors hover:border-primary hover:bg-muted/50 hover:text-primary">
+                                        <PlusCircle size={40} />
+                                        <span className="mt-4 font-semibold">Шинэ ур чадвар нэмэх</span>
+                                    </button>
+                                </AddSkillDialog>
+                           </motion.div>
+                        )}
                     </div>
                 )}
             </div>

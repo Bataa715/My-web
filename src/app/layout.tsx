@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { AppThemeProvider } from "@/components/AppThemeProvider";
-import { Header } from "@/components/layout/Header";
+import Header from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { FirebaseClientProvider } from "@/firebase/client-provider";
 import Footer from "@/components/footer";
+import { EditModeProvider } from "@/contexts/EditModeContext";
 
 export const metadata: Metadata = {
   title: "Kaizen",
@@ -37,18 +38,20 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <FirebaseClientProvider>
-            <div className="relative flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1">
-                <div className="page-container-wrapper rounded-lg">
-                  <div className="page-container p-4 sm:p-6 lg:p-8 rounded-lg">
-                    {children}
+            <EditModeProvider>
+              <div className="relative flex min-h-screen flex-col">
+                <Header />
+                <main className="flex-1">
+                  <div className="page-container-wrapper rounded-lg">
+                    <div className="page-container p-4 sm:p-6 lg:p-8 rounded-lg">
+                      {children}
+                    </div>
                   </div>
-                </div>
-              </main>
-              <Footer />
-            </div>
-            <Toaster />
+                </main>
+                <Footer />
+              </div>
+              <Toaster />
+            </EditModeProvider>
           </FirebaseClientProvider>
         </AppThemeProvider>
       </body>
