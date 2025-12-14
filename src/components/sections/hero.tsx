@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import * as Icons from 'lucide-react';
+import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, LinkIcon, AlertTriangle, Pencil, Upload } from 'lucide-react';
 import { useState, useEffect, type FC } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -19,8 +19,6 @@ import Image from "next/image";
 import { useFirebase, updateDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase";
 import { initialOrbitInfo as dataOrbitInfo } from "@/lib/data";
 
-const { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, LinkIcon, AlertTriangle, Pencil, Upload } from Icons;
-
 const staticPersonalInfo = {
     name: "Б.Батмягмар",
     bio: "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.",
@@ -32,8 +30,8 @@ const staticPersonalInfo = {
 const defaultProfileImage = "https://images.unsplash.com/photo-1607878111648-75872a0a0736?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NjU1Mjc1NTN8MA&ixlib=rb-4.1.0&q=80&w=1080";
 
 const getIcon = (iconName: string) => {
-    const Icon = (Icons as any)[iconName];
-    return Icon ? <Icon className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6 text-destructive" />;
+    const LucideIcon = (require('lucide-react') as any)[iconName];
+    return LucideIcon ? <LucideIcon className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6 text-destructive" />;
 };
 
 interface OrbitItemProps {

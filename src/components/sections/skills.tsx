@@ -5,7 +5,7 @@ import { Badge } from '../ui/badge';
 import { Skeleton } from '../ui/skeleton';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { Button } from '../ui/button';
-import { PlusCircle, Trash2, Edit } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, AlertTriangle } from 'lucide-react';
 import { AddSkillDialog } from '../AddSkillDialog';
 import { EditSkillDialog } from '../EditSkillDialog';
 import {
@@ -19,8 +19,6 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import * as Icons from 'lucide-react';
-import { AlertTriangle } from 'lucide-react';
 
 
 const Skills = () => {
@@ -28,8 +26,8 @@ const Skills = () => {
     const { isEditMode } = useEditMode();
 
     const getIcon = (iconName: string) => {
-        const Icon = (Icons as any)[iconName];
-        return Icon ? <Icon className="h-8 w-8 text-primary" /> : <AlertTriangle className="h-8 w-8 text-destructive" />;
+        const LucideIcon = (require('lucide-react') as any)[iconName];
+        return LucideIcon ? <LucideIcon className="h-8 w-8 text-primary" /> : <AlertTriangle className="h-8 w-8 text-destructive" />;
     };
 
     return (
