@@ -17,11 +17,6 @@ const Footer = () => {
             </Link>
           </Button>
           <Button variant="ghost" size="icon" asChild>
-            <Link href={personalInfo.instagram} target="_blank">
-              <Linkedin />
-            </Link>
-          </Button>
-          <Button variant="ghost" size="icon" asChild>
             <Link href={`mailto:${personalInfo.email}`} target="_blank">
               <Twitter />
             </Link>
