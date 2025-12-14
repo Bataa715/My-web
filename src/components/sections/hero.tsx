@@ -36,8 +36,8 @@ interface OrbitItemProps {
 const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick, isEditing }) => {
     const angle = (index / total) * 2 * Math.PI;
     
-    const baseRadius = 150;
-    const mdBaseRadius = 190;
+    const baseRadius = 140;
+    const mdBaseRadius = 180;
     const editingRadius = 170;
     const mdEditingRadius = 210;
 
@@ -509,7 +509,7 @@ export default function Hero() {
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className={cn("absolute -top-2 -right-2 h-8 w-8 text-muted-foreground", selectedOrbit.type !== 'audio' && "hover:text-white")}
+                                                className="absolute -top-2 -right-2 h-8 w-8 z-30 text-background/80 hover:text-background"
                                             >
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
