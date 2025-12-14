@@ -13,7 +13,7 @@ import { initialEnglishWords } from '@/data/english';
 
 const columns = [
   { key: 'word' as keyof EnglishWord, header: 'English Word' },
-  { key: 'meaning' as keyof EnglishWord, header: 'Mongolian' },
+  { key: 'meaning' as keyof EnglishWord, header: 'Утга' },
 ];
 
 export default function EnglishVocabularyPage() {
