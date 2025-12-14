@@ -12,6 +12,12 @@ import Image from 'next/image';
 
 const tools = [
   {
+    title: "Англи хэл",
+    description: "Үгсийн сан болон дүрмээ бататгаарай.",
+    href: "/tools/english",
+    icon: <BookOpen className="h-6 w-6" />
+  },
+  {
     title: "Япон хэл",
     description: "Хирагана, катакана, үгсийн сан, дүрэм.",
     href: "/tools/japanese",
