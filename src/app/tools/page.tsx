@@ -74,7 +74,7 @@ export default function ToolsPage() {
     }, [user, firestore, isUserLoading]);
 
   return (
-    <div className="relative min-h-[calc(100vh-57px-81px)] flex flex-col overflow-hidden">
+    <div className="relative min-h-[calc(100vh-57px-81px)]">
        {heroImage && (
           <div className="absolute bottom-0 left-0 w-full h-[60vh] z-0">
               <Image
@@ -87,7 +87,7 @@ export default function ToolsPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
           </div>
         )}
-       <div className="space-y-8 z-10 pt-8 flex-grow">
+       <div className="relative z-10 space-y-8 pt-8">
           <BackButton />
           <div className="text-center">
             <h1 className="text-3xl font-bold font-headline">Хэрэгслүүд</h1>
