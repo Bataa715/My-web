@@ -5,6 +5,9 @@ import Image from 'next/image';
 import { useFirebase } from '@/firebase';
 import type { UserProfile } from '@/lib/types';
 import { doc, getDoc } from 'firebase/firestore';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { ArrowRight, Wrench } from 'lucide-react';
 
 export default function Home() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -47,6 +50,26 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-10"></div>
         </>
       )}
+       <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
+          <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl font-headline">
+            Тавтай морилно уу
+          </h1>
+          <p className="max-w-[700px] text-muted-foreground md:text-xl">
+           Энэ бол тасралтгүй хөгжил, суралцах үйл явцыг минь харуулсан хувийн орон зай юм.
+          </p>
+          <div className="flex flex-col gap-4 sm:flex-row">
+            <Button asChild size="lg">
+              <Link href="/about">
+                Миний тухай <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link href="/tools">
+                <Wrench className="mr-2 h-5 w-5" /> Хэрэгслүүд
+              </Link>
+            </Button>
+          </div>
+        </div>
     </div>
   );
 }
