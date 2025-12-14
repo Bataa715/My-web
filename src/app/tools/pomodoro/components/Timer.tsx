@@ -89,20 +89,20 @@ export default function Timer() {
     };
 
     return (
-        <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm">
+        <Card className="w-full max-w-lg bg-card/80 backdrop-blur-sm">
             <CardContent className="flex flex-col items-center justify-center space-y-8 py-10">
-                <div className="text-8xl font-bold font-mono text-primary tracking-tighter">
+                <div className="text-9xl font-bold font-mono text-primary tracking-tighter">
                     {formatTime(time)}
                 </div>
                 <div className="flex items-center space-x-4">
-                    <Button onClick={toggleTimer} size="lg" className="w-32">
-                        {isActive ? <Pause className="mr-2 h-5 w-5" /> : <Play className="mr-2 h-5 w-5" />}
+                    <Button onClick={toggleTimer} className="w-40 h-14 px-8 text-lg">
+                        {isActive ? <Pause className="mr-2 h-6 w-6" /> : <Play className="mr-2 h-6 w-6" />}
                         {isActive ? 'Pause' : 'Start'}
                     </Button>
                      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                         <DialogTrigger asChild>
-                             <Button variant="outline" size="icon">
-                                <Settings className="h-5 w-5" />
+                             <Button variant="outline" size="icon" className="h-14 w-14">
+                                <Settings className="h-6 w-6" />
                                 <span className="sr-only">Тохиргоо</span>
                             </Button>
                         </DialogTrigger>
@@ -143,8 +143,8 @@ export default function Timer() {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <Button onClick={resetTimer} variant="outline" size="icon">
-                        <RotateCw className="h-5 w-5" />
+                    <Button onClick={resetTimer} variant="outline" size="icon" className="h-14 w-14">
+                        <RotateCw className="h-6 w-6" />
                         <span className="sr-only">Reset</span>
                     </Button>
                 </div>
