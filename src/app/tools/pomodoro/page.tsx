@@ -118,16 +118,15 @@ const PomodoroTimer = () => {
             </div>
           </div>
           <div className="flex justify-center gap-4">
-            <Button onClick={toggleTimer} size="lg" className="w-32">
-              {isActive ? <Pause className="mr-2" /> : <Play className="mr-2" />}
-              {isActive ? 'Зогсоох' : 'Эхлүүлэх'}
+            <Button onClick={toggleTimer} size="icon" variant="default" className="w-16 h-16 rounded-full">
+              {isActive ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
             </Button>
-            <Button onClick={resetTimer} variant="outline" size="lg">
-              <RotateCcw />
+            <Button onClick={resetTimer} variant="outline" size="icon" className="w-16 h-16 rounded-full">
+              <RotateCcw className="w-8 h-8" />
             </Button>
              <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline" size="lg"><Settings /></Button>
+                    <Button variant="outline" size="icon" className="w-16 h-16 rounded-full"><Settings className="w-8 h-8" /></Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
