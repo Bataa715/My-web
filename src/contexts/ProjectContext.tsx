@@ -4,12 +4,12 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import type { Project } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { useFirebase } from '@/firebase';
-import { collection, getDocs, doc, query, orderBy, Timestamp, serverTimestamp, writeBatch } from "firebase/firestore";
-import { addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { collection, getDocs, doc, query, orderBy, Timestamp, serverTimestamp, writeBatch, addDoc, deleteDoc, updateDoc } from "firebase/firestore";
 
 interface ProjectContextType {
   projects: Project[];
   addProject: (project: Omit<Project, 'id' | 'createdAt'>) => Promise<void>;
+  updateProject: (projectId: string, project: Partial<Omit<Project, 'id' | 'createdAt'>>) => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
   loading: boolean;
 }
@@ -118,14 +118,12 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         const projectsCollection = collection(firestore, `users/${user.uid}/projects`);
         const newProjectData = { ...project, createdAt: serverTimestamp() };
         
-        // Optimistically update UI
         const tempId = "temp-" + Date.now();
-        const optimisticProject = { ...project, id: tempId, createdAt: new Date() };
+        const optimisticProject: Project = { ...project, id: tempId, createdAt: new Date() };
         setProjects((prevProjects) => [optimisticProject, ...prevProjects]);
 
         const docRef = await addDoc(projectsCollection, newProjectData);
       
-        // Replace temporary project with real one from Firestore
         setProjects((prevProjects) => prevProjects.map(p => p.id === tempId ? { ...optimisticProject, id: docRef.id } : p));
 
         toast({
@@ -139,8 +137,33 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
             description: "Төсөл нэмэхэд алдаа гарлаа.",
             variant: "destructive",
         });
-        // Rollback optimistic update
         setProjects(prev => prev.filter(p => !p.id?.startsWith('temp-')));
+    }
+  };
+
+  const updateProject = async (projectId: string, projectUpdate: Partial<Omit<Project, 'id' | 'createdAt'>>) => {
+    if (!firestore || !user) {
+      toast({ title: "Алдаа", description: "Нэвтэрч орно уу.", variant: "destructive" });
+      return;
+    }
+    const originalProjects = projects;
+    setProjects(prev => prev.map(p => p.id === projectId ? { ...p, ...projectUpdate } as Project : p));
+
+    try {
+      const projectDoc = doc(firestore, `users/${user.uid}/projects`, projectId);
+      await updateDoc(projectDoc, projectUpdate);
+      toast({
+        title: "Амжилттай шинэчлэгдлээ",
+        description: `Төсөл шинэчлэгдлээ.`,
+      });
+    } catch (error) {
+      console.error("Error updating project: ", error);
+      setProjects(originalProjects);
+      toast({
+        title: "Алдаа",
+        description: "Төсөл шинэчлэхэд алдаа гарлаа.",
+        variant: "destructive",
+      });
     }
   };
   
@@ -153,7 +176,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     const projectToDelete = projects.find(p => p.id === projectId);
     if (!projectToDelete) return;
 
-    // Optimistic UI update
     setProjects((prevProjects) => prevProjects.filter(p => p.id !== projectId));
 
     try {
@@ -165,7 +187,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       });
     } catch (error) {
       console.error("Error deleting project: ", error);
-      // Rollback UI update
       setProjects((prevProjects) => [...prevProjects, projectToDelete].sort((a,b) => (b.createdAt as any) - (a.createdAt as any)));
       toast({
         title: "Алдаа",
@@ -176,7 +197,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ProjectContext.Provider value={{ projects, addProject, deleteProject, loading }}>
+    <ProjectContext.Provider value={{ projects, addProject, updateProject, deleteProject, loading }}>
       {children}
     </ProjectContext.Provider>
   );

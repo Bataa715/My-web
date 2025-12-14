@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Github, ExternalLink, Trash2, Loader2, PlusCircle } from "lucide-react";
+import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit } from "lucide-react";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useProjects } from "@/contexts/ProjectContext";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { AddProjectDialog } from "../AddProjectDialog";
+import { EditProjectDialog } from "../EditProjectDialog";
 
 export default function Projects() {
   const { projects, deleteProject, loading } = useProjects();
@@ -64,18 +65,25 @@ export default function Projects() {
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
                   >
-                    <Card className="flex h-full flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-card relative">
+                    <Card className="flex h-full flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-card relative group">
                       {isEditMode && (
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="absolute top-2 right-2 h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive z-10"
-                          onClick={() => project.id && deleteProject(project.id)}
-                          aria-label="Delete project"
-                          disabled={!project.id}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                         <div className="absolute top-2 right-2 flex gap-1 z-10">
+                            <EditProjectDialog project={project}>
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-muted/50 hover:text-foreground">
+                                    <Edit className="h-4 w-4" />
+                                </Button>
+                            </EditProjectDialog>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                              onClick={() => project.id && deleteProject(project.id)}
+                              aria-label="Delete project"
+                              disabled={!project.id}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
                       )}
                       <CardHeader>
                         <CardTitle className="font-headline">{project.name}</CardTitle>
