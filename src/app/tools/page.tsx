@@ -76,7 +76,7 @@ export default function ToolsPage() {
   return (
     <div className="relative">
        {heroImage && (
-        <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
+        <div className="absolute top-0 left-0 w-full h-[70vh] -z-10">
           <Image
             src={heroImage}
             alt="Abstract technology background"
