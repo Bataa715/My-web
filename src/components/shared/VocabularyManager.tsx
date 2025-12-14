@@ -169,19 +169,23 @@ export default function VocabularyManager<T extends Word>({
 
   const handleDelete = async (id: string) => {
     if (!user || !userWordsCollection) return;
-     if (initialWords.some(iw => iw.id === id)) {
+
+    if (initialWords.some(iw => iw.id === id)) {
       toast({ title: "Анхааруулга", description: "Анхдагч үгийг устгах боломжгүй.", variant: "destructive" });
       return;
     }
+    
     const originalWords = words;
     setWords(words.filter(w => w.id !== id));
+    
     try {
         const docRef = doc(userWordsCollection, id);
         await deleteDoc(docRef);
         toast({ title: "Амжилттай устгалаа", variant: "destructive" });
     } catch(e) {
         setWords(originalWords); // rollback
-        toast({ title: "Алдаа гарлаа", variant: "destructive" });
+        toast({ title: "Алдаа гарлаа", description: "Үг устгахад алдаа гарлаа.", variant: "destructive" });
+        console.error("Error deleting word: ", e);
     }
   };
 
