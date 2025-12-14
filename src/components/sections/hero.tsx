@@ -119,6 +119,8 @@ export default function Hero() {
   const [orbitInfo, setOrbitInfo] = useState<OrbitInfo[]>([]);
   const [socialLinks, setSocialLinks] = useState({ github: '', instagram: '', email: '' });
 
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState("");
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [editedBio, setEditedBio] = useState("");
   
@@ -161,6 +163,7 @@ export default function Hero() {
           setBio(data.bio || '');
           setEditedBio(data.bio || '');
           setName(data.name || '');
+          setEditedName(data.name || '');
           const imageUrl = data.profileImage || '';
           setProfileImage(imageUrl);
           setEditedImage(imageUrl);
@@ -205,6 +208,7 @@ export default function Hero() {
           setBio(defaultBio);
           setEditedBio(defaultBio);
           setName(defaultName);
+          setEditedName(defaultName);
           setProfileImage(defaultProfileImage);
           setEditedImage(defaultProfileImage);
           setOrbitInfo(defaultOrbitInfo);
@@ -306,6 +310,26 @@ export default function Hero() {
     }
   };
 
+  const handleSaveName = async () => {
+    if (!user || !firestore) return;
+    const userInfoDocRef = doc(firestore, "users", user.uid);
+    setSaving(true);
+    try {
+      await updateDoc(userInfoDocRef, { name: editedName });
+      setName(editedName);
+      setIsEditingName(false);
+      toast({
+        title: "Амжилттай",
+        description: "Таны нэр шинэчлэгдлээ.",
+      });
+    } catch (error) {
+      console.error("Error updating name:", error);
+      toast({ title: "Алдаа", description: "Нэр шинэчлэхэд алдаа гарлаа.", variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleSaveBio = async () => {
     if (!user || !firestore) return;
     const userInfoDocRef = doc(firestore, "users", user.uid);
@@ -329,6 +353,11 @@ export default function Hero() {
   const handleCancelEditBio = () => {
     setEditedBio(bio);
     setIsEditingBio(false);
+  };
+
+  const handleCancelEditName = () => {
+    setEditedName(name);
+    setIsEditingName(false);
   };
   
   if (loading) {
@@ -379,9 +408,39 @@ export default function Hero() {
         <div className="grid items-center justify-center gap-10 lg:grid-cols-2 lg:gap-20">
           <div className="flex flex-col justify-center space-y-6">
             <div className="space-y-4">
-              <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                {name}
-              </h1>
+               <div className="relative">
+                {isEditingName ? (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={editedName}
+                      onChange={(e) => setEditedName(e.target.value)}
+                      className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none h-auto p-0 border-0 focus-visible:ring-0 bg-transparent"
+                    />
+                    <Button onClick={handleSaveName} size="icon" className="h-8 w-8" disabled={saving}>
+                      {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4" />}
+                    </Button>
+                    <Button onClick={handleCancelEditName} size="icon" variant="ghost" className="h-8 w-8">
+                      <XCircle className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                      {name}
+                    </h1>
+                    {isEditMode && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setIsEditingName(true)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
               <div className="relative">
                 {isEditingBio ? (
                   <div className="space-y-2">
@@ -639,20 +698,20 @@ export default function Hero() {
                                     <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
                                 </Avatar>
                             </div>
+                             {isEditMode && (
+                                <Button 
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => setIsEditingImage(true)}
+                                    className="absolute bottom-0 right-0 h-10 w-10 rounded-full z-10 bg-background/50 backdrop-blur-sm"
+                                >
+                                    <Upload className="h-4 w-4" />
+                                    <span className="sr-only">Зураг солих</span>
+                                </Button>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
-                {isEditMode && !selectedOrbit && (
-                    <Button 
-                        variant="outline"
-                        size="icon"
-                        onClick={() => setIsEditingImage(true)}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-10 w-10 rounded-full z-30 bg-background/50 backdrop-blur-sm"
-                    >
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">Зураг солих</span>
-                    </Button>
-                )}
                 {orbitInfo.map((item, index) => (
                    <OrbitItem 
                      key={item.id}
