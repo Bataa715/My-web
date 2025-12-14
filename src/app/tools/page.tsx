@@ -37,18 +37,6 @@ const tools = [
   },
 ];
 
-const WavyLine = () => (
-  <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="w-full h-auto">
-    <path
-      d="M0,64 C240,128 480,32 720,64 C960,96 1200,0 1440,64"
-      stroke="hsl(var(--border))"
-      strokeWidth="4"
-      fill="none"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
 
 export default function ToolsPage() {
    const { firestore, user, isUserLoading } = useFirebase();
@@ -110,9 +98,6 @@ export default function ToolsPage() {
        </div>
 
         <div className="absolute bottom-0 left-0 w-full z-0 h-full">
-            <div className="absolute -top-16 left-0 w-full z-10">
-            </div>
-            
             {heroImage && (
               <div 
                 className="absolute inset-0 w-full h-full"
