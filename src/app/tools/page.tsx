@@ -75,7 +75,7 @@ export default function ToolsPage() {
 
   return (
     <div className="relative">
-       {heroImage && (
+      {heroImage && (
         <div className="absolute top-0 left-0 w-full h-[70vh] -z-10">
           <Image
             src={heroImage}
@@ -89,10 +89,6 @@ export default function ToolsPage() {
       )}
       <div className="space-y-8">
         <BackButton />
-        <div className="text-center">
-          
-        </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
           {tools.map((tool) => (
             <Link href={tool.href} key={tool.title} className="group">
