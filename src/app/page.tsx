@@ -2,13 +2,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { personalInfo } from '@/lib/data';
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find(p => p.id === 'hero-background');
 
   return (
-    <div className="flex flex-col items-center justify-center text-center py-16 md:py-24 min-h-[calc(100vh-120px)]">
+    <div className="relative flex flex-col items-center justify-center text-center py-32 md:py-48">
        {heroImage && (
         <Image
           src={heroImage.imageUrl}
