@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload } from 'lucide-react';
+import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, Quote, Film, Music, Gamepad2, MapPin, Dribbble } from 'lucide-react';
 import { useState, useEffect, type FC } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,8 @@ import type { OrbitInfo } from "@/lib/types";
 import { useEditMode } from "@/contexts/EditModeContext";
 import Image from "next/image";
 import { useFirebase, updateDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
+
 
 const staticPersonalInfo = {
     name: "Б.Батмягмар",
@@ -26,16 +28,21 @@ const staticPersonalInfo = {
     email: "batmyagmar.b@gmail.com",
 };
 
+const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
+const defaultProfileImage = avatarPlaceholder?.imageUrl || "https://picsum.photos/seed/avatar/400/400";
+
+
 const initialOrbitInfo: OrbitInfo[] = [
-    { id: 'about', icon: 'User', title: 'Миний тухай', content: 'Би бол ирээдүйн програм хангамжийн инженер. Технологид дуртай, шинийг эрэлхийлэгч.' },
-    { id: 'hobbies', icon: 'Heart', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.' },
+    { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Улаанбаатар, Монгол' },
+    { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.' },
     { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн хэмжээний програм хангамжийн компанид ажиллах.' },
-    { id: 'contact', icon: 'Mail', title: 'Холбоо барих', content: 'Надтай batmyagmar.b@gmail.com хаягаар холбогдоорой.' },
+    { id: 'funFact', icon: 'Dribbble', title: 'Сонирхолтой баримт', content: 'Би сагсан бөмбөг тоглох дуртай.' },
     { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Дуртай дууг сонсох.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
-    { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', backgroundImage: 'https://images.unsplash.com/photo-1536440136628-849c177E76a1?w=800' }
+    { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', backgroundImage: 'https://images.unsplash.com/photo-1536440136628-849c177E76a1?w=800' },
+    { id: 'quote', icon: 'Quote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay' },
+    { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.' },
 ];
 
-const defaultProfileImage = "https://images.unsplash.com/photo-1607878111648-75872a0a0736?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NjU1Mjc1NTN8MA&ixlib=rb-4.1.0&q=80&w=1080";
 
 const getIcon = (iconName: string) => {
     const LucideIcon = (require('lucide-react') as any)[iconName];
@@ -306,7 +313,7 @@ export default function Hero() {
         setSelectedOrbit(item);
         setEditedOrbitContent(item.content);
         if(item.type === 'audio') {
-            setEditedYoutubeUrl(item.youtubeVideoId ? `https://www.youtube.com/watch?v=${'item.youtubeVideoId'}` : '');
+            setEditedYoutubeUrl(item.youtubeVideoId ? `https://www.youtube.com/watch?v=${item.youtubeVideoId}` : '');
         } else {
             setEditedOrbitBgImage(item.backgroundImage || "");
         }
@@ -382,7 +389,7 @@ export default function Hero() {
               <Link href={staticPersonalInfo.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <Instagram className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
               </Link>
-              <Link href={`mailto:${'staticPersonalInfo.email'}`} aria-label="Email">
+              <Link href={`mailto:${staticPersonalInfo.email}`} aria-label="Email">
                 <Mail className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
               </Link>
             </div>
@@ -462,7 +469,7 @@ export default function Hero() {
                                                 <div className="w-full aspect-video rounded-lg overflow-hidden">
                                                       <iframe
                                                         className="w-full h-full"
-                                                        src={`https://www.youtube.com/embed/${'selectedOrbit.youtubeVideoId'}`}
+                                                        src={`https://www.youtube.com/embed/${selectedOrbit.youtubeVideoId}`}
                                                         title="YouTube video player"
                                                         frameBorder="0"
                                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -536,7 +543,7 @@ export default function Hero() {
           <DialogHeader>
             <DialogTitle>Профайл зургийн холбоос</DialogTitle>
             <DialogDescription>
-              Шинэ зургийнхаа URL хаягийг энд буулгана уу.
+              Шинэ зургийнхаа URL хаягийг энд буулгана уу. Base64 форматтай зураг байж болно.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
