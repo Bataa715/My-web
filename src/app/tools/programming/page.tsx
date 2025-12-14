@@ -1,6 +1,6 @@
 
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { db } from '@/firebase/config';
+import { initializeFirebase } from '@/firebase';
 import BackButton from '@/components/shared/BackButton';
 import CheatSheet from '@/app/tools/programming/components/CheatSheet';
 import ConceptCards from '@/app/tools/programming/components/ConceptCards';
@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 async function getProgrammingData() {
     try {
+        const { firestore: db } = initializeFirebase();
+
         const conceptsRef = collection(db, "programmingConcepts");
         const conceptsSnap = await getDocs(conceptsRef);
         const concepts = conceptsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgrammingConcept));
