@@ -6,7 +6,7 @@ import GrammarList from '@/components/shared/GrammarList';
 import type { EnglishWord, GrammarRule } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import { useFirebase } from '@/firebase';
-import { collection, getDocs, query, orderBy, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, writeBatch, doc } from 'firebase/firestore';
 
 const englishColumns = [
     { key: 'word' as keyof EnglishWord, header: 'English Word' },
@@ -28,7 +28,7 @@ const initialEnglishGrammarData: Omit<GrammarRule, 'id'>[] = [
 
 
 export default function EnglishPage() {
-    const { firestore } = useFirebase();
+    const { firestore, user } = useFirebase();
     const [initialEnglishWords, setInitialEnglishWords] = useState<EnglishWord[]>([]);
     const [englishGrammar, setEnglishGrammar] = useState<GrammarRule[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,6 +37,7 @@ export default function EnglishPage() {
         if (!firestore) return;
 
         async function seedCollection(collectionName: string, data: any[]) {
+            if (!user) return; // Only seed if user is logged in
             const collectionRef = collection(firestore, collectionName);
             const snapshot = await getDocs(query(collectionRef));
             if (snapshot.empty) {
@@ -83,7 +84,7 @@ export default function EnglishPage() {
             setLoading(false);
         }
         fetchData();
-    }, [firestore]);
+    }, [firestore, user]);
 
 
     if (loading) {

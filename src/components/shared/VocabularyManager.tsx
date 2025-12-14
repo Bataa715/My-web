@@ -38,7 +38,7 @@ import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
 import { useFirebase } from '@/firebase';
-import { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, writeBatch } from "firebase/firestore";
+import { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, setDoc, query } from "firebase/firestore";
 
 type Word = EnglishWord | JapaneseWord;
 
@@ -56,7 +56,7 @@ export default function VocabularyManager<T extends Word>({
   columns,
 }: VocabularyManagerProps<T>) {
   const { firestore, user } = useFirebase();
-  const [words, setWords] = useState<T[]>(initialWords);
+  const [words, setWords] = useState<T[]>(initialWords.map(w => ({ ...w, memorized: false })));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentWord, setCurrentWord] = useState<T | null>(null);
   const { toast } = useToast();
@@ -64,34 +64,48 @@ export default function VocabularyManager<T extends Word>({
   const userWordsCollection = user ? collection(firestore, `users/${user.uid}/${collectionPath}`) : null;
 
   useEffect(() => {
-    if (!userWordsCollection) {
-      setWords(initialWords.map(w => ({ ...w, memorized: false })));
-      return;
+    if (!user || !firestore) {
+        setWords(initialWords.map(w => ({ ...w, memorized: false })));
+        return;
     }
 
     const fetchUserWords = async () => {
-      const userWordsSnapshot = await getDocs(userWordsCollection);
-      const userWordsData = new Map(userWordsSnapshot.docs.map(d => [d.id, d.data()]));
+        const publicWords = initialWords.map(w => ({ ...w, memorized: false }));
+        
+        if (!userWordsCollection) {
+            setWords(publicWords);
+            return;
+        }
 
-      const mergedWords = initialWords.map(initialWord => {
-        const userWord = userWordsData.get(initialWord.id!);
-        return userWord ? { ...initialWord, ...userWord } : { ...initialWord, memorized: false };
-      });
-      
-      const userAddedWords = userWordsSnapshot.docs
-        .filter(doc => !initialWords.some(iw => iw.id === doc.id))
-        .map(doc => ({ id: doc.id, ...doc.data() } as T));
+        const userWordsQuery = query(userWordsCollection);
+        const userWordsSnapshot = await getDocs(userWordsQuery);
+        const userWordsData = new Map(userWordsSnapshot.docs.map(d => [d.id, d.data() as T]));
 
-      setWords([...mergedWords, ...userAddedWords]);
+        const mergedWords = publicWords.map(initialWord => {
+            const userWord = userWordsData.get(initialWord.id!);
+            if (userWord) {
+                // If user has a record for this public word, use their memorized status
+                return { ...initialWord, memorized: userWord.memorized };
+            }
+            return initialWord; // Otherwise, use the default public word
+        });
+
+        // Add words that only the user has created
+        const userAddedWords = userWordsSnapshot.docs
+            .filter(doc => !initialWords.some(iw => iw.id === doc.id))
+            .map(doc => ({ id: doc.id, ...doc.data() } as T));
+
+        setWords([...mergedWords, ...userAddedWords]);
     };
 
     fetchUserWords();
-  }, [initialWords, userWordsCollection]);
+}, [initialWords, userWordsCollection, user, firestore]);
+
 
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!user || !firestore) return;
+    if (!userWordsCollection) return;
 
     const formData = new FormData(e.currentTarget);
     const newWordData: { [key: string]: any } = {};
@@ -102,13 +116,13 @@ export default function VocabularyManager<T extends Word>({
     });
 
     try {
-      if (currentWord) { // Edit
-        const docRef = doc(firestore, `users/${user.uid}/${collectionPath}`, currentWord.id!);
+      if (currentWord?.id) { // Edit existing word
+        const docRef = doc(userWordsCollection, currentWord.id);
         await updateDoc(docRef, newWordData);
         setWords(words.map(w => w.id === currentWord.id ? { ...w, ...newWordData } as T : w));
         toast({ title: "Амжилттай заслаа", description: "Үгийн мэдээлэл шинэчлэгдлээ." });
-      } else { // Add
-        const docRef = await addDoc(collection(firestore, `users/${user.uid}/${collectionPath}`), {
+      } else { // Add new word
+        const docRef = await addDoc(userWordsCollection, {
           ...newWordData,
           memorized: false,
         });
@@ -126,13 +140,13 @@ export default function VocabularyManager<T extends Word>({
   };
 
   const handleDelete = async (id: string) => {
-    if (!user || !firestore) return;
+    if (!userWordsCollection) return;
      if (initialWords.some(iw => iw.id === id)) {
       toast({ title: "Анхааруулга", description: "Анхдагч үгийг устгах боломжгүй.", variant: "destructive" });
       return;
     }
     try {
-        const docRef = doc(firestore, `users/${user.uid}/${collectionPath}`, id);
+        const docRef = doc(userWordsCollection, id);
         await deleteDoc(docRef);
         setWords(words.filter(w => w.id !== id));
         toast({ title: "Амжилттай устгалаа", variant: "destructive" });
@@ -142,15 +156,14 @@ export default function VocabularyManager<T extends Word>({
   };
 
   const toggleMemorized = async (id: string, checked: boolean) => {
-    if (!user || !firestore) return;
+    if (!userWordsCollection) return;
     setWords(words.map(w => w.id === id ? { ...w, memorized: checked } : w));
     
-    const docRef = doc(firestore, `users/${user.uid}/${collectionPath}`, id);
+    const docRef = doc(userWordsCollection, id);
     try {
       await setDoc(docRef, { memorized: checked }, { merge: true });
     } catch (e) {
       console.error("Error updating memorized status:", e);
-      // Revert state on error
       setWords(words.map(w => w.id === id ? { ...w, memorized: !checked } : w));
     }
   };
@@ -225,10 +238,11 @@ export default function VocabularyManager<T extends Word>({
                     <Checkbox
                       checked={word.memorized}
                       onCheckedChange={(checked) => toggleMemorized(word.id!, !!checked)}
+                      disabled={!user}
                     />
                   </TableCell>
                   <TableCell className="text-right space-x-2">
-                    <Button variant="ghost" size="icon" onClick={() => openDialog(word)}>
+                    <Button variant="ghost" size="icon" onClick={() => openDialog(word)} disabled={!user}>
                       <Edit className="h-4 w-4" />
                     </Button>
                     <AlertDialog>
@@ -237,7 +251,7 @@ export default function VocabularyManager<T extends Word>({
                             variant="ghost"
                             size="icon"
                             className="text-destructive hover:text-destructive"
-                            disabled={initialWords.some(iw => iw.id === word.id)}
+                            disabled={!user || initialWords.some(iw => iw.id === word.id)}
                           >
                           <Trash2 className="h-4 w-4" />
                         </Button>

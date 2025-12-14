@@ -41,7 +41,7 @@ const initialJapaneseGrammarData: Omit<GrammarRule, 'id'>[] = [
 
 
 export default function JapanesePage() {
-    const { firestore } = useFirebase();
+    const { firestore, user } = useFirebase();
     const [hiragana, setHiragana] = useState<Kana[]>([]);
     const [katakana, setKatakana] = useState<Kana[]>([]);
     const [initialJapaneseWords, setInitialJapaneseWords] = useState<JapaneseWord[]>([]);
@@ -52,6 +52,7 @@ export default function JapanesePage() {
         if (!firestore) return;
 
         async function seedCollection(collectionName: string, data: any[]) {
+             if (!user) return;
             const collectionRef = collection(firestore, collectionName);
             const snapshot = await getDocs(query(collectionRef));
             if (snapshot.empty) {
@@ -104,7 +105,7 @@ export default function JapanesePage() {
             setLoading(false);
         }
         fetchData();
-    }, [firestore]);
+    }, [firestore, user]);
 
     if (loading) {
         return <div>Loading...</div>
