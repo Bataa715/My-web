@@ -426,12 +426,12 @@ export default function Hero() {
                                 {isEditingOrbit ? (
                                     <motion.div 
                                         key="edit" 
-                                        className="w-full h-full flex flex-col justify-center" 
+                                        className="w-full h-full flex flex-col justify-center items-center" 
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         <div className="w-full p-6 space-y-2">
                                             <div>
-                                                <Label className="text-left text-xs mb-1 block text-foreground">Нэр</Label>
+                                                <Label className="text-center text-xs mb-1 block text-foreground">Нэр</Label>
                                                 <Input
                                                     value={editedOrbitTitle}
                                                     onChange={(e) => setEditedOrbitTitle(e.target.value)}
@@ -440,7 +440,7 @@ export default function Hero() {
                                                 />
                                             </div>
                                             <div>
-                                                <Label className="text-left text-xs mb-1 block text-foreground">Icon</Label>
+                                                <Label className="text-center text-xs mb-1 block text-foreground">Icon</Label>
                                                 <Input
                                                     value={editedOrbitIcon}
                                                     onChange={(e) => setEditedOrbitIcon(e.target.value)}
@@ -449,7 +449,7 @@ export default function Hero() {
                                                 />
                                             </div>
                                             <div>
-                                                <Label className="text-left text-xs mb-1 block text-foreground">Тайлбар</Label>
+                                                <Label className="text-center text-xs mb-1 block text-foreground">Тайлбар</Label>
                                                 <Textarea 
                                                     value={editedOrbitContent}
                                                     onChange={(e) => setEditedOrbitContent(e.target.value)}
@@ -460,7 +460,7 @@ export default function Hero() {
                                             </div>
                                             {selectedOrbit.type === 'audio' ? (
                                                 <div>
-                                                    <Label className="text-left text-xs mb-1 block text-foreground">YouTube холбоос</Label>
+                                                    <Label className="text-center text-xs mb-1 block text-foreground">YouTube холбоос</Label>
                                                     <Input
                                                         value={editedYoutubeUrl}
                                                         onChange={(e) => setEditedYoutubeUrl(e.target.value)}
@@ -470,7 +470,7 @@ export default function Hero() {
                                                 </div>
                                             ) : (
                                                 <div>
-                                                    <Label className="text-left text-xs mb-1 block text-foreground">Арын зураг URL</Label>
+                                                    <Label className="text-center text-xs mb-1 block text-foreground">Арын зураг URL</Label>
                                                     <Input
                                                         value={editedOrbitBgImage}
                                                         onChange={(e) => setEditedOrbitBgImage(e.target.value)}
