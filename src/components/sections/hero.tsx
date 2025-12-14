@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, Quote, Film, Music, Gamepad2, MapPin } from 'lucide-react';
+import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, MessageSquareQuote, Film, Music, Gamepad2, MapPin } from 'lucide-react';
 import { useState, useEffect, type FC } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -168,7 +168,7 @@ export default function Hero() {
               { id: 'user', icon: 'User', title: 'Тухай', content: 'Би програмчлалд дуртай.', type: 'info' },
               { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Дуртай дууг сонсох.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
               { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', type: 'info', backgroundImage: 'https://i.pinimg.com/1200x/81/31/c3/8131c3dccfe8cd2f38ff3798745fbd03.jpg' },
-              { id: 'quote', icon: 'Quote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay', type: 'info' },
+              { id: 'quote', icon: 'MessageSquareQuote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay', type: 'info' },
               { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.', type: 'info' },
           ];
           const defaultData = {
@@ -194,7 +194,7 @@ export default function Hero() {
       }
     };
     fetchUserInfo();
-  }, [user, isUserLoading, firestore]);
+  }, [user, isUserLoading, firestore, toast]);
 
 
   const handleSaveOrbitInfo = async () => {
