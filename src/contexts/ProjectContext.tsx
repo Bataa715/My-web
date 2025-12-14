@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import type { Project } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { useFirebase } from '@/firebase';
-import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, Timestamp, serverTimestamp, writeBatch } from "firebase/firestore";
+import { collection, getDocs, doc, query, orderBy, Timestamp, serverTimestamp, writeBatch } from "firebase/firestore";
 import { addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 interface ProjectContextType {
@@ -110,13 +110,23 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   }, [firestore, user, toast]);
   
   const addProject = async (project: Omit<Project, 'id' | 'createdAt'>) => {
-    if (!firestore || !user) return;
+    if (!firestore || !user) {
+        toast({ title: "Алдаа", description: "Нэвтэрч орно уу.", variant: "destructive" });
+        return;
+    };
     try {
         const projectsCollection = collection(firestore, `users/${user.uid}/projects`);
-        const newProject = { ...project, createdAt: serverTimestamp() };
-        const docRef = await addDocumentNonBlocking(projectsCollection, newProject);
+        const newProjectData = { ...project, createdAt: serverTimestamp() };
+        
+        // Optimistically update UI
+        const tempId = "temp-" + Date.now();
+        const optimisticProject = { ...project, id: tempId, createdAt: new Date() };
+        setProjects((prevProjects) => [optimisticProject, ...prevProjects]);
+
+        const docRef = await addDoc(projectsCollection, newProjectData);
       
-        setProjects((prevProjects) => [{ ...project, id: docRef.id, createdAt: new Date() }, ...prevProjects]);
+        // Replace temporary project with real one from Firestore
+        setProjects((prevProjects) => prevProjects.map(p => p.id === tempId ? { ...optimisticProject, id: docRef.id } : p));
 
         toast({
             title: "Амжилттай нэмэгдлээ",
@@ -129,22 +139,34 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
             description: "Төсөл нэмэхэд алдаа гарлаа.",
             variant: "destructive",
         });
+        // Rollback optimistic update
+        setProjects(prev => prev.filter(p => !p.id?.startsWith('temp-')));
     }
   };
   
   const deleteProject = async (projectId: string) => {
-    if (!firestore || !user) return;
+    if (!firestore || !user) {
+         toast({ title: "Алдаа", description: "Нэвтэрч орно уу.", variant: "destructive" });
+        return;
+    };
+
+    const projectToDelete = projects.find(p => p.id === projectId);
+    if (!projectToDelete) return;
+
+    // Optimistic UI update
+    setProjects((prevProjects) => prevProjects.filter(p => p.id !== projectId));
+
     try {
       const projectDoc = doc(firestore, `users/${user.uid}/projects`, projectId);
-      deleteDocumentNonBlocking(projectDoc);
-      const deletedProject = projects.find(p => p.id === projectId);
-      setProjects((prevProjects) => prevProjects.filter(p => p.id !== projectId));
+      await deleteDoc(projectDoc);
       toast({
         title: "Устгагдлаа",
-        description: `"${deletedProject?.name}" төсөл устгагдлаа.`,
+        description: `"${projectToDelete?.name}" төсөл устгагдлаа.`,
       });
     } catch (error) {
       console.error("Error deleting project: ", error);
+      // Rollback UI update
+      setProjects((prevProjects) => [...prevProjects, projectToDelete].sort((a,b) => (b.createdAt as any) - (a.createdAt as any)));
       toast({
         title: "Алдаа",
         description: "Төсөл устгахад алдаа гарлаа.",

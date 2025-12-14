@@ -56,59 +56,67 @@ export default function VocabularyManager<T extends Word>({
   columns,
 }: VocabularyManagerProps<T>) {
   const { firestore, user } = useFirebase();
-  const [words, setWords] = useState<T[]>(initialWords.map(w => ({ ...w, memorized: false })));
+  const [words, setWords] = useState<T[]>(initialWords);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentWord, setCurrentWord] = useState<T | null>(null);
   const { toast } = useToast();
 
   const userWordsCollection = user ? collection(firestore, `users/${user.uid}/${collectionPath}`) : null;
+  const publicWordsCollection = firestore ? collection(firestore, collectionPath) : null;
 
   useEffect(() => {
-    if (!user || !firestore) {
-        setWords(initialWords.map(w => ({ ...w, memorized: false })));
-        return;
-    }
-
-    const fetchUserWords = async () => {
-        const publicWords = initialWords.map(w => ({ ...w, memorized: false }));
+    const fetchWords = async () => {
+        if (!firestore) return;
         
-        if (!userWordsCollection) {
+        // 1. Fetch public words
+        const publicWordsQuery = query(publicWordsCollection!);
+        const publicWordsSnapshot = await getDocs(publicWordsQuery);
+        const publicWords = publicWordsSnapshot.docs.map(d => ({ ...d.data(), id: d.id, memorized: false } as T));
+
+        if (!user || !userWordsCollection) {
             setWords(publicWords);
             return;
         }
 
+        // 2. Fetch user-specific words and statuses
         const userWordsQuery = query(userWordsCollection);
         const userWordsSnapshot = await getDocs(userWordsQuery);
-        const userWordsData = new Map(userWordsSnapshot.docs.map(d => [d.id, d.data() as T]));
-
-        const mergedWords = publicWords.map(initialWord => {
-            const userWord = userWordsData.get(initialWord.id!);
-            if (userWord) {
-                // If user has a record for this public word, use their memorized status
-                return { ...initialWord, memorized: userWord.memorized };
-            }
-            return initialWord; // Otherwise, use the default public word
+        
+        const userWordMap = new Map<string, T>();
+        userWordsSnapshot.docs.forEach(doc => {
+            userWordMap.set(doc.id, { id: doc.id, ...doc.data() } as T);
         });
 
-        // Add words that only the user has created
-        const userAddedWords = userWordsSnapshot.docs
-            .filter(doc => !initialWords.some(iw => iw.id === doc.id))
-            .map(doc => ({ id: doc.id, ...doc.data() } as T));
+        // 3. Merge public words with user's memorized status
+        const mergedWords = publicWords.map(publicWord => {
+            const userWord = userWordMap.get(publicWord.id!);
+            if (userWord) {
+                userWordMap.delete(publicWord.id!); // Remove from map to leave only user-added words
+                return { ...publicWord, memorized: userWord.memorized };
+            }
+            return publicWord; // User hasn't interacted with this public word
+        });
 
+        // 4. Add user-created words
+        const userAddedWords = Array.from(userWordMap.values());
+        
         setWords([...mergedWords, ...userAddedWords]);
     };
 
-    fetchUserWords();
-}, [initialWords, userWordsCollection, user, firestore]);
+    fetchWords();
+  }, [firestore, user, collectionPath]);
 
 
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!userWordsCollection) return;
+    if (!user || !userWordsCollection) {
+         toast({ title: "Алдаа", description: "Үг хадгалахын тулд нэвтэрнэ үү.", variant: "destructive" });
+        return
+    };
 
     const formData = new FormData(e.currentTarget);
-    const newWordData: { [key: string]: any } = {};
+    const newWordData: { [key: string]: any } = { memorized: currentWord?.memorized || false };
     columns.forEach(col => {
       if (col.key !== 'id' && col.key !== 'memorized') {
         newWordData[col.key] = formData.get(col.key as string) as string;
@@ -117,16 +125,22 @@ export default function VocabularyManager<T extends Word>({
 
     try {
       if (currentWord?.id) { // Edit existing word
+        const isPublicWord = initialWords.some(w => w.id === currentWord.id);
         const docRef = doc(userWordsCollection, currentWord.id);
-        await updateDoc(docRef, newWordData);
-        setWords(words.map(w => w.id === currentWord.id ? { ...w, ...newWordData } as T : w));
+        
+        if (isPublicWord) {
+            // Only update the memorized status for public words in user's subcollection
+            await setDoc(docRef, { memorized: currentWord.memorized }, { merge: true });
+        } else {
+            // Update the whole user-created word
+            await updateDoc(docRef, newWordData);
+            setWords(words.map(w => w.id === currentWord.id ? { ...w, ...newWordData } as T : w));
+        }
+
         toast({ title: "Амжилттай заслаа", description: "Үгийн мэдээлэл шинэчлэгдлээ." });
-      } else { // Add new word
-        const docRef = await addDoc(userWordsCollection, {
-          ...newWordData,
-          memorized: false,
-        });
-        const newWord = { id: docRef.id, ...newWordData, memorized: false } as T;
+      } else { // Add new word (always goes to user's collection)
+        const docRef = await addDoc(userWordsCollection, newWordData);
+        const newWord = { id: docRef.id, ...newWordData } as T;
         setWords([newWord, ...words]);
         toast({ title: "Амжилттай нэмлээ", description: "Шинэ үг таны санд нэмэгдлээ." });
       }
@@ -140,31 +154,39 @@ export default function VocabularyManager<T extends Word>({
   };
 
   const handleDelete = async (id: string) => {
-    if (!userWordsCollection) return;
+    if (!user || !userWordsCollection) return;
      if (initialWords.some(iw => iw.id === id)) {
       toast({ title: "Анхааруулга", description: "Анхдагч үгийг устгах боломжгүй.", variant: "destructive" });
       return;
     }
+    setWords(words.filter(w => w.id !== id));
     try {
         const docRef = doc(userWordsCollection, id);
         await deleteDoc(docRef);
-        setWords(words.filter(w => w.id !== id));
         toast({ title: "Амжилттай устгалаа", variant: "destructive" });
     } catch(e) {
+        setWords(words); // rollback
         toast({ title: "Алдаа гарлаа", variant: "destructive" });
     }
   };
 
   const toggleMemorized = async (id: string, checked: boolean) => {
-    if (!userWordsCollection) return;
+    if (!user || !userWordsCollection) {
+        toast({ title: "Алдаа", description: "Тэмдэглэхийн тулд нэвтэрнэ үү.", variant: "destructive" });
+        return;
+    };
+
+    const originalWords = words;
     setWords(words.map(w => w.id === id ? { ...w, memorized: checked } : w));
     
     const docRef = doc(userWordsCollection, id);
     try {
+      // Use setDoc with merge to create or update the memorized status
       await setDoc(docRef, { memorized: checked }, { merge: true });
     } catch (e) {
       console.error("Error updating memorized status:", e);
-      setWords(words.map(w => w.id === id ? { ...w, memorized: !checked } : w));
+      setWords(originalWords); // Rollback on error
+      toast({ title: "Алдаа гарлаа", variant: "destructive" });
     }
   };
   
@@ -185,7 +207,7 @@ export default function VocabularyManager<T extends Word>({
             setIsDialogOpen(isOpen);
         }}>
           <DialogTrigger asChild>
-            <Button onClick={() => openDialog()}>
+            <Button onClick={() => openDialog()} disabled={!user}>
               <PlusCircle className="mr-2 h-4 w-4" /> Шинэ үг
             </Button>
           </DialogTrigger>
@@ -196,6 +218,7 @@ export default function VocabularyManager<T extends Word>({
             <form onSubmit={handleSave} className="space-y-4">
               {columns.map(col => {
                 if (col.key !== 'id' && col.key !== 'memorized') {
+                  const isPublicAndEditing = currentWord && initialWords.some(iw => iw.id === currentWord.id);
                   return (
                     <div key={col.key as string}>
                       <Label htmlFor={col.key as string}>{col.header}</Label>
@@ -204,7 +227,9 @@ export default function VocabularyManager<T extends Word>({
                         name={col.key as string}
                         defaultValue={currentWord ? currentWord[col.key] as string : ''}
                         required
+                        disabled={isPublicAndEditing}
                       />
+                       {isPublicAndEditing && <p className="text-xs text-muted-foreground pt-1">Анхдагч үгийн мэдээллийг засах боломжгүй.</p>}
                     </div>
                   );
                 }

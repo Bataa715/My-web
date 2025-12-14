@@ -28,7 +28,7 @@ const initialEnglishGrammarData: Omit<GrammarRule, 'id'>[] = [
 
 
 export default function EnglishPage() {
-    const { firestore, user } = useFirebase();
+    const { firestore } = useFirebase();
     const [initialEnglishWords, setInitialEnglishWords] = useState<EnglishWord[]>([]);
     const [englishGrammar, setEnglishGrammar] = useState<GrammarRule[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,7 +37,6 @@ export default function EnglishPage() {
         if (!firestore) return;
 
         async function seedCollection(collectionName: string, data: any[]) {
-            if (!user) return; // Only seed if user is logged in
             const collectionRef = collection(firestore, collectionName);
             const snapshot = await getDocs(query(collectionRef));
             if (snapshot.empty) {
@@ -84,7 +83,7 @@ export default function EnglishPage() {
             setLoading(false);
         }
         fetchData();
-    }, [firestore, user]);
+    }, [firestore]);
 
 
     if (loading) {

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import type { OrbitInfo } from "@/lib/types";
 import { useEditMode } from "@/contexts/EditModeContext";
 import Image from "next/image";
-import { useFirebase, updateDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase";
+import { useFirebase } from "@/firebase";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 const getIcon = (iconName: string) => {
@@ -167,7 +167,7 @@ export default function Hero() {
             profileImage: defaultProfileImage,
             orbitInfo: defaultOrbitInfo
           };
-          setDocumentNonBlocking(userInfoDocRef, defaultData, { merge: true });
+          await setDoc(userInfoDocRef, defaultData, { merge: true });
           
           setBio(defaultBio);
           setEditedBio(defaultBio);
@@ -216,7 +216,7 @@ export default function Hero() {
           item.id === selectedOrbit.id ? updatedItem : item
         );
 
-        updateDocumentNonBlocking(userInfoDocRef, { orbitInfo: newOrbitInfo });
+        await updateDoc(userInfoDocRef, { orbitInfo: newOrbitInfo });
         setOrbitInfo(newOrbitInfo);
         setSelectedOrbit(updatedItem);
         setIsEditingOrbit(false);
@@ -234,7 +234,7 @@ export default function Hero() {
     const userInfoDocRef = doc(firestore, "users", user.uid);
     setSaving(true);
     try {
-      updateDocumentNonBlocking(userInfoDocRef, { profileImage: editedImage });
+      await updateDoc(userInfoDocRef, { profileImage: editedImage });
       setProfileImage(editedImage);
       setIsEditingImage(false);
       toast({ title: "Амжилттай", description: "Профайл зураг шинэчлэгдлээ." });
@@ -251,7 +251,7 @@ export default function Hero() {
     const userInfoDocRef = doc(firestore, "users", user.uid);
     setSaving(true);
     try {
-      updateDocumentNonBlocking(userInfoDocRef, { bio: editedBio });
+      await updateDoc(userInfoDocRef, { bio: editedBio });
       setBio(editedBio);
       setIsEditingBio(false);
       toast({
