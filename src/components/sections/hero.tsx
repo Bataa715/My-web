@@ -422,7 +422,7 @@ export default function Hero() {
                                 {isEditingOrbit ? (
                                     <motion.div key="edit" className="w-full h-full" onClick={(e) => e.stopPropagation()}>
                                         <div className="w-full h-full p-6 flex flex-col justify-center">
-                                            <div className="w-full mt-1">
+                                            <div className="w-full">
                                                 <Label className="text-left text-xs mb-1 block text-foreground">Нэр</Label>
                                                 <Input
                                                   value={editedOrbitTitle}
