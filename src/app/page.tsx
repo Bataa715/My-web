@@ -26,7 +26,7 @@ export default function Home() {
           Англи • Япон • Программчлал сурах хувийн систем
         </p>
         <Button asChild size="lg" className="mt-8 transform transition-transform hover:scale-105">
-          <Link href="/english">Суралцаж эхлэх</Link>
+          <Link href="/tools">Суралцаж эхлэх</Link>
         </Button>
       </div>
     </div>

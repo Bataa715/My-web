@@ -3,19 +3,28 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { BookOpenText, Menu, X } from "lucide-react";
+import { BookOpenText, Menu, X, ChevronDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-const navLinks = [
+const mainLinks = [
   { href: "/", label: "Нүүр" },
   { href: "/about", label: "Хувийн танилцуулга" },
-  { href: "/english", label: "Англи хэл" },
-  { href: "/japanese", label: "Япон хэл" },
-  { href: "/programming", label: "Программчлал" },
+];
+
+const toolsLinks = [
+  { href: "/tools/english", label: "Англи хэл" },
+  { href: "/tools/japanese", label: "Япон хэл" },
+  { href: "/tools/programming", label: "Программчлал" },
 ];
 
 export function Header() {
@@ -45,9 +54,26 @@ export function Header() {
             <span className="hidden font-bold sm:inline-block">LinguaCore</span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
-            {navLinks.map((link) => (
+            {mainLinks.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className={cn("text-sm font-medium transition-colors hover:text-primary focus-visible:ring-0", pathname.startsWith('/tools') ? "text-primary font-semibold" : "text-muted-foreground")}>
+                  Хэрэгслүүд <ChevronDown className="relative top-[1px] ml-1 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                 <DropdownMenuItem asChild>
+                  <Link href="/tools">Бүх хэрэгслүүд</Link>
+                </DropdownMenuItem>
+                {toolsLinks.map((link) => (
+                  <DropdownMenuItem key={link.href} asChild>
+                    <Link href={link.href}>{link.label}</Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
         </div>
         
@@ -72,15 +98,18 @@ export function Header() {
             </Link>
             <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
               <div className="flex flex-col space-y-3">
-                {navLinks.map((link) => (
+                {mainLinks.map((link) => (
                   <NavLink key={link.href} {...link} className="text-lg" />
+                ))}
+                 <h3 className="pt-4 font-semibold text-lg">Хэрэгслүүд</h3>
+                {toolsLinks.map((link) => (
+                   <NavLink key={link.href} href={link.href} label={link.label} className="text-lg pl-2" />
                 ))}
               </div>
             </div>
           </SheetContent>
         </Sheet>
         
-        {/* Mobile-first logo placement */}
         <Link href="/" className="flex items-center space-x-2 md:hidden">
             <BookOpenText className="h-6 w-6 text-primary" />
             <span className="font-bold">LinguaCore</span>
