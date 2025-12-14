@@ -14,7 +14,7 @@ const tools = [
     href: "/tools/japanese",
   },
   {
-    title: "💻 Программчлал",
+    title: "Программчлал",
     description: "Үндсэн ойлголтууд, cheat sheets, ахиц хянагч.",
     href: "/tools/programming",
   },
