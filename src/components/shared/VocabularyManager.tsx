@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -39,6 +39,8 @@ import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
 import { useFirebase } from '@/firebase';
 import { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, setDoc, query } from "firebase/firestore";
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { cn } from '@/lib/utils';
 
 type Word = EnglishWord | JapaneseWord;
 
@@ -59,6 +61,7 @@ export default function VocabularyManager<T extends Word>({
   const [words, setWords] = useState<T[]>(initialWords);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentWord, setCurrentWord] = useState<T | null>(null);
+  const [filter, setFilter] = useState<'all' | 'memorized' | 'not-memorized'>('all');
   const { toast } = useToast();
 
   const userWordsCollection = user ? collection(firestore, `users/${user.uid}/${collectionPath}`) : null;
@@ -106,6 +109,16 @@ export default function VocabularyManager<T extends Word>({
     fetchWords();
   }, [firestore, user, collectionPath]);
 
+  const filteredWords = useMemo(() => {
+    switch (filter) {
+      case 'memorized':
+        return words.filter(word => word.memorized);
+      case 'not-memorized':
+        return words.filter(word => !word.memorized);
+      default:
+        return words;
+    }
+  }, [words, filter]);
 
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -197,53 +210,68 @@ export default function VocabularyManager<T extends Word>({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Үг цээжлэх</CardTitle>
-          <CardDescription>Шинэ үг нэмэх, засах, устгах, цээжилснээ тэмдэглэх.</CardDescription>
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className='flex-1'>
+                <CardTitle>Үг цээжлэх</CardTitle>
+                <CardDescription>Шинэ үг нэмэх, засах, устгах, цээжилснээ тэмдэглэх.</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+                 <ToggleGroup 
+                    type="single" 
+                    defaultValue="all" 
+                    variant="outline" 
+                    size="sm"
+                    onValueChange={(value) => setFilter(value as any || 'all')}
+                >
+                    <ToggleGroupItem value="all">Бүгд</ToggleGroupItem>
+                    <ToggleGroupItem value="memorized">Цээжилсэн</ToggleGroupItem>
+                    <ToggleGroupItem value="not-memorized">Цээжлээгүй</ToggleGroupItem>
+                </ToggleGroup>
+                <Dialog open={isDialogOpen} onOpenChange={(isOpen) => {
+                    if (!isOpen) setCurrentWord(null);
+                    setIsDialogOpen(isOpen);
+                }}>
+                    <DialogTrigger asChild>
+                        <Button onClick={() => openDialog()} disabled={!user} size="sm">
+                        <PlusCircle className="mr-2 h-4 w-4" /> Шинэ үг
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                        <DialogTitle>{currentWord ? 'Үг засах' : 'Шинэ үг нэмэх'}</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleSave} className="space-y-4">
+                        {columns.map(col => {
+                            if (col.key !== 'id' && col.key !== 'memorized') {
+                            const isPublicAndEditing = currentWord && initialWords.some(iw => iw.id === currentWord.id);
+                            return (
+                                <div key={col.key as string}>
+                                <Label htmlFor={col.key as string}>{col.header}</Label>
+                                <Input
+                                    id={col.key as string}
+                                    name={col.key as string}
+                                    defaultValue={currentWord ? currentWord[col.key] as string : ''}
+                                    required
+                                    disabled={isPublicAndEditing}
+                                />
+                                {isPublicAndEditing && <p className="text-xs text-muted-foreground pt-1">Анхдагч үгийн мэдээллийг засах боломжгүй.</p>}
+                                </div>
+                            );
+                            }
+                            return null;
+                        })}
+                        <DialogFooter>
+                            <DialogClose asChild>
+                            <Button type="button" variant="secondary">Цуцлах</Button>
+                            </DialogClose>
+                            <Button type="submit">Хадгалах</Button>
+                        </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+            </div>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={(isOpen) => {
-            if (!isOpen) setCurrentWord(null);
-            setIsDialogOpen(isOpen);
-        }}>
-          <DialogTrigger asChild>
-            <Button onClick={() => openDialog()} disabled={!user}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Шинэ үг
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{currentWord ? 'Үг засах' : 'Шинэ үг нэмэх'}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSave} className="space-y-4">
-              {columns.map(col => {
-                if (col.key !== 'id' && col.key !== 'memorized') {
-                  const isPublicAndEditing = currentWord && initialWords.some(iw => iw.id === currentWord.id);
-                  return (
-                    <div key={col.key as string}>
-                      <Label htmlFor={col.key as string}>{col.header}</Label>
-                      <Input
-                        id={col.key as string}
-                        name={col.key as string}
-                        defaultValue={currentWord ? currentWord[col.key] as string : ''}
-                        required
-                        disabled={isPublicAndEditing}
-                      />
-                       {isPublicAndEditing && <p className="text-xs text-muted-foreground pt-1">Анхдагч үгийн мэдээллийг засах боломжгүй.</p>}
-                    </div>
-                  );
-                }
-                return null;
-              })}
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary">Цуцлах</Button>
-                </DialogClose>
-                <Button type="submit">Хадгалах</Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
       </CardHeader>
       <CardContent>
         <div className="border rounded-md">
@@ -256,8 +284,8 @@ export default function VocabularyManager<T extends Word>({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {words.map(word => (
-                <TableRow key={word.id} className={word.memorized ? 'bg-green-100/50 dark:bg-green-900/20' : ''}>
+              {filteredWords.map(word => (
+                <TableRow key={word.id} className={cn(word.memorized && 'bg-primary/10 hover:bg-primary/20')}>
                   {columns.map(col => <TableCell key={`${word.id}-${col.key as string}`}>{word[col.key] as string}</TableCell>)}
                   <TableCell>
                     <Checkbox
@@ -299,8 +327,15 @@ export default function VocabularyManager<T extends Word>({
               ))}
             </TableBody>
           </Table>
+           {filteredWords.length === 0 && (
+                <div className="text-center p-8 text-muted-foreground">
+                    Одоогоор "{filter === 'memorized' ? 'цээжилсэн' : 'цээжлээгүй'}" үг алга байна.
+                </div>
+            )}
         </div>
       </CardContent>
     </Card>
   );
 }
+
+    
