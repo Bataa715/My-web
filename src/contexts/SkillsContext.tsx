@@ -37,7 +37,7 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
         const q = query(skillsCollectionRef, orderBy("createdAt", "asc"));
         const skillsSnapshot = await getDocs(q);
         if (skillsSnapshot.empty) {
-          const batch = initialSkills.map(s => addDoc(skillsCollectionRef, { ...s, createdAt: serverTimestamp() }));
+          const batch = initialSkills.map(s => addDocumentNonBlocking(skillsCollectionRef, { ...s, createdAt: serverTimestamp() }));
           await Promise.all(batch);
           const newSnapshot = await getDocs(q);
           const skillsList = newSnapshot.docs.map(doc => {
@@ -84,10 +84,10 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
   };
 
   const updateSkillGroup = async (id: string, updates: Partial<Omit<Skill, 'id'>>) => {
-    if (!skillsCollectionRef) return;
+    if (!skillsCollectionRef || !user) return;
     try {
-      const skillDoc = doc(skillsCollectionRef, id);
-      await updateDocumentNonBlocking(skillDoc, updates);
+      const skillDoc = doc(firestore, `users/${user.uid}/skills`, id);
+      updateDocumentNonBlocking(skillDoc, updates);
       setSkills(prev => prev.map(s => s.id === id ? { ...s, ...updates } as Skill : s));
       toast({ title: "Амжилттай", description: "Ур чадварын бүлэг шинэчлэгдлээ." });
     } catch (error) {
@@ -97,10 +97,10 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteSkillGroup = async (id: string) => {
-    if (!skillsCollectionRef) return;
+    if (!skillsCollectionRef || !user) return;
     try {
-      const skillDoc = doc(skillsCollectionRef, id);
-      await deleteDocumentNonBlocking(skillDoc);
+      const skillDoc = doc(firestore, `users/${user.uid}/skills`, id);
+      deleteDocumentNonBlocking(skillDoc);
       setSkills(prev => prev.filter(s => s.id !== id));
       toast({ title: "Амжилттай", description: "Ур чадварын бүлэг устгагдлаа." });
     } catch (error) {

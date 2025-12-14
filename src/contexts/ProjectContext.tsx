@@ -38,7 +38,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
 
         if (projectSnapshot.empty) {
           // If no projects, add initial ones
-          const batch = initialProjects.map(p => addDoc(projectsCollectionRef, { ...p, createdAt: serverTimestamp() }));
+          const batch = initialProjects.map(p => addDocumentNonBlocking(projectsCollectionRef, { ...p, createdAt: serverTimestamp() }));
           await Promise.all(batch);
 
            const newSnapshot = await getDocs(q);
@@ -104,7 +104,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     if (!firestore || !user) return;
     try {
       const projectDoc = doc(firestore, `users/${user.uid}/projects`, projectId);
-      await deleteDocumentNonBlocking(projectDoc);
+      deleteDocumentNonBlocking(projectDoc);
       const deletedProject = projects.find(p => p.id === projectId);
       setProjects((prevProjects) => prevProjects.filter(p => p.id !== projectId));
       toast({

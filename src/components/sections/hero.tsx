@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import type { OrbitInfo } from "@/lib/types";
 import { useEditMode } from "@/contexts/EditModeContext";
 import Image from "next/image";
-import { useFirebase } from "@/firebase";
+import { useFirebase, updateDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase";
 import { initialOrbitInfo as dataOrbitInfo } from "@/lib/data";
 
 const { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, LinkIcon, AlertTriangle, Pencil, Upload } = Icons;
@@ -173,12 +173,12 @@ export default function Hero() {
 
           setOrbitInfo(fetchedOrbitInfo);
         } else {
-          await setDoc(userInfoDocRef, {
+          setDocumentNonBlocking(userInfoDocRef, {
             name: staticPersonalInfo.name,
             bio: staticPersonalInfo.bio,
             profileImage: defaultProfileImage,
             orbitInfo: dataOrbitInfo
-          });
+          }, { merge: false });
           setBio(staticPersonalInfo.bio);
           setEditedBio(staticPersonalInfo.bio);
           setName(staticPersonalInfo.name);
@@ -230,7 +230,7 @@ export default function Hero() {
           item.id === selectedOrbit.id ? updatedItem : item
         );
 
-        await updateDoc(userInfoDocRef, { orbitInfo: newOrbitInfo });
+        updateDocumentNonBlocking(userInfoDocRef, { orbitInfo: newOrbitInfo });
         setOrbitInfo(newOrbitInfo);
         setSelectedOrbit(updatedItem);
         setIsEditingOrbit(false);
@@ -247,7 +247,7 @@ export default function Hero() {
     if (!userInfoDocRef) return;
     setSaving(true);
     try {
-      await updateDoc(userInfoDocRef, { profileImage: editedImage });
+      updateDocumentNonBlocking(userInfoDocRef, { profileImage: editedImage });
       setProfileImage(editedImage);
       setIsEditingImage(false);
       toast({ title: "Амжилттай", description: "Профайл зураг шинэчлэгдлээ." });
@@ -263,7 +263,7 @@ export default function Hero() {
     if (!userInfoDocRef) return;
     setSaving(true);
     try {
-      await updateDoc(userInfoDocRef, { bio: editedBio });
+      updateDocumentNonBlocking(userInfoDocRef, { bio: editedBio });
       setBio(editedBio);
       setIsEditingBio(false);
       toast({
@@ -491,8 +491,19 @@ export default function Hero() {
                             transition={{ duration: 0.6, ease: "easeInOut" }}
                             className="absolute inset-0 flex items-center justify-center"
                         >
-                            <div className="w-full h-full rounded-full bg-muted flex items-center justify-center text-8xl font-bold text-primary opacity-50">
-                                {name.charAt(0)}
+                             <div className="avatar-glow-wrapper w-48 h-48 md:w-56 md:h-56">
+                                <Avatar className="w-full h-full border-4 border-primary/50 relative">
+                                    <AvatarImage src={profileImage} alt={name} />
+                                    <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+                                     {isEditMode && (
+                                        <button 
+                                            onClick={() => setIsEditingImage(true)}
+                                            className="absolute inset-0 bg-black/50 flex items-center justify-center text-white opacity-0 hover:opacity-100 transition-opacity"
+                                        >
+                                            <Upload className="h-8 w-8" />
+                                        </button>
+                                    )}
+                                </Avatar>
                             </div>
                         </motion.div>
                     )}
@@ -549,5 +560,3 @@ export default function Hero() {
     </section>
   );
 }
-
-    
