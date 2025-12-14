@@ -1,3 +1,4 @@
+
 import type { Timestamp } from 'firebase/firestore';
 
 export interface EnglishWord {
@@ -5,6 +6,7 @@ export interface EnglishWord {
   word: string;
   meaning: string;
   memorized: boolean;
+  favorite?: boolean;
 }
 
 export interface JapaneseWord {
@@ -13,6 +15,7 @@ export interface JapaneseWord {
   romaji: string;
   meaning: string;
   memorized: boolean;
+  favorite?: boolean;
 }
 
 export interface GrammarRule {

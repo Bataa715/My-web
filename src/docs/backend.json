@@ -94,7 +94,8 @@
       "properties": {
         "word": { "type": "string" },
         "meaning": { "type": "string" },
-        "memorized": { "type": "boolean" }
+        "memorized": { "type": "boolean" },
+        "favorite": { "type": "boolean" }
       },
       "required": ["word", "meaning"]
     },
@@ -105,7 +106,8 @@
         "word": { "type": "string" },
         "romaji": { "type": "string" },
         "meaning": { "type": "string" },
-        "memorized": { "type": "boolean" }
+        "memorized": { "type": "boolean" },
+        "favorite": { "type": "boolean" }
       },
       "required": ["word", "romaji", "meaning"]
     },

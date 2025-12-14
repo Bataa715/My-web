@@ -34,8 +34,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { PlusCircle, Edit, Trash2, X } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { PlusCircle, Edit, Trash2, X, Heart } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
 import { useFirebase } from '@/firebase';
@@ -68,7 +68,7 @@ export default function VocabularyManager<T extends Word>({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAlphabetModalOpen, setIsAlphabetModalOpen] = useState(false);
   const [currentWord, setCurrentWord] = useState<T | null>(null);
-  const [filter, setFilter] = useState<'all' | 'memorized' | 'not-memorized'>('all');
+  const [filter, setFilter] = useState<'all' | 'memorized' | 'not-memorized' | 'favorite'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [alphabetFilter, setAlphabetFilter] = useState<string | 'all'>('all');
   const { toast } = useToast();
@@ -79,13 +79,13 @@ export default function VocabularyManager<T extends Word>({
   useEffect(() => {
     const fetchWords = async () => {
         if (!firestore || !publicWordsCollection) {
-            setWords(initialWords.map(w => ({ ...w, memorized: false } as T)));
+            setWords(initialWords.map(w => ({ ...w, memorized: false, favorite: false } as T)));
             return;
         };
         
         const publicWordsQuery = query(publicWordsCollection);
         const publicWordsSnapshot = await getDocs(publicWordsQuery);
-        const publicWords = publicWordsSnapshot.docs.map(d => ({ ...d.data(), id: d.id, memorized: false } as T));
+        const publicWords = publicWordsSnapshot.docs.map(d => ({ ...d.data(), id: d.id, memorized: false, favorite: false } as T));
 
         if (!user || !userWordsCollection) {
             setWords(publicWords);
@@ -104,7 +104,7 @@ export default function VocabularyManager<T extends Word>({
             const userWordStatus = userWordMap.get(publicWord.id!);
             if (userWordStatus) {
                 userWordMap.delete(publicWord.id!);
-                return { ...publicWord, memorized: userWordStatus.memorized };
+                return { ...publicWord, memorized: userWordStatus.memorized, favorite: userWordStatus.favorite };
             }
             return publicWord;
         });
@@ -122,6 +122,7 @@ export default function VocabularyManager<T extends Word>({
         .filter(word => {
             if (filter === 'memorized') return word.memorized;
             if (filter === 'not-memorized') return !word.memorized;
+            if (filter === 'favorite') return word.favorite;
             return true;
         })
         .filter(word => {
@@ -153,16 +154,18 @@ export default function VocabularyManager<T extends Word>({
     };
 
     const formData = new FormData(e.currentTarget);
-    const newWordData: { [key: string]: any } = { memorized: currentWord?.memorized || false };
+    const newWordData: { [key: string]: any } = { 
+        memorized: currentWord?.memorized || false,
+        favorite: currentWord?.favorite || false,
+    };
     columns.forEach(col => {
-      if (col.key !== 'id' && col.key !== 'memorized') {
+      if (col.key !== 'id' && col.key !== 'memorized' && col.key !== 'favorite') {
         newWordData[col.key] = formData.get(col.key as string) as string;
       }
     });
 
     try {
       if (currentWord?.id) {
-        // This is a user-created word, update all fields
         const docRef = doc(userWordsCollection, currentWord.id);
         await updateDoc(docRef, newWordData);
         setWords(words.map(w => w.id === currentWord.id ? { ...w, ...newWordData } as T : w));
@@ -182,23 +185,21 @@ export default function VocabularyManager<T extends Word>({
     setCurrentWord(null);
   };
 
-  const handleDelete = async (wordId: string) => {
+ const handleDelete = async (wordId: string) => {
     if (!user || !userWordsCollection) {
       toast({ title: "Алдаа", description: "Устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
       return;
     }
-
     const wordToDelete = words.find(w => w.id === wordId);
     if (!wordToDelete) return;
-
+    
     setWords(words.filter(w => w.id !== wordId));
-
     try {
       const docRef = doc(userWordsCollection, wordId);
       await deleteDoc(docRef);
       toast({ title: "Амжилттай устгагдлаа" });
     } catch (error) {
-      setWords(words); // Revert on error
+      setWords(words); 
       toast({
         title: "Алдаа гарлаа",
         description: "Үг устгахад алдаа гарлаа.",
@@ -208,20 +209,29 @@ export default function VocabularyManager<T extends Word>({
     }
   };
 
-  const toggleMemorized = async (id: string, checked: boolean) => {
+  const toggleBooleanValue = async (id: string, key: 'memorized' | 'favorite') => {
     if (!user || !userWordsCollection) {
         toast({ title: "Алдаа", description: "Тэмдэглэхийн тулд нэвтэрнэ үү.", variant: "destructive" });
         return;
     };
-
-    const originalWords = words;
-    setWords(words.map(w => w.id === id ? { ...w, memorized: checked } : w));
+    
+    const originalWords = [...words];
+    let updatedValue = false;
+    
+    const newWords = words.map(w => {
+        if (w.id === id) {
+            updatedValue = !w[key];
+            return { ...w, [key]: updatedValue };
+        }
+        return w;
+    });
+    setWords(newWords as T[]);
     
     const docRef = doc(userWordsCollection, id);
     try {
-      await setDoc(docRef, { memorized: checked }, { merge: true });
+      await setDoc(docRef, { [key]: updatedValue }, { merge: true });
     } catch (e) {
-      console.error("Error updating memorized status:", e);
+      console.error(`Error updating ${key} status:`, e);
       setWords(originalWords); // Rollback on error
       toast({ title: "Алдаа гарлаа", variant: "destructive" });
     }
@@ -266,8 +276,7 @@ export default function VocabularyManager<T extends Word>({
                         </DialogHeader>
                         <form onSubmit={handleSave} className="space-y-4">
                         {columns.map(col => {
-                            if (col.key !== 'id' && col.key !== 'memorized') {
-                            const isPublicAndEditing = currentWord && initialWords.some(iw => iw.id === currentWord.id);
+                            if (col.key !== 'id' && col.key !== 'memorized' && col.key !== 'favorite') {
                             return (
                                 <div key={col.key as string}>
                                 <Label htmlFor={col.key as string}>{col.header}</Label>
@@ -305,6 +314,7 @@ export default function VocabularyManager<T extends Word>({
                 <ToggleGroupItem value="all">Бүгд</ToggleGroupItem>
                 <ToggleGroupItem value="memorized">Цээжилсэн</ToggleGroupItem>
                 <ToggleGroupItem value="not-memorized">Цээжлээгүй</ToggleGroupItem>
+                <ToggleGroupItem value="favorite">Онцолсон</ToggleGroupItem>
             </ToggleGroup>
              <div className="flex items-center gap-2">
                 <Dialog open={isAlphabetModalOpen} onOpenChange={setIsAlphabetModalOpen}>
@@ -365,11 +375,19 @@ export default function VocabularyManager<T extends Word>({
                   <TableCell>
                     <Checkbox
                       checked={word.memorized}
-                      onCheckedChange={(checked) => toggleMemorized(word.id!, !!checked)}
+                      onCheckedChange={(checked) => toggleBooleanValue(word.id!, 'memorized')}
                       disabled={!user}
                     />
                   </TableCell>
-                  <TableCell className="text-right space-x-2">
+                  <TableCell className="text-right space-x-1">
+                     <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => toggleBooleanValue(word.id!, 'favorite')}
+                        disabled={!user}
+                     >
+                      <Heart className={cn("h-4 w-4", word.favorite ? "fill-red-500 text-red-500" : "text-muted-foreground")} />
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => openDialog(word)} disabled={!user}>
                       <Edit className="h-4 w-4" />
                     </Button>
