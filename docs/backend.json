@@ -4,7 +4,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "EnglishWord",
       "type": "object",
-      "description": "Represents an English word and its associated data for learning.",
+      "description": "Represents an English word and its Mongolian meaning for vocabulary learning.",
       "properties": {
         "id": {
           "type": "string",
@@ -16,11 +16,11 @@
         },
         "mongolianMeaning": {
           "type": "string",
-          "description": "The Mongolian translation/meaning of the English word."
+          "description": "The Mongolian translation or meaning of the English word."
         },
         "memorized": {
           "type": "boolean",
-          "description": "Indicates whether the user has memorized the word."
+          "description": "Indicates whether the user has memorized this word."
         }
       },
       "required": [
@@ -34,7 +34,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "EnglishGrammarRule",
       "type": "object",
-      "description": "Represents a grammar rule and its explanation for English language learning.",
+      "description": "Represents a grammar rule with explanation and example sentences.",
       "properties": {
         "id": {
           "type": "string",
@@ -46,55 +46,58 @@
         },
         "explanation": {
           "type": "string",
-          "description": "A detailed explanation of the grammar rule."
+          "description": "Explanation of the grammar rule."
         },
-        "exampleSentence": {
-          "type": "string",
-          "description": "An example sentence demonstrating the usage of the grammar rule."
+        "exampleSentences": {
+          "type": "array",
+          "description": "Example sentences demonstrating the grammar rule.",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
         "id",
         "ruleName",
         "explanation",
-        "exampleSentence"
+        "exampleSentences"
       ]
     },
     "JapaneseCharacter": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "JapaneseCharacter",
       "type": "object",
-      "description": "Represents a Hiragana or Katakana character for Japanese language learning.",
+      "description": "Represents a Japanese character (Hiragana or Katakana) and its memorization status.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Japanese character entry."
+          "description": "Unique identifier for the Japanese character."
         },
         "character": {
           "type": "string",
-          "description": "The Japanese character itself (Hiragana or Katakana)."
-        },
-        "memorized": {
-          "type": "boolean",
-          "description": "Indicates whether the user has memorized the character."
+          "description": "The Japanese character itself (e.g., あ, カ)."
         },
         "type": {
           "type": "string",
-          "description": "The type of character, either Hiragana or Katakana."
+          "description": "The type of Japanese character (Hiragana or Katakana)."
+        },
+        "memorized": {
+          "type": "boolean",
+          "description": "Indicates whether the user has memorized this character."
         }
       },
       "required": [
         "id",
         "character",
-        "memorized",
-        "type"
+        "type",
+        "memorized"
       ]
     },
     "JapaneseWord": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "JapaneseWord",
       "type": "object",
-      "description": "Represents a Japanese word and its associated data for learning.",
+      "description": "Represents a Japanese word with Romaji, Mongolian meaning, and memorization status.",
       "properties": {
         "id": {
           "type": "string",
@@ -102,7 +105,7 @@
         },
         "japaneseWord": {
           "type": "string",
-          "description": "The Japanese word itself."
+          "description": "The Japanese word."
         },
         "romaji": {
           "type": "string",
@@ -110,11 +113,11 @@
         },
         "mongolianMeaning": {
           "type": "string",
-          "description": "The Mongolian translation/meaning of the Japanese word."
+          "description": "The Mongolian translation or meaning of the Japanese word."
         },
         "memorized": {
           "type": "boolean",
-          "description": "Indicates whether the user has memorized the word."
+          "description": "Indicates whether the user has memorized this word."
         }
       },
       "required": [
@@ -125,49 +128,52 @@
         "memorized"
       ]
     },
-    "JapaneseGrammarRule": {
+    "JLPTGrammar": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "JapaneseGrammarRule",
+      "title": "JLPTGrammar",
       "type": "object",
-      "description": "Represents a grammar rule and its explanation for Japanese language learning.",
+      "description": "Represents a JLPT grammar point with explanation and example sentences.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the grammar rule entry."
+          "description": "Unique identifier for the JLPT grammar point."
         },
-        "ruleName": {
+        "grammarPoint": {
           "type": "string",
-          "description": "The name of the grammar rule (e.g., JLPT N5)."
+          "description": "The JLPT grammar point (e.g., N5-1, N4-5)."
         },
         "explanation": {
           "type": "string",
-          "description": "A detailed explanation of the grammar rule."
+          "description": "Explanation of the JLPT grammar point."
         },
-        "exampleSentence": {
-          "type": "string",
-          "description": "An example sentence demonstrating the usage of the grammar rule."
+        "exampleSentences": {
+          "type": "array",
+          "description": "Example sentences demonstrating the JLPT grammar point.",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
         "id",
-        "ruleName",
+        "grammarPoint",
         "explanation",
-        "exampleSentence"
+        "exampleSentences"
       ]
     },
     "ProgrammingConcept": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "ProgrammingConcept",
       "type": "object",
-      "description": "Represents a programming concept (e.g., JavaScript, React) and its explanation.",
+      "description": "Represents a programming concept with a short explanation.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the programming concept entry."
+          "description": "Unique identifier for the programming concept."
         },
         "topic": {
           "type": "string",
-          "description": "The name of the programming concept (e.g., JavaScript)."
+          "description": "The name of the programming topic (e.g., JavaScript, HTML/CSS)."
         },
         "explanation": {
           "type": "string",
@@ -184,45 +190,40 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "CodeSnippet",
       "type": "object",
-      "description": "Represents a code snippet or syntax example for programming.",
+      "description": "Represents a code snippet with syntax and a copy button.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the code snippet entry."
-        },
-        "title": {
-          "type": "string",
-          "description": "A descriptive title for the code snippet."
-        },
-        "code": {
-          "type": "string",
-          "description": "The code snippet itself."
+          "description": "Unique identifier for the code snippet."
         },
         "language": {
           "type": "string",
           "description": "The programming language of the code snippet (e.g., JavaScript, HTML)."
+        },
+        "code": {
+          "type": "string",
+          "description": "The code snippet itself."
         }
       },
       "required": [
         "id",
-        "title",
-        "code",
-        "language"
+        "language",
+        "code"
       ]
     },
-    "ProgrammingProgress": {
+    "LearningProgress": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ProgrammingProgress",
+      "title": "LearningProgress",
       "type": "object",
-      "description": "Represents the user's progress in learning a programming concept.",
+      "description": "Tracks the learning progress for a specific programming concept.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the programming progress entry."
+          "description": "Unique identifier for the learning progress entry."
         },
         "conceptId": {
           "type": "string",
-          "description": "Reference to ProgrammingConcept. (Relationship: ProgrammingConcept 1:N ProgrammingProgress)"
+          "description": "Reference to ProgrammingConcept. (Relationship: ProgrammingConcept 1:N LearningProgress)"
         },
         "learned": {
           "type": "boolean",
@@ -230,7 +231,7 @@
         },
         "practicing": {
           "type": "boolean",
-          "description": "Indicates whether the user is currently practicing the concept."
+          "description": "Indicates whether the user is practicing the concept."
         }
       },
       "required": [
@@ -238,74 +239,6 @@
         "conceptId",
         "learned",
         "practicing"
-      ]
-    },
-    "Project": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Project",
-      "type": "object",
-      "description": "Represents a project in the user's portfolio.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the project."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the project."
-        },
-        "description": {
-          "type": "string",
-          "description": "A brief description of the project."
-        },
-        "imageUrl": {
-          "type": "string",
-          "description": "URL of the image for the project.",
-          "format": "uri"
-        },
-        "link": {
-          "type": "string",
-          "description": "Link to the project.",
-          "format": "uri"
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Timestamp indicating when the project was created.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "description",
-        "imageUrl",
-        "link",
-        "createdAt"
-      ]
-    },
-    "Skill": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Skill",
-      "type": "object",
-      "description": "Represents a skill or area of expertise.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the skill."
-        },
-        "title": {
-          "type": "string",
-          "description": "The name or title of the skill (e.g., React, UI/UX Design)."
-        },
-        "description": {
-          "type": "string",
-          "description": "A description of the skill and level of expertise."
-        }
-      },
-      "required": [
-        "id",
-        "title",
-        "description"
       ]
     }
   },
@@ -324,11 +257,11 @@
           "schema": {
             "$ref": "#/backend/entities/EnglishWord"
           },
-          "description": "Stores English words for a specific user. Path-based ownership is enforced via the `userId` parameter.",
+          "description": "Stores English words and their Mongolian meanings for a specific user.",
           "params": [
             {
               "name": "userId",
-              "description": "The ID of the user who owns the English word."
+              "description": "The ID of the user."
             },
             {
               "name": "englishWordId",
@@ -344,11 +277,11 @@
           "schema": {
             "$ref": "#/backend/entities/EnglishGrammarRule"
           },
-          "description": "Stores English grammar rules for a specific user. Path-based ownership is enforced via the `userId` parameter.",
+          "description": "Stores English grammar rules with explanations and example sentences for a specific user.",
           "params": [
             {
               "name": "userId",
-              "description": "The ID of the user who owns the English grammar rule."
+              "description": "The ID of the user."
             },
             {
               "name": "englishGrammarRuleId",
@@ -364,11 +297,11 @@
           "schema": {
             "$ref": "#/backend/entities/JapaneseCharacter"
           },
-          "description": "Stores Japanese characters for a specific user. Path-based ownership is enforced via the `userId` parameter.",
+          "description": "Stores Japanese characters (Hiragana or Katakana) and their memorization status for a specific user.",
           "params": [
             {
               "name": "userId",
-              "description": "The ID of the user who owns the Japanese character."
+              "description": "The ID of the user."
             },
             {
               "name": "japaneseCharacterId",
@@ -384,11 +317,11 @@
           "schema": {
             "$ref": "#/backend/entities/JapaneseWord"
           },
-          "description": "Stores Japanese words for a specific user. Path-based ownership is enforced via the `userId` parameter.",
+          "description": "Stores Japanese words with Romaji, Mongolian meaning, and memorization status for a specific user.",
           "params": [
             {
               "name": "userId",
-              "description": "The ID of the user who owns the Japanese word."
+              "description": "The ID of the user."
             },
             {
               "name": "japaneseWordId",
@@ -398,21 +331,21 @@
         }
       },
       {
-        "path": "/users/{userId}/japaneseGrammarRules/{japaneseGrammarRuleId}",
+        "path": "/users/{userId}/jlptGrammar/{jlptGrammarId}",
         "definition": {
-          "entityName": "JapaneseGrammarRule",
+          "entityName": "JLPTGrammar",
           "schema": {
-            "$ref": "#/backend/entities/JapaneseGrammarRule"
+            "$ref": "#/backend/entities/JLPTGrammar"
           },
-          "description": "Stores Japanese grammar rules for a specific user. Path-based ownership is enforced via the `userId` parameter.",
+          "description": "Stores JLPT grammar points with explanations and example sentences for a specific user.",
           "params": [
             {
               "name": "userId",
-              "description": "The ID of the user who owns the Japanese grammar rule."
+              "description": "The ID of the user."
             },
             {
-              "name": "japaneseGrammarRuleId",
-              "description": "The ID of the Japanese grammar rule."
+              "name": "jlptGrammarId",
+              "description": "The ID of the JLPT grammar point."
             }
           ]
         }
@@ -424,11 +357,11 @@
           "schema": {
             "$ref": "#/backend/entities/ProgrammingConcept"
           },
-          "description": "Stores programming concepts for a specific user. Path-based ownership is enforced via the `userId` parameter.",
+          "description": "Stores programming concepts with short explanations for a specific user.",
           "params": [
             {
               "name": "userId",
-              "description": "The ID of the user who owns the programming concept."
+              "description": "The ID of the user."
             },
             {
               "name": "programmingConceptId",
@@ -444,11 +377,11 @@
           "schema": {
             "$ref": "#/backend/entities/CodeSnippet"
           },
-          "description": "Stores code snippets for a specific user. Path-based ownership is enforced via the `userId` parameter.",
+          "description": "Stores code snippets with syntax for a specific user.",
           "params": [
             {
               "name": "userId",
-              "description": "The ID of the user who owns the code snippet."
+              "description": "The ID of the user."
             },
             {
               "name": "codeSnippetId",
@@ -458,66 +391,26 @@
         }
       },
       {
-        "path": "/users/{userId}/programmingProgress/{programmingProgressId}",
+        "path": "/users/{userId}/learningProgress/{learningProgressId}",
         "definition": {
-          "entityName": "ProgrammingProgress",
+          "entityName": "LearningProgress",
           "schema": {
-            "$ref": "#/backend/entities/ProgrammingProgress"
+            "$ref": "#/backend/entities/LearningProgress"
           },
-          "description": "Stores programming progress for a specific user. Path-based ownership is enforced via the `userId` parameter.",
+          "description": "Stores learning progress for specific programming concepts for a specific user.",
           "params": [
             {
               "name": "userId",
-              "description": "The ID of the user who owns the programming progress."
+              "description": "The ID of the user."
             },
             {
-              "name": "programmingProgressId",
-              "description": "The ID of the programming progress."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/projects/{projectId}",
-        "definition": {
-          "entityName": "Project",
-          "schema": {
-            "$ref": "#/backend/entities/Project"
-          },
-          "description": "Stores projects for a specific user. Path-based ownership is enforced via the `userId` parameter.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The ID of the user who owns the project."
-            },
-            {
-              "name": "projectId",
-              "description": "The ID of the project."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/skills/{skillId}",
-        "definition": {
-          "entityName": "Skill",
-          "schema": {
-            "$ref": "#/backend/entities/Skill"
-          },
-          "description": "Stores skills for a specific user. Path-based ownership is enforced via the `userId` parameter.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The ID of the user who owns the skill."
-            },
-            {
-              "name": "skillId",
-              "description": "The ID of the skill."
+              "name": "learningProgressId",
+              "description": "The ID of the learning progress entry."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to store data related to English, Japanese, and Programming concepts, along with user progress and portfolio projects. User data is implicitly managed through Firebase Authentication. To adhere to Authorization Independence, no `get()` calls are necessary for security rules. This is achieved by structuring data in a way that authorization can be determined directly from the request and document data.\n\n*   **User-Owned Data:** English words, English grammar rules, Japanese characters, Japanese words, Japanese grammar rules, Programming concepts, Code snippets, Programming progress, Skills, and Projects are all implicitly owned by the authenticated user.\n\n*   **QAPs (Rules are not Filters):**  Each top-level collection segregates data with distinct security postures.  The structure avoids mixing data requiring different access controls within the same collection. List operations are secure, as rules only need to check `request.auth.uid` against the owner ID in the path."
+    "reasoning": "The data structure is designed to store user-specific learning data (English words, grammar rules, Japanese characters/words/grammar, programming concepts, code snippets, and learning progress).  Authorization independence is achieved by using path-based ownership; each user's data is stored under their `userId`, removing the need for `get()` calls in security rules to determine ownership. QAPs are achieved through structural segregation; each collection stores data with the same access needs (private to the user)."
   }
 }
