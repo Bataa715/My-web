@@ -167,7 +167,7 @@ export default function Hero() {
               { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн хэмжээний програм хангамжийн компанид ажиллах.', type: 'info' },
               { id: 'user', icon: 'User', title: 'Тухай', content: 'Би програмчлалд дуртай.', type: 'info' },
               { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Дуртай дууг сонсох.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
-              { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', type: 'info', backgroundImage: 'https://images.unsplash.com/photo-1536440136628-849c177E76a1?w=800' },
+              { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', type: 'info', backgroundImage: 'https://i.pinimg.com/1200x/81/31/c3/8131c3dccfe8cd2f38ff3798745fbd03.jpg' },
               { id: 'quote', icon: 'Quote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay', type: 'info' },
               { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.', type: 'info' },
           ];
