@@ -393,7 +393,7 @@ export default function Hero() {
                             animate={{ rotateY: 0, opacity: 1, scale: 1 }}
                             exit={{ rotateY: 180, opacity: 0, scale: 0.8 }}
                             transition={{ duration: 0.6, ease: "easeInOut" }}
-                            className="absolute inset-0 flex flex-col items-center justify-center bg-muted rounded-full border-4 border-primary shadow-lg p-6 text-center overflow-hidden"
+                            className="absolute inset-0 flex flex-col items-center justify-center bg-muted rounded-full border-4 border-primary shadow-lg text-center overflow-hidden"
                             onClick={handleCloseContent}
                         >
                            {selectedOrbit.type !== 'audio' && selectedOrbit.backgroundImage && (
@@ -411,8 +411,8 @@ export default function Hero() {
                            
                             <AnimatePresence mode="wait">
                                 {isEditingOrbit ? (
-                                    <motion.div key="edit" className="w-full z-20 space-y-2" onClick={(e) => e.stopPropagation()}>
-                                        <div className="grid grid-cols-2 gap-2">
+                                    <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20 space-y-1 p-4 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                                        <div className="grid grid-cols-2 gap-1 items-start">
                                             <div>
                                                 <Label className={cn("text-left text-xs", selectedOrbit.type !== 'audio' && "text-white")}>Нэр</Label>
                                                 <Input
@@ -430,7 +430,7 @@ export default function Hero() {
                                                   className={cn("h-8 text-base bg-transparent border-primary/50 focus-visible:ring-primary", selectedOrbit.type !== 'audio' && 'text-white')}
                                                   placeholder="Lucide Icon"
                                                 />
-                                                 <p className="text-xs text-muted-foreground pt-1">
+                                                 <p className="text-[10px] text-muted-foreground pt-0.5">
                                                     <a href="https://lucide.dev/" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">Lucide</a>-аас icon хайх
                                                 </p>
                                             </div>
@@ -441,7 +441,7 @@ export default function Hero() {
                                                 value={editedOrbitContent}
                                                 onChange={(e) => setEditedOrbitContent(e.target.value)}
                                                 className={cn("text-sm bg-transparent border-primary/50 focus-visible:ring-primary", selectedOrbit.type !== 'audio' && "text-white")}
-                                                rows={1}
+                                                rows={2}
                                                 placeholder="Тайлбар..."
                                             />
                                         </div>
@@ -451,7 +451,7 @@ export default function Hero() {
                                                 <Input
                                                   value={editedYoutubeUrl}
                                                   onChange={(e) => setEditedYoutubeUrl(e.target.value)}
-                                                  className={cn("h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary mt-1 text-foreground")}
+                                                  className={cn("h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground")}
                                                   placeholder="https://www.youtube.com/watch?v=..."
                                                 />
                                             </div>
@@ -461,22 +461,22 @@ export default function Hero() {
                                                 <Input
                                                   value={editedOrbitBgImage}
                                                   onChange={(e) => setEditedOrbitBgImage(e.target.value)}
-                                                  className={cn("h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary mt-1", selectedOrbit.type !== 'audio' && 'text-white')}
+                                                  className={cn("h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary", selectedOrbit.type !== 'audio' && 'text-white')}
                                                   placeholder="https://example.com/image.png"
                                                 />
                                             </div>
                                         )}
-                                        <div className="flex gap-2 pt-2 justify-center">
-                                            <Button onClick={handleSaveOrbitInfo} size="sm" disabled={saving}>
+                                        <div className="flex gap-2 pt-1 justify-center">
+                                            <Button onClick={handleSaveOrbitInfo} size="icon" className="h-8 w-8" disabled={saving}>
                                                 {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}
                                             </Button>
-                                            <Button onClick={() => setIsEditingOrbit(false)} size="sm" variant="ghost">
+                                            <Button onClick={() => setIsEditingOrbit(false)} size="icon" variant="ghost" className="h-8 w-8">
                                                 <XCircle className="h-4 w-4"/>
                                             </Button>
                                         </div>
                                     </motion.div>
                                 ) : (
-                                    <motion.div key="view" className="relative w-full cursor-pointer z-20" onClick={handleContentClick}>
+                                    <motion.div key="view" className="relative w-full cursor-pointer z-20 p-6" onClick={handleContentClick}>
                                         <h3 className="font-headline text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
                                         {selectedOrbit.type === 'audio' ? (
                                             selectedOrbit.youtubeVideoId ? (
