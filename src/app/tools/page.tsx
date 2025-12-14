@@ -75,19 +75,20 @@ export default function ToolsPage() {
 
   return (
     <div className="relative">
-      {heroImage && (
-        <div className="absolute top-0 left-0 w-full h-[70vh] -z-10">
-          <Image
-            src={heroImage}
-            alt="Abstract technology background"
-            fill
-            className="object-cover"
-            data-ai-hint="abstract technology"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
-        </div>
-      )}
-      <div className="space-y-8">
+      <div className="absolute top-0 left-0 w-full h-3/4 -z-10">
+         {heroImage && (
+            <Image
+                src={heroImage}
+                alt="Abstract technology background"
+                fill
+                className="object-cover"
+                data-ai-hint="abstract technology"
+            />
+         )}
+         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+      </div>
+      
+      <div className="relative space-y-8 pt-16">
         <BackButton />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
           {tools.map((tool) => (
