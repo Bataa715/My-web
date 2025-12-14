@@ -420,7 +420,7 @@ export default function Hero() {
                            
                             <AnimatePresence mode="wait">
                                 {isEditingOrbit ? (
-                                    <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20" onClick={(e) => e.stopPropagation()}>
+                                    <motion.div key="edit" className="w-full h-full z-20" onClick={(e) => e.stopPropagation()}>
                                         <div className="w-full h-full p-6 flex flex-col justify-center">
                                             <div className="w-full mt-1">
                                                 <Label className="text-left text-xs mb-1 block text-foreground">Нэр</Label>
