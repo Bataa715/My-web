@@ -1,3 +1,5 @@
+import type { Timestamp } from 'firebase/firestore';
+
 export interface EnglishWord {
   id: string;
   word: string;
@@ -44,31 +46,32 @@ export interface ProgressItem {
   practicing: boolean;
 }
 
-export interface Project {
-  id: string;
+export type Project = {
+  id?: string;
   name: string;
   description: string;
   technologies: string[];
   link?: string;
   live?: string;
   category: string;
-  createdAt: Date;
-}
+  createdAt?: Date | Timestamp;
+};
 
-export interface Skill {
-    id: string;
-    name: string;
-    icon: string;
+export type Skill = {
+    id?: string;
+    name:string;
+    icon: string; // Icon name as string
     items: string[];
-    createdAt?: Date;
-}
+    createdAt?: Date | Timestamp;
+};
 
-export interface OrbitInfo {
+export type OrbitInfo = {
   id: string;
   icon: string;
   title: string;
   content: string;
-  type?: 'info' | 'audio';
   backgroundImage?: string;
+  type?: 'info' | 'audio';
+  audioUrl?: string;
   youtubeVideoId?: string;
-}
+};
