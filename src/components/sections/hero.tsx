@@ -20,13 +20,14 @@ import { useEditMode } from "@/contexts/EditModeContext";
 import Image from "next/image";
 import { useFirebase } from "@/firebase";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import IconPicker from "../shared/IconPicker";
 
-const getIcon = (iconName: string) => {
+const getIcon = (iconName: string, props = {}) => {
     // Add BrainCircuit as a special case if the user had 'brain'
-    if (iconName === 'brain' || iconName === 'Brain') return <BrainCircuit className="h-6 w-6" />;
+    if (iconName === 'brain' || iconName === 'Brain') return <BrainCircuit className="h-6 w-6" {...props} />;
     
     const LucideIcon = (require('lucide-react') as any)[iconName];
-    return LucideIcon ? <LucideIcon className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6 text-destructive" />;
+    return LucideIcon ? <LucideIcon className="h-6 w-6" {...props} /> : <AlertTriangle className="h-6 w-6 text-destructive" {...props} />;
 };
 
 interface OrbitItemProps {
@@ -531,14 +532,17 @@ export default function Hero() {
                                                     placeholder="Нэр..."
                                                 />
                                             </div>
-                                            <div>
+                                             <div className="space-y-2">
                                                 <Label className="text-center text-xs mb-1 block text-foreground">Icon</Label>
-                                                <Input
-                                                    value={editedOrbitIcon}
-                                                    onChange={(e) => setEditedOrbitIcon(e.target.value)}
-                                                    className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
-                                                    placeholder="Lucide Icon"
-                                                />
+                                                <IconPicker 
+                                                    selectedIcon={editedOrbitIcon} 
+                                                    onIconSelect={setEditedOrbitIcon}
+                                                >
+                                                    <Button type="button" variant="outline" className="w-full h-8 text-sm justify-center gap-2 bg-transparent border-primary/50 focus:ring-primary text-foreground">
+                                                       {getIcon(editedOrbitIcon, {className: "h-4 w-4"})}
+                                                       <span>{editedOrbitIcon}</span>
+                                                    </Button>
+                                                </IconPicker>
                                             </div>
                                             <div>
                                                 <Label className="text-center text-xs mb-1 block text-foreground">Тайлбар</Label>
@@ -638,7 +642,7 @@ export default function Hero() {
                         </motion.div>
                     )}
                 </AnimatePresence>
-                 {isEditMode && !selectedOrbit && (
+                {isEditMode && !selectedOrbit && (
                     <Button 
                         variant="outline"
                         size="icon"
