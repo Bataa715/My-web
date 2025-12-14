@@ -93,6 +93,7 @@ export default function EnglishVocabularyPage() {
             initialWords={words}
             wordType="english"
             columns={columns}
+            title="Англи үгс"
         />
       )}
     </div>
