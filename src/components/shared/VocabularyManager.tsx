@@ -35,7 +35,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { PlusCircle, Edit, Trash2, X, Pilcrow } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, X } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
 import { useFirebase } from '@/firebase';
@@ -181,28 +181,37 @@ export default function VocabularyManager<T extends Word>({
   };
 
   const handleDelete = async (wordId: string) => {
-    if (!user || !userWordsCollection) {
-        toast({ title: "Алдаа", description: "Устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
-        return;
-    }
+      if (!user || !userWordsCollection || !firestore) {
+          toast({ title: "Алдаа", description: "Устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
+          return;
+      }
 
-    const originalWords = words;
-    setWords(words.filter(w => w.id !== wordId));
+      const originalWords = [...words];
+      const wordToDelete = words.find(w => w.id === wordId);
 
-    try {
-        const wordDocRef = doc(firestore, `users/${user.uid}/${collectionPath}`, wordId);
-        await deleteDoc(wordDocRef);
-        toast({ title: "Амжилттай устгагдлаа", variant: "destructive" });
+      if (!wordToDelete) return;
 
-    } catch (error) {
-        setWords(originalWords);
-        toast({
-            title: "Алдаа гарлаа",
-            description: "Үг устгахад алдаа гарлаа. Та дахин оролдоно уу.",
-            variant: "destructive",
-        });
-        console.error("Error deleting word:", error);
-    }
+      // Optimistically update UI
+      setWords(words.filter(w => w.id !== wordId));
+      
+      try {
+          // A word is a "user word" if it exists in the user's subcollection.
+          // We can try to delete it from there. If it fails, it might be a public word.
+          const userWordDocRef = doc(firestore, `users/${user.uid}/${collectionPath}`, wordId);
+          await deleteDoc(userWordDocRef);
+          
+          toast({ title: "Амжилттай устгагдлаа" });
+
+      } catch (error) {
+          // If the delete fails, revert the UI and show an error.
+          setWords(originalWords);
+          toast({
+              title: "Алдаа гарлаа",
+              description: "Үг устгахад алдаа гарлаа.",
+              variant: "destructive",
+          });
+          console.error("Error deleting word:", error);
+      }
   };
 
   const toggleMemorized = async (id: string, checked: boolean) => {
@@ -240,7 +249,6 @@ export default function VocabularyManager<T extends Word>({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className='flex-1'>
                 <CardTitle>Үг цээжлэх</CardTitle>
-                <CardDescription>Шинэ үг нэмэх, засах, устгах, цээжилснээ тэмдэглэх.</CardDescription>
             </div>
             <div className="flex w-full sm:w-auto items-center gap-2">
                  <Input 
@@ -377,7 +385,7 @@ export default function VocabularyManager<T extends Word>({
                             variant="ghost"
                             size="icon"
                             className="text-destructive hover:text-destructive"
-                            disabled={!user || initialWords.some(initialWord => initialWord.word === word.word && initialWord.meaning === word.meaning)}
+                            disabled={!user}
                           >
                           <Trash2 className="h-4 w-4" />
                         </Button>
