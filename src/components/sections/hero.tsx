@@ -1,7 +1,8 @@
+
 "use client";
 
 import Link from "next/link";
-import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, MessageSquareQuote, Film, Music, Gamepad2, MapPin } from 'lucide-react';
+import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, MessageSquareQuote, Film, Music, Gamepad2, MapPin, BrainCircuit } from 'lucide-react';
 import { useState, useEffect, type FC } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,9 @@ import { useFirebase } from "@/firebase";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 const getIcon = (iconName: string) => {
+    // Add BrainCircuit as a special case if the user had 'brain'
+    if (iconName === 'brain' || iconName === 'Brain') return <BrainCircuit className="h-6 w-6" />;
+    
     const LucideIcon = (require('lucide-react') as any)[iconName];
     return LucideIcon ? <LucideIcon className="h-6 w-6" /> : <AlertTriangle className="h-6 w-6 text-destructive" />;
 };
@@ -535,7 +539,7 @@ export default function Hero() {
                                     variant="outline"
                                     size="icon"
                                     onClick={() => setIsEditingImage(true)}
-                                    className="absolute top-0 right-0 h-8 w-8 rounded-full z-30"
+                                    className="absolute top-0 right-0 h-8 w-8 rounded-full z-20"
                                 >
                                     <Edit className="h-4 w-4" />
                                     <span className="sr-only">Зураг солих</span>
@@ -553,7 +557,7 @@ export default function Hero() {
                      total={orbitInfo.length}
                      selectedOrbit={selectedOrbit}
                      onItemClick={orbitItemClick}
-                     isEditing={isEditingOrbit}
+                     isEditing={!!selectedOrbit && isEditingOrbit}
                    />
                 ))}
                 
@@ -597,5 +601,7 @@ export default function Hero() {
     </section>
   );
 }
+
+    
 
     
