@@ -79,16 +79,6 @@ const Header = () => {
                     {link.label}
                   </Link>
                 ))}
-                {isEditMode && isAboutPage && (
-                  <>
-                    <AddProjectDialog>
-                        <Button variant="ghost" className="transition-colors hover:text-foreground/80 text-foreground/60 px-0">Төсөл нэмэх</Button>
-                    </AddProjectDialog>
-                    <AddSkillDialog>
-                         <Button variant="ghost" className="transition-colors hover:text-foreground/80 text-foreground/60 px-0">Ур чадвар нэмэх</Button>
-                    </AddSkillDialog>
-                  </>
-                )}
             </nav>
         </div>
         <div className="flex-1 md:hidden">
@@ -124,16 +114,6 @@ const Header = () => {
                     {link.label}
                   </Link>
                 ))}
-                {isEditMode && isAboutPage && (
-                  <>
-                    <AddProjectDialog>
-                        <Button variant="link" className="text-sm font-medium transition-colors hover:text-primary justify-start p-0">Төсөл нэмэх</Button>
-                    </AddProjectDialog>
-                    <AddSkillDialog>
-                        <Button variant="link" className="text-sm font-medium transition-colors hover:text-primary justify-start p-0">Ур чадвар нэмэх</Button>
-                    </AddSkillDialog>
-                  </>
-                )}
               </nav>
             </SheetContent>
           </Sheet>
