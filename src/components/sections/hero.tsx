@@ -393,7 +393,7 @@ export default function Hero() {
             </div>
           </div>
           <div className="relative flex items-center justify-center w-full max-w-[400px] aspect-square mx-auto">
-             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-52 h-52 md:w-64 md:h-64")}>
+             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-64 h-64 md:w-64 md:h-64")}>
                 <AnimatePresence>
                     {selectedOrbit ? (
                         <motion.div
@@ -534,7 +534,7 @@ export default function Hero() {
                                         variant="outline"
                                         size="icon"
                                         onClick={() => setIsEditingImage(true)}
-                                        className="absolute top-0 right-0 h-8 w-8 rounded-full"
+                                        className="absolute top-0 right-0 h-8 w-8 rounded-full z-20"
                                     >
                                         <Edit className="h-4 w-4" />
                                         <span className="sr-only">Зураг солих</span>
