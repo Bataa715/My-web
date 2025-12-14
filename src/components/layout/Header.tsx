@@ -9,6 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronDown } from "lucide-react";
+
 
 const mainLinks = [
   { href: "/", label: "Нүүр" },
@@ -17,6 +25,7 @@ const mainLinks = [
 ];
 
 const toolsLinks = [
+  { href: "/tools", label: "All Tools" },
   { href: "/tools/english", label: "Англи хэл" },
   { href: "/tools/japanese", label: "Япон хэл" },
   { href: "/tools/programming", label: "Программчлал" },
@@ -43,11 +52,16 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
-        <div className="flex-1 hidden md:flex items-center">
+        <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <BookOpenText className="h-6 w-6 text-primary" />
             <span className="hidden font-bold sm:inline-block">Kaizen</span>
           </Link>
+          <nav className="flex items-center space-x-6 text-sm font-medium">
+            {mainLinks.map((link) => (
+               <NavLink key={link.href} {...link} />
+            ))}
+          </nav>
         </div>
         
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -75,7 +89,7 @@ export function Header() {
                   <NavLink key={link.href} {...link} className="text-lg" />
                 ))}
                  <h3 className="pt-4 font-semibold text-lg">Tools</h3>
-                {toolsLinks.map((link) => (
+                {toolsLinks.slice(1).map((link) => (
                    <NavLink key={link.href} href={link.href} label={link.label} className="text-lg pl-2" />
                 ))}
               </div>
@@ -83,19 +97,14 @@ export function Header() {
           </SheetContent>
         </Sheet>
         
-        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          {mainLinks.map((link) => (
-            <NavLink key={link.href} {...link} />
-          ))}
-        </nav>
-
-        <div className="flex flex-1 items-center justify-end space-x-2">
+        <div className="flex flex-1 items-center justify-between md:justify-end">
            <Link href="/" className="flex items-center space-x-2 md:hidden">
               <BookOpenText className="h-6 w-6 text-primary" />
               <span className="font-bold">Kaizen</span>
           </Link>
-          <div className="flex-1 hidden md:flex"></div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </header>
