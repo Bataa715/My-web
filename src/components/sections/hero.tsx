@@ -653,23 +653,26 @@ export default function Hero() {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="relative w-full cursor-pointer z-20 p-6" onClick={handleContentClick}>
+                                        className="relative w-full cursor-pointer z-20 p-4" onClick={handleContentClick}>
                                         <h3 className="font-headline text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
                                         {selectedOrbit.type === 'audio' ? (
-                                            selectedOrbit.youtubeVideoId ? (
-                                                <div className="w-full aspect-video rounded-lg overflow-hidden">
-                                                      <iframe
-                                                        className="w-full h-full"
-                                                        src={`https://www.youtube.com/embed/${selectedOrbit.youtubeVideoId}`}
-                                                        title="YouTube video player"
-                                                        frameBorder="0"
-                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                        allowFullScreen
-                                                    ></iframe>
-                                                </div>
-                                            ) : (
-                                                 <p className="text-lg text-foreground">{selectedOrbit.content}</p>
-                                            )
+                                            <div className="space-y-2">
+                                                <p className="text-sm text-foreground/80">{selectedOrbit.content}</p>
+                                                {selectedOrbit.youtubeVideoId ? (
+                                                    <div className="w-full aspect-video rounded-lg overflow-hidden">
+                                                        <iframe
+                                                            className="w-full h-full"
+                                                            src={`https://www.youtube.com/embed/${selectedOrbit.youtubeVideoId}`}
+                                                            title="YouTube video player"
+                                                            frameBorder="0"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                            allowFullScreen
+                                                        ></iframe>
+                                                    </div>
+                                                ) : (
+                                                     <p className="text-base text-foreground italic">Youtube video оруулаагүй байна.</p>
+                                                )}
+                                            </div>
                                         ) : (
                                             <p className="text-lg text-foreground">{selectedOrbit.content}</p>
                                         )}
