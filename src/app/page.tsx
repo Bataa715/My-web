@@ -61,7 +61,6 @@ export default function Home() {
        )}
        <div className="absolute inset-0 bg-black/30"></div>
        <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
-          <h1 className="text-4xl font-bold tracking-tighter text-white sm:text-5xl md:text-6xl font-headline">Kaizen</h1>
           <p className="max-w-[700px] text-gray-200 md:text-xl">
            Энэ бол тасралтгүй хөгжил, суралцах үйл явцыг минь харуулсан хувийн орон зай юм.
           </p>
