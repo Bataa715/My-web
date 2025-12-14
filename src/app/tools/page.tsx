@@ -66,6 +66,18 @@ export default function ToolsPage() {
 
   return (
     <div className="relative min-h-[calc(100vh-57px-81px)] flex flex-col overflow-hidden">
+       {heroImage && (
+            <div className="absolute bottom-0 left-0 w-full z-0 h-[60vh]">
+                <Image
+                    src={heroImage}
+                    alt="Abstract learning background"
+                    fill
+                    className="object-cover"
+                    data-ai-hint="abstract library"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+            </div>
+        )}
        <div className="space-y-8 z-10 pt-8 flex-grow">
           <BackButton />
           <div className="text-center">
@@ -96,21 +108,6 @@ export default function ToolsPage() {
             ))}
           </div>
        </div>
-        {heroImage && (
-            <div className="absolute bottom-0 left-0 w-full z-0 h-full">
-                <Image
-                    src={heroImage}
-                    alt="Abstract learning background"
-                    fill
-                    className="object-cover"
-                    data-ai-hint="abstract library"
-                    style={{
-                        maskImage: 'linear-gradient(to top right, transparent 20%, black 70%)',
-                        WebkitMaskImage: 'linear-gradient(to top right, transparent 20%, black 70%)'
-                    }}
-                />
-            </div>
-        )}
     </div>
   );
 }
