@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -77,18 +76,20 @@ export default function ToolsPage() {
   return (
     <div className="relative min-h-[calc(100vh-57px-81px)]">
        {heroImage && (
-        <div className="absolute bottom-0 left-0 w-full h-[60vh] -z-0">
-          <Image
-            src={heroImage}
-            alt="Abstract technology background"
-            fill
-            className="object-cover"
-            data-ai-hint="abstract technology"
-          />
-           <div className="absolute inset-0 z-10 bg-gradient-to-t from-background to-transparent"></div>
-        </div>
+        <>
+          <div className="absolute bottom-0 left-0 w-full h-[60vh] z-0">
+            <Image
+              src={heroImage}
+              alt="Abstract technology background"
+              fill
+              className="object-cover"
+              data-ai-hint="abstract technology"
+            />
+          </div>
+          <div className="absolute bottom-0 left-0 w-full h-[60vh] z-1 bg-gradient-to-t from-background to-transparent"></div>
+        </>
       )}
-       <div className="relative z-20 space-y-8">
+       <div className="relative z-10 space-y-8">
           <BackButton />
           <div className="text-center">
             <h1 className="text-3xl font-bold font-headline">Хэрэгслүүд</h1>
