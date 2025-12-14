@@ -126,8 +126,8 @@ export default function ToolsPage() {
                       data-ai-hint="abstract library"
                   />
                   <div 
-                    className="absolute inset-0 bg-gradient-to-br from-background via-background to-transparent"
-                    style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}
+                    className="absolute inset-0 w-full h-full bg-gradient-to-br from-background via-background to-transparent"
+                    style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)' }}
                   ></div>
               </div>
             )}
