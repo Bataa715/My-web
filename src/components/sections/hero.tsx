@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -121,8 +121,6 @@ export default function Hero() {
   
   const { toast } = useToast();
   
-  const userInfoDocRef = user ? doc(firestore, "users", user.uid) : null;
-
   useEffect(() => {
     const fetchUserInfo = async () => {
         if (isUserLoading) {
@@ -130,15 +128,16 @@ export default function Hero() {
             return;
         }
 
-        if (!user || !userInfoDocRef) {
+        if (!user || !firestore) {
             setLoading(false);
             return;
         }
 
+        const userInfoDocRef = doc(firestore, "users", user.uid);
         setLoading(true);
       try {
         const docSnap = await getDoc(userInfoDocRef);
-        if (docSnap.exists() && docSnap.data().name) { // Check if doc exists and has data
+        if (docSnap.exists() && docSnap.data().name) { 
           const data = docSnap.data();
           setBio(data.bio || '');
           setEditedBio(data.bio || '');
@@ -148,7 +147,6 @@ export default function Hero() {
           setEditedImage(imageUrl);
           setOrbitInfo(data.orbitInfo || []);
         } else {
-          // If doc doesn't exist, create it with default data. Non-blocking.
           const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
           const defaultName = "Б.Батмягмар";
           const defaultBio = "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.";
@@ -186,11 +184,13 @@ export default function Hero() {
       }
     };
     fetchUserInfo();
-  }, [user, isUserLoading, userInfoDocRef, toast]);
+  }, [user, isUserLoading, firestore]);
 
 
   const handleSaveOrbitInfo = async () => {
-    if (!selectedOrbit || !userInfoDocRef) return;
+    if (!user || !firestore || !selectedOrbit) return;
+    const userInfoDocRef = doc(firestore, "users", user.uid);
+
     setSaving(true);
     
     let updatedItem: OrbitInfo = { ...selectedOrbit, content: editedOrbitContent };
@@ -230,7 +230,8 @@ export default function Hero() {
   };
 
   const handleSaveImage = async () => {
-    if (!userInfoDocRef) return;
+    if (!user || !firestore) return;
+    const userInfoDocRef = doc(firestore, "users", user.uid);
     setSaving(true);
     try {
       updateDocumentNonBlocking(userInfoDocRef, { profileImage: editedImage });
@@ -246,7 +247,8 @@ export default function Hero() {
   };
 
   const handleSaveBio = async () => {
-    if (!userInfoDocRef) return;
+    if (!user || !firestore) return;
+    const userInfoDocRef = doc(firestore, "users", user.uid);
     setSaving(true);
     try {
       updateDocumentNonBlocking(userInfoDocRef, { bio: editedBio });
@@ -551,5 +553,3 @@ export default function Hero() {
     </section>
   );
 }
-
-    
