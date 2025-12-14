@@ -99,21 +99,23 @@ export default function ToolsPage() {
 
         <div className="absolute bottom-0 left-0 w-full z-0 h-full">
             {heroImage && (
-              <div 
-                className="absolute inset-0 w-full h-full"
-                style={{ clipPath: 'polygon(0 70%, 100% 20%, 100% 100%, 0% 100%)' }}
-              >
-                  <Image
-                      src={heroImage}
-                      alt="Abstract learning background"
-                      fill
-                      className="object-cover"
-                      data-ai-hint="abstract library"
-                  />
-                  <div 
-                    className="absolute inset-0 w-full h-full bg-gradient-to-t from-background via-background/80 to-transparent"
-                  ></div>
-              </div>
+              <>
+                <div 
+                  className="absolute inset-0 w-full h-full"
+                  style={{ clipPath: 'polygon(0 70%, 100% 20%, 100% 100%, 0% 100%)' }}
+                >
+                    <Image
+                        src={heroImage}
+                        alt="Abstract learning background"
+                        fill
+                        className="object-cover"
+                        data-ai-hint="abstract library"
+                    />
+                </div>
+                <div 
+                  className="absolute inset-0 w-full h-full bg-gradient-to-t from-background via-background/80 to-transparent"
+                ></div>
+              </>
             )}
         </div>
     </div>
