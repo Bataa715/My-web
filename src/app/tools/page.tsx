@@ -32,7 +32,7 @@ const tools = [
     icon: <CodeIcon className="h-6 w-6" />
   },
   {
-    title: "Pomodoro Timer",
+    title: "Timer",
     description: "Хичээллэх, завсарлах хугацааг удирдах.",
     href: "/tools/pomodoro",
     icon: <Timer className="h-6 w-6" />
