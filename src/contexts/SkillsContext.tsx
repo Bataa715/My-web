@@ -31,7 +31,7 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   
   const skillsCollectionRef = useMemoFirebase(() => {
-    if (!user) return null;
+    if (!user || !firestore) return null;
     return collection(firestore, `users/${user.uid}/skills`);
   }, [user, firestore]);
 
@@ -89,7 +89,7 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
       }
     };
     fetchSkills();
-  }, [skillsCollectionRef, toast, user]);
+  }, [skillsCollectionRef, toast, user, firestore]);
 
   const addSkillGroup = async (group: Omit<Skill, 'id' | 'createdAt'>) => {
     if (!skillsCollectionRef) return;
@@ -105,7 +105,7 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
   };
 
   const updateSkillGroup = async (id: string, updates: Partial<Omit<Skill, 'id'>>) => {
-    if (!user) return;
+    if (!user || !firestore) return;
     try {
       const skillDoc = doc(firestore, `users/${user.uid}/skills`, id);
       updateDocumentNonBlocking(skillDoc, updates);
@@ -118,7 +118,7 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteSkillGroup = async (id: string) => {
-    if (!user) return;
+    if (!user || !firestore) return;
     try {
       const skillDoc = doc(firestore, `users/${user.uid}/skills`, id);
       deleteDocumentNonBlocking(skillDoc);

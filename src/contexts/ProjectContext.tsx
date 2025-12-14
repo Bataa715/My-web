@@ -48,7 +48,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !firestore) {
         setLoading(false);
         setProjects([]);
         return;
