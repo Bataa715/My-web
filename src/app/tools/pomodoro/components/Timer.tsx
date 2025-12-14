@@ -4,7 +4,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -91,15 +90,6 @@ export default function Timer() {
 
     return (
         <Card className="w-full max-w-md bg-card/80 backdrop-blur-sm">
-            <CardHeader>
-                <Tabs value={mode} onValueChange={(value) => switchMode(value as Mode)} className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="pomodoro">Pomodoro</TabsTrigger>
-                        <TabsTrigger value="shortBreak">Short Break</TabsTrigger>
-                        <TabsTrigger value="longBreak">Long Break</TabsTrigger>
-                    </TabsList>
-                </Tabs>
-            </CardHeader>
             <CardContent className="flex flex-col items-center justify-center space-y-8 py-10">
                 <div className="text-8xl font-bold font-mono text-primary tracking-tighter">
                     {formatTime(time)}
