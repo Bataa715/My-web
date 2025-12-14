@@ -9,9 +9,9 @@ export default function BackButton() {
 
     return (
         <div className="mb-8">
-            <Button variant="outline" onClick={() => router.back()}>
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Буцах
+            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                <ArrowLeft className="h-4 w-4" />
+                <span className="sr-only">Буцах</span>
             </Button>
         </div>
     );
