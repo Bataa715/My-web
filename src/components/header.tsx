@@ -18,8 +18,8 @@ import { usePathname } from 'next/navigation';
 
 const mainLinks = [
   { href: "/", label: "Нүүр" },
-  { href: "/about", label: "My CV" },
-  { href: "/tools", label: "Tools" },
+  { href: "/about", label: "Миний тухай" },
+  { href: "/tools", label: "Миний хэрэгслүүд" },
 ];
 
 const CORRECT_PASSWORD = "Bataa2480";
