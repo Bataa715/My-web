@@ -61,3 +61,13 @@ export interface Skill {
     skills: string[];
     createdAt: Date;
 }
+
+export interface OrbitInfo {
+  id: string;
+  icon: string;
+  title: string;
+  content: string;
+  type?: 'info' | 'audio';
+  backgroundImage?: string;
+  youtubeVideoId?: string;
+}

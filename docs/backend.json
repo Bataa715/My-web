@@ -1,245 +1,41 @@
+
 {
   "entities": {
-    "EnglishWord": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "EnglishWord",
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a user's profile information.",
       "type": "object",
-      "description": "Represents an English word and its Mongolian meaning for vocabulary learning.",
       "properties": {
-        "id": {
+        "name": {
           "type": "string",
-          "description": "Unique identifier for the English word entry."
+          "description": "The user's display name."
         },
-        "englishWord": {
+        "bio": {
           "type": "string",
-          "description": "The English word itself."
+          "description": "A short biography of the user."
         },
-        "mongolianMeaning": {
+        "profileImage": {
           "type": "string",
-          "description": "The Mongolian translation or meaning of the English word."
+          "description": "URL of the user's profile image."
         },
-        "memorized": {
-          "type": "boolean",
-          "description": "Indicates whether the user has memorized this word."
-        }
-      },
-      "required": [
-        "id",
-        "englishWord",
-        "mongolianMeaning",
-        "memorized"
-      ]
-    },
-    "EnglishGrammarRule": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "EnglishGrammarRule",
-      "type": "object",
-      "description": "Represents a grammar rule with explanation and example sentences.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the grammar rule entry."
-        },
-        "ruleName": {
-          "type": "string",
-          "description": "The name of the grammar rule."
-        },
-        "explanation": {
-          "type": "string",
-          "description": "Explanation of the grammar rule."
-        },
-        "exampleSentences": {
+        "orbitInfo": {
           "type": "array",
-          "description": "Example sentences demonstrating the grammar rule.",
           "items": {
-            "type": "string"
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "icon": { "type": "string" },
+              "title": { "type": "string" },
+              "content": { "type": "string" },
+              "type": { "type": "string" },
+              "backgroundImage": { "type": "string" },
+              "youtubeVideoId": { "type": "string" }
+            },
+            "required": ["id", "icon", "title", "content"]
           }
         }
       },
-      "required": [
-        "id",
-        "ruleName",
-        "explanation",
-        "exampleSentences"
-      ]
-    },
-    "JapaneseCharacter": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "JapaneseCharacter",
-      "type": "object",
-      "description": "Represents a Japanese character (Hiragana or Katakana) and its memorization status.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Japanese character."
-        },
-        "character": {
-          "type": "string",
-          "description": "The Japanese character itself (e.g., あ, カ)."
-        },
-        "type": {
-          "type": "string",
-          "description": "The type of Japanese character (Hiragana or Katakana)."
-        },
-        "memorized": {
-          "type": "boolean",
-          "description": "Indicates whether the user has memorized this character."
-        }
-      },
-      "required": [
-        "id",
-        "character",
-        "type",
-        "memorized"
-      ]
-    },
-    "JapaneseWord": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "JapaneseWord",
-      "type": "object",
-      "description": "Represents a Japanese word with Romaji, Mongolian meaning, and memorization status.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Japanese word entry."
-        },
-        "japaneseWord": {
-          "type": "string",
-          "description": "The Japanese word."
-        },
-        "romaji": {
-          "type": "string",
-          "description": "The Romaji representation of the Japanese word."
-        },
-        "mongolianMeaning": {
-          "type": "string",
-          "description": "The Mongolian translation or meaning of the Japanese word."
-        },
-        "memorized": {
-          "type": "boolean",
-          "description": "Indicates whether the user has memorized this word."
-        }
-      },
-      "required": [
-        "id",
-        "japaneseWord",
-        "romaji",
-        "mongolianMeaning",
-        "memorized"
-      ]
-    },
-    "JLPTGrammar": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "JLPTGrammar",
-      "type": "object",
-      "description": "Represents a JLPT grammar point with explanation and example sentences.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the JLPT grammar point."
-        },
-        "grammarPoint": {
-          "type": "string",
-          "description": "The JLPT grammar point (e.g., N5-1, N4-5)."
-        },
-        "explanation": {
-          "type": "string",
-          "description": "Explanation of the JLPT grammar point."
-        },
-        "exampleSentences": {
-          "type": "array",
-          "description": "Example sentences demonstrating the JLPT grammar point.",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "required": [
-        "id",
-        "grammarPoint",
-        "explanation",
-        "exampleSentences"
-      ]
-    },
-    "ProgrammingConcept": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ProgrammingConcept",
-      "type": "object",
-      "description": "Represents a programming concept with a short explanation.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the programming concept."
-        },
-        "topic": {
-          "type": "string",
-          "description": "The name of the programming topic (e.g., JavaScript, HTML/CSS)."
-        },
-        "explanation": {
-          "type": "string",
-          "description": "A short explanation of the programming concept."
-        }
-      },
-      "required": [
-        "id",
-        "topic",
-        "explanation"
-      ]
-    },
-    "CodeSnippet": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "CodeSnippet",
-      "type": "object",
-      "description": "Represents a code snippet with syntax and a copy button.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the code snippet."
-        },
-        "language": {
-          "type": "string",
-          "description": "The programming language of the code snippet (e.g., JavaScript, HTML)."
-        },
-        "code": {
-          "type": "string",
-          "description": "The code snippet itself."
-        }
-      },
-      "required": [
-        "id",
-        "language",
-        "code"
-      ]
-    },
-    "LearningProgress": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "LearningProgress",
-      "type": "object",
-      "description": "Tracks the learning progress for a specific programming concept.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the learning progress entry."
-        },
-        "conceptId": {
-          "type": "string",
-          "description": "Reference to ProgrammingConcept. (Relationship: ProgrammingConcept 1:N LearningProgress)"
-        },
-        "learned": {
-          "type": "boolean",
-          "description": "Indicates whether the user has learned the concept."
-        },
-        "practicing": {
-          "type": "boolean",
-          "description": "Indicates whether the user is practicing the concept."
-        }
-      },
-      "required": [
-        "id",
-        "conceptId",
-        "learned",
-        "practicing"
-      ]
+      "required": ["name", "bio"]
     },
     "Project": {
       "title": "Project",
@@ -254,20 +50,24 @@
           "type": "string",
           "description": "A description of the project."
         },
-        "tags": {
+        "technologies": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "A list of tags associated with the project."
+          "description": "A list of technologies used in the project."
         },
-        "imageUrl": {
-          "type": "string",
-          "description": "The URL of an image for the project."
+        "category": {
+            "type": "string",
+            "description": "The category of the project."
         },
         "link": {
           "type": "string",
           "description": "A link to the project."
+        },
+        "live": {
+            "type": "string",
+            "description": "A link to the live version of the project."
         },
         "createdAt": {
             "type": "string",
@@ -277,9 +77,8 @@
       "required": [
         "name",
         "description",
-        "tags",
-        "imageUrl",
-        "link",
+        "technologies",
+        "category",
         "createdAt"
       ]
     },
@@ -318,6 +117,12 @@
     ]
   },
   "firestore": {
+    "/userInfo/{userId}": {
+        "schema": {
+            "$ref": "#/entities/UserProfile"
+        },
+        "description": "Stores user profile information."
+    },
     "/users/{userId}/projects/{projectId}": {
         "schema": {
             "$ref": "#/entities/Project"

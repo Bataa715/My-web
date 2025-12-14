@@ -1,4 +1,4 @@
-import type { EnglishWord, JapaneseWord, GrammarRule, Kana, ProgrammingConcept, CheatSheetItem, ProgressItem } from './types';
+import type { EnglishWord, JapaneseWord, GrammarRule, Kana, ProgrammingConcept, CheatSheetItem, ProgressItem, OrbitInfo } from './types';
 
 export const initialEnglishWords: EnglishWord[] = [
   { id: '1', word: 'Perseverance', meaning: 'Тууштай байдал', memorized: true },
@@ -109,4 +109,18 @@ export const initialProgressItems: ProgressItem[] = [
   { id: '2', label: 'CSS Flexbox', learned: true, practicing: true },
   { id: '3', label: 'JavaScript Variables', learned: false, practicing: true },
   { id: '4', label: 'React Components', learned: false, practicing: false },
+];
+
+export const personalInfo = {
+    name: "Б.Батмягмар",
+    bio: "Би програм хангамж хөгжүүлэлт, хиймэл оюун ухаан, өгөгдлийн шинжлэх ухааны чиглэлээр ажилладаг.",
+    github: "https://github.com/batmyagmar",
+    instagram: "https://instagram.com/batmyagmar",
+    email: "batmyagmar.b@gmail.com",
+};
+
+export const initialOrbitInfo: OrbitInfo[] = [
+    { id: 'about', icon: 'User', title: 'Миний тухай', content: 'Би 20 настай, Мэдээллийн технологийн инженер мэргэжлээр суралцдаг. Вэб болон програм хангамж хөгжүүлэлтээр дагнаж, сүүлийн үеийн технологиудыг судлах сонирхолтой.' },
+    { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа би код бичих, шинэ технологи судлах, мөн уран зөгнөлт ном унших дуртай.' },
+    { id: 'song', icon: 'Music', title: 'Дуу', content: 'Одоогоор сонсож буй дуртай дуу.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
 ];
