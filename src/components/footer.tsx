@@ -6,7 +6,7 @@ import { personalInfo } from '@/lib/data';
 const Footer = () => {
   return (
     <footer className="border-t">
-      <div className="container flex items-center justify-center gap-4 py-6">
+      <div className="container flex items-center justify-end gap-4 py-6">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" asChild>
             <Link href={personalInfo.github} target="_blank">
