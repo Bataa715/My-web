@@ -509,7 +509,7 @@ export default function Hero() {
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="absolute -top-2 -right-2 h-8 w-8 z-30 text-background/80 hover:text-background"
+                                                className="absolute top-2 right-2 h-8 w-8 z-30 text-primary hover:text-primary/80"
                                             >
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
