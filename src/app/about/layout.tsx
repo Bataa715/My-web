@@ -13,11 +13,11 @@ export default function AboutLayout({
   return (
     <FirebaseClientProvider>
         <EditModeProvider>
-        <ProjectProvider>
-            <SkillsProvider>
-            {children}
-            </SkillsProvider>
-        </ProjectProvider>
+            <ProjectProvider>
+                <SkillsProvider>
+                    {children}
+                </SkillsProvider>
+            </ProjectProvider>
         </EditModeProvider>
     </FirebaseClientProvider>
   );
