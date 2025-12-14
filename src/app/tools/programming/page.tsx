@@ -98,7 +98,7 @@ export default function ProgrammingPage() {
     return (
         <div className="space-y-8">
             <div className="text-center">
-                <h1 className="text-3xl font-bold font-headline">💻 Программчлал</h1>
+                <h1 className="text-3xl font-bold font-headline">Программчлал</h1>
                 <p className="text-muted-foreground">Үндсэн ойлголт, хэрэгтэй кодууд, болон ахицаа хянах хэсэг.</p>
             </div>
             <Tabs defaultValue="concepts" className="w-full">
