@@ -6,16 +6,15 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useSkills } from "@/contexts/SkillsContext";
-
-interface AddSkillDialogProps {
-    children: ReactNode;
-}
+import IconPicker from "./shared/IconPicker";
+import { Badge } from "./ui/badge";
+import * as LucideIcons from 'lucide-react';
 
 export function AddSkillDialog({ children }: AddSkillDialogProps) {
     const { addSkillGroup } = useSkills();
     const [open, setOpen] = useState(false);
     const [name, setName] = useState('');
-    const [icon, setIcon] = useState('');
+    const [icon, setIcon] = useState('Code');
     const [items, setItems] = useState('');
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -26,9 +25,14 @@ export function AddSkillDialog({ children }: AddSkillDialogProps) {
             addSkillGroup({ name, icon, items: skillItems });
             setOpen(false);
             setName('');
-            setIcon('');
+            setIcon('Code');
             setItems('');
         }
+    };
+
+    const getIcon = (iconName: string) => {
+        const LucideIcon = (LucideIcons as any)[iconName];
+        return LucideIcon ? <LucideIcon className="h-5 w-5" /> : null;
     };
 
     return (
@@ -40,7 +44,7 @@ export function AddSkillDialog({ children }: AddSkillDialogProps) {
                 <DialogHeader>
                     <DialogTitle>Шинэ ур чадварын бүлэг нэмэх</DialogTitle>
                     <DialogDescription>
-                        Бүлгийн нэр, Lucide icon нэр, болон ур чадваруудыг таслалаар тусгаарлан оруулна уу.
+                        Бүлгийн нэр, icon, болон ур чадваруудыг таслалаар тусгаарлан оруулна уу.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="grid gap-4 py-4">
@@ -48,9 +52,17 @@ export function AddSkillDialog({ children }: AddSkillDialogProps) {
                         <Label htmlFor="group-name">Бүлгийн нэр</Label>
                         <Input id="group-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Програмчлалын хэл" required />
                     </div>
-                     <div>
-                        <Label htmlFor="group-icon">Icon</Label>
-                        <Input id="group-icon" value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="Жишээ: Code" required />
+                     <div className="space-y-2">
+                        <Label>Icon</Label>
+                         <IconPicker 
+                            selectedIcon={icon} 
+                            onIconSelect={setIcon}
+                        >
+                            <Button type="button" variant="outline" className="w-full justify-start gap-2">
+                               {getIcon(icon)}
+                               <span>{icon}</span>
+                            </Button>
+                        </IconPicker>
                     </div>
                     <div>
                         <Label htmlFor="group-items">Ур чадварууд (таслалаар тусгаарлана)</Label>

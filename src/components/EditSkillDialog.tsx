@@ -7,6 +7,8 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useSkills } from "@/contexts/SkillsContext";
 import type { Skill } from "@/lib/types";
+import IconPicker from "./shared/IconPicker";
+import * as LucideIcons from 'lucide-react';
 
 interface EditSkillDialogProps {
     children: ReactNode;
@@ -34,7 +36,7 @@ export function EditSkillDialog({ children, skillGroup }: EditSkillDialogProps) 
     
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const updatedSkills = editingGroup.items.split(",").map(skill => skill.trim());
+        const updatedSkills = editingGroup.items.split(",").map(skill => skill.trim()).filter(Boolean);
 
         if (editingGroup.name && editingGroup.icon && updatedSkills.length > 0) {
             updateSkillGroup(skillGroup.id, { 
@@ -44,6 +46,11 @@ export function EditSkillDialog({ children, skillGroup }: EditSkillDialogProps) 
             });
             setOpen(false);
         }
+    };
+    
+    const getIcon = (iconName: string) => {
+        const LucideIcon = (LucideIcons as any)[iconName];
+        return LucideIcon ? <LucideIcon className="h-5 w-5" /> : null;
     };
 
     return (
@@ -65,14 +72,17 @@ export function EditSkillDialog({ children, skillGroup }: EditSkillDialogProps) 
                             required 
                         />
                     </div>
-                    <div>
-                        <Label htmlFor="edit-group-icon">Icon</Label>
-                        <Input 
-                            id="edit-group-icon"
-                            value={editingGroup.icon}
-                            onChange={(e) => setEditingGroup({...editingGroup, icon: e.target.value})}
-                            required 
-                        />
+                    <div className="space-y-2">
+                        <Label>Icon</Label>
+                         <IconPicker 
+                            selectedIcon={editingGroup.icon || 'Code'} 
+                            onIconSelect={(iconName) => setEditingGroup({...editingGroup, icon: iconName})}
+                        >
+                            <Button type="button" variant="outline" className="w-full justify-start gap-2">
+                               {getIcon(editingGroup.icon || 'Code')}
+                               <span>{editingGroup.icon}</span>
+                            </Button>
+                        </IconPicker>
                     </div>
                     <div>
                         <Label htmlFor="edit-group-items">Ур чадварууд (таслалаар тусгаарлана)</Label>
