@@ -14,7 +14,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 const tools = [
   {
     title: "Англи хэл",
-    description: "Үгсийн сан болон дүрмээ бататгаарай.",
+    description: "anlgu hel surah",
     href: "/tools/english",
     icon: <BookOpen className="h-6 w-6" />
   },
