@@ -117,6 +117,7 @@ export const personalInfo = {
   email: "bbatmyagmar7@gmail.com",
   instagram: "https://www.instagram.com/ka1__zen/",
   github: "https://github.com/Bataa715",
+  facebook: "https://www.facebook.com/profile.php?id=100010513223018",
   resume: "/resume.pdf"
 };
 
