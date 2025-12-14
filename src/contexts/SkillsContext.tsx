@@ -12,7 +12,7 @@ interface SkillsContextType {
   skills: Skill[];
   loading: boolean;
   addSkillGroup: (group: Omit<Skill, 'id' | 'createdAt'>) => Promise<void>;
-  updateSkillGroup: (id: string, updates: Partial<Skill>) => Promise<void>;
+  updateSkillGroup: (id: string, updates: Partial<Omit<Skill, 'id'>>) => Promise<void>;
   deleteSkillGroup: (id: string) => Promise<void>;
 }
 
@@ -23,14 +23,18 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const skillsCollectionRef = user ? collection(firestore, `users/${user.uid}/skills`) : null;
+
 
   useEffect(() => {
-    if (!firestore || !user) return;
+    if (!skillsCollectionRef) {
+        setLoading(false);
+        return;
+    };
     const fetchSkills = async () => {
       setLoading(true);
       try {
-        const skillsCollection = collection(firestore, `users/${user.uid}/skills`);
-        const q = query(skillsCollection, orderBy("createdAt", "asc"));
+        const q = query(skillsCollectionRef, orderBy("createdAt", "asc"));
         const skillsSnapshot = await getDocs(q);
         const skillsList = skillsSnapshot.docs.map(doc => {
             const data = doc.data();
@@ -49,14 +53,13 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
       }
     };
     fetchSkills();
-  }, [firestore, user, toast]);
+  }, [skillsCollectionRef, toast]);
 
   const addSkillGroup = async (group: Omit<Skill, 'id' | 'createdAt'>) => {
-    if (!firestore || !user) return;
+    if (!skillsCollectionRef) return;
     try {
-      const skillsCollection = collection(firestore, `users/${user.uid}/skills`);
       const newGroup = { ...group, createdAt: serverTimestamp() };
-      const docRef = await addDocumentNonBlocking(skillsCollection, newGroup);
+      const docRef = await addDocumentNonBlocking(skillsCollectionRef, newGroup);
       setSkills(prev => [...prev, { ...group, id: docRef.id, createdAt: new Date() }]);
       toast({ title: "Амжилттай", description: "Шинэ ур чадварын бүлэг нэмэгдлээ." });
     } catch (error) {
@@ -65,10 +68,10 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const updateSkillGroup = async (id: string, updates: Partial<Skill>) => {
-    if (!firestore || !user) return;
+  const updateSkillGroup = async (id: string, updates: Partial<Omit<Skill, 'id'>>) => {
+    if (!skillsCollectionRef) return;
     try {
-      const skillDoc = doc(firestore, `users/${user.uid}/skills`, id);
+      const skillDoc = doc(skillsCollectionRef, id);
       await updateDocumentNonBlocking(skillDoc, updates);
       setSkills(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
       toast({ title: "Амжилттай", description: "Ур чадварын бүлэг шинэчлэгдлээ." });
@@ -79,9 +82,9 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
   };
 
   const deleteSkillGroup = async (id: string) => {
-    if (!firestore || !user) return;
+    if (!skillsCollectionRef) return;
     try {
-      const skillDoc = doc(firestore, `users/${user.uid}/skills`, id);
+      const skillDoc = doc(skillsCollectionRef, id);
       await deleteDocumentNonBlocking(skillDoc);
       setSkills(prev => prev.filter(s => s.id !== id));
       toast({ title: "Амжилттай", description: "Ур чадварын бүлэг устгагдлаа." });

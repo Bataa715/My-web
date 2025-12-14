@@ -16,18 +16,32 @@ interface EditSkillDialogProps {
 export function EditSkillDialog({ children, skillGroup }: EditSkillDialogProps) {
     const { updateSkillGroup } = useSkills();
     const [open, setOpen] = useState(false);
-    const [skills, setSkills] = useState(skillGroup.skills.join(', '));
+    const [editingGroup, setEditingGroup] = useState<Partial<Skill> & { items: string }>({
+        name: skillGroup.name,
+        icon: skillGroup.icon,
+        items: skillGroup.items.join(', ')
+    });
 
     useEffect(() => {
-        setSkills(skillGroup.skills.join(', '));
-    }, [skillGroup]);
+        if (open) {
+            setEditingGroup({
+                name: skillGroup.name,
+                icon: skillGroup.icon,
+                items: skillGroup.items.join(', ')
+            });
+        }
+    }, [open, skillGroup]);
     
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const updatedSkills = skills.split(",").map(skill => skill.trim());
+        const updatedSkills = editingGroup.items.split(",").map(skill => skill.trim());
 
-        if (updatedSkills.length > 0) {
-            updateSkillGroup(skillGroup.id, { skills: updatedSkills });
+        if (editingGroup.name && editingGroup.icon && updatedSkills.length > 0) {
+            updateSkillGroup(skillGroup.id, { 
+                name: editingGroup.name,
+                icon: editingGroup.icon,
+                items: updatedSkills
+            });
             setOpen(false);
         }
     };
@@ -39,16 +53,33 @@ export function EditSkillDialog({ children, skillGroup }: EditSkillDialogProps) 
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>"{skillGroup.category}" бүлэгт ур чадвар нэмэх</DialogTitle>
+                    <DialogTitle>"{skillGroup.name}" бүлгийг засах</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="grid gap-4 py-4">
                     <div>
-                        <Label htmlFor="skills">Ур чадварууд (таслалаар тусгаарлана)</Label>
+                        <Label htmlFor="edit-group-name">Бүлгийн нэр</Label>
                         <Input 
-                            id="skills" 
-                            name="skills" 
-                            value={skills}
-                            onChange={(e) => setSkills(e.target.value)}
+                            id="edit-group-name"
+                            value={editingGroup.name}
+                            onChange={(e) => setEditingGroup({...editingGroup, name: e.target.value})}
+                            required 
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="edit-group-icon">Icon</Label>
+                        <Input 
+                            id="edit-group-icon"
+                            value={editingGroup.icon}
+                            onChange={(e) => setEditingGroup({...editingGroup, icon: e.target.value})}
+                            required 
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="edit-group-items">Ур чадварууд (таслалаар тусгаарлана)</Label>
+                        <Input 
+                            id="edit-group-items" 
+                            value={editingGroup.items}
+                            onChange={(e) => setEditingGroup({...editingGroup, items: e.target.value})}
                             placeholder="JavaScript, TypeScript, Python" required 
                         />
                     </div>

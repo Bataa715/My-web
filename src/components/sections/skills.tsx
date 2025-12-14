@@ -5,75 +5,121 @@ import { Badge } from '../ui/badge';
 import { Skeleton } from '../ui/skeleton';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { Button } from '../ui/button';
-import { PlusCircle, Trash2 } from 'lucide-react';
+import { PlusCircle, Trash2, Edit } from 'lucide-react';
 import { AddSkillDialog } from '../AddSkillDialog';
 import { EditSkillDialog } from '../EditSkillDialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import * as Icons from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
+
 
 const Skills = () => {
     const { skills, loading, deleteSkillGroup } = useSkills();
     const { isEditMode } = useEditMode();
-  return (
-    <section id="skills" className="bg-muted/50 py-12 md:py-24">
-      <div className="container">
-        <div className="mb-12 text-center">
-          <h2 className="text-4xl font-bold font-headline">Миний ур чадварууд</h2>
-          <p className="mt-2 text-muted-foreground">Би ямар технологиуд дээр ажилладаг вэ?</p>
-        </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {loading && Array.from({ length: 3 }).map((_, i) => (
-             <Card key={i}>
-                <CardHeader>
-                    <Skeleton className="h-8 w-3/4" />
-                </CardHeader>
-                <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                        <Skeleton className="h-6 w-20 rounded-full" />
-                        <Skeleton className="h-6 w-16 rounded-full" />
-                        <Skeleton className="h-6 w-24 rounded-full" />
-                    </div>
-                </CardContent>
-             </Card>
-          ))}
+    const getIcon = (iconName: string) => {
+        const Icon = (Icons as any)[iconName];
+        return Icon ? <Icon className="h-8 w-8 text-primary" /> : <AlertTriangle className="h-8 w-8 text-destructive" />;
+    };
 
-          {!loading && skills.map((group) => (
-            <Card key={group.id} className="relative group">
-                {isEditMode && (
-                    <div className="absolute top-2 right-2 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <EditSkillDialog skillGroup={group}>
-                            <Button variant="secondary" size="icon" >
-                               <PlusCircle />
+    return (
+        <section id="skills" className="py-12 md:py-24 lg:py-32 bg-muted/50">
+            <div className="container">
+                <div className="mb-12 text-center space-y-4">
+                    <h2 className="text-4xl font-bold font-headline">Миний ур чадварууд</h2>
+                    <p className="mt-2 text-muted-foreground max-w-[900px] mx-auto md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">Би ямар технологиуд дээр ажилладаг вэ?</p>
+                    {isEditMode && (
+                        <AddSkillDialog>
+                            <Button>
+                                <PlusCircle className="mr-2 h-4 w-4" /> Шинэ бүлэг нэмэх
                             </Button>
-                        </EditSkillDialog>
-                        <Button variant="destructive" size="icon" onClick={() => deleteSkillGroup(group.id)}>
-                            <Trash2 />
-                        </Button>
+                        </AddSkillDialog>
+                    )}
+                </div>
+
+                {loading && (
+                    <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                            <Card key={i}>
+                                <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                                    <Skeleton className="h-8 w-8 rounded-full" />
+                                    <Skeleton className="h-6 w-3/4" />
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex flex-wrap gap-2">
+                                        <Skeleton className="h-6 w-20 rounded-full" />
+                                        <Skeleton className="h-6 w-16 rounded-full" />
+                                        <Skeleton className="h-6 w-24 rounded-full" />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
                 )}
-              <CardHeader>
-                <CardTitle>{group.category}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {group.skills.map((skill) => (
-                    <Badge key={skill}>{skill}</Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-          {isEditMode && (
-            <AddSkillDialog>
-                <button className="flex h-full min-h-[150px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/50 bg-transparent text-muted-foreground transition-colors hover:border-primary hover:text-primary">
-                    <PlusCircle size={32} />
-                    <span className="mt-2 font-semibold">Шинэ бүлэг нэмэх</span>
-                </button>
-            </AddSkillDialog>
-          )}
-        </div>
-      </div>
-    </section>
-  );
+
+                {!loading && (
+                     <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                        {skills.map((skillGroup) => (
+                            <Card key={skillGroup.id} className="hover:shadow-md transition-shadow duration-300 relative group">
+                                {isEditMode && (
+                                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <EditSkillDialog skillGroup={skillGroup}>
+                                            <Button variant="ghost" size="icon" className="h-7 w-7">
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                        </EditSkillDialog>
+
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive/10 hover:text-destructive">
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        "{skillGroup.name}" бүлгийг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => deleteSkillGroup(skillGroup.id)}>Устгах</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </div>
+                                )}
+                                <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                                    {getIcon(skillGroup.icon)}
+                                    <CardTitle className="font-headline text-lg">{skillGroup.name}</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="flex flex-wrap gap-2">
+                                        {skillGroup.items.map((item, index) => (
+                                            <Badge key={index} variant="outline" className="text-sm font-medium">
+                                                {item}
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </section>
+    );
 };
 
 export default Skills;

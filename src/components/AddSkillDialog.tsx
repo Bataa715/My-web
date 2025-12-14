@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "./ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose, DialogDescription } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -14,16 +14,20 @@ interface AddSkillDialogProps {
 export function AddSkillDialog({ children }: AddSkillDialogProps) {
     const { addSkillGroup } = useSkills();
     const [open, setOpen] = useState(false);
+    const [name, setName] = useState('');
+    const [icon, setIcon] = useState('');
+    const [items, setItems] = useState('');
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const category = formData.get("category") as string;
-        const skills = (formData.get("skills") as string).split(",").map(skill => skill.trim());
+        const skillItems = items.split(",").map(skill => skill.trim());
 
-        if (category && skills.length > 0) {
-            addSkillGroup({ category, skills });
+        if (name && icon && skillItems.length > 0) {
+            addSkillGroup({ name, icon, items: skillItems });
             setOpen(false);
+            setName('');
+            setIcon('');
+            setItems('');
         }
     };
 
@@ -35,15 +39,22 @@ export function AddSkillDialog({ children }: AddSkillDialogProps) {
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Шинэ ур чадварын бүлэг нэмэх</DialogTitle>
+                    <DialogDescription>
+                        Бүлгийн нэр, Lucide icon нэр, болон ур чадваруудыг таслалаар тусгаарлан оруулна уу.
+                    </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="grid gap-4 py-4">
                     <div>
-                        <Label htmlFor="category">Бүлгийн нэр</Label>
-                        <Input id="category" name="category" placeholder="Програмчлалын хэл" required />
+                        <Label htmlFor="group-name">Бүлгийн нэр</Label>
+                        <Input id="group-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Програмчлалын хэл" required />
+                    </div>
+                     <div>
+                        <Label htmlFor="group-icon">Icon</Label>
+                        <Input id="group-icon" value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="Жишээ: Code" required />
                     </div>
                     <div>
-                        <Label htmlFor="skills">Ур чадварууд (таслалаар тусгаарлана)</Label>
-                        <Input id="skills" name="skills" placeholder="JavaScript, TypeScript, Python" required />
+                        <Label htmlFor="group-items">Ур чадварууд (таслалаар тусгаарлана)</Label>
+                        <Input id="group-items" value={items} onChange={(e) => setItems(e.target.value)} placeholder="JavaScript, TypeScript, Python" required />
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>

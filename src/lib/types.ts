@@ -57,9 +57,10 @@ export interface Project {
 
 export interface Skill {
     id: string;
-    category: string;
-    skills: string[];
-    createdAt: Date;
+    name: string;
+    icon: string;
+    items: string[];
+    createdAt?: Date;
 }
 
 export interface OrbitInfo {
