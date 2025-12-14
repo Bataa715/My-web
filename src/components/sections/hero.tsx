@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import Link from "next/link";
@@ -435,7 +436,7 @@ export default function Hero() {
                                                 <Input
                                                     value={editedOrbitTitle}
                                                     onChange={(e) => setEditedOrbitTitle(e.target.value)}
-                                                    className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                    className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
                                                     placeholder="Нэр..."
                                                 />
                                             </div>
@@ -444,7 +445,7 @@ export default function Hero() {
                                                 <Input
                                                     value={editedOrbitIcon}
                                                     onChange={(e) => setEditedOrbitIcon(e.target.value)}
-                                                    className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                    className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
                                                     placeholder="Lucide Icon"
                                                 />
                                             </div>
@@ -464,7 +465,7 @@ export default function Hero() {
                                                     <Input
                                                         value={editedYoutubeUrl}
                                                         onChange={(e) => setEditedYoutubeUrl(e.target.value)}
-                                                        className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                        className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
                                                         placeholder="https://www.youtube.com/watch?v=..."
                                                     />
                                                 </div>
@@ -474,7 +475,7 @@ export default function Hero() {
                                                     <Input
                                                         value={editedOrbitBgImage}
                                                         onChange={(e) => setEditedOrbitBgImage(e.target.value)}
-                                                        className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                        className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
                                                         placeholder="https://example.com/image.png"
                                                     />
                                                 </div>
@@ -537,18 +538,18 @@ export default function Hero() {
                                     <AvatarImage src={profileImage} alt={name} />
                                     <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
                                 </Avatar>
+                                {isEditMode && (
+                                    <Button 
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => setIsEditingImage(true)}
+                                        className="absolute top-0 right-0 h-8 w-8 rounded-full z-20"
+                                    >
+                                        <Edit className="h-4 w-4" />
+                                        <span className="sr-only">Зураг солих</span>
+                                    </Button>
+                                )}
                             </div>
-                             {isEditMode && (
-                                <Button 
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => setIsEditingImage(true)}
-                                    className="absolute top-0 right-0 h-8 w-8 rounded-full z-20"
-                                >
-                                    <Edit className="h-4 w-4" />
-                                    <span className="sr-only">Зураг солих</span>
-                                </Button>
-                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
