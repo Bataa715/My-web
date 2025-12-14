@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useFirebase } from '@/firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, Timestamp, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-
+import { initialSkills } from '@/lib/data';
 
 interface SkillsContextType {
   skills: Skill[];
@@ -36,15 +36,30 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
       try {
         const q = query(skillsCollectionRef, orderBy("createdAt", "asc"));
         const skillsSnapshot = await getDocs(q);
-        const skillsList = skillsSnapshot.docs.map(doc => {
+        if (skillsSnapshot.empty) {
+          const batch = initialSkills.map(s => addDoc(skillsCollectionRef, { ...s, createdAt: serverTimestamp() }));
+          await Promise.all(batch);
+          const newSnapshot = await getDocs(q);
+          const skillsList = newSnapshot.docs.map(doc => {
             const data = doc.data();
             return { 
                 id: doc.id, 
                 ...data,
                 createdAt: (data.createdAt as Timestamp)?.toDate() 
             } as Skill;
-        });
-        setSkills(skillsList);
+          });
+          setSkills(skillsList);
+        } else {
+            const skillsList = skillsSnapshot.docs.map(doc => {
+                const data = doc.data();
+                return { 
+                    id: doc.id, 
+                    ...data,
+                    createdAt: (data.createdAt as Timestamp)?.toDate() 
+                } as Skill;
+            });
+            setSkills(skillsList);
+        }
       } catch (error) {
         console.error("Error fetching skills: ", error);
         toast({ title: "Алдаа", description: "Ур чадваруудыг дуудахад алдаа гарлаа.", variant: "destructive" });
@@ -73,7 +88,7 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
     try {
       const skillDoc = doc(skillsCollectionRef, id);
       await updateDocumentNonBlocking(skillDoc, updates);
-      setSkills(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+      setSkills(prev => prev.map(s => s.id === id ? { ...s, ...updates } as Skill : s));
       toast({ title: "Амжилттай", description: "Ур чадварын бүлэг шинэчлэгдлээ." });
     } catch (error) {
       console.error("Error updating skill group: ", error);

@@ -1,4 +1,4 @@
-import type { EnglishWord, JapaneseWord, GrammarRule, Kana, ProgrammingConcept, CheatSheetItem, ProgressItem, OrbitInfo } from './types';
+import type { EnglishWord, JapaneseWord, GrammarRule, Kana, ProgrammingConcept, CheatSheetItem, ProgressItem, OrbitInfo, Project, Skill } from './types';
 
 export const initialEnglishWords: EnglishWord[] = [
   { id: '1', word: 'Perseverance', meaning: 'Тууштай байдал', memorized: true },
@@ -112,15 +112,74 @@ export const initialProgressItems: ProgressItem[] = [
 ];
 
 export const personalInfo = {
-    name: "Б.Батмягмар",
-    bio: "Би програм хангамж хөгжүүлэлт, хиймэл оюун ухаан, өгөгдлийн шинжлэх ухааны чиглэлээр ажилладаг.",
-    github: "https://github.com/batmyagmar",
-    instagram: "https://instagram.com/batmyagmar",
-    email: "batmyagmar.b@gmail.com",
+  name: "Б. Батмягмар",
+  bio: "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.",
+  email: "bbatmyagmar7@gmail.com",
+  instagram: "https://www.instagram.com/ka1__zen/",
+  github: "https://github.com/Bataa715",
+  resume: "/resume.pdf"
 };
 
 export const initialOrbitInfo: OrbitInfo[] = [
-    { id: 'about', icon: 'User', title: 'Миний тухай', content: 'Би 20 настай, Мэдээллийн технологийн инженер мэргэжлээр суралцдаг. Вэб болон програм хангамж хөгжүүлэлтээр дагнаж, сүүлийн үеийн технологиудыг судлах сонирхолтой.' },
-    { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа би код бичих, шинэ технологи судлах, мөн уран зөгнөлт ном унших дуртай.' },
-    { id: 'song', icon: 'Music', title: 'Дуу', content: 'Одоогоор сонсож буй дуртай дуу.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
+    { id: 'goal', type: 'info', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн түвшний програм хангамжийн инженер болох', backgroundImage: 'https://picsum.photos/seed/goal/400/400' },
+    { id: 'sport', type: 'info', icon: 'Dribbble', title: 'Дуртай спорт', content: 'Сагсан бөмбөг', backgroundImage: 'https://picsum.photos/seed/sport/400/400' },
+    { id: 'song', type: 'audio', icon: 'Music', title: 'Дуртай дуу', content: 'J.Cole - No Role Modelz', youtubeVideoId: '90sMyx92_4M' },
+    { id: 'anime', type: 'info', icon: 'Film', title: 'Дуртай анимэ', content: 'Attack on Titan', backgroundImage: 'https://picsum.photos/seed/anime/400/400' },
+    { id: 'motto', type: 'info', icon: 'Quote', title: 'Ишлэл', content: 'Өдөр бүр өөрийнхөө хамгийн сайн хувилбар бай', backgroundImage: 'https://picsum.photos/seed/quote/400/400' },
+    { id: 'crush', type: 'info', icon: 'Heart', title: 'Crush', content: 'Нууц', backgroundImage: 'https://picsum.photos/seed/heart/400/400' },
+    { id: 'principle', type: 'info', icon: 'Milestone', title: 'Амьдралын зарчим', content: 'Энгийн байх', backgroundImage: 'https://picsum.photos/seed/milestone/400/400' },
+    { id: 'hobby', type: 'info', icon: 'Gamepad2', title: 'Дуртай тоглоом', content: 'Компьютер тоглоом тоглох', backgroundImage: 'https://picsum.photos/seed/game/400/400' }
+];
+
+export const initialSkills: Omit<Skill, 'id' | 'createdAt'>[] = [
+    {
+        name: "Програмчлалын хэл",
+        icon: 'Code',
+        items: ["C++", "Python", "JavaScript", "Java"],
+    },
+    {
+        name: "Вэб хөгжүүлэлт",
+        icon: 'Tv',
+        items: ["HTML", "CSS", "React", "Next.js", "Node.js"],
+    },
+    {
+        name: "Өгөгдлийн сан",
+        icon: 'Database',
+        items: ["MongoDB", "MySQL"],
+    },
+    {
+        name: "Бусад",
+        icon: 'BrainCircuit',
+        items: ["Machine Learning", "Data Processing", "REST API"],
+    },
+    {
+        name: "Хэрэгслүүд",
+        icon: 'Cog',
+        items: ["Linux", "Git", "VS Code", "Docker"],
+    },
+];
+
+export const initialProjects: Omit<Project, 'id' | 'createdAt'>[] = [
+    {
+        name: "Mongol Speech Filter",
+        description: "Дууг текст болгон хөрвүүлэх, нэр ба бүдүүлэг үг шүүх Python програм.",
+        technologies: ["Python", "SpeechRecognition", "NLP"],
+        link: "https://github.com/Bataa715/mongol-speech-filter",
+        category: "Machine Learning"
+    },
+    {
+        name: "Checkers Game",
+        description: "C болон Raylib ашиглан шатрын тоглоом бүтээсэн.",
+        technologies: ["C", "Raylib"],
+        link: "https://github.com/Bataa715/checkers-game",
+        category: "Game Development"
+    },
+    {
+        name: "Portfolio Website",
+        description: "Өөрийн вэб портфолио болон лабораторийн тайлангийн сайт хөгжүүлсэн.",
+        technologies: ["Next.js", "React", "Tailwind CSS", "Firebase"],
+        link: "https://github.com/Bataa715/my-cv",
+        live: "https://my-cv-batmyagmar.vercel.app/",
+        category: "Web Development"
+    }
 ];

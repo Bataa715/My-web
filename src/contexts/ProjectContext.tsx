@@ -4,8 +4,9 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import type { Project } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 import { useFirebase } from '@/firebase';
-import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, Timestamp, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, Timestamp, serverTimestamp, setDoc } from "firebase/firestore";
 import { addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { initialProjects } from '@/lib/data';
 
 interface ProjectContextType {
   projects: Project[];
@@ -23,24 +24,41 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!firestore || !user) return;
+    if (!user) return;
+    const projectsCollectionRef = collection(firestore, `users/${user.uid}/projects`);
 
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const projectsCollection = collection(firestore, `users/${user.uid}/projects`);
-        const q = query(projectsCollection, orderBy("createdAt", "desc"));
+        const q = query(projectsCollectionRef, orderBy("createdAt", "desc"));
         const projectSnapshot = await getDocs(q);
 
-        const projectList = projectSnapshot.docs.map(doc => {
+        if (projectSnapshot.empty) {
+          // If no projects, add initial ones
+          const batch = initialProjects.map(p => addDoc(projectsCollectionRef, { ...p, createdAt: serverTimestamp() }));
+          await Promise.all(batch);
+
+           const newSnapshot = await getDocs(q);
+           const projectList = newSnapshot.docs.map(doc => {
             const data = doc.data();
             return { 
                 id: doc.id, 
                 ...data,
                 createdAt: (data.createdAt as Timestamp)?.toDate() 
             } as Project;
-        });
-        setProjects(projectList);
+          });
+          setProjects(projectList);
+        } else {
+          const projectList = projectSnapshot.docs.map(doc => {
+              const data = doc.data();
+              return { 
+                  id: doc.id, 
+                  ...data,
+                  createdAt: (data.createdAt as Timestamp)?.toDate() 
+              } as Project;
+          });
+          setProjects(projectList);
+        }
       } catch (error) {
         console.error("Error fetching projects: ", error);
         toast({
@@ -52,6 +70,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       }
     };
+
     fetchProjects();
   }, [firestore, user, toast]);
   
@@ -62,7 +81,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         const newProject = { ...project, createdAt: serverTimestamp() };
         const docRef = await addDocumentNonBlocking(projectsCollection, newProject);
       
-        // Optimistically update UI
         setProjects((prevProjects) => [{ ...project, id: docRef.id, createdAt: new Date() }, ...prevProjects]);
 
         toast({

@@ -110,12 +110,14 @@ export default function Projects() {
                   </motion.div>
                 ))}
                  {isEditMode && (
-                  <AddProjectDialog>
-                    <button className="flex h-full min-h-[400px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/20 text-muted-foreground transition-colors hover:border-primary hover:bg-muted/50 hover:text-primary">
-                      <PlusCircle size={48} />
-                      <span className="mt-4 font-semibold">Шинэ төсөл нэмэх</span>
-                    </button>
-                  </AddProjectDialog>
+                   <motion.div layout initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
+                    <AddProjectDialog>
+                      <button className="flex h-full min-h-[400px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/20 text-muted-foreground transition-colors hover:border-primary hover:bg-muted/50 hover:text-primary">
+                        <PlusCircle size={48} />
+                        <span className="mt-4 font-semibold">Шинэ төсөл нэмэх</span>
+                      </button>
+                    </AddProjectDialog>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </motion.div>
