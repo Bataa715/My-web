@@ -12,12 +12,6 @@ import Image from 'next/image';
 
 const tools = [
   {
-    title: "Англи хэл",
-    description: "Үгсийн сан, дүрмийн дасгал, сорил.",
-    href: "/tools/english",
-    icon: <BookOpen className="h-6 w-6" />
-  },
-  {
     title: "Япон хэл",
     description: "Хирагана, катакана, үгсийн сан, дүрэм.",
     href: "/tools/japanese",
@@ -87,7 +81,7 @@ export default function ToolsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tools.map((tool) => (
               <Link href={tool.href} key={tool.title} className="group">
                 <Card className="h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1">
