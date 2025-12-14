@@ -1,23 +1,26 @@
 import BackButton from "@/components/shared/BackButton";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { ArrowRight, Timer } from "lucide-react";
+import { ArrowRight, Timer, Code, BookOpen } from "lucide-react";
 
 const tools = [
   {
     title: "Англи хэл",
     description: "Үгсийн сан, дүрмийн дасгал, сорил.",
     href: "/tools/english",
+    icon: <BookOpen className="h-6 w-6" />
   },
   {
     title: "Япон хэл",
     description: "Хирагана, катакана, үгсийн сан, дүрэм.",
     href: "/tools/japanese",
+    icon: <BookOpen className="h-6 w-6" />
   },
   {
     title: "Программчлал",
     description: "Үндсэн ойлголтууд, cheat sheets, ахиц хянагч.",
     href: "/tools/programming",
+    icon: <Code className="h-6 w-6" />
   },
   {
     title: "Pomodoro Timer",
