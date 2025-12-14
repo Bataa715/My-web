@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
@@ -172,13 +173,14 @@ export default function VocabularyManager<T extends Word>({
       toast({ title: "Анхааруулга", description: "Анхдагч үгийг устгах боломжгүй.", variant: "destructive" });
       return;
     }
+    const originalWords = words;
     setWords(words.filter(w => w.id !== id));
     try {
         const docRef = doc(userWordsCollection, id);
         await deleteDoc(docRef);
         toast({ title: "Амжилттай устгалаа", variant: "destructive" });
     } catch(e) {
-        setWords(words); // rollback
+        setWords(originalWords); // rollback
         toast({ title: "Алдаа гарлаа", variant: "destructive" });
     }
   };
@@ -337,5 +339,3 @@ export default function VocabularyManager<T extends Word>({
     </Card>
   );
 }
-
-    
