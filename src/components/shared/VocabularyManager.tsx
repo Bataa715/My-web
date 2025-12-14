@@ -35,7 +35,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, X } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
 import { useFirebase } from '@/firebase';
@@ -52,6 +52,8 @@ interface VocabularyManagerProps<T extends Word> {
   columns: { key: keyof T; header: string; }[];
 }
 
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
 export default function VocabularyManager<T extends Word>({
   collectionPath,
   initialWords,
@@ -63,6 +65,8 @@ export default function VocabularyManager<T extends Word>({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentWord, setCurrentWord] = useState<T | null>(null);
   const [filter, setFilter] = useState<'all' | 'memorized' | 'not-memorized'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [alphabetFilter, setAlphabetFilter] = useState<string | 'all'>('all');
   const { toast } = useToast();
 
   const userWordsCollection = user ? collection(firestore, `users/${user.uid}/${collectionPath}`) : null;
@@ -75,7 +79,6 @@ export default function VocabularyManager<T extends Word>({
             return;
         };
         
-        // 1. Fetch public words
         const publicWordsQuery = query(publicWordsCollection);
         const publicWordsSnapshot = await getDocs(publicWordsQuery);
         const publicWords = publicWordsSnapshot.docs.map(d => ({ ...d.data(), id: d.id, memorized: false } as T));
@@ -85,7 +88,6 @@ export default function VocabularyManager<T extends Word>({
             return;
         }
 
-        // 2. Fetch user-specific words and statuses
         const userWordsQuery = query(userWordsCollection);
         const userWordsSnapshot = await getDocs(userWordsQuery);
         
@@ -94,7 +96,6 @@ export default function VocabularyManager<T extends Word>({
             userWordMap.set(doc.id, { id: doc.id, ...doc.data() } as T);
         });
 
-        // 3. Merge public words with user's memorized status
         const mergedWords = publicWords.map(publicWord => {
             const userWordStatus = userWordMap.get(publicWord.id!);
             if (userWordStatus) {
@@ -104,25 +105,40 @@ export default function VocabularyManager<T extends Word>({
             return publicWord;
         });
 
-        // 4. The remaining words in the map are purely user-created words.
         const userAddedWords = Array.from(userWordMap.values());
         
-        setWords([...mergedWords, ...userAddedWords]);
+        setWords([...mergedWords, ...userAddedWords].sort((a,b) => (a.word as string).localeCompare(b.word as string)));
     };
 
     fetchWords();
-  }, [firestore, user, collectionPath, initialWords]);
+  }, [firestore, user, collectionPath]);
 
   const filteredWords = useMemo(() => {
-    switch (filter) {
-      case 'memorized':
-        return words.filter(word => word.memorized);
-      case 'not-memorized':
-        return words.filter(word => !word.memorized);
-      default:
-        return words;
-    }
-  }, [words, filter]);
+    return words
+        .filter(word => {
+            if (filter === 'memorized') return word.memorized;
+            if (filter === 'not-memorized') return !word.memorized;
+            return true;
+        })
+        .filter(word => {
+            const wordKey = wordType === 'english' ? 'word' : 'romaji';
+            const searchableWord = (word[wordKey] as string) || '';
+            if (alphabetFilter !== 'all') {
+                return searchableWord.toLowerCase().startsWith(alphabetFilter.toLowerCase());
+            }
+            return true;
+        })
+        .filter(word => {
+            const wordKey = wordType === 'english' ? 'word' : 'romaji';
+            const primaryValue = (word[wordKey] as string) || '';
+            const secondaryValue = (word['meaning'] as string) || '';
+            
+            if (searchQuery.trim() === '') return true;
+            
+            return primaryValue.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                   secondaryValue.toLowerCase().includes(searchQuery.toLowerCase());
+        });
+  }, [words, filter, alphabetFilter, searchQuery, wordType]);
 
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -141,22 +157,23 @@ export default function VocabularyManager<T extends Word>({
     });
 
     try {
-      if (currentWord?.id) { // Edit existing word
-        const isPublicWord = initialWords.some(w => w.id === currentWord.id);
+      if (currentWord?.id) { 
         const docRef = doc(userWordsCollection, currentWord.id);
         
-        if (isPublicWord) {
+        if (initialWords.some(w => w.id === currentWord.id)) {
+            // This is a public word, only update memorized status
             await setDoc(docRef, { memorized: currentWord.memorized }, { merge: true });
         } else {
+            // This is a user-created word, update all fields
             await updateDoc(docRef, newWordData);
             setWords(words.map(w => w.id === currentWord.id ? { ...w, ...newWordData } as T : w));
         }
 
         toast({ title: "Амжилттай заслаа", description: "Үгийн мэдээлэл шинэчлэгдлээ." });
-      } else { // Add new word (always goes to user's collection)
+      } else {
         const docRef = await addDoc(userWordsCollection, newWordData);
         const newWord = { id: docRef.id, ...newWordData } as T;
-        setWords([newWord, ...words]);
+        setWords(prev => [...prev, newWord].sort((a,b) => (a.word as string).localeCompare(b.word as string)));
         toast({ title: "Амжилттай нэмлээ", description: "Шинэ үг таны санд нэмэгдлээ." });
       }
     } catch (error) {
@@ -168,36 +185,45 @@ export default function VocabularyManager<T extends Word>({
     setCurrentWord(null);
   };
 
-const handleDelete = async (id: string) => {
+  const handleDelete = async (wordId: string) => {
     if (!user || !userWordsCollection) {
         toast({ title: "Алдаа", description: "Устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
         return;
-    };
+    }
 
     const originalWords = words;
-    setWords(words.filter(w => w.id !== id));
+    // Optimistic UI update
+    setWords(words.filter(w => w.id !== wordId));
 
     try {
-        const docRef = doc(userWordsCollection, id);
-        await deleteDoc(docRef);
-
-        // Also try to delete from public collection if it exists there
-        if(publicWordsCollection) {
-           try {
-             const publicDocRef = doc(publicWordsCollection, id);
-             await deleteDoc(publicDocRef);
-           } catch(e) {
-            // Ignore error if it doesn't exist in public collection
-           }
+        const wordDocRef = doc(userWordsCollection, wordId);
+        await deleteDoc(wordDocRef);
+        
+        // Also attempt to delete from the public collection if it exists there and you have permission
+        if (publicWordsCollection) {
+            try {
+                const publicWordDocRef = doc(publicWordsCollection, wordId);
+                await deleteDoc(publicWordDocRef);
+            } catch (publicError) {
+                // This might fail if the user doesn't have permissions or if it doesn't exist, which is okay.
+                // We don't need to inform the user about this part.
+                console.log(`Could not delete from public collection (this might be expected): ${publicError}`);
+            }
         }
         
-        toast({ title: "Амжилттай устгалаа", variant: "destructive" });
-    } catch (e) {
+        toast({ title: "Амжилттай устгагдлаа", variant: "destructive" });
+
+    } catch (error) {
+        // Rollback on error
         setWords(originalWords);
-        toast({ title: "Алдаа гарлаа", description: "Үг устгахад алдаа гарлаа.", variant: "destructive" });
-        console.error("Error deleting word: ", e);
+        toast({
+            title: "Алдаа гарлаа",
+            description: "Үг устгахад алдаа гарлаа. Та дахин оролдоно уу.",
+            variant: "destructive",
+        });
+        console.error("Error deleting word:", error);
     }
-};
+  };
 
   const toggleMemorized = async (id: string, checked: boolean) => {
     if (!user || !userWordsCollection) {
@@ -225,30 +251,25 @@ const handleDelete = async (id: string) => {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className='space-y-4'>
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className='flex-1'>
                 <CardTitle>Үг цээжлэх</CardTitle>
                 <CardDescription>Шинэ үг нэмэх, засах, устгах, цээжилснээ тэмдэглэх.</CardDescription>
             </div>
-            <div className="flex items-center gap-2">
-                 <ToggleGroup 
-                    type="single" 
-                    defaultValue="all" 
-                    variant="outline" 
-                    size="sm"
-                    onValueChange={(value) => setFilter(value as any || 'all')}
-                >
-                    <ToggleGroupItem value="all">Бүгд</ToggleGroupItem>
-                    <ToggleGroupItem value="memorized">Цээжилсэн</ToggleGroupItem>
-                    <ToggleGroupItem value="not-memorized">Цээжлээгүй</ToggleGroupItem>
-                </ToggleGroup>
+            <div className="flex w-full sm:w-auto items-center gap-2">
+                 <Input 
+                    placeholder='Үг хайх...'
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex-1 sm:w-48"
+                 />
                 <Dialog open={isDialogOpen} onOpenChange={(isOpen) => {
                     if (!isOpen) setCurrentWord(null);
                     setIsDialogOpen(isOpen);
                 }}>
                     <DialogTrigger asChild>
-                        <Button onClick={() => openDialog()} disabled={!user} size="sm">
+                        <Button onClick={() => openDialog()} disabled={!user} size="sm" className='whitespace-nowrap'>
                         <PlusCircle className="mr-2 h-4 w-4" /> Шинэ үг
                         </Button>
                     </DialogTrigger>
@@ -287,6 +308,42 @@ const handleDelete = async (id: string) => {
                 </Dialog>
             </div>
         </div>
+
+        <div className='flex flex-col sm:flex-row gap-4 justify-between items-center'>
+            <ToggleGroup 
+                type="single" 
+                defaultValue="all" 
+                variant="outline" 
+                size="sm"
+                onValueChange={(value) => setFilter(value as any || 'all')}
+            >
+                <ToggleGroupItem value="all">Бүгд</ToggleGroupItem>
+                <ToggleGroupItem value="memorized">Цээжилсэн</ToggleGroupItem>
+                <ToggleGroupItem value="not-memorized">Цээжлээгүй</ToggleGroupItem>
+            </ToggleGroup>
+        </div>
+         <div className="flex flex-wrap gap-1 justify-center">
+            <Button 
+                variant={alphabetFilter === 'all' ? 'default' : 'outline'} 
+                size="sm"
+                className="h-8 w-8 px-2"
+                onClick={() => setAlphabetFilter('all')}
+            >
+                All
+            </Button>
+            {ALPHABET.map(letter => (
+                <Button 
+                    key={letter}
+                    variant={alphabetFilter === letter ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-8 w-8 px-2"
+                    onClick={() => setAlphabetFilter(letter)}
+                >
+                    {letter}
+                </Button>
+            ))}
+        </div>
+
       </CardHeader>
       <CardContent>
         <div className="border rounded-md">
@@ -344,7 +401,7 @@ const handleDelete = async (id: string) => {
           </Table>
            {filteredWords.length === 0 && (
                 <div className="text-center p-8 text-muted-foreground">
-                    Одоогоор "{filter === 'memorized' ? 'цээжилсэн' : 'цээжлээгүй'}" үг алга байна.
+                    Шүүлтүүрт тохирох үг олдсонгүй.
                 </div>
             )}
         </div>
@@ -354,4 +411,6 @@ const handleDelete = async (id: string) => {
 }
 
     
+    
+
     
