@@ -73,8 +73,9 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       setUserAuthState({ user: null, isUserLoading: false, userError: new Error("Auth service not provided.") });
       return;
     }
-
-    setUserAuthState({ user: null, isUserLoading: true, userError: null }); // Reset on auth instance change
+    
+    // Set initial loading state. This is important on re-renders if auth object changes.
+    setUserAuthState({ user: auth.currentUser, isUserLoading: true, userError: null });
 
     const unsubscribe = onAuthStateChanged(
       auth,
@@ -86,6 +87,12 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
         setUserAuthState({ user: null, isUserLoading: false, userError: error });
       }
     );
+
+    // If there's already a user, the initial state might not be loading.
+    if (auth.currentUser) {
+       setUserAuthState(prevState => ({ ...prevState, isUserLoading: false }));
+    }
+
     return () => unsubscribe(); // Cleanup
   }, [auth]); // Depends on the auth instance
 
