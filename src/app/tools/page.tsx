@@ -32,7 +32,7 @@ const tools = [
   },
   {
     title: "Timer",
-    description: "Хичээллэх, завсарлах хугацааг удирдах.",
+    description: "Time managment",
     href: "/tools/pomodoro",
     icon: <Timer className="h-6 w-6" />
   },
