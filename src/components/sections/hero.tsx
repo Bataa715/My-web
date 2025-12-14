@@ -524,23 +524,23 @@ export default function Hero() {
                             transition={{ duration: 0.6, ease: "easeInOut" }}
                             className="absolute inset-0 flex flex-col items-center justify-center"
                         >
-                            <div className="avatar-glow-wrapper w-full h-full">
+                            <div className="avatar-glow-wrapper w-full h-full relative">
                                 <Avatar className="w-full h-full border-4 border-primary/50">
                                     <AvatarImage src={profileImage} alt={name} />
                                     <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
                                 </Avatar>
+                                {isEditMode && (
+                                    <Button 
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => setIsEditingImage(true)}
+                                        className="absolute top-0 right-0 h-8 w-8 rounded-full z-20"
+                                    >
+                                        <Edit className="h-4 w-4" />
+                                        <span className="sr-only">Зураг солих</span>
+                                    </Button>
+                                )}
                             </div>
-                            {isEditMode && (
-                                <Button 
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => setIsEditingImage(true)}
-                                    className="absolute top-0 right-0 h-8 w-8 rounded-full z-20"
-                                >
-                                    <Edit className="h-4 w-4" />
-                                    <span className="sr-only">Зураг солих</span>
-                                </Button>
-                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
