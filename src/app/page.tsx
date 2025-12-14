@@ -20,7 +20,7 @@ export default function Home() {
       )}
       <div className="relative z-10 p-8 bg-background/50 dark:bg-background/60 backdrop-blur-sm rounded-xl shadow-lg border">
         <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight text-primary animate-fade-in-down">
-          LinguaCore
+          Kaizen
         </h1>
         <p className="mt-4 text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto">
           Англи • Япон • Программчлал сурах хувийн систем

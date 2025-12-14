@@ -51,7 +51,7 @@ export function Header() {
         <div className="mr-4 hidden md:flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <BookOpenText className="h-6 w-6 text-primary" />
-            <span className="hidden font-bold sm:inline-block">LinguaCore</span>
+            <span className="hidden font-bold sm:inline-block">Kaizen</span>
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             {mainLinks.map((link) => (
@@ -94,7 +94,7 @@ export function Header() {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <BookOpenText className="mr-2 h-6 w-6 text-primary" />
-              <span className="font-bold">LinguaCore</span>
+              <span className="font-bold">Kaizen</span>
             </Link>
             <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
               <div className="flex flex-col space-y-3">
@@ -112,7 +112,7 @@ export function Header() {
         
         <Link href="/" className="flex items-center space-x-2 md:hidden">
             <BookOpenText className="h-6 w-6 text-primary" />
-            <span className="font-bold">LinguaCore</span>
+            <span className="font-bold">Kaizen</span>
         </Link>
 
         <div className="flex flex-1 items-center justify-end space-x-2">

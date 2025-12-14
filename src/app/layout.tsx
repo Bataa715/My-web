@@ -7,7 +7,7 @@ import { FirebaseClientProvider } from "@/firebase/client-provider";
 import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
-  title: "LinguaCore",
+  title: "Kaizen",
   description: "Англи • Япон • Программчлал сурах хувийн систем",
   icons: {
     icon: "/favicon.ico",
