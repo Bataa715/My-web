@@ -47,8 +47,9 @@ export default function Home() {
 
 
   return (
-    <div className="relative flex flex-col items-center justify-center text-center h-[calc(100vh-57px-81px)] -m-4 sm:-m-6 lg:-m-8">
-       {heroImage ? (
+    <div className="relative">
+      {heroImage && (
+        <div className="absolute top-0 left-0 w-full h-[60vh] -z-10">
           <Image
             src={heroImage}
             alt="Welcome background"
@@ -56,27 +57,28 @@ export default function Home() {
             className="object-cover"
             data-ai-hint="welcome abstract"
           />
-       ) : (
-         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-accent/20" />
-       )}
-       <div className="absolute inset-0 bg-black/30"></div>
-       <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
-          <p className="max-w-[700px] text-gray-200 md:text-xl">
-           Энэ бол тасралтгүй хөгжил, суралцах үйл явцыг минь харуулсан хувийн орон зай юм.
-          </p>
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <Button asChild size="lg">
-              <Link href="/about">
-                Миний тухай <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className='bg-background/20 border-white text-white hover:bg-white hover:text-black'>
-              <Link href="/tools">
-                <Wrench className="mr-2 h-5 w-5" /> Хэрэгслүүд
-              </Link>
-            </Button>
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
         </div>
+      )}
+      <div className="flex flex-col items-center justify-center text-center h-[calc(100vh-57px-81px)]">
+         <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
+            <p className="max-w-[700px] text-muted-foreground md:text-xl">
+             Энэ бол тасралтгүй хөгжил, суралцах үйл явцыг минь харуулсан хувийн орон зай юм.
+            </p>
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <Button asChild size="lg">
+                <Link href="/about">
+                  Миний тухай <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="secondary">
+                <Link href="/tools">
+                  <Wrench className="mr-2 h-5 w-5" /> Хэрэгслүүд
+                </Link>
+              </Button>
+            </div>
+          </div>
+      </div>
     </div>
   );
 }
