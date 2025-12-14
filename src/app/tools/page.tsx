@@ -77,7 +77,7 @@ export default function ToolsPage() {
 
 
   return (
-    <div className="relative min-h-[calc(100vh-57px-81px)] flex flex-col">
+    <div className="relative min-h-[calc(100vh-57px-81px)] flex flex-col overflow-hidden">
        <div className="space-y-8 z-10 pt-8 flex-grow">
           <BackButton />
           <div className="text-center">
@@ -117,7 +117,6 @@ export default function ToolsPage() {
             {heroImage && (
               <div 
                 className="absolute inset-0 w-full h-full"
-                style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }}
               >
                   <Image
                       src={heroImage}
@@ -127,8 +126,8 @@ export default function ToolsPage() {
                       data-ai-hint="abstract library"
                   />
                   <div 
-                    className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"
-                    style={{ clipPath: 'polygon(100% 0, 100% 100%, 0 100%)' }}
+                    className="absolute inset-0 bg-gradient-to-br from-background via-background to-transparent"
+                    style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%)' }}
                   ></div>
               </div>
             )}
