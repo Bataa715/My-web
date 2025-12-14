@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, Quote, Film, Music, Gamepad2, MapPin, Dribbble } from 'lucide-react';
+import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, Quote, Film, Music, Gamepad2, MapPin } from 'lucide-react';
 import { useState, useEffect, type FC } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,27 +20,23 @@ import { useFirebase, updateDocumentNonBlocking, setDocumentNonBlocking } from "
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 
-const staticPersonalInfo = {
-    name: "Б.Батмягмар",
-    bio: "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.",
-    github: "https://github.com/batmyagmar",
-    instagram: "https://instagram.com/batmyagmar",
-    email: "batmyagmar.b@gmail.com",
-};
-
 const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
 const defaultProfileImage = avatarPlaceholder?.imageUrl || "https://picsum.photos/seed/avatar/400/400";
+const defaultName = "Б.Батмягмар";
+const defaultBio = "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.";
+const defaultGithub = "https://github.com/batmyagmar";
+const defaultInstagram = "https://instagram.com/batmyagmar";
+const defaultEmail = "batmyagmar.b@gmail.com";
 
-
-const initialOrbitInfo: OrbitInfo[] = [
-    { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Улаанбаатар, Монгол' },
-    { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.' },
-    { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн хэмжээний програм хангамжийн компанид ажиллах.' },
-    { id: 'funFact', icon: 'Dribbble', title: 'Сонирхолтой баримт', content: 'Би сагсан бөмбөг тоглох дуртай.' },
+const defaultOrbitInfo: OrbitInfo[] = [
+    { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Улаанбаатар, Монгол', type: 'info' },
+    { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.', type: 'info' },
+    { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн хэмжээний програм хангамжийн компанид ажиллах.', type: 'info' },
+    { id: 'user', icon: 'User', title: 'Тухай', content: 'Би програмчлалд дуртай.', type: 'info' },
     { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Дуртай дууг сонсох.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
-    { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', backgroundImage: 'https://images.unsplash.com/photo-1536440136628-849c177E76a1?w=800' },
-    { id: 'quote', icon: 'Quote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay' },
-    { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.' },
+    { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', type: 'info', backgroundImage: 'https://images.unsplash.com/photo-1536440136628-849c177E76a1?w=800' },
+    { id: 'quote', icon: 'Quote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay', type: 'info' },
+    { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.', type: 'info' },
 ];
 
 
@@ -125,12 +121,12 @@ export default function Hero() {
   const { isEditMode } = useEditMode();
   const { firestore, user } = useFirebase();
   const [profileImage, setProfileImage] = useState<string>('');
-  const [bio, setBio] = useState(staticPersonalInfo.bio);
-  const [name, setName] = useState(staticPersonalInfo.name);
-  const [orbitInfo, setOrbitInfo] = useState<OrbitInfo[]>(initialOrbitInfo);
+  const [bio, setBio] = useState('');
+  const [name, setName] = useState('');
+  const [orbitInfo, setOrbitInfo] = useState<OrbitInfo[]>([]);
 
   const [isEditingBio, setIsEditingBio] = useState(false);
-  const [editedBio, setEditedBio] = useState(bio);
+  const [editedBio, setEditedBio] = useState("");
   
   const [isEditingImage, setIsEditingImage] = useState(false);
   const [editedImage, setEditedImage] = useState('');
@@ -150,13 +146,7 @@ export default function Hero() {
 
   useEffect(() => {
     if (!userInfoDocRef) {
-        if (!user) { // Not logged in, use static data
-            setBio(staticPersonalInfo.bio);
-            setEditedBio(staticPersonalInfo.bio);
-            setName(staticPersonalInfo.name);
-            setProfileImage(defaultProfileImage);
-            setEditedImage(defaultProfileImage);
-            setOrbitInfo(initialOrbitInfo);
+        if (!user) { // Not logged in, can't fetch data.
             setLoading(false);
         }
         return;
@@ -167,47 +157,39 @@ export default function Hero() {
         const docSnap = await getDoc(userInfoDocRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
-          setBio(data.bio || staticPersonalInfo.bio);
-          setEditedBio(data.bio || staticPersonalInfo.bio);
-          setName(data.name || staticPersonalInfo.name);
+          setBio(data.bio || defaultBio);
+          setEditedBio(data.bio || defaultBio);
+          setName(data.name || defaultName);
           const imageUrl = data.profileImage || defaultProfileImage;
           setProfileImage(imageUrl);
           setEditedImage(imageUrl);
-          
-          const fetchedOrbitInfo = (data.orbitInfo || initialOrbitInfo).map((item: any) => {
-            if (item.id === 'song' && !item.type) {
-              return { ...item, type: 'audio' };
-            }
-            if (!item.type) {
-              return { ...item, type: 'info' };
-            }
-            return item;
-          });
-
-          setOrbitInfo(fetchedOrbitInfo);
+          setOrbitInfo(data.orbitInfo || defaultOrbitInfo);
         } else {
+          // If doc doesn't exist, create it with default data. Non-blocking.
           setDocumentNonBlocking(userInfoDocRef, {
-            name: staticPersonalInfo.name,
-            bio: staticPersonalInfo.bio,
+            name: defaultName,
+            bio: defaultBio,
             profileImage: defaultProfileImage,
-            orbitInfo: initialOrbitInfo
+            orbitInfo: defaultOrbitInfo
           }, { merge: false });
-          setBio(staticPersonalInfo.bio);
-          setEditedBio(staticPersonalInfo.bio);
-          setName(staticPersonalInfo.name);
+          // Set local state to default values immediately.
+          setBio(defaultBio);
+          setEditedBio(defaultBio);
+          setName(defaultName);
           setProfileImage(defaultProfileImage);
           setEditedImage(defaultProfileImage);
-          setOrbitInfo(initialOrbitInfo);
+          setOrbitInfo(defaultOrbitInfo);
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
-        toast({ title: "Алдаа", description: "Хэрэглэгчийн мэдээлэл татахад алдаа гарлаа. Офлайн горимд ажиллаж байна.", variant: "destructive" });
-        setBio(staticPersonalInfo.bio);
-        setEditedBio(staticPersonalInfo.bio);
-        setName(staticPersonalInfo.name);
+        toast({ title: "Алдаа", description: "Хэрэглэгчийн мэдээлэл татахад алдаа гарлаа.", variant: "destructive" });
+        // Fallback to default in case of error
+        setBio(defaultBio);
+        setEditedBio(defaultBio);
+        setName(defaultName);
         setProfileImage(defaultProfileImage);
         setEditedImage(defaultProfileImage);
-        setOrbitInfo(initialOrbitInfo);
+        setOrbitInfo(defaultOrbitInfo);
       } finally {
         setLoading(false);
       }
@@ -341,7 +323,7 @@ export default function Hero() {
           <div className="flex flex-col justify-center space-y-6">
             <div className="space-y-4">
               <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                {name}
+                {name || defaultName}
               </h1>
               <div className="relative">
                 {isEditingBio ? (
@@ -364,7 +346,7 @@ export default function Hero() {
                 ) : (
                   <>
                     <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                      {bio}
+                      {bio || defaultBio}
                     </p>
                     {isEditMode && (
                       <Button
@@ -383,13 +365,13 @@ export default function Hero() {
             </div>
             
             <div className="flex items-center gap-4 pt-2">
-              <Link href={staticPersonalInfo.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <Link href={defaultGithub} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                 <Github className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
               </Link>
-              <Link href={staticPersonalInfo.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <Link href={defaultInstagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                 <Instagram className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
               </Link>
-              <Link href={`mailto:${staticPersonalInfo.email}`} aria-label="Email">
+              <Link href={`mailto:${defaultEmail}`} aria-label="Email">
                 <Mail className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
               </Link>
             </div>
@@ -507,7 +489,7 @@ export default function Hero() {
                              <div className="avatar-glow-wrapper w-48 h-48 md:w-56 md:h-56">
                                 <Avatar className="w-full h-full border-4 border-primary/50 relative">
                                     <AvatarImage src={profileImage} alt={name} />
-                                    <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+                                    <AvatarFallback>{(name || defaultName).charAt(0)}</AvatarFallback>
                                      {isEditMode && (
                                         <button 
                                             onClick={() => setIsEditingImage(true)}
@@ -522,12 +504,12 @@ export default function Hero() {
                     )}
                 </AnimatePresence>
 
-                {orbitInfo.map((item, index) => (
+                {(orbitInfo.length > 0 ? orbitInfo : defaultOrbitInfo).map((item, index) => (
                    <OrbitItem 
                      key={item.id}
                      item={item}
                      index={index}
-                     total={orbitInfo.length}
+                     total={(orbitInfo.length > 0 ? orbitInfo : defaultOrbitInfo).length}
                      selectedOrbit={selectedOrbit}
                      onItemClick={orbitItemClick}
                    />
@@ -573,3 +555,5 @@ export default function Hero() {
     </section>
   );
 }
+
+    
