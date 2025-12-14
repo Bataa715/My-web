@@ -4,7 +4,8 @@ import type { Timestamp } from 'firebase/firestore';
 export interface EnglishWord {
   id?: string;
   word: string;
-  meaning: string;
+  translation: string;
+  definition?: string;
   memorized: boolean;
   favorite?: boolean;
 }

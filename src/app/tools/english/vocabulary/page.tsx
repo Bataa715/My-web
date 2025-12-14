@@ -13,7 +13,8 @@ import { initialEnglishWords } from '@/data/english';
 
 const columns = [
   { key: 'word' as keyof EnglishWord, header: 'English Word' },
-  { key: 'meaning' as keyof EnglishWord, header: 'Утга' },
+  { key: 'translation' as keyof EnglishWord, header: 'Монгол орчуулга' },
+  { key: 'definition' as keyof EnglishWord, header: 'Утга' },
 ];
 
 export default function EnglishVocabularyPage() {
@@ -29,6 +30,7 @@ export default function EnglishVocabularyPage() {
         ...word,
         id: `local-${index}`,
         memorized: false,
+        favorite: false,
       }));
       setWords(localWords);
       setLoading(false);
@@ -48,6 +50,7 @@ export default function EnglishVocabularyPage() {
                 ...word,
                 id: `local-fallback-${index}`, // Differentiate from pure local
                 memorized: false,
+                favorite: false,
             }));
             setWords(localWords);
         } else {
@@ -65,6 +68,7 @@ export default function EnglishVocabularyPage() {
             ...word,
             id: `local-error-${index}`,
             memorized: false,
+            favorite: false,
         }));
         setWords(localWords);
       } finally {
