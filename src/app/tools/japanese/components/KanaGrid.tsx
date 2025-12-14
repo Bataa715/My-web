@@ -55,9 +55,9 @@ export default function KanaGrid({ kana, title, collectionPath }: KanaGridProps)
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-5 gap-2 text-center">
-          {kana.map(k => (
+          {kana.map((k, index) => (
             <Button
-              key={k.character}
+              key={`${k.character}-${index}`}
               variant="outline"
               onClick={() => toggleMemorized(k.character)}
               className={cn(
