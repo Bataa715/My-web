@@ -98,23 +98,15 @@ export default function EnglishPage() {
                 <h1 className="text-3xl font-bold font-headline">Англи хэл</h1>
                 <p className="text-muted-foreground">Үгсийн сан болон дүрмээ бататгаарай.</p>
             </div>
-            <Tabs defaultValue="vocabulary" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="vocabulary">Үг цээжлэх</TabsTrigger>
-                    <TabsTrigger value="grammar">Дүрэм</TabsTrigger>
-                </TabsList>
-                <TabsContent value="vocabulary" className="mt-6">
-                    <VocabularyManager
-                        collectionPath="englishWords"
-                        initialWords={initialEnglishWords}
-                        wordType="english"
-                        columns={englishColumns}
-                    />
-                </TabsContent>
-                <TabsContent value="grammar" className="mt-6">
-                    <GrammarList rules={englishGrammar} />
-                </TabsContent>
-            </Tabs>
+            <div className="space-y-8">
+                <VocabularyManager
+                    collectionPath="englishWords"
+                    initialWords={initialEnglishWords}
+                    wordType="english"
+                    columns={englishColumns}
+                />
+                <GrammarList rules={englishGrammar} />
+            </div>
         </div>
     );
 }

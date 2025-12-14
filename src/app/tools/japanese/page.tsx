@@ -118,31 +118,21 @@ export default function JapanesePage() {
                 <h1 className="text-3xl font-bold font-headline">Япон хэл</h1>
                 <p className="text-muted-foreground">Үсэг, үг, дүрмээ давтан суралцаарай.</p>
             </div>
-            <Tabs defaultValue="hiragana" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-                    <TabsTrigger value="hiragana">Hiragana</TabsTrigger>
-                    <TabsTrigger value="katakana">Katakana</TabsTrigger>
-                    <TabsTrigger value="vocabulary">Үг цээжлэх</TabsTrigger>
-                    <TabsTrigger value="grammar">Дүрэм</TabsTrigger>
-                </TabsList>
-                <TabsContent value="hiragana" className="mt-6">
-                    <KanaGrid kana={hiragana} title="Hiragana" collectionPath="hiragana" />
-                </TabsContent>
-                <TabsContent value="katakana" className="mt-6">
-                    <KanaGrid kana={katakana} title="Katakana" collectionPath="katakana" />
-                </TabsContent>
-                <TabsContent value="vocabulary" className="mt-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <KanaGrid kana={hiragana} title="Hiragana" collectionPath="hiragana" />
+                <KanaGrid kana={katakana} title="Katakana" collectionPath="katakana" />
+                <div className="lg:col-span-2">
                     <VocabularyManager
                         collectionPath="japaneseWords"
                         initialWords={initialJapaneseWords}
                         wordType="japanese"
                         columns={japaneseColumns}
                     />
-                </TabsContent>
-                <TabsContent value="grammar" className="mt-6">
-                    <GrammarList rules={japaneseGrammar} />
-                </TabsContent>
-            </Tabs>
+                </div>
+                <div className="lg:col-span-2">
+                     <GrammarList rules={japaneseGrammar} />
+                </div>
+            </div>
         </div>
     );
 }
