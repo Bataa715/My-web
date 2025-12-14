@@ -38,8 +38,8 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
     
     const baseRadius = 130;
     const mdBaseRadius = 160;
-    const editingRadius = 140;
-    const mdEditingRadius = 180;
+    const editingRadius = 170;
+    const mdEditingRadius = 210;
 
     const [currentRadius, setCurrentRadius] = useState(baseRadius);
 
