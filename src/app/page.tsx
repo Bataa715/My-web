@@ -51,9 +51,6 @@ export default function Home() {
         </>
       )}
        <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
-          <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl font-headline">
-            Тавтай морилно уу
-          </h1>
           <p className="max-w-[700px] text-muted-foreground md:text-xl">
            Энэ бол тасралтгүй хөгжил, суралцах үйл явцыг минь харуулсан хувийн орон зай юм.
           </p>
