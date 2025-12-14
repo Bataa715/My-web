@@ -42,7 +42,7 @@ import { useFirebase } from '@/firebase';
 import { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, setDoc, query } from "firebase/firestore";
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
-import { ScrollArea } from './scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Word = EnglishWord | JapaneseWord;
 
@@ -190,7 +190,7 @@ export default function VocabularyManager<T extends Word>({
     setWords(words.filter(w => w.id !== wordId));
 
     try {
-        const wordDocRef = doc(userWordsCollection, wordId);
+        const wordDocRef = doc(firestore, `users/${user.uid}/${collectionPath}`, wordId);
         await deleteDoc(wordDocRef);
         toast({ title: "Амжилттай устгагдлаа", variant: "destructive" });
 
@@ -411,3 +411,5 @@ export default function VocabularyManager<T extends Word>({
     </Card>
   );
 }
+
+    
