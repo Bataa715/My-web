@@ -57,11 +57,12 @@
       "description": "Represents a skill category and a list of skills within it.",
       "type": "object",
       "properties": {
-        "category": { "type": "string" },
-        "skills": { "type": "array", "items": { "type": "string" } },
+        "name": { "type": "string" },
+        "icon": { "type": "string" },
+        "items": { "type": "array", "items": { "type": "string" } },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["category", "skills", "createdAt"]
+      "required": ["name", "icon", "items", "createdAt"]
     },
     "EnglishWord": {
       "title": "English Word",
@@ -71,7 +72,7 @@
         "meaning": { "type": "string" },
         "memorized": { "type": "boolean" }
       },
-      "required": ["word", "meaning", "memorized"]
+      "required": ["word", "meaning"]
     },
     "JapaneseWord": {
       "title": "Japanese Word",
@@ -82,7 +83,7 @@
         "meaning": { "type": "string" },
         "memorized": { "type": "boolean" }
       },
-      "required": ["word", "romaji", "meaning", "memorized"]
+      "required": ["word", "romaji", "meaning"]
     },
     "GrammarRule": {
       "title": "Grammar Rule",
@@ -131,13 +132,27 @@
         "practicing": { "type": "boolean" }
       },
       "required": ["label", "learned", "practicing"]
+    },
+    "MemorizedKana": {
+        "title": "Memorized Kana",
+        "type": "object",
+        "properties": {
+            "characters": { "type": "array", "items": { "type": "string" } }
+        }
+    },
+    "ProgrammingProgress": {
+        "title": "Programming Progress",
+        "type": "object",
+        "properties": {
+            "items": { "type": "object" }
+        }
     }
   },
   "auth": {
     "providers": ["password", "anonymous"]
   },
   "firestore": {
-    "/userInfo/{userId}": {
+    "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserProfile" },
       "description": "Stores user profile information."
     },
@@ -148,6 +163,18 @@
     "/users/{userId}/skills/{skillId}": {
       "schema": { "$ref": "#/entities/Skill" },
       "description": "Stores user skills."
+    },
+     "/users/{userId}/englishWords/{wordId}": {
+      "schema": { "$ref": "#/entities/EnglishWord" }
+    },
+    "/users/{userId}/japaneseWords/{wordId}": {
+      "schema": { "$ref": "#/entities/JapaneseWord" }
+    },
+     "/users/{userId}/memorized/{kanaType}": {
+      "schema": { "$ref": "#/entities/MemorizedKana" }
+    },
+    "/users/{userId}/progress/{progressType}": {
+      "schema": { "$ref": "#/entities/ProgrammingProgress" }
     },
     "/englishWords/{wordId}": { "schema": { "$ref": "#/entities/EnglishWord" } },
     "/japaneseWords/{wordId}": { "schema": { "$ref": "#/entities/JapaneseWord" } },
