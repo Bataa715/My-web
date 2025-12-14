@@ -113,7 +113,7 @@ export default function JapanesePage() {
     return (
         <div className="space-y-8">
             <div className="text-center">
-                <h1 className="text-3xl font-bold font-headline">🇯🇵 Япон хэл</h1>
+                <h1 className="text-3xl font-bold font-headline">Япон хэл</h1>
                 <p className="text-muted-foreground">Үсэг, үг, дүрмээ давтан суралцаарай.</p>
             </div>
             <Tabs defaultValue="hiragana" className="w-full">

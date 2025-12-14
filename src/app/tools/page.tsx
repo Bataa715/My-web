@@ -4,12 +4,12 @@ import { ArrowRight, Timer } from "lucide-react";
 
 const tools = [
   {
-    title: "🇬🇧 Англи хэл",
+    title: "Англи хэл",
     description: "Үгсийн сан, дүрмийн дасгал, сорил.",
     href: "/tools/english",
   },
   {
-    title: "🇯🇵 Япон хэл",
+    title: "Япон хэл",
     description: "Хирагана, катакана, үгсийн сан, дүрэм.",
     href: "/tools/japanese",
   },
