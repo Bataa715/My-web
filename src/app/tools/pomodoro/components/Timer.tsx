@@ -2,32 +2,42 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Play, Pause, RotateCw } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Play, Pause, RotateCw, Settings } from 'lucide-react';
 
-const timeSettings = {
-    pomodoro: 25 * 60,
-    shortBreak: 5 * 60,
-    longBreak: 15 * 60,
+const defaultTimeSettings = {
+    pomodoro: 25,
+    shortBreak: 5,
+    longBreak: 15,
 };
 
 type Mode = 'pomodoro' | 'shortBreak' | 'longBreak';
 
 export default function Timer() {
+    const [settings, setSettings] = useState(defaultTimeSettings);
     const [mode, setMode] = useState<Mode>('pomodoro');
-    const [time, setTime] = useState(timeSettings.pomodoro);
+    const [time, setTime] = useState(settings.pomodoro * 60);
     const [isActive, setIsActive] = useState(false);
     const [pomodoroCount, setPomodoroCount] = useState(0);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [tempSettings, setTempSettings] = useState(settings);
 
     const audioRef = useRef<HTMLAudioElement>(null);
 
     const switchMode = useCallback((newMode: Mode) => {
         setIsActive(false);
         setMode(newMode);
-        setTime(timeSettings[newMode]);
-    }, []);
+        setTime(settings[newMode] * 60);
+    }, [settings]);
+
+    useEffect(() => {
+        switchMode(mode);
+    }, [settings, switchMode, mode]);
 
     useEffect(() => {
         let interval: NodeJS.Timeout | null = null;
@@ -65,7 +75,12 @@ export default function Timer() {
 
     const resetTimer = () => {
         setIsActive(false);
-        setTime(timeSettings[mode]);
+        setTime(settings[mode] * 60);
+    };
+
+    const handleSettingsSave = () => {
+        setSettings(tempSettings);
+        setIsSettingsOpen(false);
     };
 
     const formatTime = (seconds: number) => {
@@ -94,6 +109,60 @@ export default function Timer() {
                         {isActive ? <Pause className="mr-2 h-5 w-5" /> : <Play className="mr-2 h-5 w-5" />}
                         {isActive ? 'Pause' : 'Start'}
                     </Button>
+                     <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+                        <DialogTrigger asChild>
+                             <Button variant="outline" size="icon">
+                                <Settings className="h-5 w-5" />
+                                <span className="sr-only">Тохиргоо</span>
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Цаг тохируулах</DialogTitle>
+                                <DialogDescription>
+                                    Хичээллэх болон амрах хугацааг минутаар оруулна уу.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="pomodoro-time" className="text-right">Pomodoro</Label>
+                                    <Input
+                                        id="pomodoro-time"
+                                        type="number"
+                                        value={tempSettings.pomodoro}
+                                        onChange={(e) => setTempSettings({...tempSettings, pomodoro: Number(e.target.value)})}
+                                        className="col-span-3"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="short-break-time" className="text-right">Short Break</Label>
+                                    <Input
+                                        id="short-break-time"
+                                        type="number"
+                                        value={tempSettings.shortBreak}
+                                        onChange={(e) => setTempSettings({...tempSettings, shortBreak: Number(e.target.value)})}
+                                        className="col-span-3"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="long-break-time" className="text-right">Long Break</Label>
+                                    <Input
+                                        id="long-break-time"
+                                        type="number"
+                                        value={tempSettings.longBreak}
+                                        onChange={(e) => setTempSettings({...tempSettings, longBreak: Number(e.target.value)})}
+                                        className="col-span-3"
+                                    />
+                                </div>
+                            </div>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button type="button" variant="secondary">Цуцлах</Button>
+                                </DialogClose>
+                                <Button type="button" onClick={handleSettingsSave}>Хадгалах</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                     <Button onClick={resetTimer} variant="outline" size="icon">
                         <RotateCw className="h-5 w-5" />
                         <span className="sr-only">Reset</span>
