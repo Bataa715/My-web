@@ -1,25 +1,71 @@
 "use client";
 
-import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import type { ProgressItem } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
+import { useFirebase } from '@/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 interface ProgressTrackerProps {
   initialItems: ProgressItem[];
 }
 
 export default function ProgressTracker({ initialItems }: ProgressTrackerProps) {
-  const [items, setItems] = useLocalStorage<ProgressItem[]>('programming-progress', initialItems);
+  const { firestore, user } = useFirebase();
+  const [items, setItems] = useState<ProgressItem[]>(initialItems);
 
-  const handleToggle = (id: string, key: 'learned' | 'practicing') => {
-    setItems(
-      items.map(item =>
-        item.id === id ? { ...item, [key]: !item[key] } : item
-      )
+  useEffect(() => {
+    // Merge initial items with user's progress
+    if (!user || !firestore) {
+        setItems(initialItems);
+        return;
+    };
+
+    const fetchProgress = async () => {
+      const docRef = doc(firestore, `users/${user.uid}/progress`, 'programming');
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const userProgress = docSnap.data().items as { [id: string]: { learned: boolean, practicing: boolean } };
+        const mergedItems = initialItems.map(item => ({
+          ...item,
+          ...userProgress[item.id!]
+        }));
+        setItems(mergedItems);
+      } else {
+        setItems(initialItems);
+      }
+    };
+    fetchProgress();
+  }, [user, firestore, initialItems]);
+
+
+  const handleToggle = async (id: string, key: 'learned' | 'practicing') => {
+    if (!user || !firestore) return;
+
+    const newItems = items.map(item =>
+      item.id === id ? { ...item, [key]: !item[key] } : item
     );
+    setItems(newItems);
+
+    const updatedItem = newItems.find(item => item.id === id);
+    if (!updatedItem) return;
+
+    const docRef = doc(firestore, `users/${user.uid}/progress`, 'programming');
+    try {
+        await setDoc(docRef, {
+            items: {
+                [id]: {
+                    learned: updatedItem.learned,
+                    practicing: updatedItem.practicing
+                }
+            }
+        }, { merge: true });
+    } catch (e) {
+        console.error("Error updating progress:", e);
+    }
   };
 
   return (

@@ -1,10 +1,12 @@
+'use client';
 
+import { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import VocabularyManager from '@/components/shared/VocabularyManager';
 import GrammarList from '@/components/shared/GrammarList';
 import KanaGrid from './components/KanaGrid';
 import { getHiragana, getKatakana, getJapaneseWords, getJapaneseGrammar } from '@/lib/data';
-import type { JapaneseWord } from '@/lib/types';
+import type { JapaneseWord, Kana, GrammarRule } from '@/lib/types';
 
 const japaneseColumns = [
     { key: 'word' as keyof JapaneseWord, header: 'Japanese Word' },
@@ -12,11 +14,34 @@ const japaneseColumns = [
     { key: 'meaning' as keyof JapaneseWord, header: 'Mongolian Meaning' },
 ];
 
-export default async function JapanesePage() {
-    const hiragana = await getHiragana();
-    const katakana = await getKatakana();
-    const initialJapaneseWords = await getJapaneseWords();
-    const japaneseGrammar = await getJapaneseGrammar();
+export default function JapanesePage() {
+    const [hiragana, setHiragana] = useState<Kana[]>([]);
+    const [katakana, setKatakana] = useState<Kana[]>([]);
+    const [initialJapaneseWords, setInitialJapaneseWords] = useState<JapaneseWord[]>([]);
+    const [japaneseGrammar, setJapaneseGrammar] = useState<GrammarRule[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchData() {
+            setLoading(true);
+            const [h, k, w, g] = await Promise.all([
+                getHiragana(),
+                getKatakana(),
+                getJapaneseWords(),
+                getJapaneseGrammar(),
+            ]);
+            setHiragana(h);
+            setKatakana(k);
+            setInitialJapaneseWords(w);
+            setJapaneseGrammar(g);
+            setLoading(false);
+        }
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return <div>Loading...</div>
+    }
 
     return (
         <div className="space-y-8">
@@ -32,14 +57,14 @@ export default async function JapanesePage() {
                     <TabsTrigger value="grammar">Дүрэм</TabsTrigger>
                 </TabsList>
                 <TabsContent value="hiragana" className="mt-6">
-                    <KanaGrid kana={hiragana} title="Hiragana" storageKey="hiragana-memorized" />
+                    <KanaGrid kana={hiragana} title="Hiragana" collectionPath="hiragana" />
                 </TabsContent>
                 <TabsContent value="katakana" className="mt-6">
-                    <KanaGrid kana={katakana} title="Katakana" storageKey="katakana-memorized" />
+                    <KanaGrid kana={katakana} title="Katakana" collectionPath="katakana" />
                 </TabsContent>
                 <TabsContent value="vocabulary" className="mt-6">
                     <VocabularyManager
-                        storageKey="japanese-words"
+                        collectionPath="japaneseWords"
                         initialWords={initialJapaneseWords}
                         wordType="japanese"
                         columns={japaneseColumns}

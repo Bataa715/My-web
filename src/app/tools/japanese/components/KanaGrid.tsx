@@ -1,26 +1,50 @@
 "use client";
 
-import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Kana } from "@/lib/types";
+import { useFirebase } from "@/firebase";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 
 interface KanaGridProps {
   kana: Kana[];
   title: string;
-  storageKey: string;
+  collectionPath: string;
 }
 
-export default function KanaGrid({ kana, title, storageKey }: KanaGridProps) {
-  const [memorized, setMemorized] = useLocalStorage<string[]>(storageKey, []);
+export default function KanaGrid({ kana, title, collectionPath }: KanaGridProps) {
+  const { firestore, user } = useFirebase();
+  const [memorized, setMemorized] = useState<string[]>([]);
 
-  const toggleMemorized = (character: string) => {
-    setMemorized(prev =>
-      prev.includes(character)
-        ? prev.filter(c => c !== character)
-        : [...prev, character]
-    );
+  useEffect(() => {
+    if (!user || !firestore) return;
+    const fetchMemorized = async () => {
+      const docRef = doc(firestore, `users/${user.uid}/memorized`, collectionPath);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setMemorized(docSnap.data().characters || []);
+      }
+    };
+    fetchMemorized();
+  }, [user, firestore, collectionPath]);
+
+  const toggleMemorized = async (character: string) => {
+    if (!user || !firestore) return;
+
+    const newMemorized = memorized.includes(character)
+      ? memorized.filter(c => c !== character)
+      : [...memorized, character];
+    
+    setMemorized(newMemorized);
+
+    const docRef = doc(firestore, `users/${user.uid}/memorized`, collectionPath);
+    try {
+        await setDoc(docRef, { characters: newMemorized }, { merge: true });
+    } catch (e) {
+        console.error("Error updating memorized kana:", e)
+    }
   };
 
   return (

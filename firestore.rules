@@ -19,8 +19,7 @@ service cloud.firestore {
 
     // Rules for user-specific data
     match /users/{userId}/{document=**} {
-      allow read: if true;
-      allow write: if isSignedIn() && isOwner(userId);
+      allow read, write: if isSignedIn() && isOwner(userId);
     }
     
     // Allow public read for learning materials

@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from 'react';
-import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -38,29 +37,62 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/com
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
+import { useFirebase } from '@/firebase';
+import { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, writeBatch } from "firebase/firestore";
 
 type Word = EnglishWord | JapaneseWord;
 
 interface VocabularyManagerProps<T extends Word> {
-  storageKey: string;
+  collectionPath: string;
   initialWords: T[];
   wordType: 'english' | 'japanese';
   columns: { key: keyof T; header: string; }[];
 }
 
 export default function VocabularyManager<T extends Word>({
-  storageKey,
+  collectionPath,
   initialWords,
   wordType,
   columns,
 }: VocabularyManagerProps<T>) {
-  const [words, setWords] = useLocalStorage<T[]>(storageKey, initialWords);
+  const { firestore, user } = useFirebase();
+  const [words, setWords] = useState<T[]>(initialWords);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentWord, setCurrentWord] = useState<T | null>(null);
   const { toast } = useToast();
 
-  const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
+  const userWordsCollection = user ? collection(firestore, `users/${user.uid}/${collectionPath}`) : null;
+
+  useEffect(() => {
+    if (!userWordsCollection) {
+      setWords(initialWords.map(w => ({ ...w, memorized: false })));
+      return;
+    }
+
+    const fetchUserWords = async () => {
+      const userWordsSnapshot = await getDocs(userWordsCollection);
+      const userWordsData = new Map(userWordsSnapshot.docs.map(d => [d.id, d.data()]));
+
+      const mergedWords = initialWords.map(initialWord => {
+        const userWord = userWordsData.get(initialWord.id!);
+        return userWord ? { ...initialWord, ...userWord } : { ...initialWord, memorized: false };
+      });
+      
+      const userAddedWords = userWordsSnapshot.docs
+        .filter(doc => !initialWords.some(iw => iw.id === doc.id))
+        .map(doc => ({ id: doc.id, ...doc.data() } as T));
+
+      setWords([...mergedWords, ...userAddedWords]);
+    };
+
+    fetchUserWords();
+  }, [initialWords, userWordsCollection]);
+
+
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!user || !firestore) return;
+
     const formData = new FormData(e.currentTarget);
     const newWordData: { [key: string]: any } = {};
     columns.forEach(col => {
@@ -69,31 +101,58 @@ export default function VocabularyManager<T extends Word>({
       }
     });
 
-    if (currentWord) {
-      // Edit
-      setWords(words.map(w => w.id === currentWord.id ? { ...w, ...newWordData } : w));
-      toast({ title: "Амжилттай заслаа", description: "Үгийн мэдээлэл шинэчлэгдлээ." });
-    } else {
-      // Add
-      const newWord: T = {
-        id: Date.now().toString(),
-        ...newWordData,
-        memorized: false,
-      } as T;
-      setWords([newWord, ...words]);
-      toast({ title: "Амжилттай нэмлээ", description: "Шинэ үг таны санд нэмэгдлээ." });
+    try {
+      if (currentWord) { // Edit
+        const docRef = doc(firestore, `users/${user.uid}/${collectionPath}`, currentWord.id!);
+        await updateDoc(docRef, newWordData);
+        setWords(words.map(w => w.id === currentWord.id ? { ...w, ...newWordData } as T : w));
+        toast({ title: "Амжилттай заслаа", description: "Үгийн мэдээлэл шинэчлэгдлээ." });
+      } else { // Add
+        const docRef = await addDoc(collection(firestore, `users/${user.uid}/${collectionPath}`), {
+          ...newWordData,
+          memorized: false,
+        });
+        const newWord = { id: docRef.id, ...newWordData, memorized: false } as T;
+        setWords([newWord, ...words]);
+        toast({ title: "Амжилттай нэмлээ", description: "Шинэ үг таны санд нэмэгдлээ." });
+      }
+    } catch (error) {
+       toast({ title: "Алдаа гарлаа", variant: "destructive" });
+       console.error(error);
     }
+    
     setIsDialogOpen(false);
     setCurrentWord(null);
   };
 
-  const handleDelete = (id: string) => {
-    setWords(words.filter(w => w.id !== id));
-    toast({ title: "Амжилттай устгалаа", variant: "destructive" });
+  const handleDelete = async (id: string) => {
+    if (!user || !firestore) return;
+     if (initialWords.some(iw => iw.id === id)) {
+      toast({ title: "Анхааруулга", description: "Анхдагч үгийг устгах боломжгүй.", variant: "destructive" });
+      return;
+    }
+    try {
+        const docRef = doc(firestore, `users/${user.uid}/${collectionPath}`, id);
+        await deleteDoc(docRef);
+        setWords(words.filter(w => w.id !== id));
+        toast({ title: "Амжилттай устгалаа", variant: "destructive" });
+    } catch(e) {
+        toast({ title: "Алдаа гарлаа", variant: "destructive" });
+    }
   };
 
-  const toggleMemorized = (id: string, checked: boolean) => {
+  const toggleMemorized = async (id: string, checked: boolean) => {
+    if (!user || !firestore) return;
     setWords(words.map(w => w.id === id ? { ...w, memorized: checked } : w));
+    
+    const docRef = doc(firestore, `users/${user.uid}/${collectionPath}`, id);
+    try {
+      await setDoc(docRef, { memorized: checked }, { merge: true });
+    } catch (e) {
+      console.error("Error updating memorized status:", e);
+      // Revert state on error
+      setWords(words.map(w => w.id === id ? { ...w, memorized: !checked } : w));
+    }
   };
   
   const openDialog = (word: T | null = null) => {
@@ -108,7 +167,10 @@ export default function VocabularyManager<T extends Word>({
           <CardTitle>Үг цээжлэх</CardTitle>
           <CardDescription>Шинэ үг нэмэх, засах, устгах, цээжилснээ тэмдэглэх.</CardDescription>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={(isOpen) => {
+            if (!isOpen) setCurrentWord(null);
+            setIsDialogOpen(isOpen);
+        }}>
           <DialogTrigger asChild>
             <Button onClick={() => openDialog()}>
               <PlusCircle className="mr-2 h-4 w-4" /> Шинэ үг
@@ -162,7 +224,7 @@ export default function VocabularyManager<T extends Word>({
                   <TableCell>
                     <Checkbox
                       checked={word.memorized}
-                      onCheckedChange={(checked) => toggleMemorized(word.id, !!checked)}
+                      onCheckedChange={(checked) => toggleMemorized(word.id!, !!checked)}
                     />
                   </TableCell>
                   <TableCell className="text-right space-x-2">
@@ -171,7 +233,12 @@ export default function VocabularyManager<T extends Word>({
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                         <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            disabled={initialWords.some(iw => iw.id === word.id)}
+                          >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </AlertDialogTrigger>
@@ -184,7 +251,7 @@ export default function VocabularyManager<T extends Word>({
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(word.id)}>Устгах</AlertDialogAction>
+                          <AlertDialogAction onClick={() => handleDelete(word.id!)}>Устгах</AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>

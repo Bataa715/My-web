@@ -1,14 +1,38 @@
+'use client';
 
+import { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ConceptCards from './components/ConceptCards';
 import CheatSheet from './components/CheatSheet';
 import ProgressTracker from './components/ProgressTracker';
 import { getProgrammingConcepts, getCheatSheetItems, getInitialProgressItems } from '@/lib/data';
+import type { ProgrammingConcept, CheatSheetItem, ProgressItem } from '@/lib/types';
 
-export default async function ProgrammingPage() {
-    const programmingConcepts = await getProgrammingConcepts();
-    const cheatSheetItems = await getCheatSheetItems();
-    const initialProgressItems = await getInitialProgressItems();
+export default function ProgrammingPage() {
+    const [programmingConcepts, setProgrammingConcepts] = useState<ProgrammingConcept[]>([]);
+    const [cheatSheetItems, setCheatSheetItems] = useState<CheatSheetItem[]>([]);
+    const [initialProgressItems, setInitialProgressItems] = useState<ProgressItem[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchData() {
+            setLoading(true);
+            const [concepts, cheats, progress] = await Promise.all([
+                getProgrammingConcepts(),
+                getCheatSheetItems(),
+                getInitialProgressItems()
+            ]);
+            setProgrammingConcepts(concepts);
+            setCheatSheetItems(cheats);
+            setInitialProgressItems(progress);
+            setLoading(false);
+        }
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return <div>Loading...</div>
+    }
 
     return (
         <div className="space-y-8">

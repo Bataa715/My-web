@@ -60,7 +60,7 @@ export type Project = {
 };
 
 export type Skill = {
-    id?: string;
+    id: string;
     name:string;
     icon: string; // Icon name as string
     items: string[];
