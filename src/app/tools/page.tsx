@@ -109,14 +109,14 @@ export default function ToolsPage() {
           </div>
        </div>
 
-        <div className="absolute bottom-0 left-0 w-full z-0 h-[40vh]">
+        <div className="absolute bottom-0 left-0 w-full z-0 h-full">
             <div className="absolute -top-16 left-0 w-full z-10">
-              <WavyLine />
             </div>
             
             {heroImage && (
               <div 
                 className="absolute inset-0 w-full h-full"
+                style={{ clipPath: 'polygon(0 70%, 100% 20%, 100% 100%, 0% 100%)' }}
               >
                   <Image
                       src={heroImage}
@@ -126,8 +126,7 @@ export default function ToolsPage() {
                       data-ai-hint="abstract library"
                   />
                   <div 
-                    className="absolute inset-0 w-full h-full bg-gradient-to-br from-background via-background to-transparent"
-                    style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0% 100%)' }}
+                    className="absolute inset-0 w-full h-full bg-gradient-to-t from-background via-background/80 to-transparent"
                   ></div>
               </div>
             )}
