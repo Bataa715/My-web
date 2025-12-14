@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Github, Linkedin, Twitter } from 'lucide-react';
+import { Github, Instagram } from 'lucide-react';
 import { Button } from './ui/button';
 import { personalInfo } from '@/lib/data';
 
@@ -17,8 +17,8 @@ const Footer = () => {
             </Link>
           </Button>
           <Button variant="ghost" size="icon" asChild>
-            <Link href={`mailto:${personalInfo.email}`} target="_blank">
-              <Twitter />
+            <Link href={personalInfo.instagram} target="_blank">
+              <Instagram />
             </Link>
           </Button>
         </div>
