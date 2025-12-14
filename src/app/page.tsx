@@ -40,7 +40,7 @@ export default function Home() {
             src={heroImage}
             alt="Abstract learning background"
             fill
-            className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-25 dark:opacity-15"
+            className="absolute top-0 left-0 w-full h-full object-cover z-0"
             data-ai-hint="abstract library"
             priority
           />
