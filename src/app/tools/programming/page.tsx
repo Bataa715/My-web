@@ -1,39 +1,56 @@
+'use client';
 
+import { useEffect, useState } from 'react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { useFirebase } from '@/firebase';
 import BackButton from '@/components/shared/BackButton';
 import CheatSheet from '@/app/tools/programming/components/CheatSheet';
 import ConceptCards from '@/app/tools/programming/components/ConceptCards';
 import ProgressTracker from '@/app/tools/programming/components/ProgressTracker';
 import type { CheatSheetItem, ProgrammingConcept, ProgressItem } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from '@/components/ui/skeleton';
 
-async function getProgrammingData() {
-    try {
-        const { firestore: db } = initializeFirebase();
+export default function ProgrammingPage() {
+    const { firestore } = useFirebase();
+    const [concepts, setConcepts] = useState<ProgrammingConcept[]>([]);
+    const [cheatSheetItems, setCheatSheetItems] = useState<CheatSheetItem[]>([]);
+    const [progressItems, setProgressItems] = useState<ProgressItem[]>([]);
+    const [loading, setLoading] = useState(true);
 
-        const conceptsRef = collection(db, "programmingConcepts");
-        const conceptsSnap = await getDocs(conceptsRef);
-        const concepts = conceptsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgrammingConcept));
+    useEffect(() => {
+        if (!firestore) return;
 
-        const cheatSheetRef = collection(db, "cheatSheetItems");
-        const cheatSheetSnap = await getDocs(cheatSheetRef);
-        const cheatSheetItems = cheatSheetSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as CheatSheetItem));
+        const getProgrammingData = async () => {
+            setLoading(true);
+            try {
+                const conceptsRef = collection(firestore, "programmingConcepts");
+                const conceptsSnap = await getDocs(conceptsRef);
+                const conceptsData = conceptsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgrammingConcept));
+                setConcepts(conceptsData);
 
-        const progressItemsRef = collection(db, "progressItems");
-        const q = query(progressItemsRef, orderBy("label"));
-        const progressItemsSnap = await getDocs(q);
-        const progressItems = progressItemsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgressItem));
+                const cheatSheetRef = collection(firestore, "cheatSheetItems");
+                const cheatSheetSnap = await getDocs(cheatSheetRef);
+                const cheatSheetItemsData = cheatSheetSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as CheatSheetItem));
+                setCheatSheetItems(cheatSheetItemsData);
 
-        return { concepts, cheatSheetItems, progressItems };
-    } catch (error) {
-        console.error("Error fetching programming data:", error);
-        return { concepts: [], cheatSheetItems: [], progressItems: [] };
-    }
-}
+                const progressItemsRef = collection(firestore, "progressItems");
+                const q = query(progressItemsRef, orderBy("label"));
+                const progressItemsSnap = await getDocs(q);
+                const progressItemsData = progressItemsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProgressItem));
+                setProgressItems(progressItemsData);
 
-export default async function ProgrammingPage() {
-    const { concepts, cheatSheetItems, progressItems } = await getProgrammingData();
+            } catch (error) {
+                console.error("Error fetching programming data:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        
+        getProgrammingData();
+
+    }, [firestore]);
+
 
     return (
         <div className="space-y-8">
@@ -49,15 +66,25 @@ export default async function ProgrammingPage() {
                     <TabsTrigger value="cheatsheet">Cheat Sheet</TabsTrigger>
                     <TabsTrigger value="progress">Ахиц</TabsTrigger>
                 </TabsList>
-                <TabsContent value="concepts">
-                   <ConceptCards concepts={concepts} />
-                </TabsContent>
-                <TabsContent value="cheatsheet">
-                   <CheatSheet items={cheatSheetItems} />
-                </TabsContent>
-                <TabsContent value="progress">
-                    <ProgressTracker initialItems={progressItems} />
-                </TabsContent>
+                {loading ? (
+                     <div className="mt-4 space-y-4">
+                        <Skeleton className="h-48 w-full" />
+                        <Skeleton className="h-24 w-full" />
+                        <Skeleton className="h-24 w-full" />
+                    </div>
+                ) : (
+                    <>
+                        <TabsContent value="concepts">
+                           <ConceptCards concepts={concepts} />
+                        </TabsContent>
+                        <TabsContent value="cheatsheet">
+                           <CheatSheet items={cheatSheetItems} />
+                        </TabsContent>
+                        <TabsContent value="progress">
+                            <ProgressTracker initialItems={progressItems} />
+                        </TabsContent>
+                    </>
+                )}
             </Tabs>
         </div>
     );
