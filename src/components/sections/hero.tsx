@@ -421,25 +421,23 @@ export default function Hero() {
                             <AnimatePresence mode="wait">
                                 {isEditingOrbit ? (
                                     <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20 p-4 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                                        <div className="grid grid-cols-2 gap-2 items-start">
-                                            <div>
-                                                <Label className="text-left text-xs mb-1 block text-foreground">Нэр</Label>
-                                                <Input
-                                                  value={editedOrbitTitle}
-                                                  onChange={(e) => setEditedOrbitTitle(e.target.value)}
-                                                  className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
-                                                  placeholder="Нэр..."
-                                                />
-                                            </div>
-                                             <div>
-                                                <Label className="text-left text-xs mb-1 block text-foreground">Icon</Label>
-                                                <Input
-                                                  value={editedOrbitIcon}
-                                                  onChange={(e) => setEditedOrbitIcon(e.target.value)}
-                                                  className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
-                                                  placeholder="Lucide Icon"
-                                                />
-                                            </div>
+                                        <div className="w-full">
+                                            <Label className="text-left text-xs mb-1 block text-foreground">Нэр</Label>
+                                            <Input
+                                              value={editedOrbitTitle}
+                                              onChange={(e) => setEditedOrbitTitle(e.target.value)}
+                                              className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                              placeholder="Нэр..."
+                                            />
+                                        </div>
+                                         <div className="w-full mt-1">
+                                            <Label className="text-left text-xs mb-1 block text-foreground">Icon</Label>
+                                            <Input
+                                              value={editedOrbitIcon}
+                                              onChange={(e) => setEditedOrbitIcon(e.target.value)}
+                                              className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                              placeholder="Lucide Icon"
+                                            />
                                         </div>
                                         <div className="mt-1">
                                             <Label className="text-left text-xs mb-1 block text-foreground">Тайлбар</Label>
