@@ -40,7 +40,11 @@ export default function RootLayout({
             <div className="relative flex min-h-screen flex-col">
               <Header />
               <main className="flex-1 container mx-auto px-4 py-8 sm:px-6 lg:px-8">
-                {children}
+                <div className="page-container-wrapper rounded-lg">
+                  <div className="page-container p-4 sm:p-6 lg:p-8 rounded-lg">
+                    {children}
+                  </div>
+                </div>
               </main>
               <Footer />
             </div>
