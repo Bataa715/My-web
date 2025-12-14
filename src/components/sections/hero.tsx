@@ -427,6 +427,9 @@ export default function Hero() {
                                 {isEditingOrbit ? (
                                     <motion.div
                                         key="edit"
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
                                         className="w-full h-full flex flex-col justify-center items-center"
                                         onClick={(e) => e.stopPropagation()}
                                     >
@@ -491,7 +494,12 @@ export default function Hero() {
                                         </div>
                                     </motion.div>
                                 ) : (
-                                    <motion.div key="view" className="relative w-full cursor-pointer z-20 p-6" onClick={handleContentClick}>
+                                    <motion.div 
+                                        key="view" 
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="relative w-full cursor-pointer z-20 p-6" onClick={handleContentClick}>
                                         <h3 className="font-headline text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
                                         {selectedOrbit.type === 'audio' ? (
                                             selectedOrbit.youtubeVideoId ? (
@@ -533,27 +541,26 @@ export default function Hero() {
                             transition={{ duration: 0.6, ease: "easeInOut" }}
                             className="relative w-full h-full"
                         >
-                            <div className="avatar-glow-wrapper w-full h-full">
+                            <div className="avatar-glow-wrapper w-full h-full relative">
                                 <Avatar className="w-full h-full border-4 border-primary/50">
                                     <AvatarImage src={profileImage} alt={name} />
                                     <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
                                 </Avatar>
-                                {isEditMode && (
-                                    <Button 
-                                        variant="outline"
-                                        size="icon"
-                                        onClick={() => setIsEditingImage(true)}
-                                        className="absolute top-0 right-0 h-8 w-8 rounded-full z-20"
-                                    >
-                                        <Edit className="h-4 w-4" />
-                                        <span className="sr-only">Зураг солих</span>
-                                    </Button>
-                                )}
                             </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
-
+                 {isEditMode && !selectedOrbit && (
+                    <Button 
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setIsEditingImage(true)}
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-10 w-10 rounded-full z-30 bg-background/50 backdrop-blur-sm"
+                    >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Зураг солих</span>
+                    </Button>
+                )}
                 {orbitInfo.map((item, index) => (
                    <OrbitItem 
                      key={item.id}
