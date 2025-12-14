@@ -26,7 +26,7 @@ const tools = [
   },
   {
     title: "Code",
-    description: "Үндсэн ойлголтууд, cheat sheets, ахиц хянагч.",
+    description: "Code surah",
     href: "/tools/programming",
     icon: <CodeIcon className="h-6 w-6" />
   },
