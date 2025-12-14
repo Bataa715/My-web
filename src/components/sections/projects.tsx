@@ -1,105 +1,127 @@
-'use client';
+"use client";
 
-import { useProjects } from '@/contexts/ProjectContext';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import Image from 'next/image';
-import { Button } from '../ui/button';
-import { ArrowRight, PlusCircle, Trash2 } from 'lucide-react';
-import Link from 'next/link';
-import { Skeleton } from '../ui/skeleton';
-import { useEditMode } from '@/contexts/EditModeContext';
-import { AddProjectDialog } from '../AddProjectDialog';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { Github, ExternalLink, Trash2, Loader2, PlusCircle } from "lucide-react";
 
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useProjects } from "@/contexts/ProjectContext";
+import { useEditMode } from "@/contexts/EditModeContext";
+import { AddProjectDialog } from "../AddProjectDialog";
 
-const Projects = () => {
-  const { projects, loading, deleteProject } = useProjects();
+export default function Projects() {
+  const { projects, deleteProject, loading } = useProjects();
   const { isEditMode } = useEditMode();
+  const categories = ["All", ...Array.from(new Set(projects.map((p) => p.category)))];
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  const filteredProjects =
+    selectedCategory === "All"
+      ? projects
+      : projects.filter((p) => p.category === selectedCategory);
 
   return (
-    <section id="projects" className="container py-12 md:py-24">
-      <div className="mb-12 text-center">
-        <h2 className="text-4xl font-bold font-headline">Миний төслүүд</h2>
-        <p className="mt-2 text-muted-foreground">Би юу хийж бүтээсэн бэ?</p>
-      </div>
+    <section id="projects" className="py-12 md:py-24 lg:py-32">
+      <div className="container px-4 md:px-6">
+        <div className="flex flex-col items-center justify-center space-y-4 text-center">
+          <div className="space-y-2">
+            <h2 className="text-3xl font-headline font-bold tracking-tighter sm:text-5xl">Миний төслүүд</h2>
+            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              Миний хийсэн ажлууд, технологийн шийдлүүдтэй танилцана уу.
+            </p>
+          </div>
+        </div>
 
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {loading && Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i}>
-            <CardHeader>
-              <Skeleton className="h-64 w-full" />
-              <Skeleton className="mt-4 h-8 w-3/4" />
-              <Skeleton className="mt-2 h-4 w-full" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                <Skeleton className="h-6 w-16 rounded-full" />
-                <Skeleton className="h-6 w-20 rounded-full" />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Skeleton className="h-10 w-32" />
-            </CardFooter>
-          </Card>
-        ))}
-
-        {!loading && projects.map((project) => (
-          <Card key={project.id} className="group relative flex flex-col">
-             {isEditMode && (
-              <Button variant="destructive" size="icon" className="absolute top-2 right-2 z-10" onClick={() => deleteProject(project.id)}>
-                <Trash2 />
-              </Button>
-            )}
-            <CardHeader>
-              <div className="relative h-64 w-full overflow-hidden rounded-t-lg">
-                <Image
-                  src={`https://picsum.photos/seed/${project.id}/600/400`}
-                  alt={project.name}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              </div>
-              <CardTitle className="mt-4">{project.name}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <CardDescription>{project.description}</CardDescription>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {project.technologies.map((tag) => (
-                  <Badge key={tag} variant="secondary">
-                    {tag}
-                  </Badge>
+        {loading ? (
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          </div>
+        ) : (
+          <>
+            <div className="flex justify-center flex-wrap gap-2 py-8">
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? "default" : "outline"}
+                  onClick={() => setSelectedCategory(category)}
+                  className="rounded-full transition-colors duration-300"
+                >
+                  {category}
+                </Button>
+              ))}
+            </div>
+            <motion.div layout className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <AnimatePresence>
+                {filteredProjects.map((project, index) => (
+                  <motion.div
+                    key={project.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                  >
+                    <Card className="flex h-full flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-card relative">
+                      {isEditMode && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="absolute top-2 right-2 h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive z-10"
+                          onClick={() => project.id && deleteProject(project.id)}
+                          aria-label="Delete project"
+                          disabled={!project.id}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <CardHeader>
+                        <CardTitle className="font-headline">{project.name}</CardTitle>
+                        <CardDescription>{project.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex-grow">
+                        <div className="flex flex-wrap gap-2">
+                          {project.technologies.map((tech) => (
+                            <Badge key={tech} variant="secondary">
+                              {tech}
+                            </Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                      <CardFooter className="flex justify-end gap-2 bg-muted/50 p-4">
+                        {project.link && (
+                          <Button asChild variant="ghost" size="icon">
+                            <Link href={project.link} target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
+                              <Github className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        )}
+                        {project.live && (
+                          <Button asChild variant="ghost" size="icon">
+                            <Link href={project.live} target="_blank" rel="noopener noreferrer" aria-label="Live Demo">
+                              <ExternalLink className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        )}
+                      </CardFooter>
+                    </Card>
+                  </motion.div>
                 ))}
-              </div>
-            </CardContent>
-            <CardFooter className="flex-wrap gap-2">
-              {project.link && (
-                <Button asChild variant="outline">
-                  <Link href={project.link} target="_blank">
-                    Дэлгэрэнгүй <ArrowRight className="ml-2" />
-                  </Link>
-                </Button>
-              )}
-               {project.live && (
-                <Button asChild >
-                  <Link href={project.live} target="_blank">
-                    Live хувилбар
-                  </Link>
-                </Button>
-              )}
-            </CardFooter>
-          </Card>
-        ))}
-         {isEditMode && (
-          <AddProjectDialog>
-            <button className="flex h-full min-h-[400px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/20 text-muted-foreground transition-colors hover:border-primary hover:bg-muted/50 hover:text-primary">
-              <PlusCircle size={48} />
-              <span className="mt-4 font-semibold">Шинэ төсөл нэмэх</span>
-            </button>
-          </AddProjectDialog>
+                 {isEditMode && (
+                  <AddProjectDialog>
+                    <button className="flex h-full min-h-[400px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/20 text-muted-foreground transition-colors hover:border-primary hover:bg-muted/50 hover:text-primary">
+                      <PlusCircle size={48} />
+                      <span className="mt-4 font-semibold">Шинэ төсөл нэмэх</span>
+                    </button>
+                  </AddProjectDialog>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </>
         )}
       </div>
     </section>
   );
-};
-
-export default Projects;
+}
