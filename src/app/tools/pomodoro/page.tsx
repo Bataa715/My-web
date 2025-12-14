@@ -86,7 +86,7 @@ const PomodoroTimer = () => {
       <Card
         className={cn(
           "w-full max-w-md text-center transition-colors duration-500",
-          isBreak ? "bg-blue-100/30 dark:bg-blue-900/30 border-blue-500/50" : "bg-red-100/30 dark:bg-red-900/30 border-red-500/50"
+          isBreak ? "bg-accent/10 dark:bg-accent/10 border-accent/20" : "bg-primary/10 dark:bg-primary/10 border-primary/20"
         )}
       >
         <CardHeader>
@@ -114,7 +114,7 @@ const PomodoroTimer = () => {
                       fill="transparent"
                       strokeDasharray={2 * Math.PI * 130}
                       strokeDashoffset={(2 * Math.PI * 130) * (1 - progress / 100)}
-                      className={cn("transition-all duration-500", isBreak ? "text-blue-500" : "text-red-500")}
+                      className={cn("transition-all duration-500", isBreak ? "text-accent" : "text-primary")}
                   />
               </svg>
             <div className="absolute text-7xl font-bold font-mono text-foreground">
