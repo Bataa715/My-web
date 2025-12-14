@@ -1,7 +1,6 @@
 import Hero from '@/components/sections/hero';
 import Projects from '@/components/sections/projects';
 import Skills from '@/components/sections/skills';
-import Footer from '@/components/footer';
 
 export default function AboutPage() {
   return (
@@ -11,7 +10,6 @@ export default function AboutPage() {
         <Projects />
         <Skills />
       </main>
-      <Footer />
     </div>
   );
 }

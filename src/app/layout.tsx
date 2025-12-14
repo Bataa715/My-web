@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { FirebaseClientProvider } from "@/firebase/client-provider";
+import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "LinguaCore",
@@ -36,6 +37,7 @@ export default function RootLayout({
               <main className="flex-1 container mx-auto px-4 py-8 sm:px-6 lg:px-8">
                 {children}
               </main>
+              <Footer />
             </div>
             <Toaster />
           </FirebaseClientProvider>
