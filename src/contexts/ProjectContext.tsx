@@ -24,7 +24,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+        setLoading(false);
+        return;
+    };
     const projectsCollectionRef = collection(firestore, `users/${user.uid}/projects`);
 
     const fetchProjects = async () => {

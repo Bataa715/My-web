@@ -3,6 +3,7 @@
 import { ProjectProvider } from '@/contexts/ProjectContext';
 import { SkillsProvider } from '@/contexts/SkillsContext';
 import { EditModeProvider } from '@/contexts/EditModeContext';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
 
 export default function AboutLayout({
   children,
@@ -10,12 +11,14 @@ export default function AboutLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <EditModeProvider>
-      <ProjectProvider>
-        <SkillsProvider>
-          {children}
-        </SkillsProvider>
-      </ProjectProvider>
-    </EditModeProvider>
+    <FirebaseClientProvider>
+        <EditModeProvider>
+        <ProjectProvider>
+            <SkillsProvider>
+            {children}
+            </SkillsProvider>
+        </ProjectProvider>
+        </EditModeProvider>
+    </FirebaseClientProvider>
   );
 }
