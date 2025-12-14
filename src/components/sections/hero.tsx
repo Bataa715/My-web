@@ -360,7 +360,7 @@ export default function Hero() {
                     </div>
                   </div>
                 ) : (
-                  <>
+                  <div className="flex items-start gap-2">
                     <p className="max-w-[600px] text-muted-foreground md:text-xl">
                       {bio}
                     </p>
@@ -368,14 +368,14 @@ export default function Hero() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="absolute -top-2 -right-12 h-8 w-8"
+                        className="h-8 w-8 shrink-0"
                         onClick={() => setIsEditingBio(true)}
                       >
                         <Edit className="h-4 w-4" />
                         <span className="sr-only">Танилцуулга засах</span>
                       </Button>
                     )}
-                  </>
+                  </div>
                 )}
               </div>
             </div>
@@ -393,7 +393,7 @@ export default function Hero() {
             </div>
           </div>
           <div className="relative flex items-center justify-center w-full max-w-[400px] aspect-square mx-auto">
-             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-64 h-64 md:w-80 md:h-80")}>
+             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-52 h-52 md:w-64 md:h-64")}>
                 <AnimatePresence>
                     {selectedOrbit ? (
                         <motion.div
@@ -420,8 +420,8 @@ export default function Hero() {
                            
                             <AnimatePresence mode="wait">
                                 {isEditingOrbit ? (
-                                    <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20 p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                                        <div className="w-full">
+                                    <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20 p-4" onClick={(e) => e.stopPropagation()}>
+                                        <div className="w-full mt-1">
                                             <Label className="text-left text-xs mb-1 block text-foreground">Нэр</Label>
                                             <Input
                                               value={editedOrbitTitle}
@@ -522,7 +522,7 @@ export default function Hero() {
                             transition={{ duration: 0.6, ease: "easeInOut" }}
                             className="absolute inset-0 flex flex-col items-center justify-center"
                         >
-                             <div className="avatar-glow-wrapper w-52 h-52 md:w-64 md:h-64 relative">
+                             <div className="avatar-glow-wrapper w-full h-full relative">
                                 <Avatar className="w-full h-full border-4 border-primary/50 relative">
                                     <AvatarImage src={profileImage} alt={name} />
                                     <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
