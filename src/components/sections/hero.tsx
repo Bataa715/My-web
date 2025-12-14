@@ -411,10 +411,10 @@ export default function Hero() {
                            
                             <AnimatePresence mode="wait">
                                 {isEditingOrbit ? (
-                                    <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20 space-y-1 p-4 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                                        <div className="grid grid-cols-2 gap-1 items-start">
+                                    <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20 p-6 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                                        <div className="grid grid-cols-2 gap-2 items-start">
                                             <div>
-                                                <Label className={cn("text-left text-xs", selectedOrbit.type !== 'audio' && "text-white")}>Нэр</Label>
+                                                <Label className={cn("text-left text-xs mb-1 block", selectedOrbit.type !== 'audio' && "text-white")}>Нэр</Label>
                                                 <Input
                                                   value={editedOrbitTitle}
                                                   onChange={(e) => setEditedOrbitTitle(e.target.value)}
@@ -423,7 +423,7 @@ export default function Hero() {
                                                 />
                                             </div>
                                              <div>
-                                                <Label className={cn("text-left text-xs", selectedOrbit.type !== 'audio' && "text-white")}>Icon</Label>
+                                                <Label className={cn("text-left text-xs mb-1 block", selectedOrbit.type !== 'audio' && "text-white")}>Icon</Label>
                                                 <Input
                                                   value={editedOrbitIcon}
                                                   onChange={(e) => setEditedOrbitIcon(e.target.value)}
@@ -436,7 +436,7 @@ export default function Hero() {
                                             </div>
                                         </div>
                                         <div>
-                                            <Label className={cn("text-left text-xs", selectedOrbit.type !== 'audio' && "text-white")}>Тайлбар</Label>
+                                            <Label className={cn("text-left text-xs mb-1 block", selectedOrbit.type !== 'audio' && "text-white")}>Тайлбар</Label>
                                             <Textarea 
                                                 value={editedOrbitContent}
                                                 onChange={(e) => setEditedOrbitContent(e.target.value)}
@@ -447,7 +447,7 @@ export default function Hero() {
                                         </div>
                                         {selectedOrbit.type === 'audio' ? (
                                              <div>
-                                                <Label className={cn("text-left text-xs", selectedOrbit.type === 'audio' && 'text-foreground')}>YouTube холбоос</Label>
+                                                <Label className={cn("text-left text-xs mb-1 block", selectedOrbit.type === 'audio' && 'text-foreground')}>YouTube холбоос</Label>
                                                 <Input
                                                   value={editedYoutubeUrl}
                                                   onChange={(e) => setEditedYoutubeUrl(e.target.value)}
@@ -457,7 +457,7 @@ export default function Hero() {
                                             </div>
                                         ) : (
                                             <div>
-                                                <Label className={cn("text-left text-xs", selectedOrbit.type !== 'audio' && 'text-white')}>Арын зураг URL</Label>
+                                                <Label className={cn("text-left text-xs mb-1 block", selectedOrbit.type !== 'audio' && 'text-white')}>Арын зураг URL</Label>
                                                 <Input
                                                   value={editedOrbitBgImage}
                                                   onChange={(e) => setEditedOrbitBgImage(e.target.value)}
@@ -466,7 +466,7 @@ export default function Hero() {
                                                 />
                                             </div>
                                         )}
-                                        <div className="flex gap-2 pt-1 justify-center">
+                                        <div className="flex gap-2 mt-2 justify-center">
                                             <Button onClick={handleSaveOrbitInfo} size="icon" className="h-8 w-8" disabled={saving}>
                                                 {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}
                                             </Button>
