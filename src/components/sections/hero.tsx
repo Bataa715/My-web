@@ -393,7 +393,7 @@ export default function Hero() {
             </div>
           </div>
           <div className="relative flex items-center justify-center w-full max-w-[400px] aspect-square mx-auto">
-             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-64 h-64 md:w-64 md:h-64")}>
+             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-52 h-52 md:w-64 md:h-64")}>
                 <AnimatePresence>
                     {selectedOrbit ? (
                         <motion.div
@@ -422,7 +422,7 @@ export default function Hero() {
                                 {isEditingOrbit ? (
                                     <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20" onClick={(e) => e.stopPropagation()}>
                                         <div className="w-full h-full p-6 flex flex-col justify-center">
-                                            <div className="w-full">
+                                            <div className="w-full mt-1">
                                                 <Label className="text-left text-xs mb-1 block text-foreground">Нэр</Label>
                                                 <Input
                                                   value={editedOrbitTitle}
