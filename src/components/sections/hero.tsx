@@ -19,7 +19,7 @@ import Image from "next/image";
 import { useFirebase, updateDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase";
 import { initialOrbitInfo as dataOrbitInfo } from "@/lib/data";
 
-const { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, LinkIcon, AlertTriangle, Pencil, Upload } = Icons;
+const { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, LinkIcon, AlertTriangle, Pencil, Upload } from Icons;
 
 const staticPersonalInfo = {
     name: "Б.Батмягмар",
@@ -560,3 +560,5 @@ export default function Hero() {
     </section>
   );
 }
+
+    
