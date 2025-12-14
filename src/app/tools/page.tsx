@@ -14,13 +14,13 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 const tools = [
   {
     title: "Англи хэл",
-    description: "anlgu hel surah",
+    description: "Англи хэл сурах",
     href: "/tools/english",
     icon: <BookOpen className="h-6 w-6" />
   },
   {
     title: "Япон хэл",
-    description: "Хирагана, катакана, үгсийн сан, дүрэм.",
+    description: "Япон хэл сурах",
     href: "/tools/japanese",
     icon: <BookOpen className="h-6 w-6" />
   },
