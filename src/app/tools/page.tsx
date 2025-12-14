@@ -85,8 +85,9 @@ export default function ToolsPage() {
                         className="object-cover"
                         data-ai-hint="abstract library"
                     />
+                     <div className="absolute inset-0 bg-gradient-to-t from-background/0 via-background/90 to-background"></div>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-0"></div>
+               
             </>
         )}
        <div className="space-y-8 z-10 pt-8 flex-grow">
