@@ -393,7 +393,7 @@ export default function Hero() {
             </div>
           </div>
           <div className="relative flex items-center justify-center w-full max-w-[400px] aspect-square mx-auto">
-             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-52 h-52 md:w-64 md:h-64")}>
+             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-64 h-64 md:w-64 md:h-64")}>
                 <AnimatePresence>
                     {selectedOrbit ? (
                         <motion.div
@@ -420,63 +420,65 @@ export default function Hero() {
                            
                             <AnimatePresence mode="wait">
                                 {isEditingOrbit ? (
-                                    <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20 p-4" onClick={(e) => e.stopPropagation()}>
-                                        <div className="w-full mt-1">
-                                            <Label className="text-left text-xs mb-1 block text-foreground">Нэр</Label>
-                                            <Input
-                                              value={editedOrbitTitle}
-                                              onChange={(e) => setEditedOrbitTitle(e.target.value)}
-                                              className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
-                                              placeholder="Нэр..."
-                                            />
-                                        </div>
-                                         <div className="w-full mt-1">
-                                            <Label className="text-left text-xs mb-1 block text-foreground">Icon</Label>
-                                            <Input
-                                              value={editedOrbitIcon}
-                                              onChange={(e) => setEditedOrbitIcon(e.target.value)}
-                                              className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
-                                              placeholder="Lucide Icon"
-                                            />
-                                        </div>
-                                        <div className="mt-1">
-                                            <Label className="text-left text-xs mb-1 block text-foreground">Тайлбар</Label>
-                                            <Textarea 
-                                                value={editedOrbitContent}
-                                                onChange={(e) => setEditedOrbitContent(e.target.value)}
-                                                className="text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
-                                                rows={1}
-                                                placeholder="Тайлбар..."
-                                            />
-                                        </div>
-                                        {selectedOrbit.type === 'audio' ? (
-                                             <div className="mt-1">
-                                                <Label className="text-left text-xs mb-1 block text-foreground">YouTube холбоос</Label>
+                                    <motion.div key="edit" className="w-full h-full flex flex-col justify-center z-20" onClick={(e) => e.stopPropagation()}>
+                                        <div className="w-full h-full p-6 flex flex-col justify-center">
+                                            <div className="w-full">
+                                                <Label className="text-left text-xs mb-1 block text-foreground">Нэр</Label>
                                                 <Input
-                                                  value={editedYoutubeUrl}
-                                                  onChange={(e) => setEditedYoutubeUrl(e.target.value)}
-                                                  className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
-                                                  placeholder="https://www.youtube.com/watch?v=..."
+                                                  value={editedOrbitTitle}
+                                                  onChange={(e) => setEditedOrbitTitle(e.target.value)}
+                                                  className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                  placeholder="Нэр..."
                                                 />
                                             </div>
-                                        ) : (
+                                             <div className="w-full mt-1">
+                                                <Label className="text-left text-xs mb-1 block text-foreground">Icon</Label>
+                                                <Input
+                                                  value={editedOrbitIcon}
+                                                  onChange={(e) => setEditedOrbitIcon(e.target.value)}
+                                                  className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                  placeholder="Lucide Icon"
+                                                />
+                                            </div>
                                             <div className="mt-1">
-                                                <Label className="text-left text-xs mb-1 block text-foreground">Арын зураг URL</Label>
-                                                <Input
-                                                  value={editedOrbitBgImage}
-                                                  onChange={(e) => setEditedOrbitBgImage(e.target.value)}
-                                                  className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
-                                                  placeholder="https://example.com/image.png"
+                                                <Label className="text-left text-xs mb-1 block text-foreground">Тайлбар</Label>
+                                                <Textarea 
+                                                    value={editedOrbitContent}
+                                                    onChange={(e) => setEditedOrbitContent(e.target.value)}
+                                                    className="text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                    rows={1}
+                                                    placeholder="Тайлбар..."
                                                 />
                                             </div>
-                                        )}
-                                        <div className="flex gap-2 mt-2 justify-center">
-                                            <Button onClick={handleSaveOrbitInfo} size="icon" className="h-8 w-8" disabled={saving}>
-                                                {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}
-                                            </Button>
-                                            <Button onClick={() => setIsEditingOrbit(false)} size="icon" variant="ghost" className="h-8 w-8">
-                                                <XCircle className="h-4 w-4"/>
-                                            </Button>
+                                            {selectedOrbit.type === 'audio' ? (
+                                                 <div className="mt-1">
+                                                    <Label className="text-left text-xs mb-1 block text-foreground">YouTube холбоос</Label>
+                                                    <Input
+                                                      value={editedYoutubeUrl}
+                                                      onChange={(e) => setEditedYoutubeUrl(e.target.value)}
+                                                      className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                      placeholder="https://www.youtube.com/watch?v=..."
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="mt-1">
+                                                    <Label className="text-left text-xs mb-1 block text-foreground">Арын зураг URL</Label>
+                                                    <Input
+                                                      value={editedOrbitBgImage}
+                                                      onChange={(e) => setEditedOrbitBgImage(e.target.value)}
+                                                      className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                      placeholder="https://example.com/image.png"
+                                                    />
+                                                </div>
+                                            )}
+                                            <div className="flex gap-2 mt-2 justify-center">
+                                                <Button onClick={handleSaveOrbitInfo} size="icon" className="h-8 w-8" disabled={saving}>
+                                                    {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}
+                                                </Button>
+                                                <Button onClick={() => setIsEditingOrbit(false)} size="icon" variant="ghost" className="h-8 w-8">
+                                                    <XCircle className="h-4 w-4"/>
+                                                </Button>
+                                            </div>
                                         </div>
                                     </motion.div>
                                 ) : (
@@ -567,7 +569,7 @@ export default function Hero() {
             <DialogDescription>
               Шинэ зургийнхаа URL хаягийг энд буулгана уу. Base64 форматтай зураг байж болно.
             </DialogDescription>
-          </DialogHeader>
+          </Header>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="image-url" className="text-right">
