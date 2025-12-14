@@ -6,7 +6,31 @@ import { useToast } from "@/hooks/use-toast";
 import { useFirebase } from '@/firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, Timestamp, serverTimestamp, setDoc } from "firebase/firestore";
 import { addDocumentNonBlocking, deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { initialProjects } from '@/lib/data';
+
+const initialProjects: Omit<Project, 'id' | 'createdAt'>[] = [
+    {
+        name: 'Хувийн вебсайт',
+        description: 'Миний ур чадвар, туршлага, хийсэн төслүүдийг харуулсан вебсайт.',
+        technologies: ['Next.js', 'React', 'Tailwind CSS', 'TypeScript', 'Framer Motion'],
+        link: 'https://github.com/Bataa715/kaizen-portfolio',
+        live: 'https://kaizen-protfolio.web.app',
+        category: 'Web Development',
+    },
+    {
+        name: 'E-commerce',
+        description: 'Онлайн худалдааны цогц систем. Хэрэглэгчийн бүртгэл, барааны ангилал, сагс, төлбөрийн системтэй.',
+        technologies: ['React', 'Node.js', 'Express', 'MongoDB'],
+        link: 'https://github.com/Bataa715/E-commerce',
+        live: '#',
+        category: 'Web Development',
+    },
+    {
+        name: 'Цаг агаарын апп',
+        description: 'Хэрэглэгчийн байршлаас хамааран цаг агаарын мэдээллийг харуулдаг энгийн аппликейшн.',
+        technologies: ['React Native', 'Expo', 'OpenWeatherMap API'],
+        category: 'Mobile App',
+    },
+];
 
 interface ProjectContextType {
   projects: Project[];

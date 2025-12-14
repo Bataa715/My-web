@@ -1,9 +1,8 @@
-"use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import VocabularyManager from '@/components/shared/VocabularyManager';
 import GrammarList from '@/components/shared/GrammarList';
-import { englishGrammar, initialEnglishWords } from '@/lib/data';
+import { getEnglishWords, getEnglishGrammar } from '@/lib/data';
 import type { EnglishWord } from '@/lib/types';
 
 const englishColumns = [
@@ -11,7 +10,10 @@ const englishColumns = [
     { key: 'meaning' as keyof EnglishWord, header: 'Mongolian Meaning' },
 ];
 
-export default function EnglishPage() {
+export default async function EnglishPage() {
+    const initialEnglishWords = await getEnglishWords();
+    const englishGrammar = await getEnglishGrammar();
+
     return (
         <div className="space-y-8">
             <div className="text-center">

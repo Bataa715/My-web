@@ -4,12 +4,15 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { initialProgressItems } from '@/lib/data';
 import type { ProgressItem } from '@/lib/types';
 import { Separator } from '@/components/ui/separator';
 
-export default function ProgressTracker() {
-  const [items, setItems] = useLocalStorage<ProgressItem[]>('programming-progress', initialProgressItems);
+interface ProgressTrackerProps {
+  initialItems: ProgressItem[];
+}
+
+export default function ProgressTracker({ initialItems }: ProgressTrackerProps) {
+  const [items, setItems] = useLocalStorage<ProgressItem[]>('programming-progress', initialItems);
 
   const handleToggle = (id: string, key: 'learned' | 'practicing') => {
     setItems(
@@ -36,7 +39,7 @@ export default function ProgressTracker() {
                     <Checkbox
                       id={`learned-${item.id}`}
                       checked={item.learned}
-                      onCheckedChange={() => handleToggle(item.id, 'learned')}
+                      onCheckedChange={() => handleToggle(item.id!, 'learned')}
                     />
                     <Label htmlFor={`learned-${item.id}`} className="text-sm text-muted-foreground">
                       Сурсан
@@ -46,7 +49,7 @@ export default function ProgressTracker() {
                     <Checkbox
                       id={`practicing-${item.id}`}
                       checked={item.practicing}
-                      onCheckedChange={() => handleToggle(item.id, 'practicing')}
+                      onCheckedChange={() => handleToggle(item.id!, 'practicing')}
                     />
                     <Label htmlFor={`practicing-${item.id}`} className="text-sm text-muted-foreground">
                       Дадлагажиж буй

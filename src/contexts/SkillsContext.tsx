@@ -6,7 +6,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useFirebase } from '@/firebase';
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, orderBy, Timestamp, serverTimestamp } from "firebase/firestore";
 import { addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
-import { initialSkills } from '@/lib/data';
+
+const initialSkills: Omit<Skill, 'id' | 'createdAt'>[] = [
+    { name: 'Програмчлалын хэл', icon: 'Code', items: ['JavaScript (ES6+)', 'TypeScript', 'Python', 'HTML/CSS'] },
+    { name: 'Framework & Libraries', icon: 'Library', items: ['React', 'Next.js', 'Node.js', 'Express', 'Tailwind CSS'] },
+    { name: 'Багж хэрэгсэл', icon: 'Terminal', items: ['Git & GitHub', 'Docker', 'VS Code', 'Figma', 'Firebase'] },
+    { name: 'Мэдээллийн сан', icon: 'Database', items: ['MongoDB', 'PostgreSQL', 'MySQL', 'Firestore'] },
+];
 
 interface SkillsContextType {
   skills: Skill[];

@@ -42,98 +42,121 @@
       "description": "Represents a project in the portfolio.",
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the project."
-        },
-        "description": {
-          "type": "string",
-          "description": "A description of the project."
-        },
-        "technologies": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "A list of technologies used in the project."
-        },
-        "category": {
-            "type": "string",
-            "description": "The category of the project."
-        },
-        "link": {
-          "type": "string",
-          "description": "A link to the project."
-        },
-        "live": {
-            "type": "string",
-            "description": "A link to the live version of the project."
-        },
-        "createdAt": {
-            "type": "string",
-            "format": "date-time"
-        }
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "technologies": { "type": "array", "items": { "type": "string" } },
+        "category": { "type": "string" },
+        "link": { "type": "string" },
+        "live": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "name",
-        "description",
-        "technologies",
-        "category",
-        "createdAt"
-      ]
+      "required": ["name", "description", "technologies", "category", "createdAt"]
     },
     "Skill": {
       "title": "Skill",
       "description": "Represents a skill category and a list of skills within it.",
       "type": "object",
       "properties": {
-        "category": {
-          "type": "string",
-          "description": "The category of the skills (e.g., 'Programming Languages')."
-        },
-        "skills": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "A list of skills in this category."
-        },
-        "createdAt": {
-            "type": "string",
-            "format": "date-time"
-        }
+        "category": { "type": "string" },
+        "skills": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": [
-        "category",
-        "skills",
-        "createdAt"
-      ]
+      "required": ["category", "skills", "createdAt"]
+    },
+    "EnglishWord": {
+      "title": "English Word",
+      "type": "object",
+      "properties": {
+        "word": { "type": "string" },
+        "meaning": { "type": "string" },
+        "memorized": { "type": "boolean" }
+      },
+      "required": ["word", "meaning", "memorized"]
+    },
+    "JapaneseWord": {
+      "title": "Japanese Word",
+      "type": "object",
+      "properties": {
+        "word": { "type": "string" },
+        "romaji": { "type": "string" },
+        "meaning": { "type": "string" },
+        "memorized": { "type": "boolean" }
+      },
+      "required": ["word", "romaji", "meaning", "memorized"]
+    },
+    "GrammarRule": {
+      "title": "Grammar Rule",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "explanation": { "type": "string" },
+        "examples": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["title", "explanation", "examples"]
+    },
+    "Kana": {
+      "title": "Kana",
+      "type": "object",
+      "properties": {
+        "character": { "type": "string" },
+        "romaji": { "type": "string" }
+      },
+      "required": ["character", "romaji"]
+    },
+    "ProgrammingConcept": {
+      "title": "Programming Concept",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "emoji": { "type": "string" },
+        "explanation": { "type": "string" }
+      },
+      "required": ["title", "emoji", "explanation"]
+    },
+    "CheatSheetItem": {
+      "title": "Cheat Sheet Item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "snippet": { "type": "string" }
+      },
+      "required": ["title", "snippet"]
+    },
+    "ProgressItem": {
+      "title": "Progress Item",
+      "type": "object",
+      "properties": {
+        "label": { "type": "string" },
+        "learned": { "type": "boolean" },
+        "practicing": { "type": "boolean" }
+      },
+      "required": ["label", "learned", "practicing"]
     }
   },
   "auth": {
-    "providers": [
-      "password",
-      "anonymous"
-    ]
+    "providers": ["password", "anonymous"]
   },
   "firestore": {
     "/userInfo/{userId}": {
-        "schema": {
-            "$ref": "#/entities/UserProfile"
-        },
-        "description": "Stores user profile information."
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Stores user profile information."
     },
     "/users/{userId}/projects/{projectId}": {
-        "schema": {
-            "$ref": "#/entities/Project"
-        },
-        "description": "Stores user projects."
+      "schema": { "$ref": "#/entities/Project" },
+      "description": "Stores user projects."
     },
     "/users/{userId}/skills/{skillId}": {
-        "schema": {
-            "$ref": "#/entities/Skill"
-        },
-        "description": "Stores user skills."
-    }
+      "schema": { "$ref": "#/entities/Skill" },
+      "description": "Stores user skills."
+    },
+    "/englishWords/{wordId}": { "schema": { "$ref": "#/entities/EnglishWord" } },
+    "/japaneseWords/{wordId}": { "schema": { "$ref": "#/entities/JapaneseWord" } },
+    "/englishGrammar/{ruleId}": { "schema": { "$ref": "#/entities/GrammarRule" } },
+    "/japaneseGrammar/{ruleId}": { "schema": { "$ref": "#/entities/GrammarRule" } },
+    "/hiragana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } },
+    "/katakana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } },
+    "/programmingConcepts/{conceptId}": { "schema": { "$ref": "#/entities/ProgrammingConcept" } },
+    "/cheatSheetItems/{itemId}": { "schema": { "$ref": "#/entities/CheatSheetItem" } },
+    "/progressItems/{itemId}": { "schema": { "$ref": "#/entities/ProgressItem" } }
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, LinkIcon, AlertTriangle, Pencil, Upload } from 'lucide-react';
+import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload } from 'lucide-react';
 import { useState, useEffect, type FC } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,6 @@ import type { OrbitInfo } from "@/lib/types";
 import { useEditMode } from "@/contexts/EditModeContext";
 import Image from "next/image";
 import { useFirebase, updateDocumentNonBlocking, setDocumentNonBlocking } from "@/firebase";
-import { initialOrbitInfo as dataOrbitInfo } from "@/lib/data";
 
 const staticPersonalInfo = {
     name: "Б.Батмягмар",
@@ -26,6 +25,15 @@ const staticPersonalInfo = {
     instagram: "https://instagram.com/batmyagmar",
     email: "batmyagmar.b@gmail.com",
 };
+
+const initialOrbitInfo: OrbitInfo[] = [
+    { id: 'about', icon: 'User', title: 'Миний тухай', content: 'Би бол ирээдүйн програм хангамжийн инженер. Технологид дуртай, шинийг эрэлхийлэгч.' },
+    { id: 'hobbies', icon: 'Heart', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.' },
+    { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн хэмжээний програм хангамжийн компанид ажиллах.' },
+    { id: 'contact', icon: 'Mail', title: 'Холбоо барих', content: 'Надтай batmyagmar.b@gmail.com хаягаар холбогдоорой.' },
+    { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Дуртай дууг сонсох.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
+    { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', backgroundImage: 'https://images.unsplash.com/photo-1536440136628-849c177E76a1?w=800' }
+];
 
 const defaultProfileImage = "https://images.unsplash.com/photo-1607878111648-75872a0a0736?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwb3J0cmFpdCUyMHBlcnNvbnxlbnwwfHx8fDE3NjU1Mjc1NTN8MA&ixlib=rb-4.1.0&q=80&w=1080";
 
@@ -112,7 +120,7 @@ export default function Hero() {
   const [profileImage, setProfileImage] = useState<string>('');
   const [bio, setBio] = useState(staticPersonalInfo.bio);
   const [name, setName] = useState(staticPersonalInfo.name);
-  const [orbitInfo, setOrbitInfo] = useState<OrbitInfo[]>(dataOrbitInfo);
+  const [orbitInfo, setOrbitInfo] = useState<OrbitInfo[]>(initialOrbitInfo);
 
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [editedBio, setEditedBio] = useState(bio);
@@ -141,7 +149,7 @@ export default function Hero() {
             setName(staticPersonalInfo.name);
             setProfileImage(defaultProfileImage);
             setEditedImage(defaultProfileImage);
-            setOrbitInfo(dataOrbitInfo);
+            setOrbitInfo(initialOrbitInfo);
             setLoading(false);
         }
         return;
@@ -159,7 +167,7 @@ export default function Hero() {
           setProfileImage(imageUrl);
           setEditedImage(imageUrl);
           
-          const fetchedOrbitInfo = (data.orbitInfo || dataOrbitInfo).map((item: any) => {
+          const fetchedOrbitInfo = (data.orbitInfo || initialOrbitInfo).map((item: any) => {
             if (item.id === 'song' && !item.type) {
               return { ...item, type: 'audio' };
             }
@@ -175,14 +183,14 @@ export default function Hero() {
             name: staticPersonalInfo.name,
             bio: staticPersonalInfo.bio,
             profileImage: defaultProfileImage,
-            orbitInfo: dataOrbitInfo
+            orbitInfo: initialOrbitInfo
           }, { merge: false });
           setBio(staticPersonalInfo.bio);
           setEditedBio(staticPersonalInfo.bio);
           setName(staticPersonalInfo.name);
           setProfileImage(defaultProfileImage);
           setEditedImage(defaultProfileImage);
-          setOrbitInfo(dataOrbitInfo);
+          setOrbitInfo(initialOrbitInfo);
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
@@ -192,7 +200,7 @@ export default function Hero() {
         setName(staticPersonalInfo.name);
         setProfileImage(defaultProfileImage);
         setEditedImage(defaultProfileImage);
-        setOrbitInfo(dataOrbitInfo);
+        setOrbitInfo(initialOrbitInfo);
       } finally {
         setLoading(false);
       }
@@ -558,5 +566,3 @@ export default function Hero() {
     </section>
   );
 }
-
-    

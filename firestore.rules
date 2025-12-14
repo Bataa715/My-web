@@ -22,5 +22,16 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isSignedIn() && isOwner(userId);
     }
+    
+    // Allow public read for learning materials
+    match /englishWords/{wordId} { allow read: if true; allow write: if false; }
+    match /japaneseWords/{wordId} { allow read: if true; allow write: if false; }
+    match /englishGrammar/{ruleId} { allow read: if true; allow write: if false; }
+    match /japaneseGrammar/{ruleId} { allow read: if true; allow write: if false; }
+    match /hiragana/{kanaId} { allow read: if true; allow write: if false; }
+    match /katakana/{kanaId} { allow read: if true; allow write: if false; }
+    match /programmingConcepts/{conceptId} { allow read: if true; allow write: if false; }
+    match /cheatSheetItems/{itemId} { allow read: if true; allow write: if false; }
+    match /progressItems/{itemId} { allow read: if true; allow write: if false; }
   }
 }

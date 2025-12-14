@@ -1,7 +1,12 @@
 import Link from 'next/link';
 import { Github, Instagram, Facebook } from 'lucide-react';
 import { Button } from './ui/button';
-import { personalInfo } from '@/lib/data';
+
+const personalInfo = {
+  github: "https://github.com/Bataa715",
+  instagram: "https://www.instagram.com/ka1__zen/",
+  facebook: "https://www.facebook.com/profile.php?id=100010513223018",
+};
 
 const Footer = () => {
   return (

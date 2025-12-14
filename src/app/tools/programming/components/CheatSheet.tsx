@@ -3,11 +3,15 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { cheatSheetItems } from '@/lib/data';
 import { Copy, Check } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import type { CheatSheetItem } from '@/lib/types';
 
-export default function CheatSheet() {
+interface CheatSheetProps {
+    items: CheatSheetItem[];
+}
+
+export default function CheatSheet({ items }: CheatSheetProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -25,14 +29,14 @@ export default function CheatSheet() {
         <CardDescription>Хэрэгтэй кодны хэсгүүд болон syntax.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {cheatSheetItems.map((item) => (
+        {items.map((item) => (
           <div key={item.id} className="rounded-md border bg-muted/50">
             <div className="flex items-center justify-between px-4 py-2 border-b">
               <h3 className="font-semibold text-sm font-code">{item.title}</h3>
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => handleCopy(item.snippet, item.id)}
+                onClick={() => handleCopy(item.snippet, item.id!)}
               >
                 {copiedId === item.id ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
               </Button>

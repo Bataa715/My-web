@@ -1,11 +1,15 @@
-"use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ConceptCards from './components/ConceptCards';
 import CheatSheet from './components/CheatSheet';
 import ProgressTracker from './components/ProgressTracker';
+import { getProgrammingConcepts, getCheatSheetItems, getInitialProgressItems } from '@/lib/data';
 
-export default function ProgrammingPage() {
+export default async function ProgrammingPage() {
+    const programmingConcepts = await getProgrammingConcepts();
+    const cheatSheetItems = await getCheatSheetItems();
+    const initialProgressItems = await getInitialProgressItems();
+
     return (
         <div className="space-y-8">
             <div className="text-center">
@@ -19,13 +23,13 @@ export default function ProgrammingPage() {
                     <TabsTrigger value="progress">Progress</TabsTrigger>
                 </TabsList>
                 <TabsContent value="concepts" className="mt-6">
-                    <ConceptCards />
+                    <ConceptCards concepts={programmingConcepts} />
                 </TabsContent>
                 <TabsContent value="cheatsheet" className="mt-6">
-                    <CheatSheet />
+                    <CheatSheet items={cheatSheetItems} />
                 </TabsContent>
                 <TabsContent value="progress" className="mt-6">
-                    <ProgressTracker />
+                    <ProgressTracker initialItems={initialProgressItems} />
                 </TabsContent>
             </Tabs>
         </div>

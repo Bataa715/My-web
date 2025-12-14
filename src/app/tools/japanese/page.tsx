@@ -1,10 +1,9 @@
-"use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import VocabularyManager from '@/components/shared/VocabularyManager';
 import GrammarList from '@/components/shared/GrammarList';
 import KanaGrid from './components/KanaGrid';
-import { hiragana, katakana, initialJapaneseWords, japaneseGrammar } from '@/lib/data';
+import { getHiragana, getKatakana, getJapaneseWords, getJapaneseGrammar } from '@/lib/data';
 import type { JapaneseWord } from '@/lib/types';
 
 const japaneseColumns = [
@@ -13,7 +12,12 @@ const japaneseColumns = [
     { key: 'meaning' as keyof JapaneseWord, header: 'Mongolian Meaning' },
 ];
 
-export default function JapanesePage() {
+export default async function JapanesePage() {
+    const hiragana = await getHiragana();
+    const katakana = await getKatakana();
+    const initialJapaneseWords = await getJapaneseWords();
+    const japaneseGrammar = await getJapaneseGrammar();
+
     return (
         <div className="space-y-8">
             <div className="text-center">

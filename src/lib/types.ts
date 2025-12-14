@@ -1,14 +1,14 @@
 import type { Timestamp } from 'firebase/firestore';
 
 export interface EnglishWord {
-  id: string;
+  id?: string;
   word: string;
   meaning: string;
   memorized: boolean;
 }
 
 export interface JapaneseWord {
-  id: string;
+  id?: string;
   word: string;
   romaji: string;
   meaning: string;
@@ -16,31 +16,33 @@ export interface JapaneseWord {
 }
 
 export interface GrammarRule {
+  id?: string;
   title: string;
   explanation: string;
   examples: string[];
 }
 
 export interface Kana {
+  id?: string;
   character: string;
   romaji: string;
 }
 
 export interface ProgrammingConcept {
-  id: string;
+  id?: string;
   title: string;
   emoji: string;
   explanation: string;
 }
 
 export interface CheatSheetItem {
-  id: string;
+  id?: string;
   title: string;
   snippet: string;
 }
 
 export interface ProgressItem {
-  id: string;
+  id?: string;
   label: string;
   learned: boolean;
   practicing: boolean;
