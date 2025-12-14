@@ -125,7 +125,7 @@ export default function Timer() {
                                     />
                                 </div>
                                 <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="short-break-time" className="text-right">Short Break</Label>
+                                    <Label htmlFor="short-break-time" className="text-right">Break</Label>
                                     <Input
                                         id="short-break-time"
                                         type="number"
