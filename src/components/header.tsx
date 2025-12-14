@@ -132,7 +132,7 @@ const Header = () => {
                 ))}
             </nav>
         </div>
-        <div className="flex-1 md:hidden">
+        <div className="flex-1 pl-4 md:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button
