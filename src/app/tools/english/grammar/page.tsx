@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -40,7 +41,6 @@ export default function EnglishGrammarPage() {
     <div className="space-y-8">
       <div className="text-center pt-8">
         <h1 className="text-4xl font-bold font-headline">Англи хэлний дүрэм</h1>
-        <p className="mt-2 text-muted-foreground">Дүрэмүүдтэй танилцаж, мэдлэгээ бататгаарай.</p>
       </div>
       {loading ? (
         <div className="space-y-4 pt-8">
