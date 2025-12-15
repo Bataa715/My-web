@@ -7,8 +7,6 @@ import { useFirebase } from '@/firebase';
 import type { UserProfile } from '@/lib/types';
 import BackButton from '@/components/shared/BackButton';
 import Hero from '@/components/sections/hero';
-import Projects from '@/components/sections/projects';
-import Skills from '@/components/sections/skills';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function AboutPage() {
@@ -62,8 +60,6 @@ export default function AboutPage() {
       )}
       <BackButton />
       <Hero />
-      <Projects />
-      <Skills />
     </>
   );
 }
