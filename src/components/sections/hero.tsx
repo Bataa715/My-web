@@ -605,18 +605,20 @@ export default function Hero() {
                                                     placeholder="Нэр..."
                                                 />
                                             </div>
-                                             <div className="space-y-2">
-                                                <Label className="text-center text-xs mb-1 block text-foreground">Icon</Label>
-                                                <IconPicker 
-                                                    selectedIcon={editedOrbitIcon} 
-                                                    onIconSelect={setEditedOrbitIcon}
-                                                >
-                                                    <Button type="button" variant="outline" className="w-full h-8 text-sm justify-center gap-2 bg-transparent border-primary/50 focus:ring-primary text-foreground">
-                                                       {getIcon(editedOrbitIcon, {className: "h-4 w-4"})}
-                                                       <span>{editedOrbitIcon}</span>
-                                                    </Button>
-                                                </IconPicker>
-                                            </div>
+                                            {selectedOrbit.type !== 'audio' && (
+                                                <div className="space-y-2">
+                                                    <Label className="text-center text-xs mb-1 block text-foreground">Icon</Label>
+                                                    <IconPicker 
+                                                        selectedIcon={editedOrbitIcon} 
+                                                        onIconSelect={setEditedOrbitIcon}
+                                                    >
+                                                        <Button type="button" variant="outline" className="w-full h-8 text-sm justify-center gap-2 bg-transparent border-primary/50 focus:ring-primary text-foreground">
+                                                            {getIcon(editedOrbitIcon, {className: "h-4 w-4"})}
+                                                            <span>{editedOrbitIcon}</span>
+                                                        </Button>
+                                                    </IconPicker>
+                                                </div>
+                                            )}
                                             <div>
                                                 <Label className="text-center text-xs mb-1 block text-foreground">Тайлбар</Label>
                                                 <Textarea 
