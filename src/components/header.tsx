@@ -165,10 +165,10 @@ const Header = () => {
               <SheetHeader>
                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               </SheetHeader>
-              <Link href={user ? "/home" : "/"} className="mr-6 flex items-center space-x-2" onClick={() => setIsOpen(false)}>
+              <Link href={user ? "/home" : "/"} className="flex items-center space-x-2 pl-4" onClick={() => setIsOpen(false)}>
                 <span className="font-bold font-headline">{appName}</span>
               </Link>
-              <nav className="flex flex-col space-y-4 mt-6">
+              <nav className="flex flex-col space-y-4 mt-6 pl-4">
                 {mainLinks.map((link) => (
                   <Link
                     key={link.href}
@@ -187,7 +187,7 @@ const Header = () => {
           </Sheet>
         </div>
 
-        <div className="mr-4 hidden md:flex md:flex-1">
+        <div className="hidden md:flex flex-1 items-center gap-6">
             <Link href={user ? "/home" : "/"} className="mr-6 flex items-center space-x-2">
                  {isEditingAppName ? (
                     <div className="flex items-center gap-2">
@@ -328,5 +328,3 @@ const Header = () => {
 };
 
 export default Header;
-
-    
