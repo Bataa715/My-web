@@ -16,6 +16,8 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { ReactMarkdown } from "react-markdown/lib/react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface GrammarListProps {
   rules: GrammarRule[];
@@ -58,15 +60,19 @@ export default function GrammarList({ rules, onDeleteRule }: GrammarListProps) {
             )}
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-muted-foreground">{rule.explanation}</p>
-            <div>
-              <h4 className="font-semibold mb-2">Жишээ:</h4>
-              <ul className="list-disc pl-5 space-y-2">
-                {rule.examples.map((example, i) => (
-                  <li key={i} className="text-foreground/90">{example}</li>
-                ))}
-              </ul>
+             <div className="prose dark:prose-invert max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{rule.explanation}</ReactMarkdown>
             </div>
+             {rule.examples && rule.examples.length > 0 && (
+                 <div>
+                    <h4 className="font-semibold mb-2">Жишээ:</h4>
+                    <ul className="list-disc pl-5 space-y-2">
+                        {rule.examples.map((example, i) => (
+                        <li key={i} className="text-foreground/90">{example}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
           </CardContent>
         </Card>
       ))}
