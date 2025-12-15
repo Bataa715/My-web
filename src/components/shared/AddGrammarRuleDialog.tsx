@@ -10,7 +10,8 @@ import type { GrammarRule } from "@/lib/types";
 
 interface AddGrammarRuleDialogProps {
     children: ReactNode;
-    onAddRule: (newRule: Omit<GrammarRule, 'id'>) => Promise<void>;
+    onAddRule: (newRule: Omit<GrammarRule, 'id' | 'createdAt'>) => Promise<void>;
+    ruleType: 'english' | 'japanese'; // To know which collection to add to
 }
 
 export function AddGrammarRuleDialog({ children, onAddRule }: AddGrammarRuleDialogProps) {
@@ -42,7 +43,7 @@ export function AddGrammarRuleDialog({ children, onAddRule }: AddGrammarRuleDial
                 <DialogHeader>
                     <DialogTitle>Шинэ дүрэм нэмэх</DialogTitle>
                     <DialogDescription>
-                        Дүрмийн гарчиг, тайлбар, жишээ өгүүлбэрийг таслалаар тусгаарлан оруулна уу.
+                        Дүрмийн гарчиг, тайлбарыг Markdown ашиглан, жишээ өгүүлбэрүүдийг таслалаар тусгаарлан оруулна уу.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="grid gap-4 py-4">
@@ -51,14 +52,14 @@ export function AddGrammarRuleDialog({ children, onAddRule }: AddGrammarRuleDial
                         <Input id="rule-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Present Simple" required />
                     </div>
                      <div>
-                        <Label htmlFor="rule-explanation">Тайлбар</Label>
+                        <Label htmlFor="rule-explanation">Тайлбар (Markdown дэмжинэ)</Label>
                         <Textarea 
                             id="rule-explanation" 
                             value={explanation} 
                             onChange={(e) => setExplanation(e.target.value)} 
-                            placeholder="Энгийн одоо цагийн тайлбар..." 
+                            placeholder="Энгийн одоо цагийн дэлгэрэнгүй тайлбар..." 
                             required 
-                            rows={8}
+                            rows={10}
                         />
                     </div>
                      <div>
@@ -67,9 +68,8 @@ export function AddGrammarRuleDialog({ children, onAddRule }: AddGrammarRuleDial
                             id="rule-examples" 
                             value={examples} 
                             onChange={(e) => setExamples(e.target.value)} 
-                            placeholder="I play football, She reads a book" 
-                            required 
-                            rows={4}
+                            placeholder="I play football, She reads a book"
+                            rows={5}
                         />
                     </div>
                     <DialogFooter>

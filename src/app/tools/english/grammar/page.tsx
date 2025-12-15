@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs, addDoc, serverTimestamp, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, serverTimestamp, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { GrammarRule } from '@/lib/types';
 import GrammarList from '@/components/shared/GrammarList';
@@ -30,7 +30,8 @@ export default function EnglishGrammarPage() {
       setLoading(true);
       try {
         const rulesCollection = collection(firestore, 'englishGrammar');
-        const rulesSnapshot = await getDocs(rulesCollection);
+        const q = query(rulesCollection, orderBy('createdAt', 'desc'));
+        const rulesSnapshot = await getDocs(q);
         const rulesList = rulesSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
@@ -45,7 +46,7 @@ export default function EnglishGrammarPage() {
     fetchRules();
   }, [firestore]);
 
-  const handleAddRule = async (newRule: Omit<GrammarRule, 'id'>) => {
+  const handleAddRule = async (newRule: Omit<GrammarRule, 'id' | 'createdAt'>) => {
     if (!firestore) {
         toast({ title: "Алдаа", description: "Дүрэм нэмэхийн тулд нэвтэрнэ үү.", variant: "destructive" });
         return;
@@ -53,7 +54,7 @@ export default function EnglishGrammarPage() {
     try {
         const rulesCollection = collection(firestore, 'englishGrammar');
         const docRef = await addDoc(rulesCollection, { ...newRule, createdAt: serverTimestamp() });
-        setRules(prevRules => [{ id: docRef.id, ...newRule }, ...prevRules]);
+        setRules(prevRules => [{ id: docRef.id, ...newRule, createdAt: new Date() }, ...prevRules]);
         toast({ title: "Амжилттай", description: "Шинэ дүрэм нэмэгдлээ." });
     } catch (error) {
         console.error("Error adding new rule: ", error);
@@ -84,7 +85,7 @@ export default function EnglishGrammarPage() {
       <div className="text-center pt-8 flex items-center justify-center gap-4">
         <h1 className="text-4xl font-bold font-headline">Англи хэлний дүрэм</h1>
         {isEditMode && (
-             <AddGrammarRuleDialog onAddRule={handleAddRule}>
+             <AddGrammarRuleDialog onAddRule={handleAddRule} ruleType="english">
                 <Button variant="outline" size="icon">
                     <PlusCircle className="h-5 w-5" />
                     <span className="sr-only">Шинэ дүрэм нэмэх</span>

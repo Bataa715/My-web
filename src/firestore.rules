@@ -1,0 +1,55 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    // Rules for users collection and sub-collections
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && isOwner(userId);
+      
+      // Rules for user-specific sub-collections
+      match /projects/{projectId} {
+        allow read, write: if isSignedIn() && isOwner(userId);
+      }
+      match /skills/{skillId} {
+        allow read, write: if isSignedIn() && isOwner(userId);
+      }
+      match /englishWords/{wordId} {
+        allow read, write: if isSignedIn() && isOwner(userId);
+      }
+      match /japaneseWords/{wordId} {
+        allow read, write: if isSignedIn() && isOwner(userId);
+      }
+      match /memorized/{kanaType} {
+        allow read, write: if isSignedIn() && isOwner(userId);
+      }
+       match /progress/{progressType} {
+        allow read, write: if isSignedIn() && isOwner(userId);
+      }
+    }
+    
+    // Allow public read for learning materials, and allow write for signed-in users to seed data
+    match /englishWords/{wordId} { allow read: if true; allow write: if isSignedIn(); }
+    match /japaneseWords/{wordId} { allow read: if true; allow write: if isSignedIn(); }
+    match /englishGrammar/{ruleId} { allow read: if true; allow write: if isSignedIn(); }
+    match /japaneseGrammar/{ruleId} { allow read: if true; allow write: if isSignedIn(); }
+    match /englishReading/{materialId} { allow read: if true; allow write: if isSignedIn(); }
+    match /englishListening/{materialId} { allow read: if true; allow write: if isSignedIn(); }
+    match /englishSpeaking/{materialId} { allow read: if true; allow write: if isSignedIn(); }
+    match /englishWriting/{materialId} { allow read: if true; allow write: if isSignedIn(); }
+    match /hiragana/{kanaId} { allow read: if true; allow write: if isSignedIn(); }
+    match /katakana/{kanaId} { allow read: if true; allow write: if isSignedIn(); }
+    match /programmingConcepts/{conceptId} { allow read: if true; allow write: if isSignedIn(); }
+    match /cheatSheetItems/{itemId} { allow read: if true; allow write: if isSignedIn(); }
+    match /progressItems/{itemId} { allow read: if true; allow write: if isSignedIn(); }
+  }
+}

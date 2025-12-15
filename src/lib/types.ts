@@ -24,7 +24,17 @@ export interface GrammarRule {
   title: string;
   explanation: string;
   examples: string[];
+  createdAt?: Date | Timestamp;
 }
+
+export interface ReadingMaterial {
+  id?: string;
+  title: string;
+  content: string;
+  source?: string;
+  createdAt?: Date | Timestamp;
+}
+
 
 export interface Kana {
   id?: string;

@@ -1,10 +1,15 @@
-import PlaceholderPage from "@/components/shared/PlaceholderPage";
+'use client';
+
+import MaterialManager from '@/components/shared/MaterialManager';
 
 export default function ReadingPage() {
   return (
-    <PlaceholderPage 
-      title="Reading"
-      description="Унших чадвараа дээшлүүлэх хэсэг"
+    <MaterialManager
+      collectionName="englishReading"
+      pageTitle="Унших"
+      pageDescription="Унших чадвараа сайжруулах текст, материалууд."
+      dialogTitle="Шинэ унших материал нэмэх"
+      dialogDescription="Материалын гарчиг, унших эх, болон эх сурвалжийг оруулна уу."
     />
   );
 }

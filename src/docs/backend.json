@@ -93,11 +93,12 @@
       "type": "object",
       "properties": {
         "word": { "type": "string" },
-        "meaning": { "type": "string" },
+        "translation": { "type": "string" },
+        "definition": { "type": "string" },
         "memorized": { "type": "boolean" },
         "favorite": { "type": "boolean" }
       },
-      "required": ["word", "meaning"]
+      "required": ["word", "translation"]
     },
     "JapaneseWord": {
       "title": "Japanese Word",
@@ -119,7 +120,18 @@
         "explanation": { "type": "string" },
         "examples": { "type": "array", "items": { "type": "string" } }
       },
-      "required": ["title", "explanation", "examples"]
+      "required": ["title", "explanation"]
+    },
+    "ReadingMaterial": {
+      "title": "Reading Material",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "source": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "createdAt"]
     },
     "Kana": {
       "title": "Kana",
@@ -206,6 +218,10 @@
     "/japaneseWords/{wordId}": { "schema": { "$ref": "#/entities/JapaneseWord" } },
     "/englishGrammar/{ruleId}": { "schema": { "$ref": "#/entities/GrammarRule" } },
     "/japaneseGrammar/{ruleId}": { "schema": { "$ref": "#/entities/GrammarRule" } },
+    "/englishReading/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
+    "/englishListening/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
+    "/englishSpeaking/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
+    "/englishWriting/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
     "/hiragana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } },
     "/katakana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } },
     "/programmingConcepts/{conceptId}": { "schema": { "$ref": "#/entities/ProgrammingConcept" } },

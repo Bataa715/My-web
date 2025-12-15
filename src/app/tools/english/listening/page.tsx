@@ -1,10 +1,15 @@
-import PlaceholderPage from "@/components/shared/PlaceholderPage";
+'use client';
+
+import MaterialManager from '@/components/shared/MaterialManager';
 
 export default function ListeningPage() {
   return (
-    <PlaceholderPage 
-      title="Listening"
-      description="Сонсох чадвараа сайжруулах хэсэг"
+    <MaterialManager
+      collectionName="englishListening"
+      pageTitle="Сонсох"
+      pageDescription="Сонсох чадвараа сайжруулах дасгал, материалууд."
+      dialogTitle="Шинэ сонсох материал нэмэх"
+      dialogDescription="Материалын гарчиг, агуулга (жишээ нь, transcript), болон эх сурвалжийг оруулна уу."
     />
   );
 }
