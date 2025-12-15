@@ -152,7 +152,7 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center">
-        <div className="mr-4 hidden md:flex">
+        <div className="mr-4 flex md:flex-1">
             <Link href={user ? "/home" : "/"} className="mr-6 flex items-center space-x-2">
                  {isEditingAppName ? (
                     <div className="flex items-center gap-2">
@@ -186,7 +186,7 @@ const Header = () => {
                     </div>
                 )}
             </Link>
-            <nav className="flex items-center gap-4 text-sm">
+            <nav className="hidden md:flex items-center gap-4 text-sm">
                 {mainLinks.map((link) => (
                    <Link
                     key={link.href}
@@ -201,7 +201,7 @@ const Header = () => {
                 ))}
             </nav>
         </div>
-        <div className="flex-1 pl-4 md:hidden">
+        <div className="flex md:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button
