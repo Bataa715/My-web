@@ -82,7 +82,6 @@ export default function EnglishVocabularyPage() {
 
   return (
     <div className="space-y-8">
-      <BackButton />
        {loading ? (
         <div className="space-y-4 pt-8">
             <div className="flex justify-between items-center">

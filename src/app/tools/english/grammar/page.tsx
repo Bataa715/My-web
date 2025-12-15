@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { GrammarRule } from '@/lib/types';
-import BackButton from '@/components/shared/BackButton';
 import GrammarList from '@/components/shared/GrammarList';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -39,7 +38,6 @@ export default function EnglishGrammarPage() {
 
   return (
     <div className="space-y-8">
-      <BackButton />
       <div className="text-center pt-8">
         <h1 className="text-4xl font-bold font-headline">Англи хэлний дүрэм</h1>
         <p className="mt-2 text-muted-foreground">Дүрэмүүдтэй танилцаж, мэдлэгээ бататгаарай.</p>
