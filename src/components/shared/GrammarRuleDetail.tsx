@@ -1,13 +1,12 @@
 
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import type { GrammarRule } from "@/lib/types";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { Button } from "../ui/button";
-import { Trash2, BookCopy, CheckCircle2, XCircle, Edit } from "lucide-react";
+import { Trash2, BookCopy, Edit } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -27,6 +26,7 @@ import { EditGrammarRuleDialog } from "./EditGrammarRuleDialog";
 import { useToast } from "@/hooks/use-toast";
 import { useFirebase } from "@/firebase";
 import { doc, deleteDoc } from "firebase/firestore";
+import PracticeGenerator from "./PracticeGenerator";
 
 interface GrammarRuleDetailProps {
   rule: GrammarRule;
@@ -34,47 +34,6 @@ interface GrammarRuleDetailProps {
   onDeleteRule: (id: string) => void;
   collectionPath: 'englishGrammar' | 'japaneseGrammar';
 }
-
-const PracticeQuestion = ({ question, index }: { question: any, index: number }) => {
-    const [selectedOption, setSelectedOption] = useState<string | null>(null);
-    const [isAnswered, setIsAnswered] = useState(false);
-
-    const handleAnswer = (option: string) => {
-        setSelectedOption(option);
-        setIsAnswered(true);
-    };
-
-    return (
-        <Card key={index} className="mb-4">
-            <CardHeader>
-                <CardTitle className="text-lg">Дасгал {index + 1}:</CardTitle>
-                <CardDescription className="text-base">{question.question}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-                {question.options.map((option: string, i: number) => (
-                    <Button
-                        key={i}
-                        variant={isAnswered ? (option === question.correctAnswer ? "default" : (selectedOption === option ? "destructive" : "outline")) : "outline"}
-                        className="w-full justify-start text-left h-auto py-2"
-                        onClick={() => !isAnswered && handleAnswer(option)}
-                        disabled={isAnswered}
-                    >
-                        {option}
-                    </Button>
-                ))}
-                {isAnswered && (
-                    <div className={`mt-4 p-4 rounded-md flex items-start gap-3 ${selectedOption === question.correctAnswer ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300'}`}>
-                        {selectedOption === question.correctAnswer ? <CheckCircle2 className="h-5 w-5 mt-1" /> : <XCircle className="h-5 w-5 mt-1" />}
-                        <div>
-                            <h4 className="font-bold">{selectedOption === question.correctAnswer ? 'Зөв!' : 'Буруу!'}</h4>
-                            <p className="text-sm">{question.explanation}</p>
-                        </div>
-                    </div>
-                )}
-            </CardContent>
-        </Card>
-    );
-};
 
 
 export default function GrammarRuleDetail({ rule, onUpdateRule, onDeleteRule, collectionPath }: GrammarRuleDetailProps) {
@@ -230,19 +189,10 @@ export default function GrammarRuleDetail({ rule, onUpdateRule, onDeleteRule, co
                     ))}
                  </div>
             </div>
-            
-            {/* Practice Section */}
-            <div id="practice">
-                 <h3 className="text-xl font-bold mb-4">6. Дасгал (Practice)</h3>
-                 <div className="space-y-4">
-                    {rule.practice.map((q, i) => (
-                        <PracticeQuestion key={i} question={q} index={i} />
-                    ))}
-                 </div>
-            </div>
-
           </CardContent>
         </Card>
+        
+        <PracticeGenerator rule={rule} />
     </div>
   );
 }

@@ -137,3 +137,20 @@ export type UserProfile = {
     instagram?: string;
     email?: string;
 };
+
+export interface GeneratedMCQ {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  explanation: string;
+}
+
+export interface GeneratedWritingTask {
+  instruction: string;
+  exampleAnswer: string;
+}
+
+export interface GeneratedExercises {
+  multipleChoiceQuestions: GeneratedMCQ[];
+  writingTasks: GeneratedWritingTask[];
+}
