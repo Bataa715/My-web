@@ -37,6 +37,7 @@ const Header = () => {
     const isAboutPage = pathname === '/about';
     const isHomePage = pathname === '/';
     const isToolsPage = pathname === '/tools';
+    const isGrammarPage = pathname.includes('/grammar');
 
     const { firestore, user } = useFirebase();
 
@@ -232,7 +233,7 @@ const Header = () => {
                 </Dialog>
             )}
 
-            {(isAboutPage || isHomePage || isToolsPage) && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
+            {(isAboutPage || isHomePage || isToolsPage || isGrammarPage) && <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
                 if (!open) {
                     setPassword("");
                     setPasswordError("");
