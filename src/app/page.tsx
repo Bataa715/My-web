@@ -96,7 +96,6 @@ export default function DataMigrationPage() {
     return null;
   }
 
-
   return (
       <div className="flex h-screen w-full flex-col items-center justify-center space-y-6 text-center">
           <h1 className="text-3xl font-bold">Data Migration</h1>
