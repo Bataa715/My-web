@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, Image as ImageIcon, Save, Loader2, LogOut, User, Link2 } from 'lucide-react';
+import { Menu, PencilRuler, Eye, Image as ImageIcon, Save, Loader2, LogOut, User, Link2, XCircle } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -45,10 +45,27 @@ const Header = () => {
     const [saving, setSaving] = useState(false);
     
     const { user, isUserLoading, auth, firestore } = useFirebase();
+    const [appName, setAppName] = useState("Kaizen");
+    const [isEditingAppName, setIsEditingAppName] = useState(false);
+    const [editedAppName, setEditedAppName] = useState(appName);
 
     useEffect(() => {
         setMounted(true);
-    }, []);
+        const fetchAppName = async () => {
+            if (user && firestore) {
+                const userDocRef = doc(firestore, 'users', user.uid);
+                const docSnap = await getDoc(userDocRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data() as UserProfile;
+                    if (data.appName) {
+                        setAppName(data.appName);
+                        setEditedAppName(data.appName);
+                    }
+                }
+            }
+        };
+        fetchAppName();
+    }, [user, firestore]);
     
 
     const [isLinkAccountOpen, setIsLinkAccountOpen] = useState(false);
@@ -110,6 +127,26 @@ const Header = () => {
             setSaving(false);
         }
     };
+    
+    const handleSaveAppName = async () => {
+        if (!user || !firestore || !editedAppName.trim()) {
+            toast({ title: "Алдаа", description: "Сайтын нэр хоосон байж болохгүй.", variant: "destructive" });
+            return;
+        }
+        setSaving(true);
+        try {
+            const userDocRef = doc(firestore, 'users', user.uid);
+            await updateDoc(userDocRef, { appName: editedAppName });
+            setAppName(editedAppName);
+            setIsEditingAppName(false);
+            toast({ title: "Амжилттай", description: "Сайтын нэр шинэчлэгдлээ." });
+        } catch (error) {
+            console.error("Error updating app name:", error);
+            toast({ title: "Алдаа", description: "Сайтын нэр шинэчлэхэд алдаа гарлаа.", variant: "destructive" });
+        } finally {
+            setSaving(false);
+        }
+    };
 
 
   return (
@@ -117,9 +154,37 @@ const Header = () => {
       <div className="container flex h-14 max-w-screen-2xl items-center">
         <div className="mr-4 hidden md:flex">
             <Link href={user ? "/home" : "/"} className="mr-6 flex items-center space-x-2">
-                <span className="hidden font-bold sm:inline-block font-headline">
-                Ka1_zen
-                </span>
+                 {isEditingAppName ? (
+                    <div className="flex items-center gap-2">
+                        <Input
+                            value={editedAppName}
+                            onChange={(e) => setEditedAppName(e.target.value)}
+                            className="font-bold h-8"
+                        />
+                        <Button onClick={handleSaveAppName} size="icon" className="h-8 w-8" disabled={saving}>
+                            {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}
+                        </Button>
+                        <Button onClick={() => { setIsEditingAppName(false); setEditedAppName(appName); }} size="icon" variant="ghost" className="h-8 w-8">
+                            <XCircle className="h-4 w-4"/>
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-2">
+                        <span className="hidden font-bold sm:inline-block font-headline">
+                            {appName}
+                        </span>
+                        {isEditMode && (
+                             <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => setIsEditingAppName(true)}
+                              >
+                                <PencilRuler className="h-4 w-4" />
+                              </Button>
+                        )}
+                    </div>
+                )}
             </Link>
             <nav className="flex items-center gap-4 text-sm">
                 {mainLinks.map((link) => (
@@ -153,7 +218,7 @@ const Header = () => {
                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               </SheetHeader>
               <Link href={user ? "/home" : "/"} className="mr-6 flex items-center space-x-2" onClick={() => setIsOpen(false)}>
-                <span className="font-bold font-headline">Ka1_zen</span>
+                <span className="font-bold font-headline">{appName}</span>
               </Link>
               <nav className="flex flex-col space-y-4 mt-6">
                 {mainLinks.map((link) => (

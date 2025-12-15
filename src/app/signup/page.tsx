@@ -78,6 +78,7 @@ export default function SignupPage() {
       };
       
       const userProfile: UserProfile = {
+        appName: "Kaizen",
         name: values.name,
         email: values.email,
         bio: "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.",

@@ -6,6 +6,10 @@
       "description": "Represents a user's profile information.",
       "type": "object",
       "properties": {
+        "appName": {
+          "type": "string",
+          "description": "The custom name for the application/website."
+        },
         "name": {
           "type": "string",
           "description": "The user's display name."
@@ -279,21 +283,43 @@
     "/users/{userId}/progress/{progressType}": {
       "schema": { "$ref": "#/entities/ProgrammingProgress" }
     },
-    "/englishWords/{wordId}": { "schema": { "$ref": "#/entities/EnglishWord" } },
-    "/japaneseWords/{wordId}": { "schema": { "$ref": "#/entities/JapaneseWord" } },
-    "/englishGrammar/{ruleId}": { "schema": { "$ref": "#/entities/GrammarRule" } },
-    "/japaneseGrammar/{ruleId}": { "schema": { "$ref": "#/entities/GrammarRule" } },
-    "/englishReading/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
-    "/englishListening/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
-    "/englishSpeaking/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
-    "/englishWriting/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
-    "/japaneseReading/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
-    "/japaneseListening/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
-    "/japaneseSpeaking/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
+    "/users/{userId}/englishGrammar/{ruleId}": {
+      "schema": { "$ref": "#/entities/GrammarRule" }
+    },
+    "/users/{userId}/japaneseGrammar/{ruleId}": {
+      "schema": { "$ref": "#/entities/GrammarRule" }
+    },
+    "/users/{userId}/englishReading/{materialId}": {
+      "schema": { "$ref": "#/entities/ReadingMaterial" }
+    },
+    "/users/{userId}/englishListening/{materialId}": {
+      "schema": { "$ref": "#/entities/ReadingMaterial" }
+    },
+    "/users/{userId}/englishSpeaking/{materialId}": {
+      "schema": { "$ref": "#/entities/ReadingMaterial" }
+    },
+    "/users/{userId}/englishWriting/{materialId}": {
+      "schema": { "$ref": "#/entities/ReadingMaterial" }
+    },
+    "/users/{userId}/japaneseReading/{materialId}": {
+      "schema": { "$ref": "#/entities/ReadingMaterial" }
+    },
+    "/users/{userId}/japaneseListening/{materialId}": {
+      "schema": { "$ref": "#/entities/ReadingMaterial" }
+    },
+    "/users/{userId}/japaneseSpeaking/{materialId}": {
+      "schema": { "$ref": "#/entities/ReadingMaterial" }
+    },
+    "/users/{userId}/programmingConcepts/{conceptId}": {
+      "schema": { "$ref": "#/entities/ProgrammingConcept" }
+    },
+    "/users/{userId}/cheatSheetItems/{itemId}": {
+      "schema": { "$ref": "#/entities/CheatSheetItem" }
+    },
+    "/users/{userId}/progressItems/{itemId}": {
+      "schema": { "$ref": "#/entities/ProgressItem" }
+    },
     "/hiragana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } },
-    "/katakana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } },
-    "/programmingConcepts/{conceptId}": { "schema": { "$ref": "#/entities/ProgrammingConcept" } },
-    "/cheatSheetItems/{itemId}": { "schema": { "$ref": "#/entities/CheatSheetItem" } },
-    "/progressItems/{itemId}": { "schema": { "$ref": "#/entities/ProgressItem" } }
+    "/katakana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } }
   }
 }

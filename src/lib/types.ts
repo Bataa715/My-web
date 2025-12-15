@@ -126,6 +126,7 @@ export type OrbitInfo = {
 };
 
 export type UserProfile = {
+    appName?: string;
     name: string;
     bio: string;
     profileImage: string;
