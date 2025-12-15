@@ -12,6 +12,7 @@ import { AddGrammarRuleDialog } from '@/components/shared/AddGrammarRuleDialog';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import BackButton from '@/components/shared/BackButton';
 
 export default function EnglishGrammarPage() {
   const { firestore } = useFirebase();
@@ -62,6 +63,7 @@ export default function EnglishGrammarPage() {
 
   return (
     <div className="space-y-8">
+      <BackButton />
       <div className="text-center pt-8 flex items-center justify-center gap-4">
         <h1 className="text-4xl font-bold font-headline">Англи хэлний дүрэм</h1>
         {isEditMode && (
