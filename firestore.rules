@@ -14,26 +14,26 @@ service cloud.firestore {
 
     // Rules for users collection and sub-collections
     match /users/{userId} {
-      allow read, write: if true;
+      allow read, write: if isSignedIn() && isOwner(userId);
       
       // Rules for user-specific sub-collections
       match /projects/{projectId} {
-        allow read, write: if true;
+        allow read, write: if isSignedIn() && isOwner(userId);
       }
       match /skills/{skillId} {
-        allow read, write: if true;
+        allow read, write: if isSignedIn() && isOwner(userId);
       }
       match /englishWords/{wordId} {
-        allow read, write: if true;
+        allow read, write: if isSignedIn() && isOwner(userId);
       }
       match /japaneseWords/{wordId} {
-        allow read, write: if true;
+        allow read, write: if isSignedIn() && isOwner(userId);
       }
       match /memorized/{kanaType} {
-        allow read, write: if true;
+        allow read, write: if isSignedIn() && isOwner(userId);
       }
        match /progress/{progressType} {
-        allow read, write: if true;
+        allow read, write: if isSignedIn() && isOwner(userId);
       }
     }
     
