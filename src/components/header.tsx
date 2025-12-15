@@ -158,7 +158,7 @@ const Header = () => {
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
            {/* Left Section */}
-           <div className="flex items-center gap-6">
+           <div className="flex items-center gap-6 md:flex-1">
               {/* Mobile Menu */}
               <div className="flex md:hidden">
                 <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -216,7 +216,7 @@ const Header = () => {
 
            {/* Center Section (App Name) */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-             <button onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2">
+             <div onClick={() => !isEditingAppName && router.push(user ? "/home" : "/")} className="flex items-center space-x-2 cursor-pointer">
                  {isEditingAppName ? (
                     <div className="flex items-center gap-2">
                         <Input
@@ -248,11 +248,11 @@ const Header = () => {
                         )}
                     </div>
                 )}
-            </button>
+            </div>
           </div>
           
           {/* Right Section */}
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex items-center justify-end gap-2 md:flex-1">
               {user && !isUserLoading && (
                   <Button variant="outline" size="icon" onClick={() => setIsEditMode(!isEditMode)}>
                   {isEditMode ? <Eye className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />}
@@ -346,7 +346,7 @@ const Header = () => {
           <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <div className="container flex h-14 max-w-screen-2xl items-center">
                   <div className="flex-1"></div>
-                  <div className="flex items-center justify-end gap-2">
+                  <div className="flex items-center justify-end gap-2 md:flex-1">
                       <div className="h-10 w-10"></div>
                       <div className="h-10 w-10"></div>
                   </div>
