@@ -165,9 +165,11 @@ const Header = () => {
               <SheetHeader>
                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               </SheetHeader>
-              <button onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2 pl-4 text-left">
-                <span className="font-bold font-headline">{appName}</span>
-              </button>
+              <div className="p-4">
+                <button onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2 text-left">
+                  <span className="font-bold font-headline">{appName}</span>
+                </button>
+              </div>
               <nav className="flex flex-col space-y-4 mt-6 pl-4">
                 {mainLinks.map((link) => (
                   <Link
