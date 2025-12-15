@@ -704,7 +704,7 @@ export default function Hero() {
                             animate={{ rotateY: 0, opacity: 1, scale: 1 }}
                             exit={{ rotateY: -180, opacity: 0, scale: 0.8 }}
                             transition={{ duration: 0.6, ease: "easeInOut" }}
-                            className="relative w-full h-full"
+                            className="relative w-full h-full group"
                         >
                             <div className="avatar-glow-wrapper w-full h-full relative">
                                 <Avatar className="w-full h-full border-4 border-primary/50">
@@ -712,16 +712,18 @@ export default function Hero() {
                                     <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
                                 </Avatar>
                             </div>
-                             {isEditMode && (
-                                <Button 
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => setIsEditingImage(true)}
-                                    className="absolute bottom-0 right-0 h-10 w-10 rounded-full z-10 bg-background/50 backdrop-blur-sm"
-                                >
-                                    <Upload className="h-4 w-4" />
-                                    <span className="sr-only">Зураг солих</span>
-                                </Button>
+                            {isEditMode && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <Button 
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => setIsEditingImage(true)}
+                                        className="h-12 w-12 rounded-full z-10 bg-background/50 backdrop-blur-sm"
+                                    >
+                                        <Upload className="h-5 w-5" />
+                                        <span className="sr-only">Зураг солих</span>
+                                    </Button>
+                                </div>
                             )}
                         </motion.div>
                     )}
