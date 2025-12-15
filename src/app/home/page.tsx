@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, Wrench, ImageIcon, Loader2, Save } from 'lucide-react';
+import { ArrowRight, Wrench, ImageIcon, Loader2, Save, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -86,7 +86,7 @@ export default function Home() {
 
 
   return (
-    <div className="relative">
+    <div className="relative h-[calc(100vh-57px-81px)]">
        {isEditMode && (
           <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
             <DialogTrigger asChild>
@@ -128,7 +128,7 @@ export default function Home() {
           </Dialog>
         )}
       {heroImage && (
-        <div className="absolute top-0 left-0 w-full h-[60vh] -z-10">
+        <div className="absolute top-0 left-0 w-full h-full -z-10">
           <Image
             src={heroImage}
             alt="Welcome background"
@@ -139,7 +139,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
         </div>
       )}
-      <div className="flex flex-col items-center justify-center text-center h-[calc(100vh-57px-81px)]">
+      <div className="flex flex-col items-center justify-center text-center h-full">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
             <p className="max-w-[700px] text-muted-foreground md:text-xl">
              Энэ бол тасралтгүй хөгжил, суралцах үйл явцыг минь харуулсан хувийн орон зай юм.
@@ -156,6 +156,11 @@ export default function Home() {
                 </Link>
               </Button>
             </div>
+          </div>
+      </div>
+       <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+          <div className="animate-bounce">
+            <ChevronDown className="h-8 w-8 text-muted-foreground" />
           </div>
       </div>
     </div>
