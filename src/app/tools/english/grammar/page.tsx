@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, addDoc, serverTimestamp, deleteDoc, doc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { GrammarRule } from '@/lib/types';
 import GrammarList from '@/components/shared/GrammarList';
@@ -61,6 +61,23 @@ export default function EnglishGrammarPage() {
     }
   };
 
+  const handleDeleteRule = async (id: string) => {
+    if (!firestore) {
+      toast({ title: "Алдаа", description: "Дүрэм устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
+      return;
+    }
+    const originalRules = [...rules];
+    setRules(prevRules => prevRules.filter(rule => rule.id !== id));
+    try {
+      await deleteDoc(doc(firestore, 'englishGrammar', id));
+      toast({ title: "Амжилттай", description: "Дүрэм устгагдлаа." });
+    } catch (error) {
+      console.error("Error deleting rule: ", error);
+      setRules(originalRules);
+      toast({ title: "Алдаа", description: "Дүрэм устгахад алдаа гарлаа.", variant: "destructive" });
+    }
+  };
+
   return (
     <div className="space-y-8">
       <BackButton />
@@ -83,7 +100,7 @@ export default function EnglishGrammarPage() {
         </div>
       ) : (
         <div className="pt-8">
-            <GrammarList rules={rules} />
+            <GrammarList rules={rules} onDeleteRule={handleDeleteRule} />
         </div>
       )}
     </div>
