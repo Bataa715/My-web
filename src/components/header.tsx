@@ -93,7 +93,7 @@ const Header = () => {
 
     const onLinkAccountSubmit = async (values: z.infer<typeof linkAccountSchema>) => {
         if (!user || !user.isAnonymous || !firestore) {
-            toast({ title: "Алдаа", description: "Зөвхөн нэр-усгүй хэрэглэгч бүртгэлээ холбох боломжтой.", variant: 'destructive' });
+            toast({ title: "Алдаа", description: "Зөвхөн нэр-усгүй хэрэглэгч бүртгэлээ холбох боломжтой.", variant: "destructive" });
             return;
         }
         
@@ -163,13 +163,14 @@ const Header = () => {
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
               <SheetHeader>
-                  <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                  <SheetTitle>
+                    <SheetClose asChild>
+                       <Link href="/home" className="flex items-center space-x-2 text-left pl-4">
+                           <span className="font-bold font-headline">{appName}</span>
+                       </Link>
+                    </SheetClose>
+                  </SheetTitle>
               </SheetHeader>
-              <div className="p-4">
-                <button onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2 text-left">
-                  <span className="font-bold font-headline">{appName}</span>
-                </button>
-              </div>
               <nav className="flex flex-col space-y-4 mt-6 pl-4">
                 {mainLinks.map((link) => (
                   <Link
@@ -189,7 +190,7 @@ const Header = () => {
           </Sheet>
         </div>
 
-        <div className="hidden md:flex flex-1 items-center gap-6 mr-6">
+        <div className="mr-6 hidden md:flex flex-1 items-center gap-6">
             <button onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2">
                  {isEditingAppName ? (
                     <div className="flex items-center gap-2">
