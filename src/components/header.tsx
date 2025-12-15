@@ -216,7 +216,7 @@ const Header = () => {
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8"
-                                onClick={() => setIsEditingAppName(true)}
+                                onClick={(e) => { e.stopPropagation(); setIsEditingAppName(true);}}
                               >
                                 <PencilRuler className="h-4 w-4" />
                               </Button>
