@@ -19,7 +19,7 @@ const WritingTaskSchema = z.object({
 });
 
 // Define the schema for the flow's input
-export const GenerateExercisesInputSchema = z.object({
+const GenerateExercisesInputSchema = z.object({
   ruleTitle: z.string().describe('The title of the grammar rule.'),
   ruleIntroduction: z.string().describe('A brief introduction to the grammar rule.'),
   numMCQ: z.number().int().min(1).max(10).describe('The number of multiple-choice questions to generate.'),
@@ -28,7 +28,7 @@ export const GenerateExercisesInputSchema = z.object({
 export type GenerateExercisesInput = z.infer<typeof GenerateExercisesInputSchema>;
 
 // Define the schema for the flow's output
-export const GenerateExercisesOutputSchema = z.object({
+const GenerateExercisesOutputSchema = z.object({
   multipleChoiceQuestions: z.array(MCQSchema),
   writingTasks: z.array(WritingTaskSchema),
 });
