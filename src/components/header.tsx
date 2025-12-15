@@ -47,8 +47,7 @@ const Header = () => {
 
     useEffect(() => {
         setMounted(true);
-        setIsEditMode(!!user);
-    }, [user, setIsEditMode]);
+    }, []);
     
     const isAboutPage = pathname === '/about';
     const isHomePage = pathname === '/home';
@@ -88,6 +87,7 @@ const Header = () => {
     const handleLogout = async () => {
       try {
         await signOut(auth);
+        setIsEditMode(false);
         toast({ title: "Амжилттай гарлаа." });
         router.push('/');
       } catch (error) {
@@ -242,6 +242,12 @@ const Header = () => {
         <div className="flex flex-1 items-center justify-end gap-2">
           {mounted && (
             <>
+              {user && (
+                 <Button variant="outline" size="icon" onClick={() => setIsEditMode(!isEditMode)}>
+                    {isEditMode ? <Eye className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />}
+                    <span className="sr-only">{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
+                </Button>
+              )}
               {isEditMode && canShowEditButton && (
                 <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
                   <DialogTrigger asChild>
