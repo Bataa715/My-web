@@ -341,9 +341,7 @@ const Header = () => {
                                     </Form>
                                 </DialogContent>
                             </Dialog>
-                        ) : (
-                             <span className="text-sm font-medium hidden sm:inline">{user.displayName || user.email}</span>
-                        )}
+                        ) : null}
 
                         <Button onClick={handleLogout} variant="ghost" size="icon">
                             <LogOut className="h-5 w-5" />
