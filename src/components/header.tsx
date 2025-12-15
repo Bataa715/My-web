@@ -165,9 +165,9 @@ const Header = () => {
               <SheetHeader>
                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               </SheetHeader>
-              <Link href={user ? "/home" : "/"} className="flex items-center space-x-2 pl-4" onClick={() => setIsOpen(false)}>
+              <button onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2 pl-4 text-left">
                 <span className="font-bold font-headline">{appName}</span>
-              </Link>
+              </button>
               <nav className="flex flex-col space-y-4 mt-6 pl-4">
                 {mainLinks.map((link) => (
                   <Link
@@ -188,7 +188,7 @@ const Header = () => {
         </div>
 
         <div className="hidden md:flex flex-1 items-center gap-6">
-            <Link href={user ? "/home" : "/"} className="mr-6 flex items-center space-x-2">
+            <button onClick={() => router.push(user ? "/home" : "/")} className="mr-6 flex items-center space-x-2">
                  {isEditingAppName ? (
                     <div className="flex items-center gap-2">
                         <Input
@@ -220,7 +220,7 @@ const Header = () => {
                         )}
                     </div>
                 )}
-            </Link>
+            </button>
             <nav className="flex items-center gap-4 text-sm">
                 {mainLinks.map((link) => (
                    <Link
