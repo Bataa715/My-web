@@ -33,11 +33,18 @@ const Header = () => {
     const [passwordError, setPasswordError] = useState("");
     const { toast } = useToast();
     const pathname = usePathname();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
     
     const isAboutPage = pathname === '/about';
     const isHomePage = pathname === '/';
     const isToolsPage = pathname === '/tools';
     const isGrammarPage = pathname.includes('/grammar');
+    const canShowEditButton = isAboutPage || isHomePage || isToolsPage || isGrammarPage;
+
 
     const { firestore, user } = useFirebase();
 
@@ -192,110 +199,114 @@ const Header = () => {
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-2">
-            {isEditMode && (isHomePage || isAboutPage || isToolsPage) && (
-            <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
-                <DialogTrigger asChild>
+          {mounted && (
+            <>
+              {isEditMode && (isHomePage || isAboutPage || isToolsPage) && (
+                <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
+                  <DialogTrigger asChild>
                     <Button variant="outline" size="icon">
-                        <ImageIcon className="h-4 w-4" />
-                        <span className="sr-only">Арын зураг солих</span>
+                      <ImageIcon className="h-4 w-4" />
+                      <span className="sr-only">Арын зураг солих</span>
                     </Button>
-                </DialogTrigger>
-                <DialogContent>
+                  </DialogTrigger>
+                  <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Арын зургийн холбоос</DialogTitle>
-                        <DialogDescription>
+                      <DialogTitle>Арын зургийн холбоос</DialogTitle>
+                      <DialogDescription>
                         Шинэ зургийнхаа URL хаягийг энд буулгана уу.
-                        </DialogDescription>
+                      </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="image-url" className="text-right">
-                            URL
+                          URL
                         </Label>
                         <Input
-                            id="image-url"
-                            value={editedImageUrl}
-                            onChange={(e) => setEditedImageUrl(e.target.value)}
-                            className="col-span-3"
-                            placeholder="https://example.com/image.png"
+                          id="image-url"
+                          value={editedImageUrl}
+                          onChange={(e) => setEditedImageUrl(e.target.value)}
+                          className="col-span-3"
+                          placeholder="https://example.com/image.png"
                         />
-                        </div>
+                      </div>
                     </div>
                     <DialogFooter>
-                        <DialogClose asChild>
+                      <DialogClose asChild>
                         <Button type="button" variant="secondary">Цуцлах</Button>
-                        </DialogClose>
-                        <Button type="button" onClick={handleSaveImage} disabled={saving}>
-                        {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />} Хадгалах
-                        </Button>
+                      </DialogClose>
+                      <Button type="button" onClick={handleSaveImage} disabled={saving}>
+                        {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
+                      </Button>
                     </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        )}
+                  </DialogContent>
+                </Dialog>
+              )}
 
-        {(isAboutPage || isHomePage || isToolsPage || isGrammarPage) && (
-            <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
-                if (!open) {
+              {canShowEditButton && (
+                <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
+                  if (!open) {
                     setPassword("");
                     setPasswordError("");
-                }
-                setIsPasswordDialogOpen(open);
-            }}>
-                <DialogTrigger asChild>
+                  }
+                  setIsPasswordDialogOpen(open);
+                }}>
+                  <DialogTrigger asChild>
                     <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={handleEditClick}
-                        className={cn(
+                      variant="outline"
+                      size="icon"
+                      onClick={handleEditClick}
+                      className={cn(
                         "transition-all",
                         isEditMode && "ring-2 ring-primary ring-offset-2 ring-offset-background"
-                        )}
+                      )}
                     >
-                        {isEditMode ? (
+                      {isEditMode ? (
                         <Eye className="h-4 w-4" />
-                        ) : (
+                      ) : (
                         <PencilRuler className="h-4 w-4" />
-                        )}
-                        <span className="sr-only">{isEditMode ? "Харах" : "Засварлах"}</span>
+                      )}
+                      <span className="sr-only">{isEditMode ? "Харах" : "Засварлах"}</span>
                     </Button>
-                </DialogTrigger>
-                <DialogContent>
+                  </DialogTrigger>
+                  <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Засварлах горим</DialogTitle>
-                        <DialogDescription>
+                      <DialogTitle>Засварлах горим</DialogTitle>
+                      <DialogDescription>
                         Үргэлжлүүлэхийн тулд нууц үгээ оруулна уу.
-                        </DialogDescription>
+                      </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="password" className="text-right">
-                            Нууц үг
+                          Нууц үг
                         </Label>
                         <Input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="col-span-3"
-                            onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
+                          id="password"
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="col-span-3"
+                          onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
                         />
-                        </div>
-                        {passwordError && (
-                            <p className="col-span-4 text-center text-sm text-destructive">{passwordError}</p>
-                        )}
+                      </div>
+                      {passwordError && (
+                        <p className="col-span-4 text-center text-sm text-destructive">{passwordError}</p>
+                      )}
                     </div>
                     <DialogFooter>
-                        <DialogClose asChild>
-                            <Button type="button" variant="secondary">Цуцлах</Button>
-                        </DialogClose>
-                        <Button type="button" onClick={handlePasswordSubmit}>
+                      <DialogClose asChild>
+                        <Button type="button" variant="secondary">Цуцлах</Button>
+                      </DialogClose>
+                      <Button type="button" onClick={handlePasswordSubmit}>
                         <LockKeyhole className="mr-2 h-4 w-4" /> Нэвтрэх
-                        </Button>
+                      </Button>
                     </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        )}
-        <ThemeToggle />
+                  </DialogContent>
+                </Dialog>
+              )}
+            </>
+          )}
+          <ThemeToggle />
         </div>
       </div>
     </header>
