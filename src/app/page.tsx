@@ -1,108 +1,53 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useAuth } from '@/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useEffect, useState } from 'react';
+import { useAuth, useFirebase } from '@/firebase';
+import { signInAnonymously } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import Link from 'next/link';
 
-const formSchema = z.object({
-  email: z.string().email({ message: 'И-мэйл хаяг буруу байна.' }),
-  password: z.string().min(6, { message: 'Нууц үг дор хаяж 6 тэмдэгттэй байх ёстой.' }),
-});
-
-export default function LoginPage() {
+export default function RootPage() {
   const auth = useAuth();
   const router = useRouter();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
+  useEffect(() => {
+    const handleAnonymousLogin = async () => {
+      if (!auth) {
+        // Firebase auth is not ready yet, wait.
+        return;
+      }
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, values.email, values.password);
-      toast({ title: 'Амжилттай нэвтэрлээ.' });
-      router.push('/home');
-    } catch (error: any) {
-      console.error('Login error:', error);
-      toast({
-        title: 'Нэвтрэхэд алдаа гарлаа',
-        description: error.message,
-        variant: 'destructive',
-      });
-      setIsLoading(false);
-    }
-  }
+      if (auth.currentUser) {
+        // If there's already a user (either anonymous or permanent), redirect to home.
+        router.push('/home');
+        return;
+      }
+
+      // If no user, sign in anonymously.
+      try {
+        await signInAnonymously(auth);
+        router.push('/home');
+      } catch (error: any) {
+        console.error('Anonymous login failed:', error);
+        toast({
+          title: 'Алдаа гарлаа',
+          description: 'Түр нэвтрэлт хийхэд алдаа гарлаа. Хуудсыг дахин ачааллана уу.',
+          variant: 'destructive',
+        });
+        setLoading(false);
+      }
+    };
+
+    handleAnonymousLogin();
+  }, [auth, router, toast]);
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">Нэвтрэх</CardTitle>
-          <CardDescription>
-            Бүртгэлтэй хэрэглэгч и-мэйл, нууц үгээ ашиглан нэвтэрнэ үү.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>И-мэйл</FormLabel>
-                    <FormControl>
-                      <Input placeholder="name@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Нууц үг</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Нэвтэрч байна...' : 'Нэвтрэх'}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-         <CardFooter className="flex-col items-start text-sm">
-            <p className="text-muted-foreground">
-                Бүртгэл байхгүй юу?{' '}
-                <Link href="/signup" className="underline text-primary">
-                Бүртгүүлэх
-                </Link>
-            </p>
-        </CardFooter>
-      </Card>
+    <div className="flex h-screen w-full flex-col items-center justify-center">
+      <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      <p className="mt-4 text-muted-foreground">Уншиж байна...</p>
     </div>
   );
 }
