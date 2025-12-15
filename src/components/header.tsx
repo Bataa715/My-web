@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, LockKeyhole, Image as ImageIcon, Save, Loader2 } from 'lucide-react';
+import { Menu, PencilRuler, Eye, Image as ImageIcon, Save, Loader2, LogOut } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -12,10 +12,12 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { useFirebase } from '@/firebase';
+import { useFirebase, useUser } from '@/firebase';
 import type { UserProfile } from '@/lib/types';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { signOut } from 'firebase/auth';
 
 const mainLinks = [
   { href: "/", label: "Нүүр" },
@@ -23,30 +25,25 @@ const mainLinks = [
   { href: "/tools", label: "Хэрэгсэл" },
 ];
 
-const CORRECT_PASSWORD = "Bataa2480";
-
 const Header = () => {
     const { isEditMode, setIsEditMode } = useEditMode();
     const [isOpen, setIsOpen] = useState(false);
-    const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
-    const [password, setPassword] = useState("");
-    const [passwordError, setPasswordError] = useState("");
     const { toast } = useToast();
     const pathname = usePathname();
+    const router = useRouter();
     const [mounted, setMounted] = useState(false);
+    
+    const { user, isUserLoading, auth, firestore } = useFirebase();
 
     useEffect(() => {
         setMounted(true);
-    }, []);
+        setIsEditMode(!!user);
+    }, [user, setIsEditMode]);
     
     const isAboutPage = pathname === '/about';
     const isHomePage = pathname === '/';
     const isToolsPage = pathname === '/tools';
-    const isGrammarPage = pathname.includes('/grammar');
-    const canShowEditButton = isAboutPage || isHomePage || isToolsPage || isGrammarPage;
-
-
-    const { firestore, user } = useFirebase();
+    const canShowEditButton = isAboutPage || isHomePage || isToolsPage;
 
     const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
     const [editedImageUrl, setEditedImageUrl] = useState('');
@@ -76,27 +73,14 @@ const Header = () => {
         fetchCurrentImage();
     }, [user, firestore, isImageEditingOpen, pathname]);
 
-
-    const handleEditClick = () => {
-      if (isEditMode) {
-        setIsEditMode(false);
-      } else {
-        setIsPasswordDialogOpen(true);
-      }
-    };
-  
-    const handlePasswordSubmit = () => {
-      if (password === CORRECT_PASSWORD) {
-        setIsEditMode(true);
-        setIsPasswordDialogOpen(false);
-        setPassword("");
-        setPasswordError("");
-        toast({
-          title: "Амжилттай",
-          description: "Засварлах горимд шилжлээ.",
-        });
-      } else {
-        setPasswordError("Нууц үг буруу байна.");
+    const handleLogout = async () => {
+      try {
+        await signOut(auth);
+        toast({ title: "Амжилттай гарлаа." });
+        router.push('/');
+      } catch (error) {
+        console.error("Logout error:", error);
+        toast({ title: "Гарахад алдаа гарлаа.", variant: 'destructive' });
       }
     };
 
@@ -201,7 +185,7 @@ const Header = () => {
         <div className="flex flex-1 items-center justify-end gap-2">
           {mounted && (
             <>
-              {isEditMode && (isHomePage || isAboutPage || isToolsPage) && (
+              {isEditMode && canShowEditButton && (
                 <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="icon">
@@ -242,68 +226,25 @@ const Header = () => {
                 </Dialog>
               )}
 
-              {canShowEditButton && (
-                <Dialog open={isPasswordDialogOpen} onOpenChange={(open) => {
-                  if (!open) {
-                    setPassword("");
-                    setPasswordError("");
-                  }
-                  setIsPasswordDialogOpen(open);
-                }}>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={handleEditClick}
-                      className={cn(
-                        "transition-all",
-                        isEditMode && "ring-2 ring-primary ring-offset-2 ring-offset-background"
-                      )}
-                    >
-                      {isEditMode ? (
-                        <Eye className="h-4 w-4" />
-                      ) : (
-                        <PencilRuler className="h-4 w-4" />
-                      )}
-                      <span className="sr-only">{isEditMode ? "Харах" : "Засварлах"}</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Засварлах горим</DialogTitle>
-                      <DialogDescription>
-                        Үргэлжлүүлэхийн тулд нууц үгээ оруулна уу.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="password" className="text-right">
-                          Нууц үг
-                        </Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="col-span-3"
-                          onKeyDown={(e) => e.key === 'Enter' && handlePasswordSubmit()}
-                        />
-                      </div>
-                      {passwordError && (
-                        <p className="col-span-4 text-center text-sm text-destructive">{passwordError}</p>
-                      )}
+            {!isUserLoading && (
+                user ? (
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium hidden sm:inline">{user.displayName || user.email}</span>
+                        <Button onClick={handleLogout} variant="ghost" size="icon">
+                            <LogOut className="h-5 w-5" />
+                        </Button>
                     </div>
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button type="button" variant="secondary">Цуцлах</Button>
-                      </DialogClose>
-                      <Button type="button" onClick={handlePasswordSubmit}>
-                        <LockKeyhole className="mr-2 h-4 w-4" /> Нэвтрэх
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
+                ) : (
+                    <div className='flex gap-2'>
+                        <Button asChild variant="outline" size="sm">
+                            <Link href="/login">Нэвтрэх</Link>
+                        </Button>
+                         <Button asChild size="sm">
+                            <Link href="/signup">Бүртгүүлэх</Link>
+                        </Button>
+                    </div>
+                )
+            )}
             </>
           )}
           <ThemeToggle />

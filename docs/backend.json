@@ -117,6 +117,7 @@
       "type": "object",
       "properties": {
         "title": { "type": "string" },
+        "category": { "type": "string" },
         "introduction": { "type": "string" },
         "usage": {
           "type": "array",
@@ -164,7 +165,7 @@
           }
         }
       },
-      "required": ["title", "introduction", "usage", "form", "structure", "timeExpressions", "practice"]
+      "required": ["title", "category", "introduction", "usage", "form", "structure", "timeExpressions", "practice"]
     },
     "GrammarRuleStructureDetail": {
       "title": "Grammar Rule Structure Detail",

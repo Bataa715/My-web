@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { useFirebase } from '@/firebase';
 
 interface EditModeContextType {
   isEditMode: boolean;
@@ -11,6 +12,14 @@ const EditModeContext = createContext<EditModeContextType | undefined>(undefined
 
 export function EditModeProvider({ children }: { children: ReactNode }) {
   const [isEditMode, setIsEditMode] = useState(false);
+  const { user, isUserLoading } = useFirebase();
+
+  useEffect(() => {
+    // Enable edit mode if user is logged in and loading is complete
+    if (!isUserLoading) {
+        setIsEditMode(!!user);
+    }
+  }, [user, isUserLoading]);
 
   return (
     <EditModeContext.Provider value={{ isEditMode, setIsEditMode }}>
