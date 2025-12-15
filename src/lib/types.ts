@@ -120,8 +120,7 @@ export type OrbitInfo = {
   title: string;
   content: string;
   backgroundImage?: string;
-  type?: 'info' | 'audio';
-  audioUrl?: string;
+  type: 'info' | 'audio';
   youtubeVideoId?: string;
 };
 

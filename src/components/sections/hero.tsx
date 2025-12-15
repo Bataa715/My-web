@@ -3,7 +3,7 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, MessageSquareQuote, Film, Music, Gamepad2, MapPin, BrainCircuit } from 'lucide-react';
+import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, MessageSquareQuote, Film, Music, Gamepad2, MapPin, BrainCircuit, PlayCircle } from 'lucide-react';
 import { useState, useEffect, type FC } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -139,6 +139,8 @@ export default function Hero() {
   const [editedYoutubeUrl, setEditedYoutubeUrl] = useState("");
   const [isEditingLinks, setIsEditingLinks] = useState(false);
   const [editedLinks, setEditedLinks] = useState({ github: '', instagram: '', email: '' });
+
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   
   const { toast } = useToast();
   
@@ -281,7 +283,7 @@ export default function Hero() {
             setSaving(false);
             return;
         }
-        updatedItem = { ...updatedItem, youtubeVideoId: videoId || undefined };
+        updatedItem = { ...updatedItem, youtubeVideoId: videoId || undefined, backgroundImage: editedOrbitBgImage };
     } else {
         updatedItem = { ...updatedItem, backgroundImage: editedOrbitBgImage };
     }
@@ -392,6 +394,7 @@ export default function Hero() {
         setEditedOrbitContent(item.content);
         if(item.type === 'audio') {
             setEditedYoutubeUrl(item.youtubeVideoId ? `https://www.youtube.com/watch?v=${item.youtubeVideoId}` : '');
+             setEditedOrbitBgImage(item.backgroundImage || "");
         } else {
             setEditedOrbitBgImage(item.backgroundImage || "");
         }
@@ -569,7 +572,7 @@ export default function Hero() {
                             className="absolute inset-0 flex flex-col items-center justify-center bg-muted rounded-full border-4 border-primary shadow-lg text-center overflow-hidden"
                             onClick={handleCloseContent}
                         >
-                           {selectedOrbit.type !== 'audio' && selectedOrbit.backgroundImage && !isEditingOrbit && (
+                           {selectedOrbit.backgroundImage && !isEditingOrbit && (
                               <>
                                 <Image
                                     src={selectedOrbit.backgroundImage}
@@ -624,7 +627,17 @@ export default function Hero() {
                                                     placeholder="Тайлбар..."
                                                 />
                                             </div>
-                                            {selectedOrbit.type === 'audio' ? (
+                                            
+                                            <div>
+                                                <Label className="text-center text-xs mb-1 block text-foreground">Арын зураг URL</Label>
+                                                <Input
+                                                    value={editedOrbitBgImage}
+                                                    onChange={(e) => setEditedOrbitBgImage(e.target.value)}
+                                                    className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
+                                                    placeholder="https://example.com/image.png"
+                                                />
+                                            </div>
+                                            {selectedOrbit.type === 'audio' && (
                                                 <div>
                                                     <Label className="text-center text-xs mb-1 block text-foreground">YouTube холбоос</Label>
                                                     <Input
@@ -632,16 +645,6 @@ export default function Hero() {
                                                         onChange={(e) => setEditedYoutubeUrl(e.target.value)}
                                                         className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
                                                         placeholder="https://www.youtube.com/watch?v=..."
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <div>
-                                                    <Label className="text-center text-xs mb-1 block text-foreground">Арын зураг URL</Label>
-                                                    <Input
-                                                        value={editedOrbitBgImage}
-                                                        onChange={(e) => setEditedOrbitBgImage(e.target.value)}
-                                                        className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
-                                                        placeholder="https://example.com/image.png"
                                                     />
                                                 </div>
                                             )}
@@ -661,29 +664,16 @@ export default function Hero() {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="relative w-full cursor-pointer z-20 p-4" onClick={handleContentClick}>
+                                        className="relative w-full cursor-pointer z-20 p-4 flex flex-col items-center justify-center text-center" onClick={handleContentClick}>
                                         <h3 className="font-headline text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
-                                        {selectedOrbit.type === 'audio' ? (
-                                            <div className="space-y-2">
-                                                <p className="text-sm text-foreground/80">{selectedOrbit.content}</p>
-                                                {selectedOrbit.youtubeVideoId ? (
-                                                    <div className="w-full aspect-video rounded-lg overflow-hidden">
-                                                        <iframe
-                                                            className="w-full h-full"
-                                                            src={`https://www.youtube.com/embed/${selectedOrbit.youtubeVideoId}`}
-                                                            title="YouTube video player"
-                                                            frameBorder="0"
-                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                                            allowFullScreen
-                                                        ></iframe>
-                                                    </div>
-                                                ) : (
-                                                     <p className="text-base text-foreground italic">Youtube video оруулаагүй байна.</p>
-                                                )}
-                                            </div>
-                                        ) : (
-                                            <p className="text-lg text-foreground">{selectedOrbit.content}</p>
+                                         <p className="text-lg text-foreground">{selectedOrbit.content}</p>
+                                        
+                                        {selectedOrbit.type === 'audio' && selectedOrbit.youtubeVideoId && (
+                                            <Button variant="ghost" size="icon" className="mt-4 h-12 w-12" onClick={(e) => { e.stopPropagation(); setIsPlayerOpen(true); }}>
+                                                <PlayCircle className="h-10 w-10 text-primary" />
+                                            </Button>
                                         )}
+
                                         {isEditMode && (
                                             <Button
                                                 variant="ghost"
@@ -706,7 +696,7 @@ export default function Hero() {
                             transition={{ duration: 0.6, ease: "easeInOut" }}
                             className="relative w-full h-full group"
                         >
-                            <div className="avatar-glow-wrapper w-full h-full relative">
+                           <div className="avatar-glow-wrapper w-full h-full relative">
                                 <Avatar className="w-full h-full border-4 border-primary/50">
                                     <AvatarImage src={profileImage} alt={name} />
                                     <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
@@ -714,7 +704,7 @@ export default function Hero() {
                             </div>
                             {isEditMode && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <Button 
+                                     <Button 
                                         variant="outline"
                                         size="icon"
                                         onClick={() => setIsEditingImage(true)}
@@ -777,6 +767,21 @@ export default function Hero() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+       <Dialog open={isPlayerOpen} onOpenChange={setIsPlayerOpen}>
+          <DialogContent className="max-w-3xl aspect-video p-0 border-0">
+                {selectedOrbit?.type === 'audio' && selectedOrbit.youtubeVideoId && (
+                     <iframe
+                        className="w-full h-full rounded-lg"
+                        src={`https://www.youtube.com/embed/${selectedOrbit.youtubeVideoId}?autoplay=1`}
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                    ></iframe>
+                )}
+          </DialogContent>
+       </Dialog>
     </section>
   );
 }
