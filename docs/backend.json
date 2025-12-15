@@ -112,15 +112,90 @@
       },
       "required": ["word", "romaji", "meaning"]
     },
-    "GrammarRule": {
+     "GrammarRule": {
       "title": "Grammar Rule",
       "type": "object",
       "properties": {
         "title": { "type": "string" },
-        "explanation": { "type": "string" },
+        "introduction": { "type": "string" },
+        "usage": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "condition": { "type": "string" },
+              "example": { "type": "string" }
+            },
+            "required": ["condition", "example"]
+          }
+        },
+        "form": {
+          "type": "object",
+          "properties": {
+            "regular": { "type": "string" },
+            "irregular": { "type": "string" }
+          },
+          "required": ["regular", "irregular"]
+        },
+        "structure": {
+          "type": "object",
+          "properties": {
+            "positive": { "$ref": "#/entities/GrammarRuleStructureDetail" },
+            "negative": { "$ref": "#/entities/GrammarRuleStructureDetail" },
+            "question": { "$ref": "#/entities/GrammarRuleStructureDetail" }
+          },
+          "required": ["positive", "negative", "question"]
+        },
+        "timeExpressions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "word": { "type": "string" },
+              "translation": { "type": "string" }
+            },
+            "required": ["word", "translation"]
+          }
+        },
+        "practice": {
+          "type": "array",
+          "items": {
+            "$ref": "#/entities/GrammarPracticeQuestion"
+          }
+        }
+      },
+      "required": ["title", "introduction", "usage", "form", "structure", "timeExpressions", "practice"]
+    },
+    "GrammarRuleStructureDetail": {
+      "title": "Grammar Rule Structure Detail",
+      "type": "object",
+      "properties": {
+        "formula": { "type": "string" },
         "examples": { "type": "array", "items": { "type": "string" } }
       },
-      "required": ["title", "explanation", "examples"]
+      "required": ["formula", "examples"]
+    },
+    "GrammarPracticeQuestion": {
+      "title": "Grammar Practice Question",
+      "type": "object",
+      "properties": {
+        "question": { "type": "string" },
+        "options": { "type": "array", "items": { "type": "string" } },
+        "correctAnswer": { "type": "string" },
+        "explanation": { "type": "string" }
+      },
+      "required": ["question", "options", "correctAnswer", "explanation"]
+    },
+    "ReadingMaterial": {
+      "title": "Reading Material",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "source": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "createdAt"]
     },
     "Kana": {
       "title": "Kana",
@@ -207,6 +282,13 @@
     "/japaneseWords/{wordId}": { "schema": { "$ref": "#/entities/JapaneseWord" } },
     "/englishGrammar/{ruleId}": { "schema": { "$ref": "#/entities/GrammarRule" } },
     "/japaneseGrammar/{ruleId}": { "schema": { "$ref": "#/entities/GrammarRule" } },
+    "/englishReading/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
+    "/englishListening/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
+    "/englishSpeaking/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
+    "/englishWriting/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
+    "/japaneseReading/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
+    "/japaneseListening/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
+    "/japaneseSpeaking/{materialId}": { "schema": { "$ref": "#/entities/ReadingMaterial" } },
     "/hiragana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } },
     "/katakana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } },
     "/programmingConcepts/{conceptId}": { "schema": { "$ref": "#/entities/ProgrammingConcept" } },

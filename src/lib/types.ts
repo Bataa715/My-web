@@ -19,11 +19,43 @@ export interface JapaneseWord {
   favorite?: boolean;
 }
 
+export interface GrammarRuleUsage {
+  condition: string;
+  example: string;
+}
+
+export interface GrammarRuleForm {
+  regular: string;
+  irregular: string;
+}
+
+export interface GrammarRuleStructure {
+  positive: { formula: string; examples: string[] };
+  negative: { formula: string; examples: string[] };
+  question: { formula: string; examples: string[] };
+}
+
+export interface GrammarTimeExpression {
+  word: string;
+  translation: string;
+}
+
+export interface GrammarPracticeQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  explanation: string;
+}
+
 export interface GrammarRule {
   id?: string;
   title: string;
-  explanation: string;
-  examples: string[];
+  introduction: string;
+  usage: GrammarRuleUsage[];
+  form: GrammarRuleForm;
+  structure: GrammarRuleStructure;
+  timeExpressions: GrammarTimeExpression[];
+  practice: GrammarPracticeQuestion[];
   createdAt?: Date | Timestamp;
 }
 
