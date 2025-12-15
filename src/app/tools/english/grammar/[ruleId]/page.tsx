@@ -14,16 +14,15 @@ export default function EnglishGrammarRulePage({ params }: { params: { ruleId: s
   const [rule, setRule] = useState<GrammarRule | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { ruleId } = params;
 
   useEffect(() => {
-    if (!firestore || !ruleId) return;
+    if (!firestore || !params.ruleId) return;
 
     const fetchRule = async () => {
       setLoading(true);
       setError(null);
       try {
-        const ruleDocRef = doc(firestore, 'englishGrammar', ruleId);
+        const ruleDocRef = doc(firestore, 'englishGrammar', params.ruleId);
         const docSnap = await getDoc(ruleDocRef);
 
         if (docSnap.exists()) {
@@ -40,7 +39,7 @@ export default function EnglishGrammarRulePage({ params }: { params: { ruleId: s
     };
 
     fetchRule();
-  }, [firestore, ruleId]);
+  }, [firestore, params.ruleId]);
   
   const handleUpdateRule = (updatedRule: GrammarRule) => {
     setRule(updatedRule);
