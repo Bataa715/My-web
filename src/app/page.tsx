@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
 import { Loader2, ServerCrash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { doc, getDoc, setDoc, writeBatch, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, writeBatch, collection, getDocs } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile } from '@/lib/types';
 
@@ -18,11 +18,6 @@ export default function DataMigrationPage() {
   const [isMigrating, setIsMigrating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.replace('/login');
-    }
-  }, [user, isUserLoading, router]);
 
   const handleMigration = async () => {
     if (!firestore || !user) {
@@ -88,7 +83,7 @@ export default function DataMigrationPage() {
     }
   };
 
-  if (isUserLoading || !user) {
+  if (isUserLoading) {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
@@ -120,6 +115,11 @@ export default function DataMigrationPage() {
                   <p>{error}</p>
               </div>
           )}
+           {!user && (
+             <p className="text-muted-foreground">
+                 Мэдээлэл шилжүүлэхийн тулд эхлээд <Button variant="link" className="p-0" asChild><a href="/login">нэвтэрнэ</a></Button> үү.
+             </p>
+           )}
       </div>
   )
 }
