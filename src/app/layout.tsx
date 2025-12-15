@@ -7,6 +7,7 @@ import { EditModeProvider } from "@/contexts/EditModeContext";
 import { ProjectProvider } from "@/contexts/ProjectContext";
 import { SkillsProvider } from "@/contexts/SkillsContext";
 import MainLayout from "@/components/MainLayout";
+import { EducationProvider } from "@/contexts/EducationContext";
 
 export const metadata: Metadata = {
   title: "Kaizen",
@@ -40,14 +41,16 @@ export default function RootLayout({
         >
           <FirebaseClientProvider>
             <EditModeProvider>
-              <ProjectProvider>
-                <SkillsProvider>
-                   <MainLayout>
-                        {children}
-                    </MainLayout>
-                  <Toaster />
-                </SkillsProvider>
-              </ProjectProvider>
+                <EducationProvider>
+                  <ProjectProvider>
+                    <SkillsProvider>
+                       <MainLayout>
+                            {children}
+                        </MainLayout>
+                      <Toaster />
+                    </SkillsProvider>
+                  </ProjectProvider>
+                </EducationProvider>
             </EditModeProvider>
           </FirebaseClientProvider>
         </AppThemeProvider>

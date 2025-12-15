@@ -17,6 +17,7 @@ import { ImageIcon, Loader2, Save } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import Education from '@/components/sections/Education';
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -143,6 +144,7 @@ export default function AboutPage() {
       )}
       <BackButton />
       <Hero />
+      <Education />
       <Projects />
       <Skills />
     </>

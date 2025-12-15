@@ -95,6 +95,16 @@ export interface ProgressItem {
   practicing: boolean;
 }
 
+export type Education = {
+  id?: string;
+  degree: string;
+  school: string;
+  startDate: Date | Timestamp;
+  endDate: Date | Timestamp;
+  score?: string;
+  createdAt?: Date | Timestamp;
+};
+
 export type Project = {
   id?: string;
   name: string;

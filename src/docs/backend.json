@@ -65,6 +65,20 @@
       },
       "required": ["name", "bio"]
     },
+    "Education": {
+      "title": "Education",
+      "description": "Represents an education entry in the portfolio.",
+      "type": "object",
+      "properties": {
+        "degree": { "type": "string" },
+        "school": { "type": "string" },
+        "startDate": { "type": "string", "format": "date" },
+        "endDate": { "type": "string", "format": "date" },
+        "score": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["degree", "school", "startDate", "endDate", "createdAt"]
+    },
     "Project": {
       "title": "Project",
       "description": "Represents a project in the portfolio.",
@@ -262,6 +276,10 @@
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/UserProfile" },
       "description": "Stores user profile information."
+    },
+     "/users/{userId}/education/{educationId}": {
+      "schema": { "$ref": "#/entities/Education" },
+      "description": "Stores user education history."
     },
     "/users/{userId}/projects/{projectId}": {
       "schema": { "$ref": "#/entities/Project" },
