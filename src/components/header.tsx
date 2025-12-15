@@ -189,8 +189,8 @@ const Header = () => {
           </Sheet>
         </div>
 
-        <div className="hidden md:flex flex-1 items-center gap-6">
-            <button onClick={() => router.push(user ? "/home" : "/")} className="mr-6 flex items-center space-x-2">
+        <div className="hidden md:flex flex-1 items-center gap-6 mr-6">
+            <button onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2">
                  {isEditingAppName ? (
                     <div className="flex items-center gap-2">
                         <Input
