@@ -50,6 +50,7 @@ export interface GrammarPracticeQuestion {
 export interface GrammarRule {
   id?: string;
   title: string;
+  category: string;
   introduction: string;
   usage: GrammarRuleUsage[];
   form: GrammarRuleForm;

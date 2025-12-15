@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { collection, getDocs, addDoc, serverTimestamp, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { GrammarRule } from '@/lib/types';
@@ -20,6 +20,7 @@ export default function JapaneseGrammarPage() {
   const [rules, setRules] = useState<GrammarRule[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   useEffect(() => {
     const fetchRules = async () => {
@@ -46,6 +47,13 @@ export default function JapaneseGrammarPage() {
     fetchRules();
   }, [firestore]);
 
+  const categories = useMemo(() => ["All", ...Array.from(new Set(rules.map(r => r.category)))], [rules]);
+
+  const filteredRules = useMemo(() => {
+    if (selectedCategory === "All") return rules;
+    return rules.filter(rule => rule.category === selectedCategory);
+  }, [rules, selectedCategory]);
+
  const handleAddRule = async (newRule: Omit<GrammarRule, 'id' | 'createdAt'>) => {
     if (!firestore) {
         toast({ title: "Алдаа", description: "Дүрэм нэмэхийн тулд нэвтэрнэ үү.", variant: "destructive" });
@@ -60,6 +68,10 @@ export default function JapaneseGrammarPage() {
         console.error("Error adding new rule: ", error);
         toast({ title: "Алдаа", description: "Дүрэм нэмэхэд алдаа гарлаа.", variant: "destructive" });
     }
+  };
+
+  const handleUpdateRule = (updatedRule: GrammarRule) => {
+    setRules(prevRules => prevRules.map(rule => rule.id === updatedRule.id ? updatedRule : rule));
   };
 
   const handleDeleteRule = async (id: string) => {
@@ -94,16 +106,35 @@ export default function JapaneseGrammarPage() {
         )}
       </div>
       {loading ? (
-        <div className="space-y-4 pt-8">
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-        </div>
-      ) : (
-         <div className="pt-8">
-            <GrammarList rules={rules} onDeleteRule={handleDeleteRule} />
-        </div>
-      )}
+         <div className="space-y-4 pt-8">
+            <div className="flex justify-center flex-wrap gap-2 py-8">
+                 <Skeleton className="h-10 w-20" />
+                 <Skeleton className="h-10 w-24" />
+                 <Skeleton className="h-10 w-28" />
+             </div>
+           <Skeleton className="h-48 w-full" />
+           <Skeleton className="h-48 w-full" />
+           <Skeleton className="h-48 w-full" />
+         </div>
+       ) : (
+         <>
+            <div className="flex justify-center flex-wrap gap-2 py-8">
+              {categories.map((category) => (
+                <Button
+                  key={category}
+                  variant={selectedCategory === category ? "default" : "outline"}
+                  onClick={() => setSelectedCategory(category)}
+                  className="rounded-full transition-colors duration-300"
+                >
+                  {category}
+                </Button>
+              ))}
+            </div>
+            <div className="pt-2">
+                <GrammarList rules={filteredRules} onDeleteRule={handleDeleteRule} onUpdateRule={handleUpdateRule} collectionPath="japaneseGrammar" />
+            </div>
+         </>
+       )}
     </div>
   );
 }

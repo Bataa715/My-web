@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import type { GrammarRule } from "@/lib/types";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { Button } from "../ui/button";
-import { Trash2, AlertTriangle, BookCopy, CheckCircle2, XCircle } from "lucide-react";
+import { Trash2, AlertTriangle, BookCopy, CheckCircle2, XCircle, Edit } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -22,10 +22,13 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "../ui/badge";
+import { EditGrammarRuleDialog } from "./EditGrammarRuleDialog";
 
 interface GrammarListProps {
   rules: GrammarRule[];
   onDeleteRule: (id: string) => void;
+  onUpdateRule: (rule: GrammarRule) => void;
+  collectionPath: 'englishGrammar' | 'japaneseGrammar';
 }
 
 const PracticeQuestion = ({ question, index }: { question: any, index: number }) => {
@@ -70,7 +73,7 @@ const PracticeQuestion = ({ question, index }: { question: any, index: number })
 };
 
 
-export default function GrammarList({ rules, onDeleteRule }: GrammarListProps) {
+export default function GrammarList({ rules, onDeleteRule, onUpdateRule, collectionPath }: GrammarListProps) {
   const { isEditMode } = useEditMode();
 
   return (
@@ -80,36 +83,50 @@ export default function GrammarList({ rules, onDeleteRule }: GrammarListProps) {
            <CardHeader className="bg-muted/30">
             <div className="flex justify-between items-start">
                  <div className="space-y-2">
-                    <CardTitle className="text-3xl font-bold flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                         <BookCopy className="h-8 w-8 text-primary"/>
-                        {rule.title}
-                    </CardTitle>
-                    <CardDescription className="text-base prose dark:prose-invert max-w-none">{rule.introduction}</CardDescription>
+                        <div>
+                            <CardTitle className="text-3xl font-bold">{rule.title}</CardTitle>
+                            <Badge variant="secondary">{rule.category}</Badge>
+                        </div>
+                    </div>
+                    <CardDescription className="text-base prose dark:prose-invert max-w-none pt-2">{rule.introduction}</CardDescription>
                 </div>
                 {isEditMode && rule.id && (
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button
+                    <div className="flex gap-1">
+                        <EditGrammarRuleDialog rule={rule} onUpdateRule={onUpdateRule} collectionPath={collectionPath}>
+                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive"
+                                className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
                             >
-                                <Trash2 className="h-4 w-4" />
+                                <Edit className="h-4 w-4" />
                             </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                            <AlertDialogTitle>Та итгэлтэй байна уу?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                                Энэ үйлдлийг буцаах боломжгүй. "{rule.title}" дүрэм бүрмөсөн устгагдах болно.
-                            </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                            <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => onDeleteRule(rule.id!)}>Устгах</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+                        </EditGrammarRuleDialog>
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10 hover:text-destructive"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>Та итгэлтэй байна уу?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Энэ үйлдлийг буцаах боломжгүй. "{rule.title}" дүрэм бүрмөсөн устгагдах болно.
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => onDeleteRule(rule.id!)}>Устгах</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
                 )}
             </div>
           </CardHeader>

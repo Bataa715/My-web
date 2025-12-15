@@ -15,6 +15,7 @@ export const initialEnglishWords: Omit<EnglishWord, 'id' | 'memorized' | 'favori
 
 export const initialEnglishRule: Omit<GrammarRule, 'id' | 'createdAt'> = {
   title: "Present Simple Tense",
+  category: "Tense",
   introduction: "Тогтмол давтагддаг үйлдэл, ерөнхий үнэн, хуваарь зэргийг илэрхийлэхэд хэрэглэгддэг англи хэлний хамгийн энгийн бөгөөд чухал цаг.",
   usage: [
     { condition: "Тогтмол давтагддаг, зуршил болсон үйлдэл", example: "I drink coffee every morning." },
