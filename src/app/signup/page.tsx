@@ -107,7 +107,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+    <div className="flex items-center justify-center min-h-screen">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Бүртгүүлэх</CardTitle>
@@ -163,7 +163,7 @@ export default function SignupPage() {
             </form>
           </Form>
         </CardContent>
-         <CardFooter className="flex-col items-start text-sm">
+         <CardFooter className="flex-col items-center text-sm">
             <p className="text-muted-foreground">
                 Бүртгэлтэй юу?{' '}
                 <Link href="/" className="underline text-primary">
