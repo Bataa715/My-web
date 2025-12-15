@@ -114,17 +114,14 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         toast({ title: "Алдаа", description: "Нэвтэрч орно уу.", variant: "destructive" });
         return;
     };
+    const projectsCollection = collection(firestore, `users/${user.uid}/projects`);
     try {
-        const projectsCollection = collection(firestore, `users/${user.uid}/projects`);
         const newProjectData = { ...project, createdAt: serverTimestamp() };
         
-        const tempId = "temp-" + Date.now();
-        const optimisticProject: Project = { ...project, id: tempId, createdAt: new Date() };
-        setProjects((prevProjects) => [optimisticProject, ...prevProjects]);
-
         const docRef = await addDoc(projectsCollection, newProjectData);
+        const newProject = { ...project, id: docRef.id, createdAt: new Date() } as Project;
       
-        setProjects((prevProjects) => prevProjects.map(p => p.id === tempId ? { ...optimisticProject, id: docRef.id } : p));
+        setProjects((prevProjects) => [newProject, ...prevProjects]);
 
         toast({
             title: "Амжилттай нэмэгдлээ",
@@ -137,7 +134,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
             description: "Төсөл нэмэхэд алдаа гарлаа.",
             variant: "destructive",
         });
-        setProjects(prev => prev.filter(p => !p.id?.startsWith('temp-')));
     }
   };
 
@@ -173,6 +169,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         return;
     };
 
+    const originalProjects = [...projects];
     const projectToDelete = projects.find(p => p.id === projectId);
     if (!projectToDelete) return;
 
@@ -187,7 +184,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       });
     } catch (error) {
       console.error("Error deleting project: ", error);
-      setProjects((prevProjects) => [...prevProjects, projectToDelete].sort((a,b) => (b.createdAt as any) - (a.createdAt as any)));
+      setProjects(originalProjects);
       toast({
         title: "Алдаа",
         description: "Төсөл устгахад алдаа гарлаа.",

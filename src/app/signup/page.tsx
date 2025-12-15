@@ -42,6 +42,11 @@ export default function SignupPage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
+    if (!firestore || !auth) {
+        toast({ title: 'Алдаа', description: 'Firebase-д холбогдож чадсангүй.', variant: 'destructive' });
+        setIsLoading(false);
+        return;
+    }
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
@@ -69,6 +74,7 @@ export default function SignupPage() {
       const defaultLinks = {
         github: "https://github.com/Bataa715",
         instagram: "https://www.instagram.com/ka1__zen/",
+        email: values.email,
       };
       
       const userProfile: UserProfile = {

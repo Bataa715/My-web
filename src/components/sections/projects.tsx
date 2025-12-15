@@ -12,6 +12,17 @@ import { useProjects } from "@/contexts/ProjectContext";
 import { useEditMode } from "@/contexts/EditModeContext";
 import { AddProjectDialog } from "../AddProjectDialog";
 import { EditProjectDialog } from "../EditProjectDialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function Projects() {
   const { projects, deleteProject, loading } = useProjects();
@@ -73,16 +84,32 @@ export default function Projects() {
                                     <Edit className="h-4 w-4" />
                                 </Button>
                             </EditProjectDialog>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                              onClick={() => project.id && deleteProject(project.id)}
-                              aria-label="Delete project"
-                              disabled={!project.id}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                           <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                      aria-label="Delete project"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            "{project.name}" төслийг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => project.id && deleteProject(project.id)}>
+                                            Устгах
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
                         </div>
                       )}
                       <CardHeader>

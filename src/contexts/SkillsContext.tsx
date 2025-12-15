@@ -120,12 +120,14 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
 
   const deleteSkillGroup = async (id: string) => {
     if (!user || !firestore) return;
-    const originalSkills = skills;
+    const originalSkills = [...skills];
+    const skillToDelete = skills.find(s => s.id === id);
+    if (!skillToDelete) return;
     setSkills(prev => prev.filter(s => s.id !== id));
     try {
       const skillDoc = doc(firestore, `users/${user.uid}/skills`, id);
       await deleteDoc(skillDoc);
-      toast({ title: "Амжилттай", description: "Ур чадварын бүлэг устгагдлаа." });
+      toast({ title: "Амжилттай", description: `"${skillToDelete.name}" бүлэг устгагдлаа.` });
     } catch (error) {
       setSkills(originalSkills);
       console.error("Error deleting skill group: ", error);
