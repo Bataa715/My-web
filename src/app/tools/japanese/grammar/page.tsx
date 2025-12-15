@@ -112,9 +112,9 @@ export default function JapaneseGrammarPage() {
                  <Skeleton className="h-10 w-24" />
                  <Skeleton className="h-10 w-28" />
              </div>
-           <Skeleton className="h-48 w-full" />
-           <Skeleton className="h-48 w-full" />
-           <Skeleton className="h-48 w-full" />
+           <Skeleton className="h-24 w-full" />
+           <Skeleton className="h-24 w-full" />
+           <Skeleton className="h-24 w-full" />
          </div>
        ) : (
          <>
