@@ -20,7 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { signOut } from 'firebase/auth';
 
 const mainLinks = [
-  { href: "/", label: "Нүүр" },
+  { href: "/home", label: "Нүүр" },
   { href: "/about", label: "Миний тухай" },
   { href: "/tools", label: "Хэрэгсэл" },
 ];
@@ -41,7 +41,7 @@ const Header = () => {
     }, [user, setIsEditMode]);
     
     const isAboutPage = pathname === '/about';
-    const isHomePage = pathname === '/';
+    const isHomePage = pathname === '/home';
     const isToolsPage = pathname === '/tools';
     const canShowEditButton = isAboutPage || isHomePage || isToolsPage;
 
@@ -124,13 +124,13 @@ const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center">
         <div className="mr-4 hidden md:flex">
-            <Link href="/" className="mr-6 flex items-center space-x-2">
+            <Link href={user ? "/home" : "/"} className="mr-6 flex items-center space-x-2">
                 <span className="hidden font-bold sm:inline-block font-headline">
                 Ka1_zen
                 </span>
             </Link>
             <nav className="flex items-center gap-4 text-sm">
-                {mainLinks.map((link) => (
+                {user && mainLinks.map((link) => (
                    <Link
                     key={link.href}
                     href={link.href}
@@ -160,11 +160,11 @@ const Header = () => {
               <SheetHeader>
                   <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               </SheetHeader>
-              <Link href="/" className="mr-6 flex items-center space-x-2" onClick={() => setIsOpen(false)}>
+              <Link href={user ? "/home" : "/"} className="mr-6 flex items-center space-x-2" onClick={() => setIsOpen(false)}>
                 <span className="font-bold font-headline">Ka1_zen</span>
               </Link>
               <nav className="flex flex-col space-y-4 mt-6">
-                {mainLinks.map((link) => (
+                {user && mainLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
@@ -237,7 +237,7 @@ const Header = () => {
                 ) : (
                     <div className='flex gap-2'>
                         <Button asChild variant="outline" size="sm">
-                            <Link href="/login">Нэвтрэх</Link>
+                            <Link href="/">Нэвтрэх</Link>
                         </Button>
                          <Button asChild size="sm">
                             <Link href="/signup">Бүртгүүлэх</Link>

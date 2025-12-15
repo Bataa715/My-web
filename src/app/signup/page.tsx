@@ -86,7 +86,7 @@ export default function SignupPage() {
       await setDoc(doc(firestore, 'users', user.uid), userProfile);
 
       toast({ title: 'Амжилттай бүртгүүллээ.' });
-      router.push('/');
+      router.push('/home');
 
     } catch (error: any) {
       console.error('Signup error:', error);
@@ -160,7 +160,7 @@ export default function SignupPage() {
          <CardFooter className="flex-col items-start text-sm">
             <p className="text-muted-foreground">
                 Бүртгэлтэй юу?{' '}
-                <Link href="/login" className="underline text-primary">
+                <Link href="/" className="underline text-primary">
                 Нэвтрэх
                 </Link>
             </p>

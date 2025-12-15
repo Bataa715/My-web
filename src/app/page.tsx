@@ -1,84 +1,108 @@
 'use client';
 
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useAuth } from '@/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import { ArrowRight, Wrench } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import { doc, getDoc } from 'firebase/firestore';
-import { useFirebase } from '@/firebase';
-import type { UserProfile } from '@/lib/types';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-export default function Home() {
-  const { firestore, user, isUserLoading } = useFirebase();
-  const [heroImage, setHeroImage] = useState<string | undefined>(undefined);
+const formSchema = z.object({
+  email: z.string().email({ message: 'И-мэйл хаяг буруу байна.' }),
+  password: z.string().min(6, { message: 'Нууц үг дор хаяж 6 тэмдэгттэй байх ёстой.' }),
+});
 
-  useEffect(() => {
-    if (isUserLoading) return;
+export default function LoginPage() {
+  const auth = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-    const fetchHeroImage = async () => {
-      let imageUrl;
-      if (user && firestore) {
-        try {
-          const userDocRef = doc(firestore, 'users', user.uid);
-          const docSnap = await getDoc(userDocRef);
-          if (docSnap.exists()) {
-            const data = docSnap.data() as UserProfile;
-            if (data.homeHeroImage) {
-              imageUrl = data.homeHeroImage;
-            }
-          }
-        } catch (error) {
-            console.error("Error fetching user's hero image:", error);
-        }
-      }
-      
-      if (!imageUrl) {
-        const placeholder = PlaceHolderImages.find(p => p.id === 'home-hero-background');
-        imageUrl = placeholder?.imageUrl;
-      }
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
-      setHeroImage(imageUrl);
-    };
-
-    fetchHeroImage();
-  }, [user, firestore, isUserLoading]);
-
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      toast({ title: 'Амжилттай нэвтэрлээ.' });
+      router.push('/home');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast({
+        title: 'Нэвтрэхэд алдаа гарлаа',
+        description: error.message,
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+    }
+  }
 
   return (
-    <div className="relative">
-      {heroImage && (
-        <div className="absolute top-0 left-0 w-full h-[60vh] -z-10">
-          <Image
-            src={heroImage}
-            alt="Welcome background"
-            fill
-            className="object-cover"
-            data-ai-hint="welcome abstract"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
-        </div>
-      )}
-      <div className="flex flex-col items-center justify-center text-center h-[calc(100vh-57px-81px)]">
-         <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
-            <p className="max-w-[700px] text-muted-foreground md:text-xl">
-             Энэ бол тасралтгүй хөгжил, суралцах үйл явцыг минь харуулсан хувийн орон зай юм.
+    <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-2xl">Нэвтрэх</CardTitle>
+          <CardDescription>
+            Бүртгэлтэй хэрэглэгч и-мэйл, нууц үгээ ашиглан нэвтэрнэ үү.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>И-мэйл</FormLabel>
+                    <FormControl>
+                      <Input placeholder="name@example.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Нууц үг</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Нэвтэрч байна...' : 'Нэвтрэх'}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+         <CardFooter className="flex-col items-start text-sm">
+            <p className="text-muted-foreground">
+                Бүртгэл байхгүй юу?{' '}
+                <Link href="/signup" className="underline text-primary">
+                Бүртгүүлэх
+                </Link>
             </p>
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Button asChild size="lg">
-                <Link href="/about">
-                  Миний тухай <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="secondary">
-                <Link href="/tools">
-                  <Wrench className="mr-2 h-5 w-5" /> Хэрэгслүүд
-                </Link>
-              </Button>
-            </div>
-          </div>
-      </div>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
