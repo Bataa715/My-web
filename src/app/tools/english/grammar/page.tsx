@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs, addDoc, serverTimestamp, deleteDoc, doc, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, addDoc, serverTimestamp, deleteDoc, doc, query, orderBy, writeBatch } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { GrammarRule } from '@/lib/types';
 import GrammarList from '@/components/shared/GrammarList';
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import BackButton from '@/components/shared/BackButton';
+import { initialEnglishRule } from '@/data/english';
 
 export default function EnglishGrammarPage() {
   const { firestore } = useFirebase();
@@ -32,11 +33,30 @@ export default function EnglishGrammarPage() {
         const rulesCollection = collection(firestore, 'englishGrammar');
         const q = query(rulesCollection, orderBy('createdAt', 'desc'));
         const rulesSnapshot = await getDocs(q);
-        const rulesList = rulesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        } as GrammarRule));
-        setRules(rulesList);
+        
+        if (rulesSnapshot.empty) {
+          console.log("No grammar rules found, seeding initial rule...");
+          const batch = writeBatch(firestore);
+          const newRuleWithTimestamp = { ...initialEnglishRule, createdAt: serverTimestamp() };
+          const docRef = doc(rulesCollection);
+          batch.set(docRef, newRuleWithTimestamp);
+          await batch.commit();
+          
+          const newSnapshot = await getDocs(q);
+          const rulesList = newSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          } as GrammarRule));
+          setRules(rulesList);
+
+        } else {
+          const rulesList = rulesSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          } as GrammarRule));
+          setRules(rulesList);
+        }
+
       } catch (error) {
         console.error("Error fetching English grammar rules: ", error);
       } finally {
