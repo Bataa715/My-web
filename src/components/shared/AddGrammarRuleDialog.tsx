@@ -17,16 +17,19 @@ export function AddGrammarRuleDialog({ children, onAddRule }: AddGrammarRuleDial
     const [open, setOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [explanation, setExplanation] = useState('');
+    const [examples, setExamples] = useState('');
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         
-        // Since examples are now part of the markdown in explanation, we pass an empty array
+        const exampleArray = examples.split(',').map(ex => ex.trim()).filter(Boolean);
+
         if (title && explanation) {
-            await onAddRule({ title, explanation, examples: [] });
+            await onAddRule({ title, explanation, examples: exampleArray });
             setOpen(false);
             setTitle('');
             setExplanation('');
+            setExamples('');
         }
     };
 
@@ -39,7 +42,7 @@ export function AddGrammarRuleDialog({ children, onAddRule }: AddGrammarRuleDial
                 <DialogHeader>
                     <DialogTitle>Шинэ дүрэм нэмэх</DialogTitle>
                     <DialogDescription>
-                        Дүрмийн гарчиг болон тайлбарыг Markdown ашиглан оруулна уу.
+                        Дүрмийн гарчиг, тайлбар, жишээ өгүүлбэрийг таслалаар тусгаарлан оруулна уу.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="grid gap-4 py-4">
@@ -48,14 +51,25 @@ export function AddGrammarRuleDialog({ children, onAddRule }: AddGrammarRuleDial
                         <Input id="rule-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Present Simple" required />
                     </div>
                      <div>
-                        <Label htmlFor="rule-explanation">Тайлбар (Markdown дэмжинэ)</Label>
+                        <Label htmlFor="rule-explanation">Тайлбар</Label>
                         <Textarea 
                             id="rule-explanation" 
                             value={explanation} 
                             onChange={(e) => setExplanation(e.target.value)} 
-                            placeholder="**Эерэг хэлбэр (Affirmative)**..." 
+                            placeholder="Энгийн одоо цагийн тайлбар..." 
                             required 
-                            rows={15}
+                            rows={8}
+                        />
+                    </div>
+                     <div>
+                        <Label htmlFor="rule-examples">Жишээ (таслалаар тусгаарлана)</Label>
+                        <Textarea 
+                            id="rule-examples" 
+                            value={examples} 
+                            onChange={(e) => setExamples(e.target.value)} 
+                            placeholder="I play football, She reads a book" 
+                            required 
+                            rows={4}
                         />
                     </div>
                     <DialogFooter>
