@@ -42,6 +42,7 @@ const Header = () => {
     const pathname = usePathname();
     const router = useRouter();
     const [mounted, setMounted] = useState(false);
+    const [saving, setSaving] = useState(false);
     
     const { user, isUserLoading, auth, firestore } = useFirebase();
 
@@ -49,87 +50,22 @@ const Header = () => {
         setMounted(true);
     }, []);
     
-    const isAboutPage = pathname === '/about';
-    const isHomePage = pathname === '/home';
-    const isToolsPage = pathname === '/tools';
-    const canShowEditButton = isAboutPage || isHomePage || isToolsPage;
-
-    const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
-    const [editedImageUrl, setEditedImageUrl] = useState('');
-    const [saving, setSaving] = useState(false);
 
     const [isLinkAccountOpen, setIsLinkAccountOpen] = useState(false);
      
-    const getImageFieldForPage = (): keyof UserProfile | null => {
-        if (isHomePage) return 'homeHeroImage';
-        if (isAboutPage) return 'aboutHeroImage';
-        if (isToolsPage) return 'toolsHeroImage';
-        return null;
-    }
-
-     useEffect(() => {
-        if (!user || !firestore || !isImageEditingOpen) return;
-
-        const fetchCurrentImage = async () => {
-            const imageField = getImageFieldForPage();
-            if (!imageField) return;
-
-            const userDocRef = doc(firestore, 'users', user.uid);
-            const docSnap = await getDoc(userDocRef);
-            if (docSnap.exists()) {
-                const data = docSnap.data() as UserProfile;
-                setEditedImageUrl(data[imageField] as string || '');
-            }
-        };
-        fetchCurrentImage();
-    }, [user, firestore, isImageEditingOpen, pathname]);
 
     const handleLogout = async () => {
       try {
-        await signOut(auth);
-        setIsEditMode(false);
-        toast({ title: "Амжилттай гарлаа." });
-        router.push('/');
+        if (auth) {
+            await signOut(auth);
+            setIsEditMode(false);
+            toast({ title: "Амжилттай гарлаа." });
+            router.push('/');
+        }
       } catch (error) {
         console.error("Logout error:", error);
         toast({ title: "Гарахад алдаа гарлаа.", variant: 'destructive' });
       }
-    };
-
-    const handleSaveImage = async () => {
-        if (!user || !firestore) {
-             toast({ title: "Алдаа", description: "Нэвтэрч орно уу.", variant: "destructive" });
-             return;
-        }
-
-        const imageField = getImageFieldForPage();
-        if (!imageField) {
-            toast({ title: "Алдаа", description: "Энэ хуудсанд зураг засах боломжгүй.", variant: "destructive" });
-            return;
-        }
-        
-        setSaving(true);
-        try {
-            const userDocRef = doc(firestore, 'users', user.uid);
-            await updateDoc(userDocRef, { [imageField]: editedImageUrl });
-            
-            setSaving(false);
-            setIsImageEditingOpen(false);
-            toast({
-                title: 'Амжилттай',
-                description: 'Арын зураг шинэчлэгдлээ.',
-            });
-             // Force a reload to see the change on the page
-             window.location.reload();
-        } catch (error) {
-            console.error("Error saving hero image:", error);
-            setSaving(false);
-            toast({
-                title: 'Алдаа',
-                description: 'Арын зураг хадгалахад алдаа гарлаа.',
-                variant: 'destructive',
-            });
-        }
     };
     
     const form = useForm<z.infer<typeof linkAccountSchema>>({
@@ -141,7 +77,7 @@ const Header = () => {
     });
 
     const onLinkAccountSubmit = async (values: z.infer<typeof linkAccountSchema>) => {
-        if (!user || !user.isAnonymous) {
+        if (!user || !user.isAnonymous || !firestore) {
             toast({ title: "Алдаа", description: "Зөвхөн нэр-усгүй хэрэглэгч бүртгэлээ холбох боломжтой.", variant: 'destructive' });
             return;
         }
@@ -151,13 +87,12 @@ const Header = () => {
             const credential = EmailAuthProvider.credential(values.email, values.password);
             await linkWithCredential(user, credential);
 
-            // Optionally update the user's profile document with the new email
             const userDocRef = doc(firestore, 'users', user.uid);
             await updateDoc(userDocRef, { email: values.email });
             
             toast({ title: 'Амжилттай холбогдлоо!', description: 'Таны түр бүртгэл байнгын боллоо.' });
             setIsLinkAccountOpen(false);
-            router.refresh(); // Refresh to update user state display
+            router.refresh(); 
         } catch (error: any) {
             console.error("Account linking error:", error);
              let description = "Бүртгэл холбоход алдаа гарлаа.";
@@ -242,51 +177,11 @@ const Header = () => {
         <div className="flex flex-1 items-center justify-end gap-2">
           {mounted && (
             <>
-              {user && (
+              {user && !isUserLoading && (
                  <Button variant="outline" size="icon" onClick={() => setIsEditMode(!isEditMode)}>
                     {isEditMode ? <Eye className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />}
                     <span className="sr-only">{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
                 </Button>
-              )}
-              {isEditMode && canShowEditButton && (
-                <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <ImageIcon className="h-4 w-4" />
-                      <span className="sr-only">Арын зураг солих</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Арын зургийн холбоос</DialogTitle>
-                      <DialogDescription>
-                        Шинэ зургийнхаа URL хаягийг энд буулгана уу.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="image-url" className="text-right">
-                          URL
-                        </Label>
-                        <Input
-                          id="image-url"
-                          value={editedImageUrl}
-                          onChange={(e) => setEditedImageUrl(e.target.value)}
-                          className="col-span-3"
-                          placeholder="https://example.com/image.png"
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button type="button" variant="secondary">Цуцлах</Button>
-                      </DialogClose>
-                      <Button type="button" onClick={handleSaveImage} disabled={saving}>
-                        {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
               )}
 
             {!isUserLoading && (
