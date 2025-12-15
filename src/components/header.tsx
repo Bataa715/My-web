@@ -41,7 +41,6 @@ const Header = () => {
     const { toast } = useToast();
     const pathname = usePathname();
     const router = useRouter();
-    const [mounted, setMounted] = useState(false);
     const [saving, setSaving] = useState(false);
     
     const { user, isUserLoading, auth, firestore } = useFirebase();
@@ -50,7 +49,6 @@ const Header = () => {
     const [editedAppName, setEditedAppName] = useState(appName);
 
     useEffect(() => {
-        setMounted(true);
         const fetchAppName = async () => {
             if (user && firestore) {
                 const userDocRef = doc(firestore, 'users', user.uid);
@@ -152,62 +150,12 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center">
-        <div className="mr-4 flex md:flex-1">
-            <Link href={user ? "/home" : "/"} className="mr-6 flex items-center space-x-2">
-                 {isEditingAppName ? (
-                    <div className="flex items-center gap-2">
-                        <Input
-                            value={editedAppName}
-                            onChange={(e) => setEditedAppName(e.target.value)}
-                            className="font-bold h-8"
-                        />
-                        <Button onClick={handleSaveAppName} size="icon" className="h-8 w-8" disabled={saving}>
-                            {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}
-                        </Button>
-                        <Button onClick={() => { setIsEditingAppName(false); setEditedAppName(appName); }} size="icon" variant="ghost" className="h-8 w-8">
-                            <XCircle className="h-4 w-4"/>
-                        </Button>
-                    </div>
-                ) : (
-                    <div className="flex items-center gap-2">
-                        <span className="hidden font-bold sm:inline-block font-headline">
-                            {appName}
-                        </span>
-                        {isEditMode && (
-                             <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => setIsEditingAppName(true)}
-                              >
-                                <PencilRuler className="h-4 w-4" />
-                              </Button>
-                        )}
-                    </div>
-                )}
-            </Link>
-            <nav className="hidden md:flex items-center gap-4 text-sm">
-                {mainLinks.map((link) => (
-                   <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      "transition-colors hover:text-primary",
-                      (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href ? "text-primary font-semibold" : "text-muted-foreground"
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-            </nav>
-        </div>
-        <div className="flex md:hidden">
+        <div className="mr-4 flex md:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
               >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle Menu</span>
@@ -239,15 +187,63 @@ const Header = () => {
           </Sheet>
         </div>
 
+        <div className="mr-4 hidden md:flex md:flex-1">
+            <Link href={user ? "/home" : "/"} className="mr-6 flex items-center space-x-2">
+                 {isEditingAppName ? (
+                    <div className="flex items-center gap-2">
+                        <Input
+                            value={editedAppName}
+                            onChange={(e) => setEditedAppName(e.target.value)}
+                            className="font-bold h-8"
+                        />
+                        <Button onClick={handleSaveAppName} size="icon" className="h-8 w-8" disabled={saving}>
+                            {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}
+                        </Button>
+                        <Button onClick={() => { setIsEditingAppName(false); setEditedAppName(appName); }} size="icon" variant="ghost" className="h-8 w-8">
+                            <XCircle className="h-4 w-4"/>
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="flex items-center gap-2">
+                        <span className="font-bold sm:inline-block font-headline">
+                            {appName}
+                        </span>
+                        {isEditMode && (
+                             <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => setIsEditingAppName(true)}
+                              >
+                                <PencilRuler className="h-4 w-4" />
+                              </Button>
+                        )}
+                    </div>
+                )}
+            </Link>
+            <nav className="flex items-center gap-4 text-sm">
+                {mainLinks.map((link) => (
+                   <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "transition-colors hover:text-primary",
+                      (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href ? "text-primary font-semibold" : "text-muted-foreground"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+            </nav>
+        </div>
+        
         <div className="flex flex-1 items-center justify-end gap-2">
-          {mounted && (
-            <>
-              {user && !isUserLoading && (
-                 <Button variant="outline" size="icon" onClick={() => setIsEditMode(!isEditMode)}>
-                    {isEditMode ? <Eye className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />}
-                    <span className="sr-only">{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
-                </Button>
-              )}
+            {user && !isUserLoading && (
+                <Button variant="outline" size="icon" onClick={() => setIsEditMode(!isEditMode)}>
+                {isEditMode ? <Eye className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />}
+                <span className="sr-only">{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
+            </Button>
+            )}
 
             {!isUserLoading && (
                 user ? (
@@ -324,8 +320,6 @@ const Header = () => {
                     </div>
                 )
             )}
-            </>
-          )}
           <ThemeToggle />
         </div>
       </div>
@@ -334,3 +328,5 @@ const Header = () => {
 };
 
 export default Header;
+
+    
