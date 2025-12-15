@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFirebase } from '@/firebase';
 import { Loader2, ServerCrash } from 'lucide-react';
@@ -17,6 +17,12 @@ export default function DataMigrationPage() {
   const { toast } = useToast();
   const [isMigrating, setIsMigrating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.replace('/login');
+    }
+  }, [user, isUserLoading, router]);
 
   const handleMigration = async () => {
     if (!firestore || !user) {
@@ -82,18 +88,13 @@ export default function DataMigrationPage() {
     }
   };
 
-  if (isUserLoading) {
+  if (isUserLoading || !user) {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
         <p className="mt-4 text-muted-foreground">Уншиж байна...</p>
       </div>
     );
-  }
-  
-  if (!user) {
-    router.replace('/login');
-    return null;
   }
 
   return (
