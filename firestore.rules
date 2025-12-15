@@ -12,29 +12,9 @@ service cloud.firestore {
       return request.auth.uid == userId;
     }
 
-    // Rules for users collection and sub-collections
-    match /users/{userId} {
-      allow read, write: if isSignedIn() && isOwner(userId);
-      
-      // Rules for user-specific sub-collections
-      match /projects/{projectId} {
-        allow read, write: if isSignedIn() && isOwner(userId);
-      }
-      match /skills/{skillId} {
-        allow read, write: if isSignedIn() && isOwner(userId);
-      }
-      match /englishWords/{wordId} {
-        allow read, write: if isSignedIn() && isOwner(userId);
-      }
-      match /japaneseWords/{wordId} {
-        allow read, write: if isSignedIn() && isOwner(userId);
-      }
-      match /memorized/{kanaType} {
-        allow read, write: if isSignedIn() && isOwner(userId);
-      }
-       match /progress/{progressType} {
-        allow read, write: if isSignedIn() && isOwner(userId);
-      }
+    // Temporarily allow read/write for migration
+    match /users/{userId}/{document=**} {
+      allow read, write: if true;
     }
     
     // Allow public read for learning materials, and allow write for signed-in users to seed data
