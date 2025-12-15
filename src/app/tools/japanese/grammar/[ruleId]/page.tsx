@@ -14,9 +14,9 @@ export default function JapaneseGrammarRulePage({ params }: { params: { ruleId: 
   const [rule, setRule] = useState<GrammarRule | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const ruleId = params.ruleId;
 
   useEffect(() => {
+    const ruleId = params.ruleId;
     if (!firestore || !ruleId) return;
 
     const fetchRule = async () => {
@@ -40,7 +40,7 @@ export default function JapaneseGrammarRulePage({ params }: { params: { ruleId: 
     };
 
     fetchRule();
-  }, [firestore, ruleId]);
+  }, [firestore, params]);
   
   const handleUpdateRule = (updatedRule: GrammarRule) => {
     setRule(updatedRule);
