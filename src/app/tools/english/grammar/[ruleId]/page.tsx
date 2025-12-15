@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { GrammarRule } from '@/lib/types';
@@ -9,14 +9,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import BackButton from '@/components/shared/BackButton';
 import GrammarRuleDetail from '@/components/shared/GrammarRuleDetail';
 
-export default function EnglishGrammarRulePage({ params }: { params: { ruleId: string } }) {
+export default function EnglishGrammarRulePage({ params }: { params: Promise<{ ruleId: string }> }) {
   const { firestore } = useFirebase();
   const [rule, setRule] = useState<GrammarRule | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { ruleId } = React.use(params);
 
   useEffect(() => {
-    const ruleId = params.ruleId;
     if (!firestore || !ruleId) return;
 
     const fetchRule = async () => {
@@ -40,7 +40,7 @@ export default function EnglishGrammarRulePage({ params }: { params: { ruleId: s
     };
 
     fetchRule();
-  }, [firestore, params]);
+  }, [firestore, ruleId]);
   
   const handleUpdateRule = (updatedRule: GrammarRule) => {
     setRule(updatedRule);
