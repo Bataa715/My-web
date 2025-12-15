@@ -15,7 +15,7 @@ import { PlusCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function JapaneseGrammarPage() {
-  const { firestore } = useFirebase();
+  const { firestore, user } = useFirebase();
   const { isEditMode } = useEditMode();
   const [rules, setRules] = useState<GrammarRule[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,14 +23,14 @@ export default function JapaneseGrammarPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   useEffect(() => {
-    const fetchRules = async () => {
-      if (!firestore) {
+    if (!user || !firestore) {
         setLoading(false);
         return;
-      }
+    }
+    const fetchRules = async () => {
       setLoading(true);
       try {
-        const rulesCollection = collection(firestore, 'japaneseGrammar');
+        const rulesCollection = collection(firestore, `users/${user.uid}/japaneseGrammar`);
         const q = query(rulesCollection, orderBy('createdAt', 'desc'));
         const rulesSnapshot = await getDocs(q);
         const rulesList = rulesSnapshot.docs.map(doc => ({
@@ -45,7 +45,7 @@ export default function JapaneseGrammarPage() {
       }
     };
     fetchRules();
-  }, [firestore]);
+  }, [firestore, user]);
 
   const categories = useMemo(() => ["All", ...Array.from(new Set(rules.map(r => r.category)))], [rules]);
 
@@ -55,12 +55,12 @@ export default function JapaneseGrammarPage() {
   }, [rules, selectedCategory]);
 
  const handleAddRule = async (newRule: Omit<GrammarRule, 'id' | 'createdAt'>) => {
-    if (!firestore) {
+    if (!firestore || !user) {
         toast({ title: "Алдаа", description: "Дүрэм нэмэхийн тулд нэвтэрнэ үү.", variant: "destructive" });
         return;
     }
     try {
-        const rulesCollection = collection(firestore, 'japaneseGrammar');
+        const rulesCollection = collection(firestore, `users/${user.uid}/japaneseGrammar`);
         const docRef = await addDoc(rulesCollection, { ...newRule, createdAt: serverTimestamp() });
         setRules(prevRules => [{ id: docRef.id, ...newRule, createdAt: new Date() }, ...prevRules]);
         toast({ title: "Амжилттай", description: "Шинэ дүрэм нэмэгдлээ." });
@@ -75,14 +75,14 @@ export default function JapaneseGrammarPage() {
   };
 
   const handleDeleteRule = async (id: string) => {
-    if (!firestore) {
+    if (!firestore || !user) {
       toast({ title: "Алдаа", description: "Дүрэм устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
       return;
     }
     const originalRules = [...rules];
     setRules(prevRules => prevRules.filter(rule => rule.id !== id));
     try {
-      await deleteDoc(doc(firestore, 'japaneseGrammar', id));
+      await deleteDoc(doc(firestore, `users/${user.uid}/japaneseGrammar`, id));
       toast({ title: "Амжилттай", description: "Дүрэм устгагдлаа." });
     } catch (error) {
       console.error("Error deleting rule: ", error);
@@ -116,6 +116,10 @@ export default function JapaneseGrammarPage() {
            <Skeleton className="h-24 w-full" />
            <Skeleton className="h-24 w-full" />
          </div>
+       ) : !user ? (
+        <div className="text-center py-10">
+          <p className="text-muted-foreground">Дүрмийн жагсаалтыг харахын тулд нэвтэрнэ үү.</p>
+        </div>
        ) : (
          <>
             <div className="flex justify-center flex-wrap gap-2 py-8">

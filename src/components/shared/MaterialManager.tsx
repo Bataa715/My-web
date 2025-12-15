@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import BackButton from '@/components/shared/BackButton';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
@@ -26,8 +26,13 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+type CollectionName = 
+  | 'englishReading' | 'englishListening' | 'englishSpeaking' | 'englishWriting'
+  | 'japaneseReading' | 'japaneseListening' | 'japaneseSpeaking';
+
+
 interface MaterialManagerProps {
-    collectionName: 'englishReading' | 'englishListening' | 'englishSpeaking' | 'englishWriting' | 'japaneseReading' | 'japaneseListening' | 'japaneseSpeaking';
+    collectionName: CollectionName;
     pageTitle: string;
     pageDescription: string;
     dialogTitle: string;
@@ -41,21 +46,22 @@ export default function MaterialManager({
     dialogTitle,
     dialogDescription,
 }: MaterialManagerProps) {
-    const { firestore } = useFirebase();
+    const { firestore, user } = useFirebase();
     const { isEditMode } = useEditMode();
     const [materials, setMaterials] = useState<ReadingMaterial[]>([]);
     const [loading, setLoading] = useState(true);
     const { toast } = useToast();
 
     useEffect(() => {
+        if (!user || !firestore) {
+            setLoading(false);
+            return;
+        }
+
         const fetchMaterials = async () => {
-            if (!firestore) {
-                setLoading(false);
-                return;
-            }
             setLoading(true);
             try {
-                const materialsCollection = collection(firestore, collectionName);
+                const materialsCollection = collection(firestore, `users/${user.uid}/${collectionName}`);
                 const q = query(materialsCollection, orderBy('createdAt', 'desc'));
                 const materialsSnapshot = await getDocs(q);
                 const materialsList = materialsSnapshot.docs.map(doc => ({
@@ -71,15 +77,15 @@ export default function MaterialManager({
             }
         };
         fetchMaterials();
-    }, [firestore, collectionName, toast]);
+    }, [firestore, user, collectionName, toast]);
 
     const handleAddMaterial = async (newMaterial: Omit<ReadingMaterial, 'id' | 'createdAt'>) => {
-        if (!firestore) {
+        if (!firestore || !user) {
             toast({ title: "Алдаа", description: "Материал нэмэхийн тулд нэвтэрнэ үү.", variant: "destructive" });
             return;
         }
         try {
-            const materialsCollection = collection(firestore, collectionName);
+            const materialsCollection = collection(firestore, `users/${user.uid}/${collectionName}`);
             const docRef = await addDoc(materialsCollection, { ...newMaterial, createdAt: serverTimestamp() });
             setMaterials(prevMaterials => [{ id: docRef.id, ...newMaterial, createdAt: new Date() }, ...prevMaterials]);
             toast({ title: "Амжилттай", description: "Шинэ материал нэмэгдлээ." });
@@ -90,14 +96,14 @@ export default function MaterialManager({
     };
 
     const handleDeleteMaterial = async (id: string) => {
-        if (!firestore) {
+        if (!firestore || !user) {
             toast({ title: "Алдаа", description: "Материал устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
             return;
         }
         const originalMaterials = [...materials];
         setMaterials(prevMaterials => prevMaterials.filter(material => material.id !== id));
         try {
-            await deleteDoc(doc(firestore, collectionName, id));
+            await deleteDoc(doc(firestore, `users/${user.uid}/${collectionName}`, id));
             toast({ title: "Амжилттай", description: "Материал устгагдлаа." });
         } catch (error) {
             console.error("Error deleting material: ", error);
@@ -132,6 +138,10 @@ export default function MaterialManager({
                     <Skeleton className="h-48 w-full" />
                     <Skeleton className="h-48 w-full" />
                     <Skeleton className="h-48 w-full" />
+                </div>
+            ) : !user ? (
+                 <div className="text-center py-10">
+                    <p className="text-muted-foreground">Материал харахын тулд нэвтэрнэ үү.</p>
                 </div>
             ) : (
                 <div className="pt-8 space-y-4">

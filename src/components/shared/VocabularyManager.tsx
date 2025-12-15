@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -35,20 +35,21 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { PlusCircle, Edit, Trash2, X, Heart } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, X, Heart, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
 import { useFirebase } from '@/firebase';
-import { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, setDoc, query } from "firebase/firestore";
+import { collection, doc, addDoc, updateDoc, deleteDoc, getDocs, setDoc, query, serverTimestamp, writeBatch } from "firebase/firestore";
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { initialEnglishWords } from '@/data/english';
+import { initialJapaneseWords } from '@/data/japanese';
+import { Skeleton } from '../ui/skeleton';
 
 type Word = EnglishWord | JapaneseWord;
 
 interface VocabularyManagerProps<T extends Word> {
-  collectionPath: string;
-  initialWords: T[];
   wordType: 'english' | 'japanese';
   columns: { key: keyof T; header: string; }[];
   title: string;
@@ -57,14 +58,13 @@ interface VocabularyManagerProps<T extends Word> {
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 export default function VocabularyManager<T extends Word>({
-  collectionPath,
-  initialWords,
   wordType,
   columns,
   title,
 }: VocabularyManagerProps<T>) {
   const { firestore, user } = useFirebase();
-  const [words, setWords] = useState<T[]>(initialWords);
+  const [words, setWords] = useState<T[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAlphabetModalOpen, setIsAlphabetModalOpen] = useState(false);
   const [currentWord, setCurrentWord] = useState<T | null>(null);
@@ -72,50 +72,48 @@ export default function VocabularyManager<T extends Word>({
   const [searchQuery, setSearchQuery] = useState('');
   const [alphabetFilter, setAlphabetFilter] = useState<string | 'all'>('all');
   const { toast } = useToast();
+  
+  const collectionPath = wordType === 'english' ? 'englishWords' : 'japaneseWords';
+  const initialData = wordType === 'english' ? initialEnglishWords : initialJapaneseWords;
 
-  const userWordsCollection = user ? collection(firestore, `users/${user.uid}/${collectionPath}`) : null;
-  const publicWordsCollection = firestore ? collection(firestore, collectionPath) : null;
+  const fetchWords = useCallback(async () => {
+    if (!user || !firestore) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const wordsCollection = collection(firestore, `users/${user.uid}/${collectionPath}`);
+      const wordsSnapshot = await getDocs(wordsCollection);
+
+      if (wordsSnapshot.empty) {
+        console.log(`No ${collectionPath} found for user, seeding initial data...`);
+        const batch = writeBatch(firestore);
+        initialData.forEach(word => {
+          const docRef = doc(wordsCollection);
+          batch.set(docRef, { ...word, favorite: false, memorized: false });
+        });
+        await batch.commit();
+
+        const newSnapshot = await getDocs(wordsCollection);
+        const wordsList = newSnapshot.docs.map(d => ({ ...d.data(), id: d.id } as T));
+        setWords(wordsList);
+      } else {
+        const wordsList = wordsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as T));
+        setWords(wordsList);
+      }
+    } catch (error) {
+      console.error(`Error fetching ${collectionPath}:`, error);
+      toast({ title: "Алдаа", description: "Үгсийн санг татахад алдаа гарлаа.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  }, [user, firestore, collectionPath, initialData, toast]);
 
   useEffect(() => {
-    const fetchWords = async () => {
-        if (!firestore || !publicWordsCollection) {
-            setWords(initialWords.map(w => ({ ...w, memorized: false, favorite: false } as T)));
-            return;
-        };
-        
-        const publicWordsQuery = query(publicWordsCollection);
-        const publicWordsSnapshot = await getDocs(publicWordsQuery);
-        const publicWords = publicWordsSnapshot.docs.map(d => ({ ...d.data(), id: d.id, memorized: false, favorite: false } as T));
-
-        if (!user || !userWordsCollection) {
-            setWords(publicWords);
-            return;
-        }
-
-        const userWordsQuery = query(userWordsCollection);
-        const userWordsSnapshot = await getDocs(userWordsQuery);
-        
-        const userWordMap = new Map<string, T>();
-        userWordsSnapshot.docs.forEach(doc => {
-            userWordMap.set(doc.id, { id: doc.id, ...doc.data() } as T);
-        });
-
-        const mergedWords = publicWords.map(publicWord => {
-            const userWordStatus = userWordMap.get(publicWord.id!);
-            if (userWordStatus) {
-                userWordMap.delete(publicWord.id!);
-                return { ...publicWord, memorized: userWordStatus.memorized, favorite: userWordStatus.favorite };
-            }
-            return publicWord;
-        });
-
-        const userAddedWords = Array.from(userWordMap.values());
-        
-        setWords([...mergedWords, ...userAddedWords].sort((a,b) => (a.word as string).localeCompare(b.word as string)));
-    };
-
     fetchWords();
-  }, [firestore, user, collectionPath]);
+  }, [fetchWords]);
+
 
   const filteredWords = useMemo(() => {
     return words
@@ -127,16 +125,18 @@ export default function VocabularyManager<T extends Word>({
         })
         .filter(word => {
             const wordKey = wordType === 'english' ? 'word' : 'romaji';
-            const searchableWord = (word[wordKey] as string) || '';
+            const searchableWord = (word[wordKey as keyof Word] as string) || '';
             if (alphabetFilter !== 'all') {
                 return searchableWord.toLowerCase().startsWith(alphabetFilter.toLowerCase());
             }
             return true;
         })
         .filter(word => {
-            const wordKey = wordType === 'english' ? 'word' : 'romaji';
-            const primaryValue = (word[wordKey] as string) || '';
-            const secondaryValue = (word['meaning'] as string) || '';
+            const primaryKey = wordType === 'english' ? 'word' : 'romaji';
+            const secondaryKey = wordType === 'english' ? 'translation' : 'meaning';
+            
+            const primaryValue = (word[primaryKey as keyof Word] as string) || '';
+            const secondaryValue = (word[secondaryKey as keyof Word] as string) || '';
             
             if (searchQuery.trim() === '') return true;
             
@@ -148,7 +148,7 @@ export default function VocabularyManager<T extends Word>({
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!user || !userWordsCollection) {
+    if (!user || !firestore) {
          toast({ title: "Алдаа", description: "Үг хадгалахын тулд нэвтэрнэ үү.", variant: "destructive" });
         return
     };
@@ -159,11 +159,10 @@ export default function VocabularyManager<T extends Word>({
         favorite: currentWord?.favorite || false,
     };
     columns.forEach(col => {
-      if (col.key !== 'id' && col.key !== 'memorized' && col.key !== 'favorite') {
-        newWordData[col.key] = formData.get(col.key as string) as string;
-      }
+        newWordData[col.key as string] = formData.get(col.key as string) as string;
     });
 
+    const userWordsCollection = collection(firestore, `users/${user.uid}/${collectionPath}`);
     try {
       if (currentWord?.id) {
         const docRef = doc(userWordsCollection, currentWord.id);
@@ -186,20 +185,21 @@ export default function VocabularyManager<T extends Word>({
   };
 
  const handleDelete = async (wordId: string) => {
-    if (!user || !userWordsCollection) {
+    if (!user || !firestore) {
       toast({ title: "Алдаа", description: "Устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
       return;
     }
     const wordToDelete = words.find(w => w.id === wordId);
     if (!wordToDelete) return;
     
+    const originalWords = [...words];
     setWords(words.filter(w => w.id !== wordId));
     try {
-      const docRef = doc(userWordsCollection, wordId);
+      const docRef = doc(firestore, `users/${user.uid}/${collectionPath}`, wordId);
       await deleteDoc(docRef);
       toast({ title: "Амжилттай устгагдлаа" });
     } catch (error) {
-      setWords(words); 
+      setWords(originalWords); 
       toast({
         title: "Алдаа гарлаа",
         description: "Үг устгахад алдаа гарлаа.",
@@ -210,7 +210,7 @@ export default function VocabularyManager<T extends Word>({
   };
 
   const toggleBooleanValue = async (id: string, key: 'memorized' | 'favorite') => {
-    if (!user || !userWordsCollection) {
+    if (!user || !firestore) {
         toast({ title: "Алдаа", description: "Тэмдэглэхийн тулд нэвтэрнэ үү.", variant: "destructive" });
         return;
     };
@@ -227,12 +227,12 @@ export default function VocabularyManager<T extends Word>({
     });
     setWords(newWords as T[]);
     
-    const docRef = doc(userWordsCollection, id);
+    const docRef = doc(firestore, `users/${user.uid}/${collectionPath}`, id);
     try {
       await setDoc(docRef, { [key]: updatedValue }, { merge: true });
     } catch (e) {
       console.error(`Error updating ${key} status:`, e);
-      setWords(originalWords); // Rollback on error
+      setWords(originalWords);
       toast({ title: "Алдаа гарлаа", variant: "destructive" });
     }
   };
@@ -246,6 +246,26 @@ export default function VocabularyManager<T extends Word>({
     setAlphabetFilter(letter);
     setIsAlphabetModalOpen(false);
   };
+
+  if (loading) {
+    return <div className="space-y-4 pt-8">
+        <div className="flex justify-between items-center">
+            <Skeleton className="h-10 w-48" />
+            <Skeleton className="h-10 w-24" />
+        </div>
+        <Skeleton className="h-[400px] w-full" />
+    </div>
+  }
+  
+  if (!user) {
+    return (
+        <Card className="text-center p-8">
+          <CardContent>
+            <p className="text-muted-foreground">Үгсийн санг харахын тулд нэвтэрнэ үү.</p>
+          </CardContent>
+        </Card>
+    );
+  }
 
   return (
     <Card>
@@ -275,22 +295,17 @@ export default function VocabularyManager<T extends Word>({
                         <DialogTitle>{currentWord ? 'Үг засах' : 'Шинэ үг нэмэх'}</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={handleSave} className="space-y-4">
-                        {columns.map(col => {
-                            if (col.key !== 'id' && col.key !== 'memorized' && col.key !== 'favorite') {
-                            return (
-                                <div key={col.key as string}>
-                                <Label htmlFor={col.key as string}>{col.header}</Label>
-                                <Input
-                                    id={col.key as string}
-                                    name={col.key as string}
-                                    defaultValue={currentWord ? currentWord[col.key] as string : ''}
-                                    required
-                                />
-                                </div>
-                            );
-                            }
-                            return null;
-                        })}
+                        {columns.map(col => (
+                            <div key={col.key as string}>
+                            <Label htmlFor={col.key as string}>{col.header}</Label>
+                            <Input
+                                id={col.key as string}
+                                name={col.key as string}
+                                defaultValue={currentWord ? currentWord[col.key as keyof Word] as string : ''}
+                                required
+                            />
+                            </div>
+                        ))}
                         <DialogFooter>
                             <DialogClose asChild>
                             <Button type="button" variant="secondary">Цуцлах</Button>
@@ -371,11 +386,11 @@ export default function VocabularyManager<T extends Word>({
             <TableBody>
               {filteredWords.map(word => (
                 <TableRow key={word.id} className={cn(word.memorized && 'bg-primary/10 hover:bg-primary/20')}>
-                  {columns.map(col => <TableCell key={`${word.id}-${col.key as string}`}>{word[col.key] as string}</TableCell>)}
+                  {columns.map(col => <TableCell key={`${word.id}-${col.key as string}`}>{word[col.key as keyof Word] as string}</TableCell>)}
                   <TableCell>
                     <Checkbox
                       checked={word.memorized}
-                      onCheckedChange={(checked) => toggleBooleanValue(word.id!, 'memorized')}
+                      onCheckedChange={() => toggleBooleanValue(word.id!, 'memorized')}
                       disabled={!user}
                     />
                   </TableCell>

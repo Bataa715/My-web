@@ -16,7 +16,7 @@ import BackButton from '@/components/shared/BackButton';
 import { initialEnglishRule } from '@/data/english';
 
 export default function EnglishGrammarPage() {
-  const { firestore } = useFirebase();
+  const { firestore, user } = useFirebase();
   const { isEditMode } = useEditMode();
   const [rules, setRules] = useState<GrammarRule[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,19 +24,20 @@ export default function EnglishGrammarPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   useEffect(() => {
-    const fetchRules = async () => {
-      if (!firestore) {
+    if (!user || !firestore) {
         setLoading(false);
         return;
-      }
+    }
+    const fetchRules = async () => {
+      
       setLoading(true);
       try {
-        const rulesCollection = collection(firestore, 'englishGrammar');
+        const rulesCollection = collection(firestore, `users/${user.uid}/englishGrammar`);
         const q = query(rulesCollection, orderBy('createdAt', 'desc'));
         const rulesSnapshot = await getDocs(q);
         
         if (rulesSnapshot.empty) {
-          console.log("No grammar rules found, seeding initial rule...");
+          console.log("No grammar rules found for user, seeding initial rule...");
           const batch = writeBatch(firestore);
           const newRuleWithTimestamp = { ...initialEnglishRule, createdAt: serverTimestamp() };
           const docRef = doc(rulesCollection);
@@ -65,7 +66,7 @@ export default function EnglishGrammarPage() {
       }
     };
     fetchRules();
-  }, [firestore]);
+  }, [firestore, user]);
 
   const categories = useMemo(() => ["All", ...Array.from(new Set(rules.map(r => r.category)))], [rules]);
 
@@ -75,12 +76,12 @@ export default function EnglishGrammarPage() {
   }, [rules, selectedCategory]);
 
   const handleAddRule = async (newRule: Omit<GrammarRule, 'id' | 'createdAt'>) => {
-    if (!firestore) {
+    if (!firestore || !user) {
         toast({ title: "Алдаа", description: "Дүрэм нэмэхийн тулд нэвтэрнэ үү.", variant: "destructive" });
         return;
     }
     try {
-        const rulesCollection = collection(firestore, 'englishGrammar');
+        const rulesCollection = collection(firestore, `users/${user.uid}/englishGrammar`);
         const docRef = await addDoc(rulesCollection, { ...newRule, createdAt: serverTimestamp() });
         setRules(prevRules => [{ id: docRef.id, ...newRule, createdAt: new Date() }, ...prevRules]);
         toast({ title: "Амжилттай", description: "Шинэ дүрэм нэмэгдлээ." });
@@ -96,14 +97,14 @@ export default function EnglishGrammarPage() {
 
 
   const handleDeleteRule = async (id: string) => {
-    if (!firestore) {
+    if (!firestore || !user) {
       toast({ title: "Алдаа", description: "Дүрэм устгахын тулд нэвтэрнэ үү.", variant: "destructive" });
       return;
     }
     const originalRules = [...rules];
     setRules(prevRules => prevRules.filter(rule => rule.id !== id));
     try {
-      await deleteDoc(doc(firestore, 'englishGrammar', id));
+      await deleteDoc(doc(firestore, `users/${user.uid}/englishGrammar`, id));
       toast({ title: "Амжилттай", description: "Дүрэм устгагдлаа." });
     } catch (error) {
       console.error("Error deleting rule: ", error);
@@ -138,7 +139,11 @@ export default function EnglishGrammarPage() {
            <Skeleton className="h-24 w-full" />
            <Skeleton className="h-24 w-full" />
          </div>
-       ) : (
+       ) : !user ? (
+        <div className="text-center py-10">
+          <p className="text-muted-foreground">Дүрмийн жагсаалтыг харахын тулд нэвтэрнэ үү.</p>
+        </div>
+      ) : (
          <>
             <div className="flex justify-center flex-wrap gap-2 py-8">
               {categories.map((category) => (

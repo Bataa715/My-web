@@ -39,16 +39,16 @@ interface GrammarRuleDetailProps {
 export default function GrammarRuleDetail({ rule, onUpdateRule, onDeleteRule, collectionPath }: GrammarRuleDetailProps) {
   const { isEditMode } = useEditMode();
   const { toast } = useToast();
-  const { firestore } = useFirebase();
+  const { firestore, user } = useFirebase();
   const router = useRouter();
 
   const handleDelete = async () => {
-    if (!firestore || !rule.id) {
+    if (!firestore || !rule.id || !user) {
         toast({ title: "Алдаа", description: "Дүрэм устгах боломжгүй", variant: "destructive" });
         return;
     }
      try {
-      await deleteDoc(doc(firestore, collectionPath, rule.id));
+      await deleteDoc(doc(firestore, `users/${user.uid}/${collectionPath}`, rule.id));
       toast({ title: "Амжилттай", description: "Дүрэм устгагдлаа." });
       onDeleteRule(rule.id);
       router.back();

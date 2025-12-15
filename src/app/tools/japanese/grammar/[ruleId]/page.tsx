@@ -10,20 +10,23 @@ import BackButton from '@/components/shared/BackButton';
 import GrammarRuleDetail from '@/components/shared/GrammarRuleDetail';
 
 export default function JapaneseGrammarRulePage({ params }: { params: Promise<{ ruleId: string }> }) {
-  const { firestore } = useFirebase();
+  const { firestore, user } = useFirebase();
   const [rule, setRule] = useState<GrammarRule | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { ruleId } = React.use(params);
 
   useEffect(() => {
-    if (!firestore || !ruleId) return;
+    if (!firestore || !ruleId || !user) {
+        setLoading(false);
+        return;
+    };
 
     const fetchRule = async () => {
       setLoading(true);
       setError(null);
       try {
-        const ruleDocRef = doc(firestore, 'japaneseGrammar', ruleId);
+        const ruleDocRef = doc(firestore, `users/${user.uid}/japaneseGrammar`, ruleId);
         const docSnap = await getDoc(ruleDocRef);
 
         if (docSnap.exists()) {
@@ -40,7 +43,7 @@ export default function JapaneseGrammarRulePage({ params }: { params: Promise<{ 
     };
 
     fetchRule();
-  }, [firestore, ruleId]);
+  }, [firestore, ruleId, user]);
   
   const handleUpdateRule = (updatedRule: GrammarRule) => {
     setRule(updatedRule);
