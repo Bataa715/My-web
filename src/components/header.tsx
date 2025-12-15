@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, Image as ImageIcon, Save, Loader2, LogOut, User, Link2, XCircle } from 'lucide-react';
+import { Menu, PencilRuler, Eye, Save, Loader2, LogOut, Link2, XCircle } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -47,6 +47,12 @@ const Header = () => {
     const [appName, setAppName] = useState("Kaizen");
     const [isEditingAppName, setIsEditingAppName] = useState(false);
     const [editedAppName, setEditedAppName] = useState(appName);
+    
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
 
     useEffect(() => {
         const fetchAppName = async () => {
@@ -146,6 +152,19 @@ const Header = () => {
         }
     };
 
+    if (!mounted) {
+        return (
+            <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <div className="container flex h-14 max-w-screen-2xl items-center">
+                    {/* Placeholder for server render to avoid layout shift */}
+                    <div className="flex-1"></div>
+                    <div className="flex items-center gap-2">
+                        <div className="h-10 w-10"></div>
+                    </div>
+                </div>
+            </header>
+        )
+    }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -190,8 +209,8 @@ const Header = () => {
           </Sheet>
         </div>
 
-        <div className="mr-6 hidden md:flex flex-1 items-center gap-6">
-            <button onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2">
+        <div className="mr-6 hidden md:flex items-center gap-6">
+             <button onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2">
                  {isEditingAppName ? (
                     <div className="flex items-center gap-2">
                         <Input
