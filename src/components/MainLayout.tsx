@@ -19,7 +19,7 @@ export default function MainLayout({
       {showHeaderFooter && <Header />}
       <main className="flex-1">
          {showHeaderFooter ? (
-          <div className="page-container-wrapper rounded-lg m-4">
+          <div className="page-container-wrapper rounded-lg mx-2 my-4">
              <div className="page-container p-4 sm:p-6 lg:p-8 rounded-lg">
                 {children}
             </div>
