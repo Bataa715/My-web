@@ -1,11 +1,5 @@
 "use client";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import type { GrammarRule } from "@/lib/types";
 
@@ -15,17 +9,13 @@ interface GrammarListProps {
 
 export default function GrammarList({ rules }: GrammarListProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Дүрэм цээжлэх</CardTitle>
-        <CardDescription>Түгээмэл дүрмүүд, тайлбар, жишээ өгүүлбэрүүд.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Accordion type="single" collapsible className="w-full">
-          {rules.map((rule, index) => (
-            <AccordionItem value={`item-${index}`} key={index}>
-              <AccordionTrigger>{rule.title}</AccordionTrigger>
-              <AccordionContent className="space-y-4">
+    <div className="space-y-4">
+      {rules.map((rule, index) => (
+        <Card key={index}>
+            <CardHeader>
+                <CardTitle>{rule.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
                 <p className="text-muted-foreground">{rule.explanation}</p>
                 <div>
                   <h4 className="font-semibold mb-2">Жишээ:</h4>
@@ -35,11 +25,16 @@ export default function GrammarList({ rules }: GrammarListProps) {
                     ))}
                   </ul>
                 </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </CardContent>
-    </Card>
+              </CardContent>
+        </Card>
+      ))}
+       {rules.length === 0 && (
+          <Card className="text-center p-8">
+            <CardContent>
+              <p className="text-muted-foreground">Дүрэм олдсонгүй.</p>
+            </CardContent>
+          </Card>
+        )}
+    </div>
   );
 }
