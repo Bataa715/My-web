@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface MaterialManagerProps {
-    collectionName: 'englishReading' | 'englishListening' | 'englishSpeaking' | 'englishWriting';
+    collectionName: 'englishReading' | 'englishListening' | 'englishSpeaking' | 'englishWriting' | 'japaneseReading' | 'japaneseListening' | 'japaneseSpeaking';
     pageTitle: string;
     pageDescription: string;
     dialogTitle: string;

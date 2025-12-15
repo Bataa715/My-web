@@ -46,6 +46,9 @@ service cloud.firestore {
     match /englishListening/{materialId} { allow read: if true; allow write: if isSignedIn(); }
     match /englishSpeaking/{materialId} { allow read: if true; allow write: if isSignedIn(); }
     match /englishWriting/{materialId} { allow read: if true; allow write: if isSignedIn(); }
+    match /japaneseReading/{materialId} { allow read: if true; allow write: if isSignedIn(); }
+    match /japaneseListening/{materialId} { allow read: if true; allow write: if isSignedIn(); }
+    match /japaneseSpeaking/{materialId} { allow read: if true; allow write: if isSignedIn(); }
     match /hiragana/{kanaId} { allow read: if true; allow write: if isSignedIn(); }
     match /katakana/{kanaId} { allow read: if true; allow write: if isSignedIn(); }
     match /programmingConcepts/{conceptId} { allow read: if true; allow write: if isSignedIn(); }
