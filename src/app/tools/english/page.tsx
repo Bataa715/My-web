@@ -27,7 +27,7 @@ const englishSkillsConfig = [
     description: "Дүрмийн мэдлэгээ бататгах",
     href: "/tools/english/grammar",
     icon: <BookCopy className="h-8 w-8" />,
-    progress: 45,
+    progress: 0,
   },
     {
     id: 'reading',
@@ -35,7 +35,7 @@ const englishSkillsConfig = [
     description: "Унших чадвараа дээшлүүлэх",
     href: "/tools/english/reading",
     icon: <BookOpen className="h-8 w-8" />,
-    progress: 80,
+    progress: 0,
   },
   {
     id: 'listening',
@@ -43,7 +43,7 @@ const englishSkillsConfig = [
     description: "Сонсох чадвараа сайжруулах",
     href: "/tools/english/listening",
     icon: <Ear className="h-8 w-8" />,
-    progress: 60,
+    progress: 0,
   },
   {
     id: 'speaking',
@@ -51,7 +51,7 @@ const englishSkillsConfig = [
     description: "Ярих чадвараа нэмэгдүүлэх",
     href: "/tools/english/speaking",
     icon: <Mic className="h-8 w-8" />,
-    progress: 30,
+    progress: 0,
   },
   {
     id: 'writing',
@@ -59,7 +59,7 @@ const englishSkillsConfig = [
     description: "Бичих чадвараа хөгжүүлэх",
     href: "/tools/english/writing",
     icon: <Pencil className="h-8 w-8" />,
-    progress: 55,
+    progress: 0,
   },
 ];
 
@@ -87,8 +87,8 @@ const ProgressCard = ({ icon, title, description, progress, href, progressText }
         <CardContent>
             <div className="space-y-2">
                 <div className="flex justify-between items-center text-sm text-muted-foreground">
-                    <span>{progressText ? 'Явц' : 'Progress'}</span>
-                    <span className="font-semibold text-foreground">{progressText || `${progress}%`}</span>
+                    <span>Явц</span>
+                    <span className="font-semibold text-foreground">{progressText || `${progress.toFixed(0)}%`}</span>
                 </div>
                 <Progress value={progress} className="h-2" />
             </div>
@@ -104,21 +104,21 @@ export default function EnglishDashboardPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchVocabularyProgress = async () => {
+        const fetchProgress = async () => {
             if (!firestore) {
                 setLoading(false);
                 return;
             }
+            setLoading(true);
 
             try {
-                // Fetch all public words
+                // Fetch vocabulary progress
                 const publicWordsCollection = collection(firestore, 'englishWords');
                 const publicWordsSnapshot = await getDocs(publicWordsCollection);
                 const totalWords = publicWordsSnapshot.size;
                 
                 let memorizedCount = 0;
                 if (user) {
-                    // Fetch user-specific word data
                     const userWordsCollection = collection(firestore, `users/${user.uid}/englishWords`);
                     const userWordsSnapshot = await getDocs(userWordsCollection);
                     
@@ -136,21 +136,30 @@ export default function EnglishDashboardPage() {
                 }
                 
                 const vocabularyProgress = totalWords > 0 ? (memorizedCount / totalWords) * 100 : 0;
+                
+                // Fetch grammar progress
+                const grammarCollection = collection(firestore, 'englishGrammar');
+                const grammarSnapshot = await getDocs(grammarCollection);
+                const totalRules = grammarSnapshot.size;
 
-                setSkills(prevSkills => prevSkills.map(skill => 
-                    skill.id === 'vocabulary' 
-                        ? { ...skill, progress: vocabularyProgress, progressText: `${totalWords}-с ${memorizedCount}` } 
-                        : skill
-                ));
+                setSkills(prevSkills => prevSkills.map(skill => {
+                    if (skill.id === 'vocabulary') {
+                        return { ...skill, progress: vocabularyProgress, progressText: `${totalWords}-с ${memorizedCount}` };
+                    }
+                    if (skill.id === 'grammar') {
+                        return { ...skill, progress: 0, progressText: `Нийт ${totalRules} дүрэм` };
+                    }
+                    return skill;
+                }));
 
             } catch (error) {
-                console.error("Error fetching vocabulary progress:", error);
+                console.error("Error fetching progress:", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchVocabularyProgress();
+        fetchProgress();
 
     }, [firestore, user]);
     
