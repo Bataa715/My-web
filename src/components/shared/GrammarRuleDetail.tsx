@@ -196,3 +196,5 @@ export default function GrammarRuleDetail({ rule, onUpdateRule, onDeleteRule, co
     </div>
   );
 }
+
+    
