@@ -18,9 +18,17 @@ export default function MainLayout({
     <div className="relative flex min-h-screen flex-col">
       {showHeaderFooter && <Header />}
       <main className="flex-1">
-        <div className={showHeaderFooter ? "p-4 sm:p-6 lg:p-8" : ""}>
+         {showHeaderFooter ? (
+          <div className="page-container-wrapper rounded-lg m-4">
+             <div className="page-container p-4 sm:p-6 lg:p-8 rounded-lg">
+                {children}
+            </div>
+          </div>
+        ) : (
+          <div className="p-4 sm:p-6 lg:p-8">
             {children}
-        </div>
+          </div>
+        )}
       </main>
       {showHeaderFooter && <Footer />}
     </div>
