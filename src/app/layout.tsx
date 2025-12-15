@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import { AppThemeProvider } from "@/components/AppThemeProvider";
-import Header from "@/components/header";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { FirebaseClientProvider } from "@/firebase/client-provider";
-import Footer from "@/components/footer";
 import { EditModeProvider } from "@/contexts/EditModeContext";
 import { ProjectProvider } from "@/contexts/ProjectContext";
 import { SkillsProvider } from "@/contexts/SkillsContext";
+import MainLayout from "@/components/MainLayout";
 
 export const metadata: Metadata = {
   title: "Kaizen",
@@ -43,15 +42,9 @@ export default function RootLayout({
             <EditModeProvider>
               <ProjectProvider>
                 <SkillsProvider>
-                  <div className="relative flex min-h-screen flex-col">
-                    <Header />
-                    <main className="flex-1">
-                       <div className="p-4 sm:p-6 lg:p-8">
+                   <MainLayout>
                         {children}
-                      </div>
-                    </main>
-                    <Footer />
-                  </div>
+                    </MainLayout>
                   <Toaster />
                 </SkillsProvider>
               </ProjectProvider>
