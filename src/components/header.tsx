@@ -1,9 +1,10 @@
+
 'use client';
 
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, Save, Loader2, LogOut, Link2, XCircle } from 'lucide-react';
+import { Menu, PencilRuler, Eye, Save, Loader2, LogOut, Link2, XCircle, Pencil } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -49,6 +50,7 @@ const Header = () => {
     const [editedAppName, setEditedAppName] = useState(appName);
     
     const [mounted, setMounted] = useState(false);
+
     useEffect(() => {
         setMounted(true);
     }, []);
@@ -68,7 +70,7 @@ const Header = () => {
                 }
             }
         };
-        fetchAppName();
+        if(user) fetchAppName();
     }, [user, firestore]);
     
 
@@ -151,65 +153,69 @@ const Header = () => {
             setSaving(false);
         }
     };
+    
+    const headerContent = (
+      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
+           {/* Left Section */}
+           <div className="flex items-center gap-6">
+              {/* Mobile Menu */}
+              <div className="flex md:hidden">
+                <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Menu className="h-5 w-5" />
+                      <span className="sr-only">Toggle Menu</span>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="pr-0">
+                    <SheetHeader>
+                      <SheetTitle>
+                          <SheetClose asChild>
+                              <Link href="/home" className="flex items-center space-x-2 text-left pl-4">
+                                  <span className="font-bold font-headline">{appName}</span>
+                              </Link>
+                          </SheetClose>
+                      </SheetTitle>
+                    </SheetHeader>
+                    <nav className="flex flex-col space-y-4 mt-6 pl-4">
+                      {mainLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          onClick={() => setIsOpen(false)}
+                          className={cn(
+                            "text-sm font-medium transition-colors hover:text-primary",
+                            (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href ? "text-primary font-semibold" : "text-muted-foreground"
+                          )}
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </nav>
+                  </SheetContent>
+                </Sheet>
+              </div>
 
-    if (!mounted) {
-        return (
-            <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="container flex h-14 max-w-screen-2xl items-center">
-                    {/* Placeholder for server render to avoid layout shift */}
-                    <div className="flex-1"></div>
-                    <div className="flex items-center gap-2">
-                        <div className="h-10 w-10"></div>
-                    </div>
-                </div>
-            </header>
-        )
-    }
-
-  return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 max-w-screen-2xl items-center">
-        <div className="mr-4 flex md:hidden">
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-              >
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="pr-0">
-              <SheetHeader>
-                  <SheetTitle>
-                    <SheetClose asChild>
-                       <Link href="/home" className="flex items-center space-x-2 text-left pl-4">
-                           <span className="font-bold font-headline">{appName}</span>
-                       </Link>
-                    </SheetClose>
-                  </SheetTitle>
-              </SheetHeader>
-              <nav className="flex flex-col space-y-4 mt-6 pl-4">
-                {mainLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setIsOpen(false)}
-                    className={cn(
-                      "text-sm font-medium transition-colors hover:text-primary",
-                       (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href ? "text-primary font-semibold" : "text-muted-foreground"
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+              {/* Desktop Nav */}
+              <nav className="hidden md:flex items-center gap-4 text-sm">
+                  {mainLinks.map((link) => (
+                     <Link
+                      key={link.href}
+                      href={link.href}
+                      className={cn(
+                        "transition-colors hover:text-primary",
+                        (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href ? "text-primary font-semibold" : "text-muted-foreground"
+                      )}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
               </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
+          </div>
 
-        <div className="mr-6 hidden md:flex items-center gap-6">
+           {/* Center Section (App Name) */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
              <button onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2">
                  {isEditingAppName ? (
                     <div className="flex items-center gap-2">
@@ -237,116 +243,119 @@ const Header = () => {
                                 className="h-8 w-8"
                                 onClick={(e) => { e.stopPropagation(); setIsEditingAppName(true);}}
                               >
-                                <PencilRuler className="h-4 w-4" />
+                                <Pencil className="h-4 w-4" />
                               </Button>
                         )}
                     </div>
                 )}
             </button>
-            <nav className="flex items-center gap-4 text-sm">
-                {mainLinks.map((link) => (
-                   <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      "transition-colors hover:text-primary",
-                      (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href ? "text-primary font-semibold" : "text-muted-foreground"
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-            </nav>
-        </div>
-        
-        <div className="flex flex-1 items-center justify-end gap-2">
-            {user && !isUserLoading && (
-                <Button variant="outline" size="icon" onClick={() => setIsEditMode(!isEditMode)}>
-                {isEditMode ? <Eye className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />}
-                <span className="sr-only">{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
-            </Button>
-            )}
+          </div>
+          
+          {/* Right Section */}
+          <div className="flex items-center justify-end gap-2">
+              {user && !isUserLoading && (
+                  <Button variant="outline" size="icon" onClick={() => setIsEditMode(!isEditMode)}>
+                  {isEditMode ? <Eye className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />}
+                  <span className="sr-only">{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
+              </Button>
+              )}
 
-            {!isUserLoading && (
-                user ? (
-                    <div className="flex items-center gap-2">
-                        {user.isAnonymous ? (
-                            <Dialog open={isLinkAccountOpen} onOpenChange={setIsLinkAccountOpen}>
-                                <DialogTrigger asChild>
-                                    <Button variant="outline" size="sm">
-                                        <Link2 className="mr-2 h-4 w-4" />
-                                        Бүртгэлээ холбох
-                                    </Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogHeader>
-                                        <DialogTitle>Бүртгэлээ байнгын болгох</DialogTitle>
-                                        <DialogDescription>
-                                            Таны мэдээллийг хадгалахын тулд түр бүртгэлээ и-мэйл, нууц үгээр баталгаажуулна уу.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                    <Form {...form}>
-                                        <form onSubmit={form.handleSubmit(onLinkAccountSubmit)} className="space-y-4">
-                                            <FormField
-                                                control={form.control}
-                                                name="email"
-                                                render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>И-мэйл</FormLabel>
-                                                    <FormControl>
-                                                    <Input placeholder="name@example.com" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                                )}
-                                            />
-                                            <FormField
-                                                control={form.control}
-                                                name="password"
-                                                render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Нууц үг</FormLabel>
-                                                    <FormControl>
-                                                    <Input type="password" placeholder="••••••••" {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                                )}
-                                            />
-                                            <DialogFooter>
-                                                <DialogClose asChild>
-                                                    <Button type="button" variant="secondary">Цуцлах</Button>
-                                                </DialogClose>
-                                                <Button type="submit" disabled={saving}>
-                                                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Link2 className="mr-2 h-4 w-4" />} Холбох
-                                                </Button>
-                                            </DialogFooter>
-                                        </form>
-                                    </Form>
-                                </DialogContent>
-                            </Dialog>
-                        ) : null}
+              {!isUserLoading && (
+                  user ? (
+                      <div className="flex items-center gap-2">
+                          {user.isAnonymous ? (
+                              <Dialog open={isLinkAccountOpen} onOpenChange={setIsLinkAccountOpen}>
+                                  <DialogTrigger asChild>
+                                      <Button variant="outline" size="sm">
+                                          <Link2 className="mr-2 h-4 w-4" />
+                                          Бүртгэлээ холбох
+                                      </Button>
+                                  </DialogTrigger>
+                                  <DialogContent>
+                                      <DialogHeader>
+                                          <DialogTitle>Бүртгэлээ байнгын болгох</DialogTitle>
+                                          <DialogDescription>
+                                              Таны мэдээллийг хадгалахын тулд түр бүртгэлээ и-мэйл, нууц үгээр баталгаажуулна уу.
+                                          </DialogDescription>
+                                      </DialogHeader>
+                                      <Form {...form}>
+                                          <form onSubmit={form.handleSubmit(onLinkAccountSubmit)} className="space-y-4">
+                                              <FormField
+                                                  control={form.control}
+                                                  name="email"
+                                                  render={({ field }) => (
+                                                  <FormItem>
+                                                      <FormLabel>И-мэйл</FormLabel>
+                                                      <FormControl>
+                                                      <Input placeholder="name@example.com" {...field} />
+                                                      </FormControl>
+                                                      <FormMessage />
+                                                  </FormItem>
+                                                  )}
+                                              />
+                                              <FormField
+                                                  control={form.control}
+                                                  name="password"
+                                                  render={({ field }) => (
+                                                  <FormItem>
+                                                      <FormLabel>Нууц үг</FormLabel>
+                                                      <FormControl>
+                                                      <Input type="password" placeholder="••••••••" {...field} />
+                                                      </FormControl>
+                                                      <FormMessage />
+                                                  </FormItem>
+                                                  )}
+                                              />
+                                              <DialogFooter>
+                                                  <DialogClose asChild>
+                                                      <Button type="button" variant="secondary">Цуцлах</Button>
+                                                  </DialogClose>
+                                                  <Button type="submit" disabled={saving}>
+                                                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Link2 className="mr-2 h-4 w-4" />} Холбох
+                                                  </Button>
+                                              </DialogFooter>
+                                          </form>
+                                      </Form>
+                                  </DialogContent>
+                              </Dialog>
+                          ) : null}
 
-                        <Button onClick={handleLogout} variant="ghost" size="icon">
-                            <LogOut className="h-5 w-5" />
-                        </Button>
-                    </div>
-                ) : (
-                     <div className='flex gap-2'>
-                        <Button asChild variant="outline" size="sm">
-                            <Link href="/login">Нэвтрэх</Link>
-                        </Button>
-                         <Button asChild size="sm">
-                            <Link href="/signup">Бүртгүүлэх</Link>
-                        </Button>
-                    </div>
-                )
-            )}
-          <ThemeToggle />
+                          <Button onClick={handleLogout} variant="ghost" size="icon">
+                              <LogOut className="h-5 w-5" />
+                          </Button>
+                      </div>
+                  ) : (
+                       <div className='flex gap-2'>
+                          <Button asChild variant="outline" size="sm">
+                              <Link href="/login">Нэвтрэх</Link>
+                          </Button>
+                           <Button asChild size="sm">
+                              <Link href="/signup">Бүртгүүлэх</Link>
+                          </Button>
+                      </div>
+                  )
+              )}
+            <ThemeToggle />
+          </div>
         </div>
-      </div>
-    </header>
-  );
+      </header>
+    );
+
+    if (!mounted) {
+      return (
+          <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+              <div className="container flex h-14 max-w-screen-2xl items-center">
+                  <div className="flex-1"></div>
+                  <div className="flex items-center justify-end gap-2">
+                      <div className="h-10 w-10"></div>
+                      <div className="h-10 w-10"></div>
+                  </div>
+              </div>
+          </header>
+      )
+  }
+
+  return headerContent;
 };
 
 export default Header;
