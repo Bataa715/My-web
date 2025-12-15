@@ -86,38 +86,6 @@ export default function EnglishDashboardPage() {
           <p className="mt-2 text-muted-foreground">Таны сурлагын явц болон өдөр тутмын зорилго.</p>
       </div>
 
-       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
-            <Card className="md:col-span-1 bg-card/80 backdrop-blur-sm">
-                <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-lg font-medium">Today's Goal</CardTitle>
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                </CardHeader>
-                <CardContent>
-                    <p className="text-2xl font-bold">2 Grammar Lessons</p>
-                    <p className="text-xs text-muted-foreground">+10 new words</p>
-                </CardContent>
-            </Card>
-            <Card className="md:col-span-1 bg-card/80 backdrop-blur-sm">
-                <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-lg font-medium">Streak</CardTitle>
-                    <Flame className="h-5 w-5 text-orange-500" />
-                </CardHeader>
-                <CardContent>
-                    <p className="text-2xl font-bold">5 Days</p>
-                    <p className="text-xs text-muted-foreground">Keep it up!</p>
-                </CardContent>
-            </Card>
-             <Card className="md:col-span-1 bg-card/80 backdrop-blur-sm">
-                <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-lg font-medium">Overall Progress</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-2xl font-bold">62%</p>
-                    <p className="text-xs text-muted-foreground">Almost there!</p>
-                </CardContent>
-            </Card>
-       </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
         {englishSkills.map((skill) => (
           <ProgressCard key={skill.title} {...skill} />
