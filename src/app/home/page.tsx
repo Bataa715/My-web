@@ -158,11 +158,6 @@ export default function Home() {
             </div>
           </div>
       </div>
-       <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
-          <div className="animate-bounce">
-            <ChevronDown className="h-8 w-8 text-muted-foreground" />
-          </div>
-      </div>
     </div>
   );
 }

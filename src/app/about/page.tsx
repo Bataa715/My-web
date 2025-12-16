@@ -13,7 +13,7 @@ import Skills from '@/components/sections/skills';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ImageIcon, Loader2, Save } from 'lucide-react';
+import { ImageIcon, Loader2, Save, ChevronDown } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -144,6 +144,11 @@ export default function AboutPage() {
       )}
       <BackButton />
       <Hero />
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+          <div className="animate-bounce">
+            <ChevronDown className="h-8 w-8 text-muted-foreground" />
+          </div>
+      </div>
       <Education />
       <Projects />
       <Skills />
