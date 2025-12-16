@@ -3,7 +3,7 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, MessageSquareQuote, Film, Music, Gamepad2, MapPin, BrainCircuit, PlayCircle } from 'lucide-react';
+import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, MessageSquareQuote, Film, Music, Gamepad2, MapPin, BrainCircuit, PlayCircle, Download } from 'lucide-react';
 import { useState, useEffect, type FC } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -117,7 +117,7 @@ export default function Hero() {
   const [bio, setBio] = useState('');
   const [name, setName] = useState('');
   const [orbitInfo, setOrbitInfo] = useState<OrbitInfo[]>([]);
-  const [socialLinks, setSocialLinks] = useState({ github: '', instagram: '', email: '' });
+  const [socialLinks, setSocialLinks] = useState({ github: '', instagram: '', email: '', cvUrl: '' });
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
@@ -138,7 +138,7 @@ export default function Hero() {
   const [editedOrbitBgImage, setEditedOrbitBgImage] = useState("");
   const [editedYoutubeUrl, setEditedYoutubeUrl] = useState("");
   const [isEditingLinks, setIsEditingLinks] = useState(false);
-  const [editedLinks, setEditedLinks] = useState({ github: '', instagram: '', email: '' });
+  const [editedLinks, setEditedLinks] = useState({ github: '', instagram: '', email: '', cvUrl: '' });
 
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   
@@ -174,6 +174,7 @@ export default function Hero() {
             github: data.github || "https://github.com/Bataa715",
             instagram: data.instagram || "https://www.instagram.com/ka1__zen/",
             email: data.email || "batmyagmar715@gmail.com",
+            cvUrl: data.cvUrl || ''
           };
           setSocialLinks(links);
           setEditedLinks(links);
@@ -205,6 +206,7 @@ export default function Hero() {
             github: "https://github.com/Bataa715",
             instagram: "https://www.instagram.com/ka1__zen/",
             email: "batmyagmar715@gmail.com",
+            cvUrl: ''
           };
           const defaultData: UserProfile = {
             name: defaultName,
@@ -247,6 +249,7 @@ export default function Hero() {
                 github: editedLinks.github,
                 instagram: editedLinks.instagram,
                 email: editedLinks.email,
+                cvUrl: editedLinks.cvUrl,
             });
             setSocialLinks(editedLinks);
             setIsEditingLinks(false);
@@ -524,6 +527,15 @@ export default function Hero() {
                                 className="h-8 text-sm"
                             />
                         </div>
+                        <div className="flex items-center gap-2">
+                            <Download className="h-6 w-6 text-muted-foreground" />
+                            <Input 
+                                value={editedLinks.cvUrl} 
+                                onChange={(e) => setEditedLinks({...editedLinks, cvUrl: e.target.value})}
+                                placeholder="CV холбоос"
+                                className="h-8 text-sm"
+                            />
+                        </div>
                         <div className="flex gap-2 pt-2">
                             <Button onClick={handleSaveLinks} size="sm" disabled={saving}>
                                 {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Save className="mr-2 h-4 w-4" />} Хадгалах
@@ -544,6 +556,14 @@ export default function Hero() {
                         <Link href={`mailto:${socialLinks.email}`} aria-label="Email">
                             <Mail className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
                         </Link>
+                        {socialLinks.cvUrl && (
+                          <Button asChild variant="outline" size="sm">
+                            <Link href={socialLinks.cvUrl} target="_blank" rel="noopener noreferrer">
+                              <Download className="mr-2 h-4 w-4" />
+                              CV татах
+                            </Link>
+                          </Button>
+                        )}
                          {isEditMode && (
                             <Button
                                 variant="ghost"

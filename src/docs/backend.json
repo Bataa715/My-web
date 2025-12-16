@@ -50,6 +50,10 @@
           "type": "string",
           "description": "The user's email address."
         },
+         "cvUrl": {
+          "type": "string",
+          "description": "URL to the user's CV/Resume file."
+        },
         "homeHeroImage": {
             "type": "string",
             "description": "URL of the hero image for the home page."

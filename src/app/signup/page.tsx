@@ -75,6 +75,7 @@ export default function SignupPage() {
         github: "https://github.com/Bataa715",
         instagram: "https://www.instagram.com/ka1__zen/",
         email: values.email,
+        cvUrl: ""
       };
       
       const userProfile: UserProfile = {

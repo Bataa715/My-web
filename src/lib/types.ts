@@ -146,6 +146,7 @@ export type UserProfile = {
     github?: string;
     instagram?: string;
     email?: string;
+    cvUrl?: string;
 };
 
 export interface GeneratedMCQ {
