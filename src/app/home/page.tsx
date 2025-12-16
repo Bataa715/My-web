@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, Wrench, ImageIcon, Loader2, Save, ChevronDown } from 'lucide-react';
+import { ArrowRight, Wrench, ImageIcon, Loader2, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -142,7 +142,7 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center text-center h-full">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
             <p className="max-w-[700px] text-muted-foreground md:text-xl">
-             Энэ бол тасралтгүй хөгжил, суралцах үйл явцыг минь харуулсан хувийн орон зай юм.
+             welcome
             </p>
             <div className="flex flex-col gap-4 sm:flex-row">
               <Button asChild size="lg">
