@@ -142,7 +142,7 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center text-center h-full">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
             <p className="max-w-[700px] text-muted-foreground md:text-xl">
-             welcome
+             Welcome
             </p>
             <div className="flex flex-col gap-4 sm:flex-row">
               <Button asChild size="lg">
