@@ -173,7 +173,7 @@ export default function AboutPage() {
       <div className="flex flex-col items-center justify-center text-center h-full">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
              <motion.h1
-              className="text-4xl md:text-5xl lg:text-6xl text-muted-foreground font-light"
+              className="text-2xl md:text-3xl lg:text-4xl text-muted-foreground font-light"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
@@ -186,7 +186,7 @@ export default function AboutPage() {
             </motion.h1>
 
             <motion.h2
-              className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight"
+              className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
