@@ -173,7 +173,7 @@ export default function Hero() {
             github: data.github || "https://github.com/Bataa715",
             instagram: data.instagram || "https://www.instagram.com/ka1__zen/",
             email: data.email || "batmyagmar715@gmail.com",
-            cvUrl: data.cvUrl || '',
+            cvUrl: data.cvUrl || "https://www.google.com/",
             facebook: data.facebook || ''
           };
           setSocialLinks(links);
@@ -206,7 +206,7 @@ export default function Hero() {
             github: "https://github.com/Bataa715",
             instagram: "https://www.instagram.com/ka1__zen/",
             email: "batmyagmar715@gmail.com",
-            cvUrl: '',
+            cvUrl: 'https://www.google.com/',
             facebook: "https://www.facebook.com/profile.php?id=100010513223018",
           };
           const defaultData: UserProfile = {
