@@ -4,19 +4,25 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, Save, Loader2, LogOut, XCircle, Pencil } from 'lucide-react';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { Menu, PencilRuler, Eye, Save, Loader2, LogOut, XCircle, Pencil, Settings, Sun, Moon, Laptop } from 'lucide-react';
+import { useTheme as useNextTheme } from "next-themes";
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from './ui/input';
-import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { usePathname, useRouter } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { UserProfile } from '@/lib/types';
 import { signOut } from 'firebase/auth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 
 const mainLinks = [
@@ -40,6 +46,7 @@ const Header = () => {
     const [editedAppName, setEditedAppName] = useState(appName);
     
     const [mounted, setMounted] = useState(false);
+    const { setTheme } = useNextTheme();
 
     useEffect(() => {
         setMounted(true);
@@ -203,15 +210,35 @@ const Header = () => {
                 </Button>
               )}
 
-              {!isUserLoading && user && (
-                  <div className="flex items-center gap-2">
-                       <ThemeToggle />
-                      <Button onClick={handleLogout} variant="outline" size="icon" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                          <LogOut className="h-5 w-5" />
-                      </Button>
-                  </div>
-                )
-              }
+              {user && !isUserLoading && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                      <Settings className="h-5 w-5" />
+                      <span className="sr-only">Тохиргоо</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setTheme("light")}>
+                      <Sun className="mr-2 h-4 w-4" />
+                      <span>Цайвар</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme("dark")}>
+                      <Moon className="mr-2 h-4 w-4" />
+                      <span>Бараан</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setTheme("system")}>
+                      <Laptop className="mr-2 h-4 w-4" />
+                      <span>Систем</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Гарах</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
           </div>
         </div>
       </header>
@@ -235,7 +262,3 @@ const Header = () => {
 };
 
 export default Header;
-
-    
-
-    
