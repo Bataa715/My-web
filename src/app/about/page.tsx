@@ -52,7 +52,7 @@ export default function AboutPage() {
   
   const name = "Batuka";
   const firstLine = "Сайн уу?";
-  const secondLine = `Миний хочийг ${name} гэдэг`;
+  const secondLine = `Миний нэрийг ${name} гэдэг`;
   const thirdLine = `${name} нь Тууштай`;
 
 
