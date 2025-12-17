@@ -170,7 +170,7 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
         </div>
       )}
-      <div className="flex flex-col items-center justify-center text-center h-full">
+      <div className="flex flex-col items-center text-center h-full pt-20">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
              <motion.h1
               className="text-2xl md:text-3xl lg:text-4xl text-muted-foreground font-light"
