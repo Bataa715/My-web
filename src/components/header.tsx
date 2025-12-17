@@ -319,7 +319,7 @@ const Header = () => {
                                   </DialogContent>
                               </Dialog>
                           ) : null}
-
+                           <ThemeToggle />
                           <Button onClick={handleLogout} variant="outline" size="icon" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
                               <LogOut className="h-5 w-5" />
                           </Button>
@@ -335,7 +335,6 @@ const Header = () => {
                       </div>
                   )
               )}
-            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -359,3 +358,5 @@ const Header = () => {
 };
 
 export default Header;
+
+    
