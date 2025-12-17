@@ -12,7 +12,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
-        headline: ['var(--font-bartle)', 'sans-serif'],
+        headline: ['var(--font-jetbrainsMono)', 'sans-serif'],
         code: ['"Source Code Pro"', 'monospace'],
         jp: ['"Noto Sans JP"', 'sans-serif'],
       },
