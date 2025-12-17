@@ -304,9 +304,9 @@ export default function AboutPage() {
               {hobbies.map((hobby, index) => {
                   const tweenStyle: CSSProperties = {
                     transform: `translateX(0) rotateY(${
-                      tweenValues[index] * 15
-                    }deg) scale(${1 - Math.abs(tweenValues[index]) * 0.15})`,
-                     opacity: 1 - Math.abs(tweenValues[index]) * 0.5,
+                      (tweenValues[index] || 0) * 15
+                    }deg) scale(${1 - Math.abs(tweenValues[index] || 0) * 0.15})`,
+                     opacity: 1 - Math.abs(tweenValues[index] || 0) * 0.5,
                   };
 
                   return (
