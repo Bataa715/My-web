@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -75,7 +76,8 @@ export default function SignupPage() {
         github: "https://github.com/Bataa715",
         instagram: "https://www.instagram.com/ka1__zen/",
         email: values.email,
-        cvUrl: ""
+        cvUrl: "",
+        facebook: "https://www.facebook.com/profile.php?id=100010513223018",
       };
       
       const userProfile: UserProfile = {

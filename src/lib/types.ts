@@ -145,6 +145,7 @@ export type UserProfile = {
     orbitInfo: OrbitInfo[];
     github?: string;
     instagram?: string;
+    facebook?: string;
     email?: string;
     cvUrl?: string;
 };

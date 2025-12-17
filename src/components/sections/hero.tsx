@@ -3,7 +3,7 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, MessageSquareQuote, Film, Music, Gamepad2, MapPin, BrainCircuit, PlayCircle, Download } from 'lucide-react';
+import { Github, Instagram, Mail, Edit, Save, XCircle, Loader2, AlertTriangle, Pencil, Upload, User, Heart, Target, MessageSquareQuote, Film, Music, Gamepad2, MapPin, BrainCircuit, PlayCircle, Download, Facebook } from 'lucide-react';
 import { useState, useEffect, type FC } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -117,7 +117,7 @@ export default function Hero() {
   const [bio, setBio] = useState('');
   const [name, setName] = useState('');
   const [orbitInfo, setOrbitInfo] = useState<OrbitInfo[]>([]);
-  const [socialLinks, setSocialLinks] = useState({ github: '', instagram: '', email: '', cvUrl: '' });
+  const [socialLinks, setSocialLinks] = useState({ github: '', instagram: '', email: '', cvUrl: '', facebook: '' });
 
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
@@ -138,7 +138,7 @@ export default function Hero() {
   const [editedOrbitBgImage, setEditedOrbitBgImage] = useState("");
   const [editedYoutubeUrl, setEditedYoutubeUrl] = useState("");
   const [isEditingLinks, setIsEditingLinks] = useState(false);
-  const [editedLinks, setEditedLinks] = useState({ github: '', instagram: '', email: '', cvUrl: '' });
+  const [editedLinks, setEditedLinks] = useState({ github: '', instagram: '', email: '', cvUrl: '', facebook: '' });
 
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   
@@ -174,7 +174,8 @@ export default function Hero() {
             github: data.github || "https://github.com/Bataa715",
             instagram: data.instagram || "https://www.instagram.com/ka1__zen/",
             email: data.email || "batmyagmar715@gmail.com",
-            cvUrl: data.cvUrl || ''
+            cvUrl: data.cvUrl || '',
+            facebook: data.facebook || ''
           };
           setSocialLinks(links);
           setEditedLinks(links);
@@ -206,7 +207,8 @@ export default function Hero() {
             github: "https://github.com/Bataa715",
             instagram: "https://www.instagram.com/ka1__zen/",
             email: "batmyagmar715@gmail.com",
-            cvUrl: ''
+            cvUrl: '',
+            facebook: "https://www.facebook.com/profile.php?id=100010513223018",
           };
           const defaultData: UserProfile = {
             name: defaultName,
@@ -250,6 +252,7 @@ export default function Hero() {
                 instagram: editedLinks.instagram,
                 email: editedLinks.email,
                 cvUrl: editedLinks.cvUrl,
+                facebook: editedLinks.facebook,
             });
             setSocialLinks(editedLinks);
             setIsEditingLinks(false);
@@ -518,6 +521,15 @@ export default function Hero() {
                                 className="h-8 text-sm"
                             />
                         </div>
+                         <div className="flex items-center gap-2">
+                            <Facebook className="h-6 w-6 text-muted-foreground" />
+                            <Input 
+                                value={editedLinks.facebook} 
+                                onChange={(e) => setEditedLinks({...editedLinks, facebook: e.target.value})}
+                                placeholder="Facebook URL"
+                                className="h-8 text-sm"
+                            />
+                        </div>
                         <div className="flex items-center gap-2">
                             <Mail className="h-6 w-6 text-muted-foreground" />
                             <Input 
@@ -547,15 +559,6 @@ export default function Hero() {
                     </div>
                 ) : (
                     <div className="flex items-center gap-4">
-                        <Link href={socialLinks.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-                            <Github className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
-                        </Link>
-                        <Link href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                            <Instagram className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
-                        </Link>
-                        <Link href={`mailto:${socialLinks.email}`} aria-label="Email">
-                            <Mail className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
-                        </Link>
                         {socialLinks.cvUrl && (
                           <Button asChild variant="outline" size="sm">
                             <Link href={socialLinks.cvUrl} target="_blank" rel="noopener noreferrer">
@@ -563,6 +566,26 @@ export default function Hero() {
                               CV татах
                             </Link>
                           </Button>
+                        )}
+                        {socialLinks.github && (
+                            <Link href={socialLinks.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                                <Github className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
+                            </Link>
+                        )}
+                        {socialLinks.instagram && (
+                             <Link href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                                <Instagram className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
+                            </Link>
+                        )}
+                        {socialLinks.facebook && (
+                            <Link href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                <Facebook className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
+                            </Link>
+                        )}
+                        {socialLinks.email && (
+                             <Link href={`mailto:${socialLinks.email}`} aria-label="Email">
+                                <Mail className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
+                            </Link>
                         )}
                          {isEditMode && (
                             <Button

@@ -46,6 +46,10 @@
           "type": "string",
           "description": "URL of the user's Instagram profile."
         },
+        "facebook": {
+          "type": "string",
+          "description": "URL of the user's Facebook profile."
+        },
         "email": {
           "type": "string",
           "description": "The user's email address."
