@@ -41,7 +41,7 @@ const Header = () => {
     const [saving, setSaving] = useState(false);
     
     const { user, isUserLoading, auth, firestore } = useFirebase();
-    const [appName, setAppName] = useState("...");
+    const [appName, setAppName] = useState("");
     const [isEditingAppName, setIsEditingAppName] = useState(false);
     const [editedAppName, setEditedAppName] = useState(appName);
     
@@ -166,8 +166,10 @@ const Header = () => {
 
            {/* Center Section (App Name) */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-             <div onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2 cursor-pointer">
-                 {isEditingAppName ? (
+             <div onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2 cursor-pointer h-8">
+                 {isUserLoading ? (
+                    <div />
+                 ) : isEditingAppName ? (
                     <div className="flex items-center gap-2">
                         <Input
                             value={editedAppName}
