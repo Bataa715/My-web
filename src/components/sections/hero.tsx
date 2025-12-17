@@ -825,14 +825,14 @@ export default function Hero() {
       </Dialog>
       
        <Dialog open={isPlayerOpen} onOpenChange={setIsPlayerOpen}>
-          <DialogContent className="max-w-3xl aspect-video p-0 border-0">
+          <DialogContent className="sm:max-w-2xl bg-black/50 backdrop-blur-lg border-primary/30 p-1.5">
              <DialogHeader className="sr-only">
                 <DialogTitle>{selectedOrbit?.title}</DialogTitle>
                 <DialogDescription>Playing: {selectedOrbit?.content}</DialogDescription>
              </DialogHeader>
              {selectedOrbit?.type === 'audio' && selectedOrbit.youtubeVideoId && (
                  <iframe
-                    className="w-full h-full rounded-lg"
+                    className="w-full aspect-video rounded-md"
                     src={`https://www.youtube.com/embed/${selectedOrbit.youtubeVideoId}?autoplay=1`}
                     title="YouTube video player"
                     frameBorder="0"
@@ -850,3 +850,6 @@ export default function Hero() {
 
     
 
+
+
+    
