@@ -9,6 +9,7 @@ import { ProjectProvider } from "@/contexts/ProjectContext";
 import { SkillsProvider } from "@/contexts/SkillsContext";
 import MainLayout from "@/components/MainLayout";
 import { EducationProvider } from "@/contexts/EducationContext";
+import { HobbyProvider } from "@/contexts/HobbyContext";
 
 export const metadata: Metadata = {
   title: "Kaizen",
@@ -45,16 +46,18 @@ export default function RootLayout({
                 <EducationProvider>
                   <ProjectProvider>
                     <SkillsProvider>
-                      <MainLayout>
-                        <div className="page-container-wrapper">
-                          <div className="page-container">
-                            <div className="p-4 sm:p-6 lg:p-8">
-                              {children}
+                      <HobbyProvider>
+                        <MainLayout>
+                          <div className="page-container-wrapper">
+                            <div className="page-container">
+                              <div className="p-4 sm:p-6 lg:p-8">
+                                {children}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </MainLayout>
-                      <Toaster />
+                        </MainLayout>
+                        <Toaster />
+                      </HobbyProvider>
                     </SkillsProvider>
                   </ProjectProvider>
                 </EducationProvider>

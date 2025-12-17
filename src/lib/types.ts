@@ -105,6 +105,15 @@ export type Education = {
   createdAt?: Date | Timestamp;
 };
 
+export type Hobby = {
+  id?: string;
+  title: string;
+  description: string;
+  image: string;
+  imageHint: string;
+  createdAt?: Date | Timestamp;
+};
+
 export type Project = {
   id?: string;
   name: string;

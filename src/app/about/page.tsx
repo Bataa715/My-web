@@ -3,21 +3,26 @@
 
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, ImageIcon, Loader2, Save, ArrowLeft } from 'lucide-react';
-import { useState, useEffect, useCallback, type CSSProperties } from 'react';
+import { ArrowRight, ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { useState, useEffect, useCallback, type CSSProperties, useMemo } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
-import type { UserProfile } from '@/lib/types';
+import type { UserProfile, Hobby } from '@/lib/types';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useHobbies } from '@/contexts/HobbyContext';
+import { AddHobbyDialog } from '@/components/AddHobbyDialog';
+import { EditHobbyDialog } from '@/components/EditHobbyDialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -42,85 +47,26 @@ const letterVariants = {
   },
 };
 
-interface Hobby {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  imageHint: string;
-}
-
-const hobbies: Hobby[] = [
-  {
-    id: 'music',
-    title: 'Хөгжим тоглох',
-    description: 'Бас хаяа гитар, төгөлдөр хуур хөгжим тоглоод интернет дээр тавьчихдаг (๑• ᎑ •๑)',
-    image: 'https://picsum.photos/seed/playing-guitar/600/400',
-    imageHint: 'music instrument'
-  },
-  {
-    id: 'anime',
-    title: 'Аниме, ном, дуу, тоглоом',
-    description: 'Өдөр болгон бүхий л ном, роман уншиж, кино үзэж, хөгжим сонсдог. Үүнээс гадна жаахан содон зүйлүүдийг дурдвал Аниме, Вебтүүн, Видео гейм гэх мэтчилэн байнаа. (©w©)',
-    image: 'https://picsum.photos/seed/interstellar/600/400',
-    imageHint: 'movie poster'
-  },
-  {
-    id: 'sports',
-    title: 'Спорт',
-    description: 'Яагаад ч юм өглөө болоод гүйх шиг сайхан юм байдаггүй ээ. Тамирчин биш л дээ. Гэхдээ гүйсний дараа жинхэнэ амар амгаланг мэдэрдэг (๑´`๑). Гүйхийн хажуугаар фитнессээр, усан бассейнээр хичээллэх дуртай (๑´`๑).',
-    image: 'https://picsum.photos/seed/running-morning/600/400',
-    imageHint: 'running morning'
-  },
-  {
-    id: 'polyglot',
-    title: 'Полиглот болох мөрөөдөл',
-    description: 'Одоогоор япон хэл үзэж байгаа ба, ирээдүйд герман хэлээр ярьдаг болох бүрэн зорилготой.',
-    image: 'https://picsum.photos/seed/languages/600/400',
-    imageHint: 'languages books'
-  },
-  {
-    id: 'coding',
-    title: 'Код бичих',
-    description: 'Шинэ технологи сурч, сонирхолтой төслүүд дээр ажиллах нь миний хамгийн дуртай зүйлсийн нэг.',
-    image: 'https://picsum.photos/seed/coding-desk/600/400',
-    imageHint: 'coding desk'
-  },
-  {
-    id: 'travel',
-    title: 'Аялах',
-    description: 'Шинэ газар үзэж, өөр соёлтой танилцах нь ертөнцийг харах өнцгийг минь тэлдэг.',
-    image: 'https://picsum.photos/seed/travel-map/600/400',
-    imageHint: 'travel map'
-  },
-  {
-    id: 'photography',
-    title: 'Гэрэл зураг',
-    description: 'Гоё агшинг камерын дуранд буулгаж, тэр мөчийг мөнхлөх дуртай.',
-    image: 'https://picsum.photos/seed/camera-lens/600/400',
-    imageHint: 'camera lens'
-  },
-  {
-    id: 'cooking',
-    title: 'Хоол хийх',
-    description: 'Янз бүрийн орны хоол туршиж, шинэ амтыг нээх нь надад таашаал өгдөг.',
-    image: 'https://picsum.photos/seed/cooking-kitchen/600/400',
-    imageHint: 'cooking kitchen'
-  },
-];
-
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
   const { isEditMode } = useEditMode();
+  const { hobbies, loading: hobbiesLoading, deleteHobby } = useHobbies();
   const { toast } = useToast();
   const [heroImage, setHeroImage] = useState<string | undefined>(undefined);
   const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
   const [editedImageUrl, setEditedImageUrl] = useState('');
   const [saving, setSaving] = useState(false);
 
+  const displayItems = useMemo(() => {
+     if (isEditMode) {
+      return [...hobbies, { id: 'add-new-hobby', title: '', description: '', image: '', imageHint: '' }];
+    }
+    return hobbies;
+  }, [hobbies, isEditMode]);
+
   // 3D Carousel State
   const [activeIndex, setActiveIndex] = useState(0);
-  const totalItems = hobbies.length;
+  const totalItems = displayItems.length > 0 ? displayItems.length : 1;
   const anglePerItem = 360 / totalItems;
   const CIRCLE_RADIUS = 400; // Controls the circle's radius
   const ITEM_WIDTH = 250; // Width of a card
@@ -289,57 +235,107 @@ export default function AboutPage() {
             <h2 className="text-4xl md:text-5xl font-bold">Миний хоббинууд</h2>
           </div>
 
-            <div className="relative flex items-center justify-center h-[350px]">
-              <div className="carousel-container">
-                  <div className="carousel" style={{ transform: `rotateY(${-activeIndex * anglePerItem}deg)` }}>
-                      {hobbies.map((hobby, index) => {
-                          const angle = index * anglePerItem;
-                          const isVisible = Math.abs((activeIndex - index + totalItems) % totalItems) <= 2 || Math.abs((activeIndex - index - totalItems) % totalItems) <= 2;
-
-                          const style: CSSProperties = {
-                              transform: `rotateY(${angle}deg) translateZ(${CIRCLE_RADIUS}px)`,
-                              opacity: isVisible ? 1 : 0.2,
-                              pointerEvents: isVisible ? 'auto' : 'none',
-                          };
-
-                          return (
-                              <div className="carousel-item group" key={hobby.id} style={style} onClick={() => setActiveIndex(index)}>
-                                   <Card className="relative bg-card border-border/20 h-full w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
-                                      <Image 
-                                        src={hobby.image} 
-                                        alt={hobby.title} 
-                                        fill 
-                                        className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                        data-ai-hint={hobby.imageHint} 
-                                      />
-                                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                                       <div className="absolute bottom-0 left-0 p-4 text-white">
-                                          <CardTitle className="text-lg font-bold">{hobby.title}</CardTitle>
-                                          <p className="text-sm text-white/80 mt-1">{hobby.description}</p>
-                                       </div>
-                                   </Card>
-                               </div>
-                          )
-                      })}
-                  </div>
-              </div>
-              <Button
-                onClick={scrollPrev}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10"
-                 variant="outline"
-                 size="icon"
-              >
-                <ArrowLeft/>
-              </Button>
-              <Button
-                onClick={scrollNext}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10"
-                variant="outline"
-                size="icon"
-              >
-                <ArrowRight/>
-              </Button>
+          {hobbiesLoading ? (
+            <div className="flex justify-center items-center h-[350px]">
+              <Loader2 className="h-12 w-12 animate-spin text-primary" />
             </div>
+          ) : (
+            <div className="relative flex items-center justify-center h-[350px]">
+                {displayItems.length === 0 && !isEditMode ? (
+                     <p className="text-muted-foreground">Хобби олдсонгүй.</p>
+                ) : (
+                <div className="carousel-container">
+                    <div className="carousel" style={{ transform: `rotateY(${-activeIndex * anglePerItem}deg)` }}>
+                        <AnimatePresence>
+                           {displayItems.map((hobby, index) => {
+                              const angle = index * anglePerItem;
+                              const isVisible = Math.abs((activeIndex - index + totalItems) % totalItems) <= 2 || Math.abs((activeIndex - index - totalItems) % totalItems) <= 2;
+                              const style: CSSProperties = {
+                                  transform: `rotateY(${angle}deg) translateZ(${CIRCLE_RADIUS}px)`,
+                                  opacity: isVisible ? 1 : 0.2,
+                                  pointerEvents: isVisible ? 'auto' : 'none',
+                              };
+                              if (hobby.id === 'add-new-hobby') {
+                                return (
+                                   <div className="carousel-item" style={style} key={hobby.id} onClick={() => setActiveIndex(index)}>
+                                      <AddHobbyDialog>
+                                        <button className="flex h-full w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/50 bg-card/50 text-muted-foreground transition-colors hover:border-primary hover:bg-card/80 hover:text-primary">
+                                            <PlusCircle size={48} />
+                                            <span className="mt-4 font-semibold">Хобби нэмэх</span>
+                                        </button>
+                                    </AddHobbyDialog>
+                                  </div>
+                                )
+                              }
+                              return (
+                                  <div className="carousel-item group" key={hobby.id} style={style} onClick={() => setActiveIndex(index)}>
+                                       <Card className="relative bg-card border-border/20 h-full w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
+                                          {isEditMode && (
+                                            <div className="absolute top-2 right-2 flex gap-1 z-20">
+                                              <EditHobbyDialog hobby={hobby}>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-white bg-black/30 hover:bg-black/50 hover:text-white">
+                                                  <Edit className="h-4 w-4" />
+                                                </Button>
+                                              </EditHobbyDialog>
+                                              <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-white bg-black/30 hover:bg-destructive/80 hover:text-white">
+                                                    <Trash2 className="h-4 w-4" />
+                                                  </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                  <AlertDialogHeader>
+                                                    <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
+                                                    <AlertDialogDescription>"{hobby.title}" хоббиг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.</AlertDialogDescription>
+                                                  </AlertDialogHeader>
+                                                  <AlertDialogFooter>
+                                                    <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => hobby.id && deleteHobby(hobby.id)}>Устгах</AlertDialogAction>
+                                                  </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                              </AlertDialog>
+                                            </div>
+                                          )}
+                                          <Image 
+                                            src={hobby.image} 
+                                            alt={hobby.title} 
+                                            fill 
+                                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                            data-ai-hint={hobby.imageHint} 
+                                          />
+                                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                                           <div className="absolute bottom-0 left-0 p-4 text-white">
+                                              <CardTitle className="text-lg font-bold">{hobby.title}</CardTitle>
+                                              <p className="text-sm text-white/80 mt-1">{hobby.description}</p>
+                                           </div>
+                                       </Card>
+                                   </div>
+                              )
+                          })}
+                        </AnimatePresence>
+                    </div>
+                </div>
+                )}
+                <Button
+                    onClick={scrollPrev}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10"
+                    variant="outline"
+                    size="icon"
+                    disabled={displayItems.length === 0}
+                >
+                    <ArrowLeft/>
+                </Button>
+                <Button
+                    onClick={scrollNext}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10"
+                    variant="outline"
+                    size="icon"
+                     disabled={displayItems.length === 0}
+                >
+                    <ArrowRight/>
+                </Button>
+            </div>
+           )}
         </div>
       </section>
       

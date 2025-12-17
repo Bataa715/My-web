@@ -87,6 +87,19 @@
       },
       "required": ["degree", "school", "startDate", "endDate", "createdAt"]
     },
+    "Hobby": {
+      "title": "Hobby",
+      "description": "Represents a user's hobby.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "imageHint": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "description", "image", "imageHint"]
+    },
     "Project": {
       "title": "Project",
       "description": "Represents a project in the portfolio.",
@@ -312,6 +325,10 @@
      "/users/{userId}/education/{educationId}": {
       "schema": { "$ref": "#/entities/Education" },
       "description": "Stores user education history."
+    },
+     "/users/{userId}/hobbies/{hobbyId}": {
+      "schema": { "$ref": "#/entities/Hobby" },
+      "description": "Stores user hobbies."
     },
     "/users/{userId}/projects/{projectId}": {
       "schema": { "$ref": "#/entities/Project" },
