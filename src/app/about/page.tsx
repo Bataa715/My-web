@@ -122,8 +122,8 @@ export default function AboutPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const totalItems = hobbies.length;
   const anglePerItem = 360 / totalItems;
-  const CIRCLE_RADIUS = 500; // Controls the circle's radius
-  const ITEM_WIDTH = 280; // Width of a card
+  const CIRCLE_RADIUS = 400; // Controls the circle's radius
+  const ITEM_WIDTH = 250; // Width of a card
 
   const scrollNext = () => setActiveIndex((prev) => (prev + 1) % totalItems);
   const scrollPrev = () => setActiveIndex((prev) => (prev - 1 + totalItems) % totalItems);
@@ -289,7 +289,7 @@ export default function AboutPage() {
             <h2 className="text-4xl md:text-5xl font-bold">Миний хоббинууд</h2>
           </div>
 
-            <div className="relative flex items-center justify-center h-[500px]">
+            <div className="relative flex items-center justify-center h-[350px]">
               <div className="carousel-container">
                   <div className="carousel" style={{ transform: `rotateY(${-activeIndex * anglePerItem}deg)` }}>
                       {hobbies.map((hobby, index) => {
@@ -303,23 +303,20 @@ export default function AboutPage() {
                           };
 
                           return (
-                              <div className="carousel-item" key={hobby.id} style={style} onClick={() => setActiveIndex(index)}>
-                                   <Card className="bg-card border-border/20 h-full w-full overflow-hidden group rounded-lg">
-                                       <CardHeader>
-                                         <CardTitle className="text-xl">{hobby.title}</CardTitle>
-                                       </CardHeader>
-                                       <CardContent className="space-y-4">
-                                           <p className="text-muted-foreground text-sm h-20">{hobby.description}</p>
-                                           <div className="aspect-w-4 aspect-h-2 relative rounded-lg overflow-hidden">
-                                               <Image 
-                                                 src={hobby.image} 
-                                                 alt={hobby.title} 
-                                                 fill 
-                                                 className="object-cover transition-transform duration-300 group-hover:scale-110"
-                                                 data-ai-hint={hobby.imageHint} 
-                                               />
-                                           </div>
-                                       </CardContent>
+                              <div className="carousel-item group" key={hobby.id} style={style} onClick={() => setActiveIndex(index)}>
+                                   <Card className="relative bg-card border-border/20 h-full w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
+                                      <Image 
+                                        src={hobby.image} 
+                                        alt={hobby.title} 
+                                        fill 
+                                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                        data-ai-hint={hobby.imageHint} 
+                                      />
+                                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                                       <div className="absolute bottom-0 left-0 p-4 text-white">
+                                          <CardTitle className="text-lg font-bold">{hobby.title}</CardTitle>
+                                          <p className="text-sm text-white/80 mt-1">{hobby.description}</p>
+                                       </div>
                                    </Card>
                                </div>
                           )
@@ -348,9 +345,9 @@ export default function AboutPage() {
       
        <style jsx>{`
             .carousel-container {
-                perspective: 1500px;
+                perspective: 2000px;
                 width: ${ITEM_WIDTH}px;
-                height: 500px;
+                height: 350px;
                 position: relative;
             }
             .carousel {
@@ -363,18 +360,12 @@ export default function AboutPage() {
             .carousel-item {
                 position: absolute;
                 width: ${ITEM_WIDTH}px;
-                height: 400px;
+                height: 320px;
                 top: 15px;
                 left: 0;
                 background: transparent;
                 transition: opacity 0.6s, transform 0.6s;
                 cursor: pointer;
-            }
-            .carousel-item .card {
-                transition: transform 0.3s;
-            }
-            .carousel-item:not([style*="rotateY(0deg)"]):hover .card {
-                 transform: scale(1.05);
             }
       `}</style>
     </div>
