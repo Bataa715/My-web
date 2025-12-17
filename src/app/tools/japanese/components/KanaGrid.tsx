@@ -61,7 +61,7 @@ export default function KanaGrid({ kana, title, collectionPath }: KanaGridProps)
               variant="outline"
               onClick={() => toggleMemorized(k.character)}
               className={cn(
-                "h-20 flex flex-col transition-all duration-200 font-jp",
+                "h-20 flex flex-col transition-all duration-200",
                 memorized.includes(k.character)
                   ? "bg-primary/20 text-primary-foreground border-primary"
                   : "bg-card"

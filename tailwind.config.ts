@@ -12,8 +12,6 @@ export default {
     extend: {
       fontFamily: {
         body: ['var(--font-jetbrainsMono)', 'sans-serif'],
-        code: ['"Source Code Pro"', 'monospace'],
-        jp: ['"Noto Sans JP"', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',

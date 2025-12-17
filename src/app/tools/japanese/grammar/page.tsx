@@ -95,7 +95,7 @@ export default function JapaneseGrammarPage() {
     <div className="space-y-8">
       <BackButton />
       <div className="text-center pt-8 flex items-center justify-center gap-4">
-        <h1 className="text-4xl font-bold font-headline font-jp">Япон хэлний дүрэм</h1>
+        <h1 className="text-4xl font-bold">Япон хэлний дүрэм</h1>
          {isEditMode && (
              <AddGrammarRuleDialog onAddRule={handleAddRule} ruleType="japanese">
                 <Button variant="outline" size="icon">

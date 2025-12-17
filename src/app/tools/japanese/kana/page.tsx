@@ -47,14 +47,14 @@ export default function KanaPage() {
         <div className="space-y-8">
             <BackButton />
             <div className="text-center pt-8">
-                <h1 className="text-4xl font-bold font-headline font-jp">Кана үсэг (かな)</h1>
+                <h1 className="text-4xl font-bold">Кана үсэг (かな)</h1>
                 <p className="mt-2 text-muted-foreground">Япон хэлний авианы бичлэгүүд.</p>
             </div>
 
              <Tabs defaultValue="hiragana" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="hiragana" className="font-jp">Хирагана (ひらがな)</TabsTrigger>
-                    <TabsTrigger value="katakana" className="font-jp">Катакана (カタカナ)</TabsTrigger>
+                    <TabsTrigger value="hiragana">Хирагана (ひらがな)</TabsTrigger>
+                    <TabsTrigger value="katakana">Катакана (カタカナ)</TabsTrigger>
                 </TabsList>
                  {loading ? (
                      <div className="mt-4">
