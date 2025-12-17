@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -62,13 +63,13 @@ export default function Projects() {
           </div>
         ) : (
           <>
-            <div className="flex justify-center flex-wrap gap-2 py-8">
+            <div className="flex justify-center flex-wrap gap-3 py-8">
               {categories.map((category) => (
                 <Button
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   onClick={() => setSelectedCategory(category)}
-                  className="rounded-full transition-colors duration-300"
+                  className="rounded-full transition-colors duration-300 px-6"
                 >
                   {category}
                 </Button>
