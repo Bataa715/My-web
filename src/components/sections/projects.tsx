@@ -63,13 +63,16 @@ export default function Projects() {
           </div>
         ) : (
           <>
-            <div className="flex justify-center flex-wrap gap-3 py-8">
+            <div
+              onMouseMove={handleMouseMove}
+              className="project-card flex justify-center flex-wrap gap-3 py-8 rounded-lg"
+            >
               {categories.map((category) => (
                 <Button
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   onClick={() => setSelectedCategory(category)}
-                  className="rounded-full transition-colors duration-300 px-6"
+                  className="rounded-full transition-colors duration-300 px-6 z-10"
                 >
                   {category}
                 </Button>
