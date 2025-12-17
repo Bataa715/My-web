@@ -102,13 +102,13 @@ export default function AboutPage() {
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
-    containScroll: false,
+    skipSnaps: false,
   });
 
   const onScroll = useCallback(() => {
     if (!emblaApi) return;
-    const progress = emblaApi.scrollProgress();
-    const newRotation = progress * 360 * 2;
+    const scrollProgress = emblaApi.scrollProgress();
+    const newRotation = scrollProgress * 360 * (emblaApi.internalEngine().options.loop ? 2 : 1);
     setRotation(newRotation);
   }, [emblaApi]);
 
@@ -335,7 +335,7 @@ export default function AboutPage() {
         .scene {
             width: 100%;
             perspective: 1000px;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .carousel {
