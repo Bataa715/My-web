@@ -18,8 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
-import useEmblaCarousel from 'embla-carousel-react'
+import useEmblaCarousel, { type EmblaCarouselType } from 'embla-carousel-react'
 
 
 const containerVariants = {
@@ -84,10 +83,11 @@ const hobbies: Hobby[] = [
   },
 ];
 
-const TWEEN_FACTOR = 1.2;
+const TWEEN_FACTOR_3D = 4.2
 
 const numberWithinRange = (number: number, min: number, max: number): number =>
-  Math.min(Math.max(number, min), max);
+  Math.min(Math.max(number, min), max)
+
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -107,39 +107,40 @@ export default function AboutPage() {
     skipSnaps: false,
   })
 
-  const [tweenValues, setTweenValues] = useState<number[]>([]);
+  const [tweenValues, setTweenValues] = useState<number[]>([])
 
   const onScroll = useCallback(() => {
-    if (!emblaApi) return;
+    if (!emblaApi) return
 
-    const engine = emblaApi.internalEngine();
-    const scrollProgress = emblaApi.scrollProgress();
+    const engine = emblaApi.internalEngine()
+    const scrollProgress = emblaApi.scrollProgress()
 
     const styles = emblaApi.scrollSnapList().map((scrollSnap, index) => {
-      let diffToTarget = scrollSnap - scrollProgress;
+      let diffToTarget = scrollSnap - scrollProgress
 
       if (engine.options.loop) {
         engine.slideLooper.loopPoints.forEach((loopItem) => {
-          const target = loopItem.target();
+          const target = loopItem.target()
           if (index === loopItem.index && target !== 0) {
-            const sign = Math.sign(target);
-            if (sign === -1) diffToTarget = scrollSnap - (1 + scrollProgress);
-            if (sign === 1) diffToTarget = scrollSnap + (1 - scrollProgress);
+            const sign = Math.sign(target)
+            if (sign === -1) diffToTarget = scrollSnap - (1 + scrollProgress)
+            if (sign === 1) diffToTarget = scrollSnap + (1 - scrollProgress)
           }
-        });
+        })
       }
-      return diffToTarget;
-    });
-    setTweenValues(styles);
-  }, [emblaApi, setTweenValues]);
+      return diffToTarget
+    })
+    setTweenValues(styles)
+  }, [emblaApi, setTweenValues])
 
 
    useEffect(() => {
-    if (!emblaApi) return;
-    onScroll();
-    emblaApi.on('scroll', onScroll);
-    emblaApi.on('reInit', onScroll);
-  }, [emblaApi, onScroll]);
+    if (!emblaApi) return
+
+    onScroll()
+    emblaApi.on('scroll', onScroll)
+    emblaApi.on('reInit', onScroll)
+  }, [emblaApi, onScroll])
 
   useEffect(() => {
     if (isUserLoading) return;
@@ -299,38 +300,40 @@ export default function AboutPage() {
             <h2 className="text-4xl md:text-5xl font-bold">Миний хоббинууд</h2>
           </div>
 
-           <div className="embla" ref={emblaRef}>
-            <div className="embla__container">
-              {hobbies.map((hobby, index) => {
-                  const tweenStyle: CSSProperties = {
-                    transform: `translateX(0) rotateY(${
-                      (tweenValues[index] || 0) * 15
-                    }deg) scale(${1 - Math.abs(tweenValues[index] || 0) * 0.15})`,
-                     opacity: 1 - Math.abs(tweenValues[index] || 0) * 0.5,
-                  };
+           <div className="embla">
+            <div className="embla__viewport" ref={emblaRef}>
+                <div className="embla__container">
+                {hobbies.map((hobby, index) => {
+                    const tweenStyle: CSSProperties = {
+                        ...(tweenValues.length && {
+                        transform: `translateX(0) rotateY(${tweenValues[index] * 15}deg) scale(${1 - Math.abs(tweenValues[index]) * 0.15})`,
+                        opacity: 1 - Math.abs(tweenValues[index]) * 0.5,
+                        }),
+                    };
 
-                  return (
-                    <div className="embla__slide" key={hobby.id} style={{ flex: '0 0 33.3333%'}}>
-                       <div className="embla__slide__number" style={tweenStyle}>
-                        <Card className="bg-muted/20 border-border/20 h-full">
-                           <CardHeader>
-                             <CardTitle className="text-2xl">{hobby.title}</CardTitle>
-                           </CardHeader>
-                           <CardContent className="space-y-4">
-                             <p className="text-muted-foreground h-20">{hobby.description}</p>
-                             <div className="aspect-video relative rounded-lg overflow-hidden">
-                               <Image src={hobby.image} alt={hobby.title} layout="fill" objectFit="cover" data-ai-hint={hobby.imageHint} />
-                             </div>
-                           </CardContent>
-                         </Card>
-                       </div>
-                    </div>
-                  );
-                })}
+                    return (
+                        <div className="embla__slide" key={hobby.id}>
+                        <div className="embla__slide__number" style={tweenStyle}>
+                            <Card className="bg-muted/20 border-border/20 h-full">
+                            <CardHeader>
+                                <CardTitle className="text-2xl">{hobby.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <p className="text-muted-foreground h-20">{hobby.description}</p>
+                                <div className="aspect-video relative rounded-lg overflow-hidden">
+                                <Image src={hobby.image} alt={hobby.title} layout="fill" objectFit="cover" data-ai-hint={hobby.imageHint} />
+                                </div>
+                            </CardContent>
+                            </Card>
+                        </div>
+                        </div>
+                    );
+                    })}
+                </div>
             </div>
              <Button
                 onClick={() => emblaApi?.scrollPrev()}
-                className="embla__prev absolute left-0 top-1/2 -translate-y-1/2"
+                className="embla__prev"
                  variant="outline"
                  size="icon"
               >
@@ -338,7 +341,7 @@ export default function AboutPage() {
               </Button>
               <Button
                 onClick={() => emblaApi?.scrollNext()}
-                className="embla__next absolute right-0 top-1/2 -translate-y-1/2"
+                className="embla__next"
                 variant="outline"
                 size="icon"
               >
@@ -350,25 +353,48 @@ export default function AboutPage() {
       
        <style jsx>{`
         .embla {
-          position: relative;
-          padding: 0 40px;
+            --slide-spacing: 1rem;
+            --slide-size: 33.333%;
+            padding: 1.6rem;
+            position: relative;
         }
+
+        .embla__viewport {
+            overflow: hidden;
+        }
+
         .embla__container {
-          display: flex;
-          gap: 1rem;
-          perspective: 1000px;
+            backface-visibility: hidden;
+            display: flex;
+            touch-action: pan-y;
+            margin-left: calc(var(--slide-spacing) * -1);
+            perspective: 1000px;
         }
+
         .embla__slide {
-          position: relative;
-          min-width: 0;
+            flex: 0 0 var(--slide-size);
+            min-width: 0;
+            padding-left: var(--slide-spacing);
+            position: relative;
         }
+        
         .embla__slide__number {
             will-change: transform, opacity;
+        }
+        .embla__prev,
+        .embla__next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .embla__prev {
+            left: -20px;
+        }
+        .embla__next {
+            right: -20px;
         }
       `}</style>
 
     </div>
   );
-
-    
 }
