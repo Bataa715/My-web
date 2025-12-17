@@ -31,6 +31,14 @@ const Skills = () => {
         return LucideIcon ? <LucideIcon className="h-8 w-8 text-primary" /> : <AlertTriangle className="h-8 w-8 text-destructive" />;
     };
 
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+        e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+    };
+
     return (
         <section id="skills" className="py-12 md:py-24 lg:py-32">
             <div className="container">
@@ -62,53 +70,55 @@ const Skills = () => {
                 {!loading && (
                      <div className="mx-auto grid max-w-5xl items-start gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                         {skills.map((skillGroup) => (
-                            <Card key={skillGroup.id} className="hover:shadow-lg transition-shadow duration-300 relative group bg-muted/30">
-                                {isEditMode && (
-                                    <div className="absolute top-2 right-2 flex gap-1 z-10">
-                                        <EditSkillDialog skillGroup={skillGroup}>
-                                            <Button variant="ghost" size="icon" className="h-7 w-7">
-                                                <Edit className="h-4 w-4" />
-                                            </Button>
-                                        </EditSkillDialog>
-
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive/10 hover:text-destructive">
-                                                    <Trash2 className="h-4 w-4" />
+                             <div key={skillGroup.id} className="skill-card rounded-lg h-full" onMouseMove={handleMouseMove}>
+                                <Card className="hover:shadow-lg transition-shadow duration-300 relative group bg-muted/30 h-full flex flex-col">
+                                    {isEditMode && (
+                                        <div className="absolute top-2 right-2 flex gap-1 z-10">
+                                            <EditSkillDialog skillGroup={skillGroup}>
+                                                <Button variant="ghost" size="icon" className="h-7 w-7">
+                                                    <Edit className="h-4 w-4" />
                                                 </Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        "{skillGroup.name}" бүлгийг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => deleteSkillGroup(skillGroup.id)}>Устгах</AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                    </div>
-                                )}
-                                <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                                    {getIcon(skillGroup.icon)}
-                                    <CardTitle className="font-headline text-lg">{skillGroup.name}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="flex flex-wrap gap-2">
-                                        {skillGroup.items.map((item, index) => (
-                                            <Badge key={index} variant="secondary" className="text-sm font-medium">
-                                                {item}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                </CardContent>
-                            </Card>
+                                            </EditSkillDialog>
+
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive/10 hover:text-destructive">
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            "{skillGroup.name}" бүлгийг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                                                        <AlertDialogAction onClick={() => deleteSkillGroup(skillGroup.id)}>Устгах</AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </div>
+                                    )}
+                                    <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                                        {getIcon(skillGroup.icon)}
+                                        <CardTitle className="font-headline text-lg">{skillGroup.name}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="flex-grow">
+                                        <div className="flex flex-wrap gap-2">
+                                            {skillGroup.items.map((item, index) => (
+                                                <Badge key={index} variant="secondary" className="text-sm font-medium">
+                                                    {item}
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         ))}
                         {isEditMode && (
-                           <motion.div layout initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
+                           <motion.div layout initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} className="h-full">
                                 <AddSkillDialog>
                                     <button className="flex h-full min-h-[150px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/20 text-muted-foreground transition-colors hover:border-primary hover:bg-muted/50 hover:text-primary">
                                         <PlusCircle size={40} />

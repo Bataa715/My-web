@@ -68,12 +68,12 @@
   }
 }
 
-.education-card, .project-card {
+.education-card, .project-card, .skill-card {
   position: relative;
   overflow: hidden;
 }
 
-.education-card::before, .project-card::before {
+.education-card::before, .project-card::before, .skill-card::before {
   content: '';
   position: absolute;
   left: var(--mouse-x, -500px);
