@@ -136,7 +136,7 @@
     transparent,
     transparent,
     transparent,
-    hsl(var(--primary) / 0.8)
+    hsl(var(--primary))
   );
   animation: rotate-glow-circle 4s linear infinite;
   transform-origin: center center;

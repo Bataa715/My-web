@@ -45,6 +45,13 @@ export default function Projects() {
       ? projects
       : projects.filter((p) => p.category === selectedCategory);
       
+   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+  };
 
   return (
     <section id="projects" className="py-12 md:py-24 lg:py-32">
@@ -86,7 +93,8 @@ export default function Projects() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
-                    className="project-card-glow"
+                    onMouseMove={handleMouseMove}
+                    className="project-card-glow education-card"
                   >
                     <Card className={cn("flex h-full flex-col overflow-hidden transition-shadow duration-300 bg-card/80 backdrop-blur-sm group", isEditMode ? "hover:shadow-lg" : "")}>
                       {isEditMode && (
