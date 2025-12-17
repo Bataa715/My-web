@@ -158,7 +158,7 @@ const Header = () => {
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
            {/* Left Section */}
-           <div className="flex items-center gap-6 md:flex-1">
+           <div className="flex items-center gap-6 md:flex-1 pl-4">
               {/* Mobile Menu */}
               <div className="flex md:hidden">
                 <Sheet open={isOpen} onOpenChange={setIsOpen}>
