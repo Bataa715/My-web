@@ -32,7 +32,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-background font-body antialiased">
+      <body className="min-h-screen bg-background font-body antialiased page-border-glow">
         <AppThemeProvider
           attribute="class"
           defaultTheme="system"

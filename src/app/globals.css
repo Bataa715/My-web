@@ -156,3 +156,27 @@
 .animate-bounce {
   animation: bounce 1s infinite;
 }
+
+.page-border-glow {
+  @apply bg-transparent relative overflow-hidden;
+}
+
+.page-border-glow::before {
+  content: '';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 200vw;
+  height: 200vh;
+  z-index: -1;
+  background: conic-gradient(
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    transparent,
+    hsl(var(--primary) / 0.8)
+  );
+  animation: rotate-glow-circle 8s linear infinite;
+  transform-origin: center center;
+}
