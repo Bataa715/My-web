@@ -167,7 +167,7 @@ const Header = () => {
            {/* Center Section (App Name) */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
              <div onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2 cursor-pointer h-8">
-                 {isUserLoading ? (
+                 {isUserLoading && !appName ? (
                     <div />
                  ) : isEditingAppName ? (
                     <div className="flex items-center gap-2">
@@ -208,7 +208,7 @@ const Header = () => {
               {user && !isUserLoading && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary">
                       <Settings className="h-5 w-5" />
                       <span className="sr-only">Тохиргоо</span>
                     </Button>
