@@ -320,7 +320,7 @@ const Header = () => {
                               </Dialog>
                           ) : null}
 
-                          <Button onClick={handleLogout} variant="outline" size="icon" className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground">
+                          <Button onClick={handleLogout} variant="outline" size="icon" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
                               <LogOut className="h-5 w-5" />
                           </Button>
                       </div>
