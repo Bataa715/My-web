@@ -3,5 +3,5 @@ export default function KanaLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <div className="relative">{children}</div>;
+  return children;
 }

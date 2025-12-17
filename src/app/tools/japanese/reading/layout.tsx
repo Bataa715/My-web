@@ -3,5 +3,5 @@ export default function ReadingLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <div className="relative">{children}</div>;
+  return children;
 }
