@@ -44,7 +44,6 @@ const Skills = () => {
             <div className="container">
                 <div className="mb-12 text-center space-y-4">
                     <h2 className="text-4xl font-bold font-headline">Ур чадвар &amp; Технологиуд</h2>
-                    <p className="mt-2 text-muted-foreground max-w-[900px] mx-auto md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">Миний эзэмшсэн програмчлалын хэл, фрэймворк, багажууд.</p>
                 </div>
 
                 {loading && (
