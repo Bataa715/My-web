@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit } from "lucide-react";
+import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit, Filter } from "lucide-react";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -45,13 +45,6 @@ export default function Projects() {
       ? projects
       : projects.filter((p) => p.category === selectedCategory);
       
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
-    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
-  };
 
   return (
     <section id="projects" className="py-12 md:py-24 lg:py-32">
@@ -70,8 +63,9 @@ export default function Projects() {
           <>
             <div className="flex justify-center py-8">
               <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
-                <SelectTrigger className="w-[240px]">
-                  <SelectValue placeholder="Ангиллаар шүүх..." />
+                <SelectTrigger className="w-auto gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Ангиллаар шүүх..." />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
