@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    --background: 240 11% 95%;
-    --foreground: 240 10% 3.9%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
@@ -96,40 +96,65 @@
 }
 
 
-@keyframes rotate-glow-circle {
-  0% {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-  100% {
-    transform: translate(-50%, -50%) rotate(360deg);
-  }
+@keyframes rotate-glow-circle-cw {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes rotate-glow-circle-ccw {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
 }
 
 .avatar-glow-wrapper {
-  @apply relative overflow-hidden rounded-full;
+  @apply relative overflow-hidden rounded-full p-1;
+}
+
+.avatar-glow-wrapper::before,
+.avatar-glow-wrapper::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  border-radius: inherit;
 }
 
 .avatar-glow-wrapper::before {
-  content: '';
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: 50%;
-  left: 50%;
-  z-index: 0;
+  inset: 0;
   background: conic-gradient(
+    from 90deg at 50% 50%,
+    hsl(var(--primary) / 0.8),
+    20deg,
     transparent,
+    40deg,
+    hsl(var(--primary) / 0.8),
+    60deg,
     transparent,
-    transparent,
-    hsl(var(--primary))
+    80deg,
+    hsl(var(--primary) / 0.8),
+    transparent
   );
-  animation: rotate-glow-circle 3s linear infinite;
-  transform-origin: center center;
+  animation: rotate-glow-circle-cw 5s linear infinite;
+}
+
+.avatar-glow-wrapper::after {
+  inset: 3px;
+   background: conic-gradient(
+    from 270deg at 50% 50%,
+    hsl(var(--primary) / 0.6),
+    15deg,
+    transparent,
+    50deg,
+    hsl(var(--primary) / 0.6),
+    90deg,
+    transparent
+  );
+  animation: rotate-glow-circle-ccw 7s linear infinite;
 }
 
 .avatar-glow-wrapper > * {
   position: relative;
   z-index: 1;
+  @apply rounded-full;
 }
 
 @keyframes bounce {

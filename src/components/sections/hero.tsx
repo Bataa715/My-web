@@ -752,8 +752,8 @@ export default function Hero() {
                             transition={{ duration: 0.6, ease: "easeInOut" }}
                             className="relative w-full h-full group"
                         >
-                           <div className="avatar-glow-wrapper w-full h-full relative">
-                                <Avatar className="w-full h-full border-4 border-primary/50">
+                           <div className="avatar-glow-wrapper w-full h-full">
+                                <Avatar className="w-full h-full border-4 border-background">
                                     <AvatarImage src={profileImage} alt={name} />
                                     <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
                                 </Avatar>
