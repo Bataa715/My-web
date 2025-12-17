@@ -18,7 +18,7 @@ export default function MainLayout({
     <div className="relative flex min-h-screen flex-col">
       {showHeaderFooter && <Header />}
       <main className="flex-1">
-         <div className="p-4 sm:p-6 lg:p-8 bg-background">
+         <div className="p-4 sm:p-6 lg:p-8">
             {children}
         </div>
       </main>
