@@ -159,18 +159,18 @@
 
 .page-border-glow {
   @apply relative overflow-hidden;
+  z-index: 1;
 }
 
 .page-border-glow::before {
   content: '';
   position: absolute;
-  width: 200vw;
-  height: 200vh;
+  width: 200%;
+  height: 200%;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   z-index: -1;
-   background: conic-gradient(
+  background: conic-gradient(
     transparent,
     transparent,
     transparent,
