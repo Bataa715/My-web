@@ -171,7 +171,7 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
         </div>
       )}
-      <div className="flex flex-col items-center text-center pt-20 min-h-[50vh]">
+      <div className="flex flex-col items-center justify-center text-center pt-20 min-h-[50vh]">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
              <motion.h1
               className="text-2xl md:text-3xl lg:text-4xl text-muted-foreground font-light"
@@ -212,7 +212,6 @@ export default function AboutPage() {
         <div className="container px-4 md:px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold">Миний хоббинууд</h2>
-            <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">Өөрийгөө идэвхтэй байлгах дуртай нэгэн л дээ. Шинэ хобби бол жил болгон тогтмол нэмэгднээ.</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
