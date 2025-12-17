@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -15,6 +14,32 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const letterVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+      damping: 10,
+    },
+  },
+};
+
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -24,6 +49,13 @@ export default function AboutPage() {
   const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
   const [editedImageUrl, setEditedImageUrl] = useState('');
   const [saving, setSaving] = useState(false);
+  
+  const name = "Batuka";
+  const firstLine = "Дахин сайн уу?";
+  const secondLine = `Миний хочийг ${name} гэдэг`;
+  const thirdLine = `${name} нь Тууштай`;
+  const fourthLine = "Хайраар энэ веб сайтыг урлав ♥️🍕🚀";
+
 
   useEffect(() => {
     if (isUserLoading) return;
@@ -142,7 +174,52 @@ export default function AboutPage() {
       )}
       <div className="flex flex-col items-center justify-center text-center h-full">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
+             <motion.h1
+              className="text-4xl md:text-5xl lg:text-6xl text-muted-foreground font-light"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {firstLine.split('').map((char, index) => (
+                <motion.span key={index} variants={letterVariants}>
+                  {char}
+                </motion.span>
+              ))}
+            </motion.h1>
 
+            <motion.h2
+              className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {secondLine.split(' ').map((word, wordIndex) => (
+                <span key={wordIndex} className="inline-block mr-4">
+                  {word.split('').map((char, charIndex) => (
+                    <motion.span
+                      key={charIndex}
+                      variants={letterVariants}
+                      className={cn(word === name && 'text-primary')}
+                    >
+                      {char}
+                    </motion.span>
+                  ))}
+                </span>
+              ))}
+            </motion.h2>
+
+            <motion.div
+              className="space-y-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.5, duration: 0.5 }}
+            >
+              <p className="text-xl md:text-2xl text-muted-foreground">
+                <span className="font-bold text-foreground">{thirdLine.split(' ')[0]}</span>{' '}
+                <span className="text-primary font-semibold">{thirdLine.split(' ')[2]}</span>
+              </p>
+              <p className="text-lg md:text-xl text-muted-foreground">{fourthLine}</p>
+            </motion.div>
           </div>
       </div>
     </div>
