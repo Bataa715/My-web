@@ -23,10 +23,10 @@ import IconPicker from "../shared/IconPicker";
 
 const getIcon = (iconName: string, props = {}) => {
     // Add BrainCircuit as a special case if the user had 'brain'
-    if (iconName === 'brain' || iconName === 'Brain') return <BrainCircuit className="h-6 w-6" {...props} />;
+    if (iconName === 'brain' || iconName === 'Brain') return <BrainCircuit className="h-8 w-8" {...props} />;
     
     const LucideIcon = (require('lucide-react') as any)[iconName];
-    return LucideIcon ? <LucideIcon className="h-6 w-6" {...props} /> : <AlertTriangle className="h-6 w-6 text-destructive" {...props} />;
+    return LucideIcon ? <LucideIcon className="h-8 w-8" {...props} /> : <AlertTriangle className="h-8 w-8 text-destructive" {...props} />;
 };
 
 interface OrbitItemProps {
@@ -41,10 +41,10 @@ interface OrbitItemProps {
 const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick, isEditing }) => {
     const angle = (index / total) * 2 * Math.PI;
     
-    const baseRadius = 160;
-    const mdBaseRadius = 180;
-    const editingRadius = 190;
-    const mdEditingRadius = 210;
+    const baseRadius = 180;
+    const mdBaseRadius = 200;
+    const editingRadius = 210;
+    const mdEditingRadius = 230;
 
     const [currentRadius, setCurrentRadius] = useState(baseRadius);
 
@@ -68,7 +68,7 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
     return (
         <motion.div
             key={item.id}
-            className="absolute h-14 w-14"
+            className="absolute h-16 w-16"
             style={{
                 top: '50%',
                 left: '50%',
@@ -87,7 +87,7 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
                 variant="outline"
                 size="icon"
                 className={cn(
-                    "rounded-full h-14 w-14 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-110",
+                    "rounded-full h-16 w-16 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-110",
                     selectedOrbit?.id === item.id && "bg-primary text-primary-foreground scale-110"
                 )}
                 onClick={() => onItemClick(item)}
@@ -613,8 +613,8 @@ export default function Hero() {
                 )}
             </div>
           </div>
-          <div className="relative flex items-center justify-center w-full max-w-[400px] aspect-square mx-auto">
-             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-72 h-72 md:w-72 md:h-72")}>
+          <div className="relative flex items-center justify-center w-full max-w-[400px] aspect-square mx-auto lg:max-w-none">
+             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-72 h-72 md:w-80 md:h-80")}>
                 <AnimatePresence>
                     {selectedOrbit ? (
                         <motion.div
@@ -849,3 +849,4 @@ export default function Hero() {
     
 
     
+
