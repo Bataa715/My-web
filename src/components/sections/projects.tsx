@@ -94,7 +94,7 @@ export default function Projects() {
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
                     onMouseMove={handleMouseMove}
-                    className="project-card-glow education-card"
+                    className="education-card rounded-lg"
                   >
                     <Card className={cn("flex h-full flex-col overflow-hidden transition-shadow duration-300 bg-card/80 backdrop-blur-sm group", isEditMode ? "hover:shadow-lg" : "")}>
                       {isEditMode && (
