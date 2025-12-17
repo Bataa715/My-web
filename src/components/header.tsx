@@ -166,7 +166,7 @@ const Header = () => {
                         <Input
                             value={editedAppName}
                             onChange={(e) => setEditedAppName(e.target.value)}
-                            className="font-bold h-8"
+                            className="font-bold h-8 font-headline"
                         />
                         <Button onClick={handleSaveAppName} size="icon" className="h-8 w-8" disabled={saving}>
                             {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}

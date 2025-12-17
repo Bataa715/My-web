@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -11,9 +12,10 @@ export default {
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        headline: ['var(--font-bartle)', 'sans-serif'],
         code: ['"Source Code Pro"', 'monospace'],
         jp: ['"Noto Sans JP"', 'sans-serif'],
+        jetbrainsMono: ['var(--font-jetbrainsMono)', 'monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',
