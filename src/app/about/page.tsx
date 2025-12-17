@@ -51,7 +51,7 @@ export default function AboutPage() {
   const [saving, setSaving] = useState(false);
   
   const name = "Batuka";
-  const firstLine = "Дахин сайн уу?";
+  const firstLine = "Сайн уу?";
   const secondLine = `Миний хочийг ${name} гэдэг`;
   const thirdLine = `${name} нь Тууштай`;
   const fourthLine = "Хайраар энэ веб сайтыг урлав ♥️🍕🚀";
