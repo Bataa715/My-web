@@ -83,11 +83,7 @@ const hobbies: Hobby[] = [
   },
 ];
 
-const TWEEN_FACTOR_3D = 4.2
-
-const numberWithinRange = (number: number, min: number, max: number): number =>
-  Math.min(Math.max(number, min), max)
-
+const TWEEN_FACTOR = 1.2;
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -104,6 +100,8 @@ export default function AboutPage() {
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
+    slidesToScroll: 1,
+    align: 'center',
     skipSnaps: false,
   })
 
@@ -112,26 +110,24 @@ export default function AboutPage() {
   const onScroll = useCallback(() => {
     if (!emblaApi) return
 
-    const engine = emblaApi.internalEngine()
     const scrollProgress = emblaApi.scrollProgress()
-
     const styles = emblaApi.scrollSnapList().map((scrollSnap, index) => {
-      let diffToTarget = scrollSnap - scrollProgress
+        let diffToTarget = scrollSnap - scrollProgress
 
-      if (engine.options.loop) {
-        engine.slideLooper.loopPoints.forEach((loopItem) => {
-          const target = loopItem.target()
-          if (index === loopItem.index && target !== 0) {
-            const sign = Math.sign(target)
-            if (sign === -1) diffToTarget = scrollSnap - (1 + scrollProgress)
-            if (sign === 1) diffToTarget = scrollSnap + (1 - scrollProgress)
-          }
-        })
-      }
-      return diffToTarget
+        if (emblaApi.options.loop) {
+            emblaApi.internalEngine().slideLooper.loopPoints.forEach((loopItem) => {
+                const target = loopItem.target()
+                if (index === loopItem.index && target !== 0) {
+                    const sign = Math.sign(target)
+                    if (sign === -1) diffToTarget = scrollSnap - (1 + scrollProgress)
+                    if (sign === 1) diffToTarget = scrollSnap + (1 - scrollProgress)
+                }
+            })
+        }
+        return diffToTarget
     })
     setTweenValues(styles)
-  }, [emblaApi, setTweenValues])
+  }, [emblaApi])
 
 
    useEffect(() => {
@@ -304,16 +300,20 @@ export default function AboutPage() {
             <div className="embla__viewport" ref={emblaRef}>
                 <div className="embla__container">
                 {hobbies.map((hobby, index) => {
-                    const tweenStyle: CSSProperties = {
-                        ...(tweenValues.length && {
-                        transform: `translateX(0) rotateY(${tweenValues[index] * 15}deg) scale(${1 - Math.abs(tweenValues[index]) * 0.15})`,
-                        opacity: 1 - Math.abs(tweenValues[index]) * 0.5,
-                        }),
-                    };
+                    const tweenStyle: CSSProperties = {};
+                    if (tweenValues.length) {
+                        const tweenValue = tweenValues[index];
+                        const y = 1 - Math.abs(tweenValue) * 0.5;
+                        const x = tweenValue * -100;
+                        const rotate = tweenValue * 25;
+                        
+                        tweenStyle.transform = `translateX(${x}%) translateY(${y * 10 - 10}px) rotateY(${rotate}deg)`;
+                        tweenStyle.opacity = 1 - Math.abs(tweenValue) * 0.5;
+                    }
 
                     return (
                         <div className="embla__slide" key={hobby.id}>
-                        <div className="embla__slide__number" style={tweenStyle}>
+                        <div className="embla__slide__inner" style={tweenStyle}>
                             <Card className="bg-muted/20 border-border/20 h-full">
                             <CardHeader>
                                 <CardTitle className="text-2xl">{hobby.title}</CardTitle>
@@ -353,39 +353,40 @@ export default function AboutPage() {
       
        <style jsx>{`
         .embla {
-            --slide-spacing: 1rem;
-            --slide-size: 33.333%;
-            padding: 1.6rem;
             position: relative;
         }
 
         .embla__viewport {
             overflow: hidden;
+            width: 100%;
         }
 
         .embla__container {
-            backface-visibility: hidden;
             display: flex;
+            backface-visibility: hidden;
             touch-action: pan-y;
-            margin-left: calc(var(--slide-spacing) * -1);
             perspective: 1000px;
         }
 
         .embla__slide {
-            flex: 0 0 var(--slide-size);
+            flex: 0 0 40%;
             min-width: 0;
-            padding-left: var(--slide-spacing);
+            padding: 1rem;
             position: relative;
         }
         
-        .embla__slide__number {
+        .embla__slide__inner {
+            position: relative;
             will-change: transform, opacity;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
+
         .embla__prev,
         .embla__next {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
+            z-index: 1;
         }
         .embla__prev {
             left: -20px;
