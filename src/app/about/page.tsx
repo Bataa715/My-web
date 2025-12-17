@@ -218,12 +218,12 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-8">
             <Card className="bg-muted/20 border-border/20">
               <CardHeader>
-                <CardTitle className="text-2xl">Өглөөний гүйлт</CardTitle>
+                <CardTitle className="text-2xl">Хөгжим тоглох</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-muted-foreground">Яагаад ч юм өглөө болоод гүйх шиг сайхан юм байдаггүй ээ. Тамирчин биш л дээ. Гэхдээ гүйсний дараа жинхэнэ амар амгаланг мэдэрдэг (๑´`๑). Гүйхийн хажуугаар фитнессээр, усан бассейнээр хичээллэх дуртай (๑´`๑). Тоон үзүүлэлт гэвэл 7км зогсохгүй гүйж, 110кг үндсэн суулт, 70кг цээж шахалт хийж чадна (–  โจทย์ –)</p>
+                <p className="text-muted-foreground">Бас хаяа гитар, төгөлдөр хуур хөгжим тоглоод интернет дээр тавьчихдаг (๑• ᎑ •๑)</p>
                 <div className="aspect-video relative rounded-lg overflow-hidden">
-                  <Image src="https://picsum.photos/seed/running-sky/600/338" alt="Morning run sky" layout="fill" objectFit="cover" data-ai-hint="sky cloud" />
+                  <Image src="https://picsum.photos/seed/playing-guitar/600/338" alt="Playing guitar" layout="fill" objectFit="cover" data-ai-hint="music instrument" />
                 </div>
               </CardContent>
             </Card>
@@ -250,10 +250,10 @@ export default function AboutPage() {
 
             <Card className="bg-muted/20 border-border/20">
               <CardHeader>
-                <CardTitle className="text-2xl">Хөгжим сонирхогч</CardTitle>
+                <CardTitle className="text-2xl">Спорт</CardTitle>
               </CardHeader>
               <CardContent>
-                 <p className="text-muted-foreground">Бас хаяа гитар, төгөлдөр хуур хөгжим тоглоод интернет дээр тавьчихдаг (๑• ᎑ •๑)</p>
+                 <p className="text-muted-foreground">Яагаад ч юм өглөө болоод гүйх шиг сайхан юм байдаггүй ээ. Тамирчин биш л дээ. Гэхдээ гүйсний дараа жинхэнэ амар амгаланг мэдэрдэг (๑´`๑). Гүйхийн хажуугаар фитнессээр, усан бассейнээр хичээллэх дуртай (๑´`๑). Тоон үзүүлэлт гэвэл 7км зогсохгүй гүйж, 110кг үндсэн суулт, 70кг цээж шахалт хийж чадна (–  โจทย์ –)</p>
               </CardContent>
             </Card>
 
