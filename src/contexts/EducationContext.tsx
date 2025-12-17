@@ -17,22 +17,7 @@ interface EducationContextType {
 
 const EducationContext = createContext<EducationContextType | undefined>(undefined);
 
-const initialEducation: Omit<Education, 'id' | 'createdAt'>[] = [
-    {
-      degree: "Ерөнхий боловсрол",
-      school: "Оюуны Ирээдүй Цогцолбор",
-      startDate: new Date("2019-09-01"),
-      endDate: new Date("2022-06-15"),
-      score: "98.5",
-    },
-    {
-      degree: "Мэдээллийн технологийн бакалавр",
-      school: "Монгол Улсын Их Сургууль",
-      startDate: new Date("2022-09-01"),
-      endDate: new Date("2026-06-15"),
-      score: "3.7",
-    },
-];
+const initialEducation: Omit<Education, 'id' | 'createdAt'>[] = [];
 
 export function EducationProvider({ children }: { children: ReactNode }) {
   const { firestore, user } = useFirebase();

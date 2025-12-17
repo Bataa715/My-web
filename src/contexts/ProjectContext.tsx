@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
@@ -16,30 +17,7 @@ interface ProjectContextType {
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
-const initialProjects: Omit<Project, 'id' | 'createdAt'>[] = [
-    {
-      name: "Хувийн вебсайт",
-      description: "Миний ур чадвар, туршлага, хийсэн төслүүдийг нэгтгэсэн вебсайт.",
-      technologies: ["Next.js", "React", "Tailwind CSS", "Firebase"],
-      category: "Web",
-      link: "https://github.com/Bataa715",
-      live: "https://www.ka1zen.me",
-    },
-    {
-      name: "Зургийн танигч",
-      description: "TensorFlow ашиглан зураг таних, ангилах модель хөгжүүлсэн.",
-      technologies: ["Python", "TensorFlow", "OpenCV"],
-      category: "AI",
-      link: "https://github.com/Bataa715",
-    },
-    {
-      name: "Чат аппликейшн",
-      description: "Real-time чатлах боломжтой, энгийн мессенжер.",
-      technologies: ["Node.js", "Socket.IO", "React"],
-      category: "Web",
-      link: "https://github.com/Bataa715",
-    },
-];
+const initialProjects: Omit<Project, 'id' | 'createdAt'>[] = [];
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const { firestore, user } = useFirebase();

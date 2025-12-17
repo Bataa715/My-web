@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
@@ -16,12 +17,7 @@ interface SkillsContextType {
 
 const SkillsContext = createContext<SkillsContextType | undefined>(undefined);
 
-const initialSkillsData: Omit<Skill, 'id' | 'createdAt'>[] = [
-    { name: "Frontend", icon: "Code", items: ["HTML", "CSS", "JavaScript", "React", "Next.js", "Tailwind CSS"] },
-    { name: "Backend", icon: "Database", items: ["Node.js", "Express", "Firebase"] },
-    { name: "Програмчлалын хэл", icon: "Laptop", items: ["JavaScript", "TypeScript", "Python"] },
-    { name: "Бусад", icon: "GanttChartSquare", items: ["Git", "Docker", "Figma"] }
-];
+const initialSkillsData: Omit<Skill, 'id' | 'createdAt'>[] = [];
 
 export function SkillsProvider({ children }: { children: ReactNode }) {
   const { firestore, user } = useFirebase();

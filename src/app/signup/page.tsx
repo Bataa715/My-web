@@ -63,28 +63,28 @@ export default function SignupPage() {
       const defaultToolsHeroImage = toolsHeroPlaceholder?.imageUrl;
 
       const defaultOrbitInfo: OrbitInfo[] = [
-          { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Улаанбаатар, Монгол', type: 'info' },
-          { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.', type: 'info' },
-          { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн хэмжээний програм хангамжийн компанид ажиллах.', type: 'info' },
-          { id: 'user', icon: 'User', title: 'Тухай', content: 'Би програмчлалд дуртай.', type: 'info' },
-          { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Дуртай дууг сонсох.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
-          { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', type: 'info', backgroundImage: 'https://i.pinimg.com/1200x/81/31/c3/8131c3dccfe8cd2f38ff3798745fbd03.jpg' },
-          { id: 'quote', icon: 'MessageSquareQuote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay', type: 'info' },
-          { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.', type: 'info' },
+          { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Энд байршлаа оруулна уу.', type: 'info' },
+          { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Энд хоббигоо оруулна уу.', type: 'info' },
+          { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Энд зорилгоо оруулна уу.', type: 'info' },
+          { id: 'user', icon: 'User', title: 'Тухай', content: 'Энд өөрийн тухай бичнэ үү.', type: 'info' },
+          { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Энд дуртай дуугаа оруулна уу.', type: 'audio', youtubeVideoId: '' },
+          { id: 'movie', icon: 'Film', title: 'Кино', content: 'Энд дуртай киногоо оруулна уу.', type: 'info', backgroundImage: '' },
+          { id: 'quote', icon: 'MessageSquareQuote', title: 'Ишлэл', content: 'Энд дуртай ишлэлээ оруулна уу.', type: 'info' },
+          { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Энд дуртай зүйлсээ бичнэ үү.', type: 'info' },
       ];
       const defaultLinks = {
-        github: "https://github.com/Bataa715",
-        instagram: "https://www.instagram.com/ka1__zen/",
+        github: "",
+        instagram: "",
         email: values.email,
         cvUrl: "",
-        facebook: "https://www.facebook.com/profile.php?id=100010513223018",
+        facebook: "",
       };
       
       const userProfile: UserProfile = {
         appName: "Kaizen",
         name: values.name,
         email: values.email,
-        bio: "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.",
+        bio: "Энд өөрийнхөө тухай товч танилцуулга бичээрэй.",
         profileImage: defaultProfileImage,
         homeHeroImage: defaultHomeHeroImage,
         aboutHeroImage: defaultAboutHeroImage,
