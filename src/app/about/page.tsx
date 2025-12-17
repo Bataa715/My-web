@@ -54,7 +54,6 @@ export default function AboutPage() {
   const firstLine = "Сайн уу?";
   const secondLine = `Миний хочийг ${name} гэдэг`;
   const thirdLine = `${name} нь Тууштай`;
-  const fourthLine = "Хайраар энэ веб сайтыг урлав ♥️🍕🚀";
 
 
   useEffect(() => {
@@ -218,7 +217,6 @@ export default function AboutPage() {
                 <span className="font-bold text-foreground">{thirdLine.split(' ')[0]}</span>{' '}
                 <span className="text-primary font-semibold">{thirdLine.split(' ')[2]}</span>
               </p>
-              <p className="text-lg md:text-xl text-muted-foreground">{fourthLine}</p>
             </motion.div>
           </div>
       </div>
