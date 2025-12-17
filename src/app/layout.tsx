@@ -32,7 +32,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-background font-body antialiased">
+      <body className="min-h-screen bg-background font-body antialiased page-border-glow-body">
         <AppThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -44,11 +44,9 @@ export default function RootLayout({
                 <EducationProvider>
                   <ProjectProvider>
                     <SkillsProvider>
-                      <div className="page-border-glow rounded-lg">
-                       <MainLayout>
-                            {children}
-                        </MainLayout>
-                      </div>
+                      <MainLayout>
+                          {children}
+                      </MainLayout>
                       <Toaster />
                     </SkillsProvider>
                   </ProjectProvider>
