@@ -53,7 +53,6 @@ export default function AboutPage() {
   const name = "Batuka";
   const firstLine = "Сайн уу?";
   const secondLine = `Миний нэрийг ${name} гэдэг`;
-  const thirdLine = `${name} нь Тууштай`;
 
 
   useEffect(() => {
@@ -206,18 +205,6 @@ export default function AboutPage() {
                 </span>
               ))}
             </motion.h2>
-
-            <motion.div
-              className="space-y-2"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.5, duration: 0.5 }}
-            >
-              <p className="text-xl md:text-2xl text-muted-foreground">
-                <span className="font-bold text-foreground">{thirdLine.split(' ')[0]}</span>{' '}
-                <span className="text-primary font-semibold">{thirdLine.split(' ')[2]}</span>
-              </p>
-            </motion.div>
           </div>
       </div>
     </div>
