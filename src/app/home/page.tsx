@@ -142,18 +142,7 @@ export default function Home() {
       )}
       <div className="flex flex-col items-center justify-center text-center h-full">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Button asChild size="lg">
-                <Link href="/about">
-                  Миний тухай <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="secondary">
-                <Link href="/tools">
-                  <Wrench className="mr-2 h-5 w-5" /> Хэрэгслүүд
-                </Link>
-              </Button>
-            </div>
+
           </div>
       </div>
     </div>
