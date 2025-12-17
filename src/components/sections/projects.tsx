@@ -25,6 +25,14 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 
 export default function Projects() {
   const { projects, deleteProject, loading } = useProjects();
@@ -63,20 +71,19 @@ export default function Projects() {
           </div>
         ) : (
           <>
-            <div
-              onMouseMove={handleMouseMove}
-              className="project-card flex justify-center flex-wrap gap-3 py-8 rounded-lg"
-            >
-              {categories.map((category) => (
-                <Button
-                  key={category}
-                  variant={selectedCategory === category ? "default" : "outline"}
-                  onClick={() => setSelectedCategory(category)}
-                  className="rounded-full transition-colors duration-300 px-6 z-10"
-                >
-                  {category}
-                </Button>
-              ))}
+            <div className="flex justify-center py-8">
+              <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
+                <SelectTrigger className="w-[240px]">
+                  <SelectValue placeholder="Ангиллаар шүүх..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <motion.div layout className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <AnimatePresence>
