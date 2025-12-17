@@ -204,13 +204,6 @@ const Header = () => {
           {/* Right Section */}
           <div className="flex items-center justify-end gap-2 md:flex-1">
               {user && !isUserLoading && (
-                <Button variant="outline" size="icon" onClick={() => setIsEditMode(!isEditMode)} className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                    {isEditMode ? <Eye className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />}
-                    <span className="sr-only">{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
-                </Button>
-              )}
-
-              {user && !isUserLoading && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="icon" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
@@ -219,6 +212,11 @@ const Header = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                     <DropdownMenuItem onClick={() => setIsEditMode(!isEditMode)}>
+                        {isEditMode ? <Eye className="mr-2 h-4 w-4" /> : <PencilRuler className="mr-2 h-4 w-4" />}
+                        <span>{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setTheme("light")}>
                       <Sun className="mr-2 h-4 w-4" />
                       <span>Цайвар</span>
