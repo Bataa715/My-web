@@ -129,7 +129,7 @@ const Header = () => {
                           href={link.href}
                           onClick={() => setIsOpen(false)}
                           className={cn(
-                            "font-bartle text-lg transition-colors hover:text-primary",
+                            "text-lg transition-colors hover:text-primary",
                             (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href ? "text-primary font-semibold" : "text-muted-foreground"
                           )}
                         >
@@ -148,7 +148,7 @@ const Header = () => {
                       key={link.href}
                       href={link.href}
                       className={cn(
-                        "font-bartle text-lg transition-colors hover:text-primary",
+                        "text-lg transition-colors hover:text-primary",
                         (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href ? "text-primary font-semibold" : "text-muted-foreground"
                       )}
                     >

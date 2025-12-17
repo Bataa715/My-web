@@ -12,10 +12,10 @@ export default {
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'],
+        headline: ['var(--font-bartle)', 'sans-serif'],
         code: ['"Source Code Pro"', 'monospace'],
         jp: ['"Noto Sans JP"', 'sans-serif'],
-        bartle: ['"BBH Bartle"', 'sans-serif'],
+        bartle: ['var(--font-bartle)', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
