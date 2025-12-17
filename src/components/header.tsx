@@ -198,7 +198,7 @@ const Header = () => {
               </div>
 
               {/* Desktop Nav */}
-              <nav className="hidden md:flex items-center gap-4 text-sm">
+              <nav className="hidden md:flex items-center gap-6 text-sm">
                   {mainLinks.map((link) => (
                      <Link
                       key={link.href}
