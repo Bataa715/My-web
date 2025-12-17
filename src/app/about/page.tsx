@@ -83,7 +83,8 @@ const hobbies: Hobby[] = [
   },
 ];
 
-const TWEEN_FACTOR = 1.2;
+const CIRCLE_RADIUS = 250;
+const ITEM_WIDTH = 250;
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -93,6 +94,7 @@ export default function AboutPage() {
   const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
   const [editedImageUrl, setEditedImageUrl] = useState('');
   const [saving, setSaving] = useState(false);
+  const [rotation, setRotation] = useState(0);
 
   const name = "Batuka";
   const firstLine = "Сайн уу?";
@@ -100,45 +102,23 @@ export default function AboutPage() {
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
-    slidesToScroll: 1,
-    align: 'center',
-    skipSnaps: false,
-  })
-
-  const [tweenValues, setTweenValues] = useState<number[]>([])
+    containScroll: false,
+  });
 
   const onScroll = useCallback(() => {
-    if (!emblaApi) return
+    if (!emblaApi) return;
+    const progress = emblaApi.scrollProgress();
+    const newRotation = progress * 360 * 2;
+    setRotation(newRotation);
+  }, [emblaApi]);
 
-    const engine = emblaApi.internalEngine()
-    const scrollProgress = emblaApi.scrollProgress()
-
-    const styles = emblaApi.scrollSnapList().map((scrollSnap, index) => {
-        let diffToTarget = scrollSnap - scrollProgress
-
-        if (engine.options.loop) {
-            engine.slideLooper.loopPoints.forEach((loopItem) => {
-                const target = loopItem.target()
-                if (index === loopItem.index && target !== 0) {
-                    const sign = Math.sign(target)
-                    if (sign === -1) diffToTarget = scrollSnap - (1 + scrollProgress)
-                    if (sign === 1) diffToTarget = scrollSnap + (1 - scrollProgress)
-                }
-            })
-        }
-        return diffToTarget
-    })
-    setTweenValues(styles)
-  }, [emblaApi])
-
-
-   useEffect(() => {
-    if (!emblaApi) return
-
-    onScroll()
-    emblaApi.on('scroll', onScroll)
-    emblaApi.on('reInit', onScroll)
-  }, [emblaApi, onScroll])
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on('scroll', onScroll);
+    return () => {
+      emblaApi.off('scroll', onScroll);
+    };
+  }, [emblaApi, onScroll]);
 
   useEffect(() => {
     if (isUserLoading) return;
@@ -298,44 +278,42 @@ export default function AboutPage() {
             <h2 className="text-4xl md:text-5xl font-bold">Миний хоббинууд</h2>
           </div>
 
-           <div className="embla">
-            <div className="embla__viewport" ref={emblaRef}>
-                <div className="embla__container">
-                {hobbies.map((hobby, index) => {
-                    const tweenStyle: CSSProperties = {};
-                    if (tweenValues.length) {
-                        const tweenValue = tweenValues[index];
-                        const y = 1 - Math.abs(tweenValue) * 0.5;
-                        const x = tweenValue * -100;
-                        const rotate = tweenValue * 25;
-                        
-                        tweenStyle.transform = `translateX(${x}%) translateY(${y * 10 - 10}px) rotateY(${rotate}deg)`;
-                        tweenStyle.opacity = 1 - Math.abs(tweenValue) * 0.5;
-                    }
-
-                    return (
-                        <div className="embla__slide" key={hobby.id}>
-                        <div className="embla__slide__inner" style={tweenStyle}>
-                            <Card className="bg-muted/20 border-border/20 h-full">
-                            <CardHeader>
-                                <CardTitle className="text-2xl">{hobby.title}</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <p className="text-muted-foreground h-20">{hobby.description}</p>
-                                <div className="aspect-video relative rounded-lg overflow-hidden">
-                                <Image src={hobby.image} alt={hobby.title} layout="fill" objectFit="cover" data-ai-hint={hobby.imageHint} />
-                                </div>
-                            </CardContent>
-                            </Card>
-                        </div>
-                        </div>
-                    );
+          <div className="relative w-full h-[400px] flex items-center justify-center">
+            <div className="scene h-[300px]" ref={emblaRef}>
+                <div 
+                    className="carousel"
+                    style={{ transform: `translateZ(-${CIRCLE_RADIUS}px) rotateY(${rotation}deg)` }}
+                >
+                    {hobbies.map((hobby, index) => {
+                        const itemAngle = (360 / hobbies.length) * index;
+                        return (
+                             <div 
+                                className="carousel-item" 
+                                key={hobby.id}
+                                style={{ 
+                                    transform: `rotateY(${itemAngle}deg) translateZ(${CIRCLE_RADIUS}px)`,
+                                    width: `${ITEM_WIDTH}px`
+                                }}
+                            >
+                                <Card className="bg-muted/20 border-border/20 h-full w-full">
+                                    <CardHeader>
+                                        <CardTitle className="text-2xl">{hobby.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        <p className="text-muted-foreground h-20">{hobby.description}</p>
+                                        <div className="aspect-video relative rounded-lg overflow-hidden">
+                                            <Image src={hobby.image} alt={hobby.title} layout="fill" objectFit="cover" data-ai-hint={hobby.imageHint} />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )
                     })}
                 </div>
             </div>
              <Button
                 onClick={() => emblaApi?.scrollPrev()}
-                className="embla__prev"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10"
                  variant="outline"
                  size="icon"
               >
@@ -343,7 +321,7 @@ export default function AboutPage() {
               </Button>
               <Button
                 onClick={() => emblaApi?.scrollNext()}
-                className="embla__next"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10"
                 variant="outline"
                 size="icon"
               >
@@ -354,47 +332,32 @@ export default function AboutPage() {
       </section>
       
        <style jsx>{`
-        .embla {
-            position: relative;
-        }
-
-        .embla__viewport {
-            overflow: hidden;
+        .scene {
             width: 100%;
-        }
-
-        .embla__container {
-            display: flex;
-            backface-visibility: hidden;
-            touch-action: pan-y;
             perspective: 1000px;
+            overflow: hidden;
         }
 
-        .embla__slide {
-            flex: 0 0 40%;
-            min-width: 0;
-            padding: 1rem;
+        .carousel {
+            width: 100%;
+            height: 100%;
             position: relative;
-        }
-        
-        .embla__slide__inner {
-            position: relative;
-            will-change: transform, opacity;
-            transition: transform 0.3s ease, opacity 0.3s ease;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
         }
 
-        .embla__prev,
-        .embla__next {
+        .carousel-item {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 1;
+            top: 10px;
+            left: calc(50% - ${ITEM_WIDTH / 2}px);
+            height: 100%;
+            border-radius: 10px;
+            opacity: 0.95;
+            transition: opacity 0.5s, transform 0.5s;
         }
-        .embla__prev {
-            left: -20px;
-        }
-        .embla__next {
-            right: -20px;
+
+        .carousel-item:hover {
+            opacity: 1;
         }
       `}</style>
 
