@@ -61,7 +61,7 @@ export default function Projects() {
           </div>
         ) : (
           <>
-            <div className="flex justify-center py-8">
+            <div className="flex justify-start py-8">
               <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
                 <SelectTrigger className="w-auto gap-2">
                     <Filter className="h-4 w-4 text-muted-foreground" />
