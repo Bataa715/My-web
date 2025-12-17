@@ -309,8 +309,8 @@ export default function AboutPage() {
                                          <CardTitle className="text-xl">{hobby.title}</CardTitle>
                                        </CardHeader>
                                        <CardContent className="space-y-4">
-                                           <p className="text-muted-foreground text-sm h-24">{hobby.description}</p>
-                                           <div className="aspect-w-4 aspect-h-3 relative rounded-lg overflow-hidden">
+                                           <p className="text-muted-foreground text-sm h-20">{hobby.description}</p>
+                                           <div className="aspect-w-4 aspect-h-2 relative rounded-lg overflow-hidden">
                                                <Image 
                                                  src={hobby.image} 
                                                  alt={hobby.title} 
@@ -363,7 +363,7 @@ export default function AboutPage() {
             .carousel-item {
                 position: absolute;
                 width: ${ITEM_WIDTH}px;
-                height: 450px;
+                height: 400px;
                 top: 15px;
                 left: 0;
                 background: transparent;
