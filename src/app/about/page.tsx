@@ -230,7 +230,7 @@ export default function AboutPage() {
 
             <Card className="bg-muted/20 border-border/20">
               <CardHeader>
-                <CardTitle className="text-2xl">Кино, ном, дуу, тоглоом</CardTitle>
+                <CardTitle className="text-2xl">Аниме, ном, дуу, тоглоом</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 overflow-hidden">
                 <p className="text-muted-foreground">Өдөр болгон бүхий л ном, роман уншиж, кино үзэж, хөгжим сонсдог. Үүнээс гадна жаахан содон зүйлүүдийг дурдвал Аниме, Вебтүүн, Видео гейм гэх мэтчилэн байнаа. (©w©)</p>
