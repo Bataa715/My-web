@@ -1,22 +1,26 @@
 
 'use client';
 
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { ArrowRight, Wrench, ImageIcon, Loader2, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { UserProfile } from '@/lib/types';
+import BackButton from '@/components/shared/BackButton';
+import Hero from '@/components/sections/hero';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import Projects from '@/components/sections/projects';
+import Skills from '@/components/sections/skills';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { ImageIcon, Loader2, Save } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import Education from '@/components/sections/Education';
 
-export default function Home() {
+export default function HomePage() {
   const { firestore, user, isUserLoading } = useFirebase();
   const { isEditMode } = useEditMode();
   const { toast } = useToast();
@@ -85,9 +89,8 @@ export default function Home() {
       }
   };
 
-
   return (
-    <div className="relative h-[calc(100vh-57px-81px)]">
+    <>
        {isEditMode && (
           <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
             <DialogTrigger asChild>
@@ -128,23 +131,23 @@ export default function Home() {
             </DialogContent>
           </Dialog>
         )}
-      {heroImage && (
-        <div className="absolute top-0 left-0 w-full h-full -z-10">
+       {heroImage && (
+        <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
           <Image
             src={heroImage}
-            alt="Welcome background"
+            alt="Abstract background"
             fill
             className="object-cover"
-            data-ai-hint="welcome abstract"
+            data-ai-hint="abstract library"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
         </div>
       )}
-      <div className="flex flex-col items-center justify-center text-center h-full">
-         <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
-
-          </div>
-      </div>
-    </div>
+      <BackButton />
+      <Hero />
+      <Education />
+      <Projects />
+      <Skills />
+    </>
   );
 }
