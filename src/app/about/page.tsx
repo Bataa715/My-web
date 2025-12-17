@@ -112,8 +112,8 @@ const hobbies: Hobby[] = [
 ];
 
 
-const CIRCLE_RADIUS = 250;
-const ITEM_WIDTH = 250;
+const CIRCLE_RADIUS = 300;
+const ITEM_WIDTH = 300;
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -324,14 +324,14 @@ export default function AboutPage() {
                                     width: `${ITEM_WIDTH}px`
                                 }}
                             >
-                                <Card className="bg-muted/20 border-border/20 h-full w-full">
+                                <Card className="bg-card border-border/20 h-full w-full">
                                     <CardHeader>
                                         <CardTitle className="text-2xl">{hobby.title}</CardTitle>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <p className="text-muted-foreground h-20">{hobby.description}</p>
                                         <div className="aspect-video relative rounded-lg overflow-hidden">
-                                            <Image src={hobby.image} alt={hobby.title} layout="fill" objectFit="cover" data-ai-hint={hobby.imageHint} />
+                                            <Image src={hobby.image} alt={hobby.title} fill objectFit="cover" data-ai-hint={hobby.imageHint} />
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -363,7 +363,7 @@ export default function AboutPage() {
        <style jsx>{`
         .scene {
             width: 100%;
-            perspective: 1000px;
+            perspective: 1200px;
             overflow: visible;
         }
 
@@ -372,7 +372,7 @@ export default function AboutPage() {
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.5s;
+            transition: transform 0.6s cubic-bezier(0.87, 0, 0.13, 1);
         }
 
         .carousel-item {
@@ -382,7 +382,8 @@ export default function AboutPage() {
             height: 100%;
             border-radius: 10px;
             opacity: 0.95;
-            transition: opacity 0.5s, transform 0.5s;
+            backface-visibility: hidden;
+            transition: opacity 0.6s, transform 0.6s;
         }
 
         .carousel-item:hover {
