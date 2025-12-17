@@ -9,7 +9,7 @@ export default function BackButton() {
     const router = useRouter();
 
     return (
-        <Button variant="ghost" size="icon" onClick={() => router.back()} className="mb-8">
+        <Button variant="ghost" size="icon" onClick={() => router.back()} className="mb-8 hover:bg-primary/10 hover:text-primary">
             <ArrowLeft className="h-4 w-4" />
             <span className="sr-only">Буцах</span>
         </Button>
