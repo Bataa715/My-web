@@ -18,8 +18,12 @@ export default function MainLayout({
     <div className="relative flex min-h-screen flex-col">
       {showHeaderFooter && <Header />}
       <main className="flex-1">
-         <div className="p-4 sm:p-6 lg:p-8">
-            {children}
+        <div className="page-container-wrapper">
+          <div className="page-container">
+            <div className="p-4 sm:p-6 lg:p-8">
+              {children}
+            </div>
+          </div>
         </div>
       </main>
       {showHeaderFooter && <Footer />}

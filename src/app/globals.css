@@ -10,19 +10,19 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 251 78% 65%;
-    --primary-foreground: 251 78% 10%;
+    --primary: 251 78% 79%;
+    --primary-foreground: 251 78% 15%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
-    --accent: 251 68% 55%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 182 100% 74%;
+    --accent-foreground: 182 100% 20%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 251 78% 65%;
+    --ring: 251 78% 79%;
     --radius: 0.8rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -38,19 +38,19 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 251 78% 65%;
+    --primary: 251 78% 79%;
     --primary-foreground: 251 78% 15%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 251 68% 55%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 182 100% 74%;
+    --accent-foreground: 182 100% 20%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 251 78% 65%;
+    --ring: 251 78% 79%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -99,7 +99,6 @@
 
 .avatar-glow-wrapper {
   @apply relative overflow-hidden rounded-full;
-   z-index: 1;
 }
 
 .avatar-glow-wrapper::before {
@@ -109,7 +108,7 @@
   height: 200%;
   top: 50%;
   left: 50%;
-  z-index: -1;
+  z-index: 0;
   background: conic-gradient(
     transparent,
     transparent,
@@ -118,6 +117,11 @@
   );
   animation: rotate-glow-circle 3s linear infinite;
   transform-origin: center center;
+}
+
+.avatar-glow-wrapper > * {
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes bounce {
@@ -135,20 +139,36 @@
   animation: bounce 1s infinite;
 }
 
-.page-border-glow-body::before {
+@keyframes rotate-glow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.page-container-wrapper {
+  @apply relative p-1 overflow-hidden;
+}
+
+.page-container-wrapper::before {
   content: '';
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100vw;
-  height: 100vh;
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  z-index: -1;
   background: conic-gradient(
     transparent,
     transparent,
     transparent,
     hsl(var(--primary))
   );
-  animation: rotate-glow-circle 8s linear infinite;
-  z-index: -1;
+  animation: rotate-glow 4s linear infinite;
+}
+
+.page-container {
+  @apply bg-background relative z-0;
 }
