@@ -160,7 +160,7 @@ export default function AboutPage() {
           </Dialog>
         )}
       {heroImage && (
-        <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
+        <div className="absolute top-0 left-0 w-full h-[100vh] -z-10">
           <Image
             src={heroImage}
             alt="Welcome background"
@@ -171,10 +171,10 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
         </div>
       )}
-      <div className="flex flex-col items-center justify-center text-center pt-20 min-h-[50vh]">
+      <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-114px)]">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
              <motion.h1
-              className="text-2xl md:text-3xl lg:text-4xl text-muted-foreground font-light"
+              className="text-3xl md:text-4xl lg:text-5xl text-muted-foreground font-light"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
@@ -187,7 +187,7 @@ export default function AboutPage() {
             </motion.h1>
 
             <motion.h2
-              className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight"
+              className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight"
               variants={containerVariants}
               initial="hidden"
               animate="visible"
