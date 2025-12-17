@@ -236,13 +236,13 @@ export default function AboutPage() {
                 <p className="text-muted-foreground">Өдөр болгон бүхий л ном, роман уншиж, кино үзэж, хөгжим сонсдог. Үүнээс гадна жаахан содон зүйлүүдийг дурдвал Аниме, Вебтүүн, Видео гейм гэх мэтчилэн байнаа. (©w©)</p>
                  <div className="relative h-48">
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-48 h-64 transform -rotate-12 perspective-[1000px] hover:rotate-0 hover:scale-110 transition-transform duration-300">
-                      <Image src="https://ibb.co/2d1hjyf" alt="Dark Souls 2" layout="fill" objectFit="cover" className="rounded-lg shadow-lg" />
+                      <Image src="https://picsum.photos/seed/darksouls/256/384" alt="Dark Souls 2" layout="fill" objectFit="cover" className="rounded-lg shadow-lg" />
                     </div>
                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-64 z-10 perspective-[1000px] hover:scale-110 transition-transform duration-300">
-                      <Image src="https://ibb.co/hZJ4x3N" alt="Interstellar" layout="fill" objectFit="cover" className="rounded-lg shadow-2xl" />
+                      <Image src="https://picsum.photos/seed/interstellar/256/384" alt="Interstellar" layout="fill" objectFit="cover" className="rounded-lg shadow-2xl" />
                     </div>
                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-48 h-64 transform rotate-12 perspective-[1000px] hover:rotate-0 hover:scale-110 transition-transform duration-300">
-                      <Image src="https://ibb.co/P9tLpWB" alt="Norwegian Wood" layout="fill" objectFit="cover" className="rounded-lg shadow-lg" />
+                      <Image src="https://picsum.photos/seed/norwegianwood/256/384" alt="Norwegian Wood" layout="fill" objectFit="cover" className="rounded-lg shadow-lg" />
                     </div>
                  </div>
               </CardContent>
