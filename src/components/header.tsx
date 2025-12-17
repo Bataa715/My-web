@@ -117,7 +117,7 @@ const Header = () => {
                       <SheetTitle>
                           <SheetClose asChild>
                               <Link href="/home" className="flex items-center space-x-2 text-left pl-4">
-                                  <span className="font-bold font-headline text-2xl">{appName}</span>
+                                  <span className="font-bold text-2xl">{appName}</span>
                               </Link>
                           </SheetClose>
                       </SheetTitle>
@@ -166,7 +166,7 @@ const Header = () => {
                         <Input
                             value={editedAppName}
                             onChange={(e) => setEditedAppName(e.target.value)}
-                            className="font-bold h-8 font-headline"
+                            className="font-bold h-8"
                         />
                         <Button onClick={handleSaveAppName} size="icon" className="h-8 w-8" disabled={saving}>
                             {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}
@@ -177,7 +177,7 @@ const Header = () => {
                     </div>
                 ) : (
                     <div className="flex items-center gap-2">
-                        <span className="font-bold sm:inline-block font-headline text-2xl">
+                        <span className="font-bold sm:inline-block text-2xl">
                             {appName}
                         </span>
                         {isEditMode && (
