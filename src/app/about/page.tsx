@@ -3,8 +3,8 @@
 
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, Wrench, ImageIcon, Loader2, Save } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { ArrowRight, Wrench, ImageIcon, Loader2, Save, ArrowLeft } from 'lucide-react';
+import { useState, useEffect, useCallback, type CSSProperties } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
@@ -18,6 +18,9 @@ import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
+import useEmblaCarousel from 'embla-carousel-react'
+
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -42,6 +45,49 @@ const letterVariants = {
   },
 };
 
+interface Hobby {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  imageHint: string;
+}
+
+const hobbies: Hobby[] = [
+  {
+    id: 'music',
+    title: 'Хөгжим тоглох',
+    description: 'Бас хаяа гитар, төгөлдөр хуур хөгжим тоглоод интернет дээр тавьчихдаг (๑• ᎑ •๑)',
+    image: 'https://picsum.photos/seed/playing-guitar/600/400',
+    imageHint: 'music instrument'
+  },
+  {
+    id: 'anime',
+    title: 'Аниме, ном, дуу, тоглоом',
+    description: 'Өдөр болгон бүхий л ном, роман уншиж, кино үзэж, хөгжим сонсдог. Үүнээс гадна жаахан содон зүйлүүдийг дурдвал Аниме, Вебтүүн, Видео гейм гэх мэтчилэн байнаа. (©w©)',
+    image: 'https://picsum.photos/seed/interstellar/600/400',
+    imageHint: 'movie poster'
+  },
+  {
+    id: 'sports',
+    title: 'Спорт',
+    description: 'Яагаад ч юм өглөө болоод гүйх шиг сайхан юм байдаггүй ээ. Тамирчин биш л дээ. Гэхдээ гүйсний дараа жинхэнэ амар амгаланг мэдэрдэг (๑´`๑). Гүйхийн хажуугаар фитнессээр, усан бассейнээр хичээллэх дуртай (๑´`๑).',
+    image: 'https://picsum.photos/seed/running-morning/600/400',
+    imageHint: 'running morning'
+  },
+  {
+    id: 'polyglot',
+    title: 'Полиглот болох мөрөөдөл',
+    description: 'Одоогоор япон хэл үзэж байгаа ба, ирээдүйд герман хэлээр ярьдаг болох бүрэн зорилготой.',
+    image: 'https://picsum.photos/seed/languages/600/400',
+    imageHint: 'languages books'
+  },
+];
+
+const TWEEN_FACTOR = 1.2;
+
+const numberWithinRange = (number: number, min: number, max: number): number =>
+  Math.min(Math.max(number, min), max);
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -51,11 +97,49 @@ export default function AboutPage() {
   const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
   const [editedImageUrl, setEditedImageUrl] = useState('');
   const [saving, setSaving] = useState(false);
-  
+
   const name = "Batuka";
   const firstLine = "Сайн уу?";
   const secondLine = `Миний нэрийг ${name} гэдэг`;
 
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    skipSnaps: false,
+  })
+
+  const [tweenValues, setTweenValues] = useState<number[]>([]);
+
+  const onScroll = useCallback(() => {
+    if (!emblaApi) return;
+
+    const engine = emblaApi.internalEngine();
+    const scrollProgress = emblaApi.scrollProgress();
+
+    const styles = emblaApi.scrollSnapList().map((scrollSnap, index) => {
+      let diffToTarget = scrollSnap - scrollProgress;
+
+      if (engine.options.loop) {
+        engine.slideLooper.loopPoints.forEach((loopItem) => {
+          const target = loopItem.target();
+          if (index === loopItem.index && target !== 0) {
+            const sign = Math.sign(target);
+            if (sign === -1) diffToTarget = scrollSnap - (1 + scrollProgress);
+            if (sign === 1) diffToTarget = scrollSnap + (1 - scrollProgress);
+          }
+        });
+      }
+      return diffToTarget;
+    });
+    setTweenValues(styles);
+  }, [emblaApi, setTweenValues]);
+
+
+   useEffect(() => {
+    if (!emblaApi) return;
+    onScroll();
+    emblaApi.on('scroll', onScroll);
+    emblaApi.on('reInit', onScroll);
+  }, [emblaApi, onScroll]);
 
   useEffect(() => {
     if (isUserLoading) return;
@@ -172,7 +256,7 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
         </div>
       )}
-      <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-114px)]">
+       <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-114px)]">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
              <motion.h1
               className="text-3xl md:text-4xl lg:text-5xl text-muted-foreground font-light"
@@ -209,67 +293,82 @@ export default function AboutPage() {
             </motion.h2>
           </div>
       </div>
-       <section className="py-16 md:py-24 bg-background">
+      <section className="py-16 md:py-24 bg-background">
         <div className="container px-4 md:px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold">Миний хоббинууд</h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            <Card className="bg-muted/20 border-border/20">
-              <CardHeader>
-                <CardTitle className="text-2xl">Хөгжим тоглох</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-muted-foreground">Бас хаяа гитар, төгөлдөр хуур хөгжим тоглоод интернет дээр тавьчихдаг (๑• ᎑ •๑)</p>
-                <div className="aspect-video relative rounded-lg overflow-hidden">
-                  <Image src="https://picsum.photos/seed/playing-guitar/600/338" alt="Playing guitar" layout="fill" objectFit="cover" data-ai-hint="music instrument" />
-                </div>
-              </CardContent>
-            </Card>
+           <div className="embla" ref={emblaRef}>
+            <div className="embla__container">
+              {hobbies.map((hobby, index) => {
+                  const tweenStyle: CSSProperties = {
+                    transform: `translateX(0) rotateY(${
+                      tweenValues[index] * 15
+                    }deg) scale(${1 - Math.abs(tweenValues[index]) * 0.15})`,
+                     opacity: 1 - Math.abs(tweenValues[index]) * 0.5,
+                  };
 
-            <Card className="bg-muted/20 border-border/20">
-              <CardHeader>
-                <CardTitle className="text-2xl">Аниме, ном, дуу, тоглоом</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 overflow-hidden">
-                <p className="text-muted-foreground">Өдөр болгон бүхий л ном, роман уншиж, кино үзэж, хөгжим сонсдог. Үүнээс гадна жаахан содон зүйлүүдийг дурдвал Аниме, Вебтүүн, Видео гейм гэх мэтчилэн байнаа. (©w©)</p>
-                 <div className="relative h-64">
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-48 h-64 transform -rotate-12 perspective-[1000px] hover:rotate-0 hover:scale-110 transition-transform duration-300">
-                      <Image src="https://picsum.photos/seed/darksouls/256/384" alt="Dark Souls 2" layout="fill" objectFit="cover" className="rounded-lg shadow-lg" />
+                  return (
+                    <div className="embla__slide" key={hobby.id} style={{ flex: '0 0 33.3333%'}}>
+                       <div className="embla__slide__number" style={tweenStyle}>
+                        <Card className="bg-muted/20 border-border/20 h-full">
+                           <CardHeader>
+                             <CardTitle className="text-2xl">{hobby.title}</CardTitle>
+                           </CardHeader>
+                           <CardContent className="space-y-4">
+                             <p className="text-muted-foreground h-20">{hobby.description}</p>
+                             <div className="aspect-video relative rounded-lg overflow-hidden">
+                               <Image src={hobby.image} alt={hobby.title} layout="fill" objectFit="cover" data-ai-hint={hobby.imageHint} />
+                             </div>
+                           </CardContent>
+                         </Card>
+                       </div>
                     </div>
-                     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-64 z-10 perspective-[1000px] hover:scale-110 transition-transform duration-300">
-                      <Image src="https://picsum.photos/seed/interstellar/256/384" alt="Interstellar" layout="fill" objectFit="cover" className="rounded-lg shadow-2xl" />
-                    </div>
-                     <div className="absolute right-0 top-1/2 -translate-y-1/2 w-48 h-64 transform rotate-12 perspective-[1000px] hover:rotate-0 hover:scale-110 transition-transform duration-300">
-                      <Image src="https://picsum.photos/seed/norwegianwood/256/384" alt="Norwegian Wood" layout="fill" objectFit="cover" className="rounded-lg shadow-lg" />
-                    </div>
-                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-muted/20 border-border/20">
-              <CardHeader>
-                <CardTitle className="text-2xl">Спорт</CardTitle>
-              </CardHeader>
-              <CardContent>
-                 <p className="text-muted-foreground">Яагаад ч юм өглөө болоод гүйх шиг сайхан юм байдаггүй ээ. Тамирчин биш л дээ. Гэхдээ гүйсний дараа жинхэнэ амар амгаланг мэдэрдэг (๑´`๑). Гүйхийн хажуугаар фитнессээр, усан бассейнээр хичээллэх дуртай (๑´`๑). Тоон үзүүлэлт гэвэл 7км зогсохгүй гүйж, 110кг үндсэн суулт, 70кг цээж шахалт хийж чадна (–  โจทย์ –)</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-muted/20 border-border/20">
-              <CardHeader>
-                <CardTitle className="text-2xl">Полиглот болох мөрөөдөл</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Одоогоор япон хэл үзэж байгаа ба, ирээдүйд герман хэлээр ярьдаг болох бүрэн зорилготой.</p>
-              </CardContent>
-            </Card>
-
+                  );
+                })}
+            </div>
+             <Button
+                onClick={() => emblaApi?.scrollPrev()}
+                className="embla__prev absolute left-0 top-1/2 -translate-y-1/2"
+                 variant="outline"
+                 size="icon"
+              >
+                <ArrowLeft/>
+              </Button>
+              <Button
+                onClick={() => emblaApi?.scrollNext()}
+                className="embla__next absolute right-0 top-1/2 -translate-y-1/2"
+                variant="outline"
+                size="icon"
+              >
+                <ArrowRight/>
+              </Button>
           </div>
         </div>
       </section>
+      
+       <style jsx>{`
+        .embla {
+          position: relative;
+          padding: 0 40px;
+        }
+        .embla__container {
+          display: flex;
+          gap: 1rem;
+          perspective: 1000px;
+        }
+        .embla__slide {
+          position: relative;
+          min-width: 0;
+        }
+        .embla__slide__number {
+            will-change: transform, opacity;
+        }
+      `}</style>
+
     </div>
   );
 
     
+}
