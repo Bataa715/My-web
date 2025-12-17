@@ -146,11 +146,11 @@ export default function AboutPage() {
       )}
       <BackButton />
       <Hero />
-      <ScrollDownIndicator />
+      <div><ScrollDownIndicator /></div>
       <Education />
-      <ScrollDownIndicator />
+      <div><ScrollDownIndicator /></div>
       <Projects />
-      <ScrollDownIndicator />
+      <div><ScrollDownIndicator /></div>
       <Skills />
     </>
   );
