@@ -76,12 +76,12 @@
   }
 }
 
-.education-card, .skill-card {
+.card-glow {
   position: relative;
   overflow: hidden;
 }
 
-.education-card::before, .skill-card::before {
+.card-glow::before {
   content: '';
   position: absolute;
   left: var(--mouse-x, -500px);

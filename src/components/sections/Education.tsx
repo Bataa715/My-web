@@ -75,7 +75,7 @@ export default function Education() {
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                   onMouseMove={handleMouseMove}
-                  className="education-card rounded-lg"
+                  className="card-glow rounded-lg"
                 >
                   <Card className={cn("flex h-full flex-col overflow-hidden transition-shadow duration-300 bg-muted/30 backdrop-blur-sm group border-transparent", isEditMode ? "hover:shadow-lg" : "")}>
                     {isEditMode && (
