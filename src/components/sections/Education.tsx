@@ -80,7 +80,7 @@ export default function Education() {
                   onMouseMove={handleMouseMove}
                   className="education-card rounded-lg"
                 >
-                  <Card className={cn("flex h-full flex-col overflow-hidden transition-shadow duration-300 bg-card/80 backdrop-blur-sm group border-transparent", isEditMode ? "hover:shadow-lg" : "")}>
+                  <Card className={cn("flex h-full flex-col overflow-hidden transition-shadow duration-300 bg-muted/30 backdrop-blur-sm group border-transparent", isEditMode ? "hover:shadow-lg" : "")}>
                     {isEditMode && (
                        <div className="absolute top-2 right-2 flex gap-1 z-10">
                           <EditEducationDialog education={edu}>
