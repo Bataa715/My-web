@@ -87,7 +87,7 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
                 variant="outline"
                 size="icon"
                 className={cn(
-                    "rounded-full h-14 w-14 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground",
+                    "rounded-full h-14 w-14 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-110",
                     selectedOrbit?.id === item.id && "bg-primary text-primary-foreground scale-110"
                 )}
                 onClick={() => onItemClick(item)}
@@ -845,3 +845,5 @@ export default function Hero() {
     </section>
   );
 }
+
+    
