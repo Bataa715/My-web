@@ -88,10 +88,9 @@ export default function Projects() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
-                    onMouseMove={handleMouseMove}
-                    className="project-card rounded-lg"
+                    className="project-card-glow"
                   >
-                    <Card className={cn("flex h-full flex-col overflow-hidden transition-shadow duration-300 bg-card/80 backdrop-blur-sm group border-transparent", isEditMode ? "hover:shadow-lg" : "")}>
+                    <Card className={cn("flex h-full flex-col overflow-hidden transition-shadow duration-300 bg-card/80 backdrop-blur-sm group", isEditMode ? "hover:shadow-lg" : "")}>
                       {isEditMode && (
                          <div className="absolute top-2 right-2 flex gap-1 z-10">
                             <EditProjectDialog project={project}>
