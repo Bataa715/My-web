@@ -56,9 +56,6 @@ export default function Education() {
             <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl flex items-center gap-4">
               <GraduationCap className="w-10 h-10" /> Боловсрол
             </h2>
-            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Миний боловсролын түүх.
-            </p>
           </div>
         </div>
 
