@@ -41,7 +41,7 @@ const Header = () => {
     const [saving, setSaving] = useState(false);
     
     const { user, isUserLoading, auth, firestore } = useFirebase();
-    const [appName, setAppName] = useState("Kaizen");
+    const [appName, setAppName] = useState("...");
     const [isEditingAppName, setIsEditingAppName] = useState(false);
     const [editedAppName, setEditedAppName] = useState(appName);
     
@@ -57,12 +57,18 @@ const Header = () => {
                     if (data.appName) {
                         setAppName(data.appName);
                         setEditedAppName(data.appName);
+                    } else {
+                         setAppName("Миний Вэб");
+                         setEditedAppName("Миний Вэб");
                     }
                 }
+            } else if (!isUserLoading) {
+                 setAppName("Миний Вэб");
+                 setEditedAppName("Миний Вэб");
             }
         };
-        if(user) fetchAppName();
-    }, [user, firestore]);
+        fetchAppName();
+    }, [user, firestore, isUserLoading]);
     
     const handleLogout = async () => {
       try {
