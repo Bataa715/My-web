@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, Save, Loader2, LogOut, XCircle, Pencil, Settings, Sun, Moon, Laptop } from 'lucide-react';
+import { Menu, PencilRuler, Eye, Save, Loader2, LogOut, XCircle, Pencil, Settings, Sun, Moon } from 'lucide-react';
 import { useTheme as useNextTheme } from "next-themes";
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -226,10 +226,6 @@ const Header = () => {
                     <DropdownMenuItem onClick={() => setTheme("dark")}>
                       <Moon className="mr-2 h-4 w-4" />
                       <span>Бараан</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTheme("system")}>
-                      <Laptop className="mr-2 h-4 w-4" />
-                      <span>Систем</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
