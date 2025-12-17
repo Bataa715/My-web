@@ -19,7 +19,6 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import Education from '@/components/sections/Education';
-import ScrollDownIndicator from '@/components/shared/ScrollDownIndicator';
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -146,11 +145,8 @@ export default function AboutPage() {
       )}
       <BackButton />
       <Hero />
-      <ScrollDownIndicator targetId="education" />
       <Education />
-      <ScrollDownIndicator targetId="projects" />
       <Projects />
-      <ScrollDownIndicator targetId="skills" />
       <Skills />
     </>
   );
