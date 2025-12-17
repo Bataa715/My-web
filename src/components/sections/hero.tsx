@@ -68,10 +68,11 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
     return (
         <motion.div
             key={item.id}
-            className="absolute"
+            className="absolute h-14 w-14"
             style={{
                 top: '50%',
                 left: '50%',
+                zIndex: 20
             }}
             initial={{ opacity: 0, scale: 0, x: '-50%', y: '-50%' }}
             animate={{
@@ -848,6 +849,7 @@ export default function Hero() {
     
 
     
+
 
 
 
