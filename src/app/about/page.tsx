@@ -110,12 +110,14 @@ export default function AboutPage() {
   const onScroll = useCallback(() => {
     if (!emblaApi) return
 
+    const engine = emblaApi.internalEngine()
     const scrollProgress = emblaApi.scrollProgress()
+
     const styles = emblaApi.scrollSnapList().map((scrollSnap, index) => {
         let diffToTarget = scrollSnap - scrollProgress
 
-        if (emblaApi.options.loop) {
-            emblaApi.internalEngine().slideLooper.loopPoints.forEach((loopItem) => {
+        if (engine.options.loop) {
+            engine.slideLooper.loopPoints.forEach((loopItem) => {
                 const target = loopItem.target()
                 if (index === loopItem.index && target !== 0) {
                     const sign = Math.sign(target)
