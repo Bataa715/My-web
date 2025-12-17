@@ -559,7 +559,7 @@ export default function Hero() {
                 ) : (
                    <div className="flex flex-wrap items-center gap-4">
                         {socialLinks.cvUrl && (
-                        <Button asChild>
+                        <Button asChild variant="outline" className="text-primary border-primary hover:bg-primary/10">
                             <Link href={socialLinks.cvUrl} target="_blank" rel="noopener noreferrer">
                             <Download className="mr-2 h-4 w-4" />
                             CV татах
@@ -848,4 +848,5 @@ export default function Hero() {
     
 
     
+
 
