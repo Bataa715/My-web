@@ -566,32 +566,32 @@ export default function Hero() {
                             </Link>
                         </Button>
                         )}
-                        <div className="flex items-center gap-1 rounded-full border p-1">
+                        <div className="flex items-center gap-2">
                         {socialLinks.github && (
-                            <Button asChild variant="ghost" size="icon">
+                            <Button asChild variant="outline" size="icon" className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                                 <Link href={socialLinks.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-                                    <Github className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                                    <Github className="h-5 w-5" />
                                 </Link>
                             </Button>
                         )}
                         {socialLinks.instagram && (
-                             <Button asChild variant="ghost" size="icon">
+                             <Button asChild variant="outline" size="icon" className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                                 <Link href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                                    <Instagram className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                                    <Instagram className="h-5 w-5" />
                                 </Link>
                             </Button>
                         )}
                         {socialLinks.facebook && (
-                            <Button asChild variant="ghost" size="icon">
+                            <Button asChild variant="outline" size="icon" className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                                 <Link href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                                    <Facebook className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                                    <Facebook className="h-5 w-5" />
                                 </Link>
                             </Button>
                         )}
                         {socialLinks.email && (
-                            <Button asChild variant="ghost" size="icon">
+                            <Button asChild variant="outline" size="icon" className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                                  <Link href={`mailto:${socialLinks.email}`} aria-label="Email">
-                                    <Mail className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                                    <Mail className="h-5 w-5" />
                                 </Link>
                             </Button>
                         )}
@@ -848,5 +848,6 @@ export default function Hero() {
     
 
     
+
 
 
