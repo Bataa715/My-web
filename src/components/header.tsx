@@ -117,7 +117,7 @@ const Header = () => {
                       <SheetTitle>
                           <SheetClose asChild>
                               <Link href="/home" className="flex items-center space-x-2 text-left pl-4">
-                                  <span className="font-bold font-bartle text-2xl">{appName}</span>
+                                  <span className="font-bold font-headline text-2xl">{appName}</span>
                               </Link>
                           </SheetClose>
                       </SheetTitle>
@@ -177,7 +177,7 @@ const Header = () => {
                     </div>
                 ) : (
                     <div className="flex items-center gap-2">
-                        <span className="font-bold sm:inline-block font-bartle text-2xl">
+                        <span className="font-bold sm:inline-block font-headline text-2xl">
                             {appName}
                         </span>
                         {isEditMode && (

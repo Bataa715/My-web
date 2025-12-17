@@ -15,7 +15,6 @@ export default {
         headline: ['var(--font-bartle)', 'sans-serif'],
         code: ['"Source Code Pro"', 'monospace'],
         jp: ['"Noto Sans JP"', 'sans-serif'],
-        bartle: ['var(--font-bartle)', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
