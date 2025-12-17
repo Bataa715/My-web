@@ -88,7 +88,7 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
                 size="icon"
                 className={cn(
                     "rounded-full h-14 w-14 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:border-primary hover:bg-accent/50 hover:scale-110",
-                    selectedOrbit?.id === item.id && "bg-accent border-accent-foreground scale-110"
+                    selectedOrbit?.id === item.id && "bg-accent border-accent-foreground scale-110 text-accent-foreground"
                 )}
                 onClick={() => onItemClick(item)}
             >
@@ -815,12 +815,11 @@ export default function Hero() {
       
        <Dialog open={isPlayerOpen} onOpenChange={setIsPlayerOpen}>
           <DialogContent className="max-w-3xl aspect-video p-0 border-0">
+             <DialogHeader className="sr-only">
+                <DialogTitle>{selectedOrbit?.title}</DialogTitle>
+                <DialogDescription>Playing: {selectedOrbit?.content}</DialogDescription>
+             </DialogHeader>
              {selectedOrbit?.type === 'audio' && selectedOrbit.youtubeVideoId && (
-              <>
-                <DialogHeader className="sr-only">
-                    <DialogTitle>{selectedOrbit.title}</DialogTitle>
-                    <DialogDescription>Playing: {selectedOrbit.content}</DialogDescription>
-                </DialogHeader>
                  <iframe
                     className="w-full h-full rounded-lg"
                     src={`https://www.youtube.com/embed/${selectedOrbit.youtubeVideoId}?autoplay=1`}
@@ -829,7 +828,6 @@ export default function Hero() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                 ></iframe>
-              </>
             )}
           </DialogContent>
        </Dialog>
