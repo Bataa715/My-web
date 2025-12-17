@@ -23,6 +23,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { cn } from "@/lib/utils";
 
 export default function Projects() {
   const { projects, deleteProject, loading } = useProjects();
@@ -34,6 +35,14 @@ export default function Projects() {
     selectedCategory === "All"
       ? projects
       : projects.filter((p) => p.category === selectedCategory);
+      
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+  };
 
   return (
     <section id="projects" className="py-12 md:py-24 lg:py-32">
@@ -65,7 +74,7 @@ export default function Projects() {
                 </Button>
               ))}
             </div>
-            <motion.div layout className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <motion.div layout className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <AnimatePresence>
                 {filteredProjects.map((project, index) => (
                   <motion.div
@@ -75,8 +84,10 @@ export default function Projects() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.3, delay: index * 0.05 }}
+                    onMouseMove={handleMouseMove}
+                    className="project-card rounded-lg"
                   >
-                    <Card className="flex h-full flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-card relative group">
+                    <Card className={cn("flex h-full flex-col overflow-hidden transition-shadow duration-300 bg-card/80 backdrop-blur-sm group border-transparent", isEditMode ? "hover:shadow-lg" : "")}>
                       {isEditMode && (
                          <div className="absolute top-2 right-2 flex gap-1 z-10">
                             <EditProjectDialog project={project}>

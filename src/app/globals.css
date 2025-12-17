@@ -68,12 +68,12 @@
   }
 }
 
-.education-card {
+.education-card, .project-card {
   position: relative;
   overflow: hidden;
 }
 
-.education-card::before {
+.education-card::before, .project-card::before {
   content: '';
   position: absolute;
   left: var(--mouse-x, -500px);
