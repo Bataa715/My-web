@@ -17,7 +17,7 @@ export default function ConceptCards({ concepts }: ConceptCardsProps) {
         {concepts.map((concept) => (
           <Card key={concept.id} className="flex flex-col">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-lg font-medium font-headline">{concept.title}</CardTitle>
+              <CardTitle className="text-lg font-medium">{concept.title}</CardTitle>
               <span className="text-2xl">{concept.emoji}</span>
             </CardHeader>
             <CardContent>
