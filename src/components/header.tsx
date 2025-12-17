@@ -254,10 +254,10 @@ const Header = () => {
           {/* Right Section */}
           <div className="flex items-center justify-end gap-2 md:flex-1">
               {user && !isUserLoading && (
-                  <Button variant="ghost" size="icon" onClick={() => setIsEditMode(!isEditMode)}>
-                  {isEditMode ? <Eye className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />}
-                  <span className="sr-only">{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
-              </Button>
+                <Button variant="outline" size="icon" onClick={() => setIsEditMode(!isEditMode)} className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                    {isEditMode ? <Eye className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />}
+                    <span className="sr-only">{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
+                </Button>
               )}
 
               {!isUserLoading && (
