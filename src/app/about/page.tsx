@@ -304,13 +304,13 @@ export default function AboutPage() {
 
                           return (
                               <div className="carousel-item" key={hobby.id} style={style} onClick={() => setActiveIndex(index)}>
-                                   <Card className="bg-card border-border/20 h-full w-full overflow-hidden group">
+                                   <Card className="bg-card border-border/20 h-full w-full overflow-hidden group rounded-lg">
                                        <CardHeader>
-                                         <CardTitle className="text-2xl">{hobby.title}</CardTitle>
+                                         <CardTitle className="text-xl">{hobby.title}</CardTitle>
                                        </CardHeader>
                                        <CardContent className="space-y-4">
-                                           <p className="text-muted-foreground h-20">{hobby.description}</p>
-                                           <div className="aspect-video relative rounded-lg overflow-hidden">
+                                           <p className="text-muted-foreground text-sm h-24">{hobby.description}</p>
+                                           <div className="aspect-w-4 aspect-h-3 relative rounded-lg overflow-hidden">
                                                <Image 
                                                  src={hobby.image} 
                                                  alt={hobby.title} 
@@ -350,7 +350,7 @@ export default function AboutPage() {
             .carousel-container {
                 perspective: 1500px;
                 width: ${ITEM_WIDTH}px;
-                height: 450px;
+                height: 500px;
                 position: relative;
             }
             .carousel {
@@ -363,7 +363,7 @@ export default function AboutPage() {
             .carousel-item {
                 position: absolute;
                 width: ${ITEM_WIDTH}px;
-                height: 420px;
+                height: 450px;
                 top: 15px;
                 left: 0;
                 background: transparent;
