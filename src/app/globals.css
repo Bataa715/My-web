@@ -99,6 +99,7 @@
 
 .avatar-glow-wrapper {
   @apply relative overflow-hidden rounded-full;
+   z-index: 1;
 }
 
 .avatar-glow-wrapper::before {
@@ -108,7 +109,7 @@
   height: 200%;
   top: 50%;
   left: 50%;
-  z-index: 0;
+  z-index: -1;
   background: conic-gradient(
     transparent,
     transparent,
