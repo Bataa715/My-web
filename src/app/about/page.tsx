@@ -113,7 +113,8 @@ const hobbies: Hobby[] = [
 
 
 const CIRCLE_RADIUS = 300;
-const ITEM_WIDTH = 300;
+const ITEM_WIDTH = 320;
+const ITEM_HEIGHT = 420;
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -123,27 +124,44 @@ export default function AboutPage() {
   const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
   const [editedImageUrl, setEditedImageUrl] = useState('');
   const [saving, setSaving] = useState(false);
-  const [rotation, setRotation] = useState(0);
-
-  const name = "Batuka";
-  const firstLine = "Сайн уу?";
-  const secondLine = `Миний нэрийг ${name} гэдэг`;
-
+  
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     skipSnaps: false,
+    align: 'center',
   });
 
+  const [tweenValues, setTweenValues] = useState<number[]>([]);
+
   const onScroll = useCallback(() => {
-    if (!emblaApi) return;
-    const scrollProgress = emblaApi.scrollProgress();
-    const newRotation = scrollProgress * 360 * (emblaApi.internalEngine().options.loop ? 2 : 1);
-    setRotation(newRotation);
-  }, [emblaApi]);
+    if (!emblaApi) return
+
+    const engine = emblaApi.internalEngine()
+    const scrollProgress = emblaApi.scrollProgress()
+
+    const styles = emblaApi.scrollSnapList().map((scrollSnap, index) => {
+      let diffToTarget = scrollSnap - scrollProgress
+
+      if (engine.options.loop) {
+        engine.slideLooper.loopPoints.forEach((loopItem) => {
+          const target = loopItem.target()
+          if (index === loopItem.index && target !== 0) {
+            const sign = Math.sign(target)
+            if (sign === -1) diffToTarget = scrollSnap - (1 + scrollProgress)
+            if (sign === 1) diffToTarget = scrollSnap + (1 - scrollProgress)
+          }
+        })
+      }
+      return diffToTarget
+    })
+    setTweenValues(styles)
+  }, [emblaApi, setTweenValues])
 
   useEffect(() => {
     if (!emblaApi) return;
+    onScroll()
     emblaApi.on('scroll', onScroll);
+    emblaApi.on('resize', onScroll);
     return () => {
       emblaApi.off('scroll', onScroll);
     };
@@ -209,6 +227,9 @@ export default function AboutPage() {
       }
   };
 
+  const name = "Batuka";
+  const firstLine = "Сайн уу?";
+  const secondLine = `Миний нэрийг ${name} гэдэг`;
 
   return (
     <div className="relative">
@@ -307,40 +328,48 @@ export default function AboutPage() {
             <h2 className="text-4xl md:text-5xl font-bold">Миний хоббинууд</h2>
           </div>
 
-          <div className="relative w-full h-[400px] flex items-center justify-center">
-            <div className="scene h-[400px] w-full" ref={emblaRef}>
-                <div 
-                    className="carousel"
-                    style={{ transform: `translateZ(-${CIRCLE_RADIUS}px) rotateY(${rotation}deg)` }}
-                >
-                    {hobbies.map((hobby, index) => {
-                        const itemAngle = (360 / hobbies.length) * index;
-                        return (
-                             <div 
-                                className="carousel-item" 
-                                key={hobby.id}
-                                style={{ 
-                                    transform: `rotateY(${itemAngle}deg) translateZ(${CIRCLE_RADIUS}px)`,
-                                    width: `${ITEM_WIDTH}px`
-                                }}
-                            >
-                                <Card className="bg-card border-border/20 h-full w-full">
-                                    <CardHeader>
-                                        <CardTitle className="text-2xl">{hobby.title}</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="space-y-4">
-                                        <p className="text-muted-foreground h-20">{hobby.description}</p>
-                                        <div className="aspect-video relative rounded-lg overflow-hidden">
-                                            <Image src={hobby.image} alt={hobby.title} fill objectFit="cover" data-ai-hint={hobby.imageHint} />
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        )
-                    })}
+            <div className="relative">
+              <div className="embla" ref={emblaRef}>
+                <div className="embla__container">
+                  {hobbies.map((hobby, index) => {
+                     const tweenStyle: CSSProperties = {};
+                    if (tweenValues.length) {
+                        const V = tweenValues[index] || 0;
+                        const Y = 1 - Math.abs(V);
+                        const angle = V * 30;
+                        const opacity = 0.4 + Y * 0.6;
+
+                        tweenStyle.transform = `perspective(1000px) rotateY(${angle}deg)`;
+                        tweenStyle.opacity = opacity;
+                    }
+
+                    return (
+                        <div className="embla__slide" key={hobby.id} style={{ flex: '0 0 33.3333%'}}>
+                           <div className="embla__slide__number" style={tweenStyle}>
+                            <Card className="bg-card border-border/20 h-full w-full overflow-hidden group">
+                               <CardHeader>
+                                 <CardTitle className="text-2xl">{hobby.title}</CardTitle>
+                               </CardHeader>
+                               <CardContent className="space-y-4">
+                                   <p className="text-muted-foreground h-20">{hobby.description}</p>
+                                   <div className="aspect-video relative rounded-lg overflow-hidden">
+                                       <Image 
+                                         src={hobby.image} 
+                                         alt={hobby.title} 
+                                         fill 
+                                         className="object-cover transition-transform duration-300 group-hover:scale-110"
+                                         data-ai-hint={hobby.imageHint} 
+                                       />
+                                   </div>
+                               </CardContent>
+                           </Card>
+                           </div>
+                       </div>
+                    )
+                  })}
                 </div>
-            </div>
-             <Button
+              </div>
+              <Button
                 onClick={() => emblaApi?.scrollPrev()}
                 className="absolute left-0 top-1/2 -translate-y-1/2 z-10"
                  variant="outline"
@@ -356,43 +385,40 @@ export default function AboutPage() {
               >
                 <ArrowRight/>
               </Button>
-          </div>
+            </div>
         </div>
       </section>
       
        <style jsx>{`
-        .scene {
-            width: 100%;
-            perspective: 1200px;
-            overflow: visible;
+        .embla {
+            overflow: hidden;
         }
-
-        .carousel {
-            width: 100%;
+        .embla__container {
+            display: flex;
+        }
+        .embla__slide {
+            flex: 0 0 33.3333%;
+            min-width: 0;
+            padding: 1rem;
+        }
+        .embla__slide__number {
+            border-radius: 1.5rem;
+            font-size: 4rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.87, 0, 0.13, 1);
+            transition: opacity 0.2s ease-in-out;
         }
-
-        .carousel-item {
-            position: absolute;
-            top: 10px;
-            left: calc(50% - ${ITEM_WIDTH / 2}px);
-            height: 100%;
-            border-radius: 10px;
-            opacity: 0.95;
-            backface-visibility: hidden;
-            transition: opacity 0.6s, transform 0.6s;
+        .embla__slide__number > * {
+            width: 100%;
         }
-
-        .carousel-item:hover {
+        .embla__slide--front .embla__slide__number {
             opacity: 1;
         }
       `}</style>
-
     </div>
   );
 }
-
-    
+`
