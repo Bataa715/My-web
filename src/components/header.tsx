@@ -9,7 +9,6 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
@@ -204,25 +203,15 @@ const Header = () => {
                 </Button>
               )}
 
-              {!isUserLoading && (
-                  user ? (
-                      <div className="flex items-center gap-2">
-                           <ThemeToggle />
-                          <Button onClick={handleLogout} variant="outline" size="icon" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
-                              <LogOut className="h-5 w-5" />
-                          </Button>
-                      </div>
-                  ) : (
-                       <div className='flex gap-2'>
-                          <Button asChild variant="outline" size="sm">
-                              <Link href="/login">Нэвтрэх</Link>
-                          </Button>
-                           <Button asChild size="sm">
-                              <Link href="/signup">Бүртгүүлэх</Link>
-                          </Button>
-                      </div>
-                  )
-              )}
+              {!isUserLoading && user && (
+                  <div className="flex items-center gap-2">
+                       <ThemeToggle />
+                      <Button onClick={handleLogout} variant="outline" size="icon" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                          <LogOut className="h-5 w-5" />
+                      </Button>
+                  </div>
+                )
+              }
           </div>
         </div>
       </header>
