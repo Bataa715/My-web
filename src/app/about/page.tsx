@@ -81,7 +81,36 @@ const hobbies: Hobby[] = [
     image: 'https://picsum.photos/seed/languages/600/400',
     imageHint: 'languages books'
   },
+  {
+    id: 'coding',
+    title: 'Код бичих',
+    description: 'Шинэ технологи сурч, сонирхолтой төслүүд дээр ажиллах нь миний хамгийн дуртай зүйлсийн нэг.',
+    image: 'https://picsum.photos/seed/coding-desk/600/400',
+    imageHint: 'coding desk'
+  },
+  {
+    id: 'travel',
+    title: 'Аялах',
+    description: 'Шинэ газар үзэж, өөр соёлтой танилцах нь ертөнцийг харах өнцгийг минь тэлдэг.',
+    image: 'https://picsum.photos/seed/travel-map/600/400',
+    imageHint: 'travel map'
+  },
+  {
+    id: 'photography',
+    title: 'Гэрэл зураг',
+    description: 'Гоё агшинг камерын дуранд буулгаж, тэр мөчийг мөнхлөх дуртай.',
+    image: 'https://picsum.photos/seed/camera-lens/600/400',
+    imageHint: 'camera lens'
+  },
+  {
+    id: 'cooking',
+    title: 'Хоол хийх',
+    description: 'Янз бүрийн орны хоол туршиж, шинэ амтыг нээх нь надад таашаал өгдөг.',
+    image: 'https://picsum.photos/seed/cooking-kitchen/600/400',
+    imageHint: 'cooking kitchen'
+  },
 ];
+
 
 const CIRCLE_RADIUS = 250;
 const ITEM_WIDTH = 250;
@@ -279,7 +308,7 @@ export default function AboutPage() {
           </div>
 
           <div className="relative w-full h-[400px] flex items-center justify-center">
-            <div className="scene h-[300px]" ref={emblaRef}>
+            <div className="scene h-[400px] w-full" ref={emblaRef}>
                 <div 
                     className="carousel"
                     style={{ transform: `translateZ(-${CIRCLE_RADIUS}px) rotateY(${rotation}deg)` }}
@@ -364,3 +393,5 @@ export default function AboutPage() {
     </div>
   );
 }
+
+    
