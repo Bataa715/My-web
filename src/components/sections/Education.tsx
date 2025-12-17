@@ -24,6 +24,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import type { Education as EducationType } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 const formatDate = (date: any) => {
     if (!date) return '';
@@ -38,6 +39,14 @@ const formatDate = (date: any) => {
 export default function Education() {
   const { education, deleteEducation, loading } = useEducation();
   const { isEditMode } = useEditMode();
+  
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+  };
 
   return (
     <section id="education" className="py-12 md:py-24 lg:py-32">
@@ -68,8 +77,10 @@ export default function Education() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
+                  onMouseMove={handleMouseMove}
+                  className="education-card rounded-lg"
                 >
-                  <Card className="flex h-full flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-card relative group">
+                  <Card className={cn("flex h-full flex-col overflow-hidden transition-shadow duration-300 bg-card/80 backdrop-blur-sm group border-transparent", isEditMode ? "hover:shadow-lg" : "")}>
                     {isEditMode && (
                        <div className="absolute top-2 right-2 flex gap-1 z-10">
                           <EditEducationDialog education={edu}>
