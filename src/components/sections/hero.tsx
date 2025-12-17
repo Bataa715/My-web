@@ -557,35 +557,46 @@ export default function Hero() {
                         </div>
                     </div>
                 ) : (
-                    <div className="flex items-center gap-4">
+                   <div className="flex flex-wrap items-center gap-4">
                         {socialLinks.cvUrl && (
-                          <Button asChild variant="outline" size="sm">
+                        <Button asChild>
                             <Link href={socialLinks.cvUrl} target="_blank" rel="noopener noreferrer">
-                              <Download className="mr-2 h-4 w-4" />
-                              CV татах
+                            <Download className="mr-2 h-4 w-4" />
+                            CV татах
                             </Link>
-                          </Button>
+                        </Button>
                         )}
+                        <div className="flex items-center gap-1 rounded-full border p-1">
                         {socialLinks.github && (
-                            <Link href={socialLinks.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-                                <Github className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
-                            </Link>
+                            <Button asChild variant="ghost" size="icon">
+                                <Link href={socialLinks.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                                    <Github className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                                </Link>
+                            </Button>
                         )}
                         {socialLinks.instagram && (
-                             <Link href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                                <Instagram className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
-                            </Link>
+                             <Button asChild variant="ghost" size="icon">
+                                <Link href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                                    <Instagram className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                                </Link>
+                            </Button>
                         )}
                         {socialLinks.facebook && (
-                            <Link href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                                <Facebook className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
-                            </Link>
+                            <Button asChild variant="ghost" size="icon">
+                                <Link href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                                    <Facebook className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                                </Link>
+                            </Button>
                         )}
                         {socialLinks.email && (
-                             <Link href={`mailto:${socialLinks.email}`} aria-label="Email">
-                                <Mail className="h-6 w-6 text-muted-foreground hover:text-foreground transition-colors" />
-                            </Link>
+                            <Button asChild variant="ghost" size="icon">
+                                 <Link href={`mailto:${socialLinks.email}`} aria-label="Email">
+                                    <Mail className="h-5 w-5 text-muted-foreground hover:text-foreground transition-colors" />
+                                </Link>
+                            </Button>
                         )}
+                        </div>
+
                          {isEditMode && (
                             <Button
                                 variant="ghost"
@@ -837,3 +848,4 @@ export default function Hero() {
     
 
     
+
