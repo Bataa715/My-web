@@ -9,13 +9,18 @@ export default function ScrollDownIndicator() {
 
   const handleClick = () => {
     if (divRef.current) {
-        let nextElement = divRef.current.nextElementSibling;
-        while(nextElement && nextElement.tagName.toLowerCase() !== 'section') {
-            nextElement = nextElement.nextElementSibling;
-        }
-        
-        if (nextElement) {
-            nextElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Find the parent of the current div, which contains this indicator.
+        const parentContainer = divRef.current;
+        if (parentContainer) {
+            let nextElement = parentContainer.nextElementSibling;
+            // Find the next <section> element
+            while(nextElement && nextElement.tagName.toLowerCase() !== 'section') {
+                nextElement = nextElement.nextElementSibling;
+            }
+            
+            if (nextElement) {
+                nextElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     }
   };
