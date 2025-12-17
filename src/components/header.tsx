@@ -254,7 +254,7 @@ const Header = () => {
           {/* Right Section */}
           <div className="flex items-center justify-end gap-2 md:flex-1">
               {user && !isUserLoading && (
-                  <Button variant="outline" size="icon" onClick={() => setIsEditMode(!isEditMode)}>
+                  <Button variant="ghost" size="icon" onClick={() => setIsEditMode(!isEditMode)}>
                   {isEditMode ? <Eye className="h-4 w-4" /> : <PencilRuler className="h-4 w-4" />}
                   <span className="sr-only">{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
               </Button>
@@ -266,7 +266,7 @@ const Header = () => {
                           {user.isAnonymous ? (
                               <Dialog open={isLinkAccountOpen} onOpenChange={setIsLinkAccountOpen}>
                                   <DialogTrigger asChild>
-                                      <Button variant="outline" size="sm">
+                                      <Button variant="ghost" size="sm">
                                           <Link2 className="mr-2 h-4 w-4" />
                                           Бүртгэлээ холбох
                                       </Button>
