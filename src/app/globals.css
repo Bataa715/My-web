@@ -68,12 +68,12 @@
   }
 }
 
-.education-card, .project-card, .skill-card {
+.education-card, .skill-card {
   position: relative;
   overflow: hidden;
 }
 
-.education-card::before, .project-card::before, .skill-card::before {
+.education-card::before, .skill-card::before {
   content: '';
   position: absolute;
   left: var(--mouse-x, -500px);
@@ -168,15 +168,13 @@
   left: 50%;
   width: 200vw;
   height: 200vh;
-  z-index: 0;
-  background: conic-gradient(
+  z-index: -1;
+   background: conic-gradient(
     transparent,
     transparent,
     transparent,
-    transparent,
-    transparent,
-    hsl(var(--primary) / 0.8)
+    hsl(var(--primary))
   );
-  animation: rotate-glow-circle 8s linear infinite;
+  animation: rotate-glow-circle 3s linear infinite;
   transform-origin: center center;
 }

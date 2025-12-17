@@ -44,7 +44,7 @@ export default function RootLayout({
                 <EducationProvider>
                   <ProjectProvider>
                     <SkillsProvider>
-                      <div className="page-border-glow">
+                      <div className="page-border-glow rounded-lg">
                        <MainLayout>
                             {children}
                         </MainLayout>
