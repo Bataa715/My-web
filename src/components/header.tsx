@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
 import { Menu, PencilRuler, Eye, Save, Loader2, LogOut, XCircle, Pencil, Settings, Sun, Moon } from 'lucide-react';
-import { useTheme as useNextTheme } from "next-themes";
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -46,7 +45,7 @@ const Header = () => {
     const [editedAppName, setEditedAppName] = useState(appName);
     
     const [mounted, setMounted] = useState(false);
-    const { setTheme } = useNextTheme();
+    const { setTheme } = useEditMode().isEditMode ? { setTheme: () => {} } : require("next-themes");
 
     useEffect(() => {
         setMounted(true);
@@ -206,7 +205,7 @@ const Header = () => {
               {user && !isUserLoading && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
+                    <Button variant="ghost" size="icon">
                       <Settings className="h-5 w-5" />
                       <span className="sr-only">Тохиргоо</span>
                     </Button>
