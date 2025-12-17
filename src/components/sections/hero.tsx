@@ -434,7 +434,7 @@ export default function Hero() {
                     <Input
                       value={editedName}
                       onChange={(e) => setEditedName(e.target.value)}
-                      className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none h-auto p-0 border-0 focus-visible:ring-0 bg-transparent"
+                      className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none h-auto p-0 border-0 focus-visible:ring-0 bg-transparent"
                     />
                     <Button onClick={handleSaveName} size="icon" className="h-8 w-8" disabled={saving}>
                       {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4" />}
@@ -445,7 +445,7 @@ export default function Hero() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                    <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
                       {name}
                     </h1>
                     {isEditMode && (
@@ -721,7 +721,7 @@ export default function Hero() {
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
                                         className="relative w-full cursor-pointer z-20 p-4 flex flex-col items-center justify-center text-center" onClick={handleContentClick}>
-                                        <h3 className="font-headline text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
+                                        <h3 className="text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
                                          <p className="text-lg text-foreground">{selectedOrbit.content}</p>
                                         
                                         {selectedOrbit.type === 'audio' && selectedOrbit.youtubeVideoId && (

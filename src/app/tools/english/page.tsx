@@ -88,7 +88,7 @@ export default function EnglishDashboardPage() {
     <div className="space-y-8">
       <BackButton />
       <div className="text-center pt-8">
-          <h1 className="text-4xl font-bold font-headline">English Dashboard</h1>
+          <h1 className="text-4xl font-bold">English Dashboard</h1>
           <p className="mt-2 text-muted-foreground">Таны сурлагын явц болон өдөр тутмын зорилго.</p>
       </div>
 

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -59,7 +60,7 @@ export default function ProgrammingPage() {
         <div className="space-y-8">
             <BackButton />
             <div className="text-center pt-8">
-                <h1 className="text-4xl font-bold font-headline">Програмчлал</h1>
+                <h1 className="text-4xl font-bold">Програмчлал</h1>
                 <p className="mt-2 text-muted-foreground">Үндсэн ойлголтууд, хэрэгтэй кодууд, болон ахиц хянагч.</p>
             </div>
 

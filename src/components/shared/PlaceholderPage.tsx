@@ -1,3 +1,4 @@
+
 'use client';
 
 import BackButton from "@/components/shared/BackButton";
@@ -19,7 +20,7 @@ export default function PlaceholderPage({ title, description }: PlaceholderPageP
             <div className="flex justify-center mb-4">
               <Construction className="h-16 w-16 text-primary" />
             </div>
-            <CardTitle className="text-3xl font-bold font-headline">{title}</CardTitle>
+            <CardTitle className="text-3xl font-bold">{title}</CardTitle>
             <CardDescription>{description}</CardDescription>
           </CardHeader>
           <CardContent>

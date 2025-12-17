@@ -3,11 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  @font-face {
-    font-family: 'BBH Bartle';
-    src: url('https://fonts.googleapis.com/css2?family=BBH+Bartle&display=swap');
-  }
-
   :root {
     --background: 240 11% 95%;
     --foreground: 240 10% 3.9%;

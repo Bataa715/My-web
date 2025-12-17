@@ -117,7 +117,7 @@ export default function EnglishGrammarPage() {
     <div className="space-y-8">
       <BackButton />
       <div className="text-center pt-8 flex items-center justify-center gap-4">
-        <h1 className="text-4xl font-bold font-headline">Англи хэлний дүрэм</h1>
+        <h1 className="text-4xl font-bold">Англи хэлний дүрэм</h1>
         {isEditMode && (
              <AddGrammarRuleDialog onAddRule={handleAddRule} ruleType="english">
                 <Button variant="outline" size="icon">

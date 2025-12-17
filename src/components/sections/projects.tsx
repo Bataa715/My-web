@@ -58,7 +58,7 @@ export default function Projects() {
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
-            <h2 className="text-3xl font-headline font-bold tracking-tighter sm:text-5xl">Миний төслүүд</h2>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Миний төслүүд</h2>
           </div>
         </div>
 
@@ -133,7 +133,7 @@ export default function Projects() {
                         </div>
                       )}
                       <CardHeader>
-                        <CardTitle className="font-headline">{project.name}</CardTitle>
+                        <CardTitle>{project.name}</CardTitle>
                         <CardDescription>{project.description}</CardDescription>
                       </CardHeader>
                       <CardContent className="flex-grow">

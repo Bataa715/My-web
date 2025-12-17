@@ -1,3 +1,4 @@
+
 'use client';
 import { useSkills } from '@/contexts/SkillsContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -43,7 +44,7 @@ const Skills = () => {
         <section id="skills" className="py-12 md:py-24 lg:py-32">
             <div className="container">
                 <div className="mb-12 text-center space-y-4">
-                    <h2 className="text-4xl font-bold font-headline">Ур чадвар &amp; Технологиуд</h2>
+                    <h2 className="text-4xl font-bold">Ур чадвар &amp; Технологиуд</h2>
                 </div>
 
                 {loading && (
@@ -102,7 +103,7 @@ const Skills = () => {
                                     )}
                                     <CardHeader className="flex flex-row items-center gap-4 pb-2">
                                         {getIcon(skillGroup.icon)}
-                                        <CardTitle className="font-headline text-lg">{skillGroup.name}</CardTitle>
+                                        <CardTitle className="text-lg">{skillGroup.name}</CardTitle>
                                     </CardHeader>
                                     <CardContent className="flex-grow">
                                         <div className="flex flex-wrap gap-2">
