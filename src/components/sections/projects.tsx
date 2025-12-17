@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit, Filter } from "lucide-react";
+import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit } from "lucide-react";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,13 +25,6 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 
 export default function Projects() {
@@ -68,20 +61,17 @@ export default function Projects() {
           </div>
         ) : (
           <>
-            <div className="flex justify-start py-8">
-              <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
-                <SelectTrigger className="w-auto gap-2">
-                    <Filter className="h-4 w-4 text-muted-foreground" />
-                    <SelectValue placeholder="Ангиллаар шүүх..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex justify-center flex-wrap gap-2 py-8">
+                {categories.map((category) => (
+                  <Button
+                    key={category}
+                    variant={selectedCategory === category ? "default" : "outline"}
+                    onClick={() => setSelectedCategory(category)}
+                    className="rounded-full transition-colors duration-300"
+                  >
+                    {category}
+                  </Button>
+                ))}
             </div>
             <motion.div layout className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <AnimatePresence>
