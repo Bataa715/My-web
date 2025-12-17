@@ -157,10 +157,6 @@
   animation: bounce 1s infinite;
 }
 
-.page-border-glow-body {
-  @apply bg-transparent;
-}
-
 .page-border-glow-body::before {
   content: '';
   position: fixed;
