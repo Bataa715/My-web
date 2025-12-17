@@ -110,11 +110,6 @@ const hobbies: Hobby[] = [
   },
 ];
 
-
-const CIRCLE_RADIUS = 300;
-const ITEM_WIDTH = 320;
-const ITEM_HEIGHT = 420;
-
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
   const { isEditMode } = useEditMode();
@@ -337,8 +332,9 @@ export default function AboutPage() {
                         const Y = 1 - Math.abs(V);
                         const angle = V * 30;
                         const opacity = 0.4 + Y * 0.6;
+                        const scale = 0.8 + Y * 0.2;
 
-                        tweenStyle.transform = `perspective(1000px) rotateY(${angle}deg)`;
+                        tweenStyle.transform = `perspective(1000px) rotateY(${angle}deg) scale(${scale})`;
                         tweenStyle.opacity = opacity;
                     }
 
@@ -412,9 +408,6 @@ export default function AboutPage() {
         }
         .embla__slide__number > * {
             width: 100%;
-        }
-        .embla__slide--front .embla__slide__number {
-            opacity: 1;
         }
       `}</style>
     </div>
