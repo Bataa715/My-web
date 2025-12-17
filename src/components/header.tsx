@@ -4,12 +4,12 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, Save, Loader2, LogOut, Link2, XCircle, Pencil } from 'lucide-react';
+import { Menu, PencilRuler, Eye, Save, Loader2, LogOut, XCircle, Pencil } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from './ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { useToast } from '@/hooks/use-toast';
@@ -17,11 +17,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { UserProfile } from '@/lib/types';
-import { signOut, EmailAuthProvider, linkWithCredential } from 'firebase/auth';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
+import { signOut } from 'firebase/auth';
 
 
 const mainLinks = [
@@ -29,11 +25,6 @@ const mainLinks = [
   { href: "/about", label: "Миний тухай" },
   { href: "/tools", label: "Хэрэгсэл" },
 ];
-
-const linkAccountSchema = z.object({
-  email: z.string().email({ message: 'И-мэйл хаяг буруу байна.' }),
-  password: z.string().min(6, { message: 'Нууц үг дор хаяж 6 тэмдэгттэй байх ёстой.' }),
-});
 
 
 const Header = () => {
@@ -73,10 +64,6 @@ const Header = () => {
         if(user) fetchAppName();
     }, [user, firestore]);
     
-
-    const [isLinkAccountOpen, setIsLinkAccountOpen] = useState(false);
-     
-
     const handleLogout = async () => {
       try {
         if (auth) {
@@ -89,49 +76,6 @@ const Header = () => {
         console.error("Logout error:", error);
         toast({ title: "Гарахад алдаа гарлаа.", variant: 'destructive' });
       }
-    };
-    
-    const form = useForm<z.infer<typeof linkAccountSchema>>({
-        resolver: zodResolver(linkAccountSchema),
-        defaultValues: {
-          email: '',
-          password: '',
-        },
-    });
-
-    const onLinkAccountSubmit = async (values: z.infer<typeof linkAccountSchema>) => {
-        if (!user || !user.isAnonymous || !firestore) {
-            toast({ title: "Алдаа", description: "Зөвхөн нэр-усгүй хэрэглэгч бүртгэлээ холбох боломжтой.", variant: "destructive" });
-            return;
-        }
-        
-        setSaving(true);
-        try {
-            const credential = EmailAuthProvider.credential(values.email, values.password);
-            await linkWithCredential(user, credential);
-
-            const userDocRef = doc(firestore, 'users', user.uid);
-            await updateDoc(userDocRef, { email: values.email });
-            
-            toast({ title: 'Амжилттай холбогдлоо!', description: 'Таны түр бүртгэл байнгын боллоо.' });
-            setIsLinkAccountOpen(false);
-            router.refresh(); 
-        } catch (error: any) {
-            console.error("Account linking error:", error);
-             let description = "Бүртгэл холбоход алдаа гарлаа.";
-             if (error.code === 'auth/email-already-in-use') {
-                description = 'Энэ и-мэйл хаяг бүртгэлтэй байна. Өөр и-мэйл ашиглана уу.';
-            } else if (error.code === 'auth/credential-already-in-use') {
-                description = 'Энэ и-мэйл хаяг өөр бүртгэлд ашиглагдаж байна.';
-            }
-            toast({
-                title: 'Алдаа',
-                description: description,
-                variant: 'destructive',
-            });
-        } finally {
-            setSaving(false);
-        }
     };
     
     const handleSaveAppName = async () => {
@@ -263,62 +207,6 @@ const Header = () => {
               {!isUserLoading && (
                   user ? (
                       <div className="flex items-center gap-2">
-                          {user.isAnonymous ? (
-                              <Dialog open={isLinkAccountOpen} onOpenChange={setIsLinkAccountOpen}>
-                                  <DialogTrigger asChild>
-                                      <Button variant="ghost" size="sm">
-                                          <Link2 className="mr-2 h-4 w-4" />
-                                          Бүртгэлээ холбох
-                                      </Button>
-                                  </DialogTrigger>
-                                  <DialogContent>
-                                      <DialogHeader>
-                                          <DialogTitle>Бүртгэлээ байнгын болгох</DialogTitle>
-                                          <DialogDescription>
-                                              Таны мэдээллийг хадгалахын тулд түр бүртгэлээ и-мэйл, нууц үгээр баталгаажуулна уу.
-                                          </DialogDescription>
-                                      </DialogHeader>
-                                      <Form {...form}>
-                                          <form onSubmit={form.handleSubmit(onLinkAccountSubmit)} className="space-y-4">
-                                              <FormField
-                                                  control={form.control}
-                                                  name="email"
-                                                  render={({ field }) => (
-                                                  <FormItem>
-                                                      <FormLabel>И-мэйл</FormLabel>
-                                                      <FormControl>
-                                                      <Input placeholder="name@example.com" {...field} />
-                                                      </FormControl>
-                                                      <FormMessage />
-                                                  </FormItem>
-                                                  )}
-                                              />
-                                              <FormField
-                                                  control={form.control}
-                                                  name="password"
-                                                  render={({ field }) => (
-                                                  <FormItem>
-                                                      <FormLabel>Нууц үг</FormLabel>
-                                                      <FormControl>
-                                                      <Input type="password" placeholder="••••••••" {...field} />
-                                                      </FormControl>
-                                                      <FormMessage />
-                                                  </FormItem>
-                                                  )}
-                                              />
-                                              <DialogFooter>
-                                                  <DialogClose asChild>
-                                                      <Button type="button" variant="secondary">Цуцлах</Button>
-                                                  </DialogClose>
-                                                  <Button type="submit" disabled={saving}>
-                                                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Link2 className="mr-2 h-4 w-4" />} Холбох
-                                                  </Button>
-                                              </DialogFooter>
-                                          </form>
-                                      </Form>
-                                  </DialogContent>
-                              </Dialog>
-                          ) : null}
                            <ThemeToggle />
                           <Button onClick={handleLogout} variant="outline" size="icon" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">
                               <LogOut className="h-5 w-5" />
@@ -358,5 +246,7 @@ const Header = () => {
 };
 
 export default Header;
+
+    
 
     
