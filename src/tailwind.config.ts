@@ -1,3 +1,4 @@
+
 import type {Config} from 'tailwindcss';
 
 export default {
@@ -14,6 +15,7 @@ export default {
         headline: ['Inter', 'sans-serif'],
         code: ['"Source Code Pro"', 'monospace'],
         jp: ['"Noto Sans JP"', 'sans-serif'],
+        bartle: ['"BBH Bartle"', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
