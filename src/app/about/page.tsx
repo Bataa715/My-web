@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -121,8 +122,8 @@ export default function AboutPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const totalItems = hobbies.length;
   const anglePerItem = 360 / totalItems;
-  const CIRCLE_RADIUS = 280; // Controls the circle's radius
-  const ITEM_WIDTH = 250; // Width of a card
+  const CIRCLE_RADIUS = 340; // Controls the circle's radius
+  const ITEM_WIDTH = 280; // Width of a card
 
   const scrollNext = () => setActiveIndex((prev) => (prev + 1) % totalItems);
   const scrollPrev = () => setActiveIndex((prev) => (prev - 1 + totalItems) % totalItems);
