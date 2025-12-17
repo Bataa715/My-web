@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, Save, Loader2, LogOut, XCircle, Pencil, Settings, Sun, Moon } from 'lucide-react';
+import { Menu, PencilRuler, Eye, Save, Loader2, XCircle, Pencil, Settings, Sun, Moon, LogOut } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -22,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTheme } from 'next-themes';
 
 
 const mainLinks = [
@@ -44,13 +45,7 @@ const Header = () => {
     const [isEditingAppName, setIsEditingAppName] = useState(false);
     const [editedAppName, setEditedAppName] = useState(appName);
     
-    const [mounted, setMounted] = useState(false);
-    const { setTheme } = useEditMode().isEditMode ? { setTheme: () => {} } : require("next-themes");
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
+    const { setTheme } = useTheme();
 
     useEffect(() => {
         const fetchAppName = async () => {
@@ -236,19 +231,6 @@ const Header = () => {
         </div>
       </header>
     );
-
-    if (!mounted) {
-      return (
-          <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              <div className="container flex h-14 max-w-screen-2xl items-center">
-                  <div className="flex-1"></div>
-                  <div className="flex items-center justify-end gap-2">
-                      <div className="h-10 w-10"></div>
-                  </div>
-              </div>
-          </header>
-      )
-  }
 
   return headerContent;
 };
