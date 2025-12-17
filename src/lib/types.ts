@@ -150,6 +150,23 @@ export type UserProfile = {
     cvUrl?: string;
 };
 
+export type Exercise = {
+    id?: string;
+    name: string;
+    category: string;
+    createdAt?: Date | Timestamp;
+}
+
+export type WorkoutLog = {
+    id?: string;
+    exerciseId: string;
+    exerciseName: string;
+    duration: number; // in minutes
+    repetitions: number;
+    date: Date | Timestamp;
+}
+
+
 export interface GeneratedMCQ {
   question: string;
   options: string[];

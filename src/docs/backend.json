@@ -114,6 +114,30 @@
       },
       "required": ["name", "icon", "items", "createdAt"]
     },
+    "Exercise": {
+      "title": "Exercise",
+      "description": "Represents a fitness exercise.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "category", "createdAt"]
+    },
+    "WorkoutLog": {
+      "title": "Workout Log",
+      "description": "Represents a single workout session log.",
+      "type": "object",
+      "properties": {
+        "exerciseId": { "type": "string" },
+        "exerciseName": { "type": "string" },
+        "duration": { "type": "number", "description": "Duration in minutes" },
+        "repetitions": { "type": "number" },
+        "date": { "type": "string", "format": "date-time" }
+      },
+      "required": ["exerciseId", "exerciseName", "date"]
+    },
     "EnglishWord": {
       "title": "English Word",
       "type": "object",
@@ -296,6 +320,14 @@
     "/users/{userId}/skills/{skillId}": {
       "schema": { "$ref": "#/entities/Skill" },
       "description": "Stores user skills."
+    },
+    "/users/{userId}/fitnessExercises/{exerciseId}": {
+      "schema": { "$ref": "#/entities/Exercise" },
+      "description": "Stores user's custom fitness exercises."
+    },
+    "/users/{userId}/workoutLogs/{logId}": {
+      "schema": { "$ref": "#/entities/WorkoutLog" },
+      "description": "Stores user's workout logs."
     },
      "/users/{userId}/englishWords/{wordId}": {
       "schema": { "$ref": "#/entities/EnglishWord" }
