@@ -7,7 +7,6 @@ import React from 'react';
 export default function ScrollDownIndicator() {
   const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const currentElement = event.currentTarget;
-    // Find the next sibling element which is a section
     let nextSection = currentElement.parentElement?.nextElementSibling;
     while(nextSection && !nextSection.tagName.toLowerCase().startsWith('section')) {
         nextSection = nextSection.nextElementSibling;
