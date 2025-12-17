@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
@@ -50,7 +51,7 @@ export function EducationProvider({ children }: { children: ReactNode }) {
     const fetchEducation = async () => {
       setLoading(true);
       try {
-        const q = query(educationCollectionRef, orderBy("startDate", "desc"));
+        const q = query(educationCollectionRef, orderBy("startDate", "asc"));
         const educationSnapshot = await getDocs(q);
 
         if (educationSnapshot.empty) {
@@ -127,7 +128,7 @@ export function EducationProvider({ children }: { children: ReactNode }) {
             createdAt: new Date() 
         } as Education;
       
-        setEducation((prev) => [newEducation, ...prev].sort((a, b) => (b.startDate as Date).getTime() - (a.startDate as Date).getTime()));
+        setEducation((prev) => [...prev, newEducation].sort((a, b) => (a.startDate as Date).getTime() - (b.startDate as Date).getTime()));
 
         toast({
             title: "Амжилттай нэмэгдлээ",
@@ -155,7 +156,7 @@ export function EducationProvider({ children }: { children: ReactNode }) {
         ...(eduUpdate.endDate && { endDate: new Date(eduUpdate.endDate) }),
     }
 
-    setEducation(prev => prev.map(e => e.id === educationId ? { ...e, ...formattedUpdate } as Education : e));
+    setEducation(prev => prev.map(e => e.id === educationId ? { ...e, ...formattedUpdate } as Education : e).sort((a, b) => (a.startDate as Date).getTime() - (b.startDate as Date).getTime()));
 
     try {
       const educationDoc = doc(firestore, `users/${user.uid}/education`, educationId);
