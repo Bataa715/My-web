@@ -177,6 +177,29 @@ export default function AboutPage() {
                   <span className="matrix-text" data-text={name}>{name}</span> гэдэг
                 </h1>
             </div>
+            
+            <section className="w-full max-w-4xl">
+              <Card className="border-white/10 bg-black/20 backdrop-blur-sm">
+                <CardContent className="flex justify-around p-6">
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-primary">21</p>
+                    <p className="text-sm uppercase text-muted-foreground">Нас</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-primary">2003.07.15</p>
+                    <p className="text-sm uppercase text-muted-foreground">Төрсөн огноо</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-primary">Мэлхий</p>
+                    <p className="text-sm uppercase text-muted-foreground">Орд</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-primary">INTP-T</p>
+                    <p className="text-sm uppercase text-muted-foreground">MBTI</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
           </div>
       </div>
       
