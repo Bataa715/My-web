@@ -10,6 +10,7 @@ import { SkillsProvider } from "@/contexts/SkillsContext";
 import MainLayout from "@/components/MainLayout";
 import { EducationProvider } from "@/contexts/EducationContext";
 import { HobbyProvider } from "@/contexts/HobbyContext";
+import IntroOverlay from "@/components/IntroOverlay";
 
 export const metadata: Metadata = {
   title: "Kaizen",
@@ -35,6 +36,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-background font-body antialiased">
+        <IntroOverlay />
         <AppThemeProvider
           attribute="class"
           defaultTheme="system"
