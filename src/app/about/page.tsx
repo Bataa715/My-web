@@ -172,9 +172,10 @@ export default function AboutPage() {
        <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-114px)]">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
             <div className="matrix-text-container">
-              <h1 className="matrix-text" data-text={fullText}>
-                {fullText}
-              </h1>
+               <h1 className="text-3xl font-bold" style={{textShadow: '0 0 5px rgba(255,255,255,0.5)'}}>
+                  Сайн уу? Миний нэрийг{' '}
+                  <span className="matrix-text" data-text={name}>{name}</span> гэдэг
+                </h1>
             </div>
           </div>
       </div>
