@@ -25,6 +25,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Skeleton } from '@/components/ui/skeleton';
 
 
+const personalInfo = [
+    { value: "21", label: "Нас" },
+    { value: "2003.07.15", label: "Төрсөн огноо" },
+    { value: "Мэлхий", label: "Орд" },
+    { value: "INTP-T", label: "MBTI" },
+];
+
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
   const { isEditMode } = useEditMode();
@@ -113,7 +120,6 @@ export default function AboutPage() {
   };
 
   const name = "Batuka";
-  const fullText = `Сайн уу? Миний нэрийг ${name} гэдэг`;
   
   return (
     <div className="relative">
@@ -179,26 +185,14 @@ export default function AboutPage() {
             </div>
             
             <section className="w-full max-w-4xl">
-              <Card className="border-white/10 bg-black/20 backdrop-blur-sm">
-                <CardContent className="flex justify-around p-6">
-                  <div className="text-center">
-                    <p className="text-4xl font-bold text-primary">21</p>
-                    <p className="text-sm uppercase text-muted-foreground">Нас</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-4xl font-bold text-primary">2003.07.15</p>
-                    <p className="text-sm uppercase text-muted-foreground">Төрсөн огноо</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-4xl font-bold text-primary">Мэлхий</p>
-                    <p className="text-sm uppercase text-muted-foreground">Орд</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-4xl font-bold text-primary">INTP-T</p>
-                    <p className="text-sm uppercase text-muted-foreground">MBTI</p>
-                  </div>
-                </CardContent>
-              </Card>
+                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {personalInfo.map((info, index) => (
+                        <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-4 shadow-lg">
+                            <p className="text-4xl font-bold text-primary">{info.value}</p>
+                            <p className="text-sm uppercase text-muted-foreground mt-1">{info.label}</p>
+                        </Card>
+                    ))}
+                </div>
             </section>
           </div>
       </div>
