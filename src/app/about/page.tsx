@@ -24,29 +24,6 @@ import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const sentence = {
-  hidden: { opacity: 1 },
-  visible: {
-    opacity: 1,
-    transition: {
-      delay: 0.5,
-      staggerChildren: 0.08,
-    },
-  },
-};
-
-const letter = {
-  hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.8,
-      ease: [0.43, 0.13, 0.23, 0.96]
-    },
-  },
-};
-
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -60,7 +37,7 @@ export default function AboutPage() {
 
   const displayItems = useMemo(() => {
      if (isEditMode) {
-      return [...hobbies, { id: 'add-new-hobby', title: '', description: '', image: '', imageHint: '' }];
+      return [...hobbies, { id: 'add-new-hobby', title: '', description: '', image: '', imageHint: '', createdAt: new Date() }];
     }
     return hobbies;
   }, [hobbies, isEditMode]);
@@ -136,8 +113,7 @@ export default function AboutPage() {
   };
 
   const name = "Batuka";
-  const firstLine = "Сайн уу?";
-  const secondLine = `Миний нэрийг ${name} гэдэг`;
+  const fullText = `Сайн уу? Миний нэрийг ${name} гэдэг`;
   
   return (
     <div className="relative">
@@ -196,12 +172,9 @@ export default function AboutPage() {
        <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-114px)]">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
             <div className="matrix-text-container">
-              <h1 className="matrix-text" data-text={firstLine}>
-                {firstLine}
+              <h1 className="matrix-text" data-text={fullText}>
+                {fullText}
               </h1>
-              <h2 className="matrix-text matrix-text-h2" data-text={secondLine}>
-                {secondLine}
-              </h2>
             </div>
           </div>
       </div>
@@ -218,7 +191,10 @@ export default function AboutPage() {
           ) : (
             <div className="relative flex items-center justify-center h-[350px]">
                 {displayItems.length === 0 && !isEditMode ? (
-                     <p className="text-muted-foreground">Хобби олдсонгүй.</p>
+                     <div className="text-center">
+                        <p className="text-muted-foreground">Хобби олдсонгүй.</p>
+                        {user && <p className="text-sm text-muted-foreground mt-2">Засварлах горимд шинээр нэмнэ үү.</p>}
+                    </div>
                 ) : (
                 <div className="carousel-container">
                     <div className="carousel" style={{ transform: `rotateY(${-activeIndex * anglePerItem}deg)` }}>
@@ -343,4 +319,3 @@ export default function AboutPage() {
     </div>
   );
 }
-
