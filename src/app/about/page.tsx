@@ -177,29 +177,6 @@ export default function AboutPage() {
                   <span className="matrix-text" data-text={name}>{name}</span> гэдэг
                 </h1>
             </div>
-            
-            <section className="border-y border-white/10 py-8 w-full">
-              <div className="container mx-auto">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                  <div className="border-r border-white/10 last:border-r-0">
-                    <p className="text-4xl md:text-5xl font-bold text-primary">21</p>
-                    <p className="text-sm text-muted-foreground">Нас</p>
-                  </div>
-                  <div className="border-r border-white/10 last:border-r-0">
-                    <p className="text-4xl md:text-5xl font-bold text-primary">2</p>
-                    <p className="text-sm text-muted-foreground">Жилийн туршлага</p>
-                  </div>
-                  <div className="border-r border-white/10 last:border-r-0">
-                    <p className="text-4xl md:text-5xl font-bold text-primary">20</p>
-                    <p className="text-sm text-muted-foreground">Ажилласан төслүүд</p>
-                  </div>
-                  <div>
-                    <p className="text-4xl md:text-5xl font-bold text-primary">8</p>
-                    <p className="text-sm text-muted-foreground">Нэвтрүүлсэн төслүүд</p>
-                  </div>
-                </div>
-              </div>
-            </section>
           </div>
       </div>
       
