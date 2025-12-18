@@ -170,38 +170,39 @@ export default function AboutPage() {
         </div>
       )}
        <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-114px)]">
-         <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
+          <div className="flex flex-col items-center justify-center space-y-12">
             <div className="matrix-text-container">
                <h1 className="text-3xl font-bold" style={{textShadow: '0 0 5px rgba(255,255,255,0.5)'}}>
                   Сайн уу? Миний нэрийг{' '}
                   <span className="matrix-text" data-text={name}>{name}</span> гэдэг
                 </h1>
             </div>
+            
+            <section className="border-y border-white/10 py-8 w-full">
+              <div className="container mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                  <div className="border-r border-white/10 last:border-r-0">
+                    <p className="text-4xl md:text-5xl font-bold text-primary">21</p>
+                    <p className="text-sm text-muted-foreground">Нас</p>
+                  </div>
+                  <div className="border-r border-white/10 last:border-r-0">
+                    <p className="text-4xl md:text-5xl font-bold text-primary">2</p>
+                    <p className="text-sm text-muted-foreground">Жилийн туршлага</p>
+                  </div>
+                  <div className="border-r border-white/10 last:border-r-0">
+                    <p className="text-4xl md:text-5xl font-bold text-primary">20</p>
+                    <p className="text-sm text-muted-foreground">Ажилласан төслүүд</p>
+                  </div>
+                  <div>
+                    <p className="text-4xl md:text-5xl font-bold text-primary">8</p>
+                    <p className="text-sm text-muted-foreground">Нэвтрүүлсэн төслүүд</p>
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
       </div>
       
-      <section className="border-y border-white/10 py-8">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div className="border-r border-white/10 last:border-r-0">
-              <p className="text-4xl md:text-5xl font-bold text-primary">21</p>
-              <p className="text-sm text-muted-foreground">Нас</p>
-            </div>
-            <div className="border-r border-white/10 last:border-r-0">
-              <p className="text-4xl md:text-5xl font-bold text-primary">2</p>
-              <p className="text-sm text-muted-foreground">Жилийн туршлага</p>
-            </div>
-            <div className="border-r border-white/10 last:border-r-0">
-              <p className="text-4xl md:text-5xl font-bold text-primary">20</p>
-              <p className="text-sm text-muted-foreground">Ажилласан төслүүд</p>
-            </div>
-            <div>
-              <p className="text-4xl md:text-5xl font-bold text-primary">8</p>
-              <p className="text-sm text-muted-foreground">Нэвтрүүлсэн төслүүд</p>
-            </div>
-          </div>
-        </div>
-      </section>
       
       <section className="py-16 md:py-24 bg-background">
         <div className="container px-4 md:px-6">
