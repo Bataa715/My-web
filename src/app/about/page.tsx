@@ -138,20 +138,7 @@ export default function AboutPage() {
   const name = "Batuka";
   const firstLine = "Сайн уу?";
   const secondLine = `Миний нэрийг ${name} гэдэг`;
-
-  const wavingLetter = {
-    animate: (i:number) => ({
-      y: [0, -5, 0, 5, 0],
-      transition: {
-        delay: i * 0.1,
-        duration: 2,
-        repeat: Infinity,
-        repeatType: "loop",
-        ease: "easeInOut",
-      }
-    })
-  };
-
+  
   return (
     <div className="relative">
        {isEditMode && (
@@ -208,37 +195,14 @@ export default function AboutPage() {
       )}
        <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-114px)]">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
-             <motion.h1
-                className="text-3xl md:text-4xl lg:text-5xl text-muted-foreground font-light overflow-hidden flex"
-              >
-                {firstLine.split("").map((char, index) => (
-                  <motion.span 
-                    key={index}
-                    custom={index}
-                    variants={wavingLetter}
-                    animate="animate"
-                  >
-                    {char === " " ? "\u00A0" : char}
-                  </motion.span>
-                ))}
-              </motion.h1>
-              <motion.h2
-                className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight overflow-hidden flex flex-wrap justify-center"
-              >
-                {secondLine.split("").map((char, index) => (
-                   <motion.span
-                    key={index}
-                    custom={index + firstLine.length}
-                    variants={wavingLetter}
-                    animate="animate"
-                    className={cn(
-                        (name.includes(char) && secondLine.indexOf(char) >= secondLine.indexOf(name) && secondLine.indexOf(char) < secondLine.indexOf(name) + name.length) && "text-primary"
-                    )}
-                  >
-                    {char === " " ? "\u00A0" : char}
-                  </motion.span>
-                ))}
-              </motion.h2>
+            <div className="matrix-text-container">
+              <h1 className="matrix-text" data-text={firstLine}>
+                {firstLine}
+              </h1>
+              <h2 className="matrix-text matrix-text-h2" data-text={secondLine}>
+                {secondLine}
+              </h2>
+            </div>
           </div>
       </div>
       <section className="py-16 md:py-24 bg-background">
