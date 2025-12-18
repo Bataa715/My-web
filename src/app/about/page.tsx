@@ -24,28 +24,29 @@ import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
-const containerVariants = {
-  hidden: { opacity: 0 },
+const sentence = {
+  hidden: { opacity: 1 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      delay: 0.5,
+      staggerChildren: 0.15,
     },
   },
 };
 
-const letterVariants = {
-  hidden: { opacity: 0, y: 20 },
+const letter = {
+  hidden: { opacity: 0, y: 50 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      type: 'spring',
-      stiffness: 100,
-      damping: 10,
+      duration: 0.5,
+      ease: [0.43, 0.13, 0.23, 0.96]
     },
   },
 };
+
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -195,38 +196,29 @@ export default function AboutPage() {
        <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-114px)]">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
              <motion.h1
-              className="text-3xl md:text-4xl lg:text-5xl text-muted-foreground font-light"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {firstLine.split('').map((char, index) => (
-                <motion.span key={index} variants={letterVariants}>
-                  {char}
-                </motion.span>
-              ))}
-            </motion.h1>
-
-            <motion.h2
-              className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {secondLine.split(' ').map((word, wordIndex) => (
-                <span key={wordIndex} className="inline-block mr-4">
-                  {word.split('').map((char, charIndex) => (
-                    <motion.span
-                      key={charIndex}
-                      variants={letterVariants}
-                      className={cn(word === name && 'text-primary')}
-                    >
-                      {char}
-                    </motion.span>
-                  ))}
-                </span>
-              ))}
-            </motion.h2>
+                className="text-3xl md:text-4xl lg:text-5xl text-muted-foreground font-light overflow-hidden"
+                variants={sentence}
+                initial="hidden"
+                animate="visible"
+              >
+                {firstLine.split(" ").map((word, index) => (
+                  <motion.span key={index} className="inline-block" variants={letter}>
+                    {word}&nbsp;
+                  </motion.span>
+                ))}
+              </motion.h1>
+              <motion.h2
+                className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight overflow-hidden"
+                variants={sentence}
+                initial="hidden"
+                animate="visible"
+              >
+                {secondLine.split(" ").map((word, index) => (
+                  <motion.span key={index} className={cn("inline-block", word === name && "text-primary")} variants={letter}>
+                     {word}&nbsp;
+                  </motion.span>
+                ))}
+              </motion.h2>
           </div>
       </div>
       <section className="py-16 md:py-24 bg-background">
