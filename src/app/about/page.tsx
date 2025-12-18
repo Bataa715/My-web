@@ -30,7 +30,7 @@ const sentence = {
     opacity: 1,
     transition: {
       delay: 0.5,
-      staggerChildren: 0.15,
+      staggerChildren: 0.08,
     },
   },
 };
@@ -41,7 +41,7 @@ const letter = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.5,
+      duration: 0.8,
       ease: [0.43, 0.13, 0.23, 0.96]
     },
   },
@@ -139,6 +139,19 @@ export default function AboutPage() {
   const firstLine = "Сайн уу?";
   const secondLine = `Миний нэрийг ${name} гэдэг`;
 
+  const wavingLetter = {
+    animate: (i:number) => ({
+      y: [0, -5, 0, 5, 0],
+      transition: {
+        delay: i * 0.1,
+        duration: 2,
+        repeat: Infinity,
+        repeatType: "loop",
+        ease: "easeInOut",
+      }
+    })
+  };
+
   return (
     <div className="relative">
        {isEditMode && (
@@ -196,26 +209,33 @@ export default function AboutPage() {
        <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-114px)]">
          <div className="relative z-20 flex flex-col items-center justify-center space-y-6 px-4">
              <motion.h1
-                className="text-3xl md:text-4xl lg:text-5xl text-muted-foreground font-light overflow-hidden"
-                variants={sentence}
-                initial="hidden"
-                animate="visible"
+                className="text-3xl md:text-4xl lg:text-5xl text-muted-foreground font-light overflow-hidden flex"
               >
-                {firstLine.split(" ").map((word, index) => (
-                  <motion.span key={index} className="inline-block" variants={letter}>
-                    {word}&nbsp;
+                {firstLine.split("").map((char, index) => (
+                  <motion.span 
+                    key={index}
+                    custom={index}
+                    variants={wavingLetter}
+                    animate="animate"
+                  >
+                    {char === " " ? "\u00A0" : char}
                   </motion.span>
                 ))}
               </motion.h1>
               <motion.h2
-                className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight overflow-hidden"
-                variants={sentence}
-                initial="hidden"
-                animate="visible"
+                className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight overflow-hidden flex flex-wrap justify-center"
               >
-                {secondLine.split(" ").map((word, index) => (
-                  <motion.span key={index} className={cn("inline-block", word === name && "text-primary")} variants={letter}>
-                     {word}&nbsp;
+                {secondLine.split("").map((char, index) => (
+                   <motion.span
+                    key={index}
+                    custom={index + firstLine.length}
+                    variants={wavingLetter}
+                    animate="animate"
+                    className={cn(
+                        (name.includes(char) && secondLine.indexOf(char) >= secondLine.indexOf(name) && secondLine.indexOf(char) < secondLine.indexOf(name) + name.length) && "text-primary"
+                    )}
+                  >
+                    {char === " " ? "\u00A0" : char}
                   </motion.span>
                 ))}
               </motion.h2>
@@ -359,3 +379,4 @@ export default function AboutPage() {
     </div>
   );
 }
+
