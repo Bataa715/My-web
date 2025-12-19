@@ -43,7 +43,7 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({ title: 'Амжилттай нэвтэрлээ.' });
-      router.push('/home');
+      router.push('/');
 
     } catch (error: any) {
        let errorMessage = 'И-мэйл эсвэл нууц үг буруу байна.';
