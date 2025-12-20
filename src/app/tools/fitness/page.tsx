@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
@@ -242,7 +243,6 @@ export default function FitnessPage() {
           <BackButton />
           <div className="text-center pt-8">
               <h1 className="text-4xl font-bold">Fitness Tracker</h1>
-              <p className="mt-2 text-muted-foreground">Дасгалын тэмдэглэлээ хөтөлж, явцаа хянаарай.</p>
           </div>
           
            <div className="flex justify-center">
@@ -253,7 +253,6 @@ export default function FitnessPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><Dumbbell /> Дасгалууд</CardTitle>
-                        <CardDescription>Бүртгэлтэй дасгалууд. Дасгал дээрээ тэмдэглэл нэмээрэй.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {Object.keys(groupedExercises).map(category => (
@@ -304,3 +303,5 @@ export default function FitnessPage() {
         </div>
     )
 }
+
+    
