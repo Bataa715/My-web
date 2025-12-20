@@ -41,10 +41,10 @@ interface OrbitItemProps {
 const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick, isEditing }) => {
     const angle = (index / total) * 2 * Math.PI;
     
-    const baseRadius = 180;
-    const mdBaseRadius = 200;
-    const editingRadius = 210;
-    const mdEditingRadius = 230;
+    const baseRadius = 200;
+    const mdBaseRadius = 240;
+    const editingRadius = 230;
+    const mdEditingRadius = 270;
 
     const [currentRadius, setCurrentRadius] = useState(baseRadius);
 
@@ -423,10 +423,187 @@ export default function Hero() {
 
 
   return (
-    <section id="home" className="w-full py-12">
+     <section id="home" className="w-full flex items-center min-h-[calc(100vh-114px)] py-12">
       <div className="container px-4 md:px-6">
         <div className="grid items-center justify-center gap-10 lg:grid-cols-2 lg:gap-20">
-          <div className="flex flex-col justify-center space-y-6">
+          <div className="flex flex-col justify-center space-y-6 lg:order-2">
+            <div className="relative flex items-center justify-center w-full max-w-[500px] aspect-square mx-auto">
+             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[360px] h-[360px] md:w-[480px] md:h-[480px]" : "w-80 h-80 md:w-96 md:h-96")}>
+                <AnimatePresence>
+                    {selectedOrbit ? (
+                        <motion.div
+                            key="orbit-content"
+                            initial={{ rotateY: -180, opacity: 0, scale: 0.8 }}
+                            animate={{ rotateY: 0, opacity: 1, scale: 1 }}
+                            exit={{ rotateY: 180, opacity: 0, scale: 0.8 }}
+                            transition={{ duration: 0.6, ease: "easeInOut" }}
+                            className="absolute inset-0 flex flex-col items-center justify-center bg-muted rounded-full border-4 border-primary shadow-lg text-center overflow-hidden"
+                            onClick={handleCloseContent}
+                        >
+                           {selectedOrbit.backgroundImage && !isEditingOrbit && (
+                              <>
+                                <Image
+                                    src={selectedOrbit.backgroundImage}
+                                    alt={selectedOrbit.title}
+                                    fill
+                                    objectFit="cover"
+                                    className="z-0 opacity-20"
+                                />
+                                 <div className="absolute inset-0 bg-black/50 z-10" />
+                              </>
+                           )}
+                           
+                            <AnimatePresence mode="wait">
+                                {isEditingOrbit ? (
+                                    <motion.div
+                                        key="edit"
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        className="w-full h-full flex flex-col justify-center items-center"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <div className="w-full max-w-xs mx-auto p-6 space-y-2">
+                                            <div>
+                                                <Label className="text-center text-xs mb-1 block text-foreground">Нэр</Label>
+                                                <Input
+                                                    value={editedOrbitTitle}
+                                                    onChange={(e) => setEditedOrbitTitle(e.target.value)}
+                                                    className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
+                                                    placeholder="Нэр..."
+                                                />
+                                            </div>
+                                            {selectedOrbit.type !== 'audio' && (
+                                                <div className="space-y-2">
+                                                    <Label className="text-center text-xs mb-1 block text-foreground">Icon</Label>
+                                                    <IconPicker 
+                                                        selectedIcon={editedOrbitIcon} 
+                                                        onIconSelect={setEditedOrbitIcon}
+                                                    >
+                                                        <Button type="button" variant="outline" className="w-full h-8 text-sm justify-center gap-2 bg-transparent border-primary/50 focus:ring-primary text-foreground">
+                                                            {getIcon(editedOrbitIcon, {className: "h-4 w-4"})}
+                                                            <span>{editedOrbitIcon}</span>
+                                                        </Button>
+                                                    </IconPicker>
+                                                </div>
+                                            )}
+                                            <div>
+                                                <Label className="text-center text-xs mb-1 block text-foreground">Тайлбар</Label>
+                                                <Textarea 
+                                                    value={editedOrbitContent}
+                                                    onChange={(e) => setEditedOrbitContent(e.target.value)}
+                                                    className="text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                                    rows={2}
+                                                    placeholder="Тайлбар..."
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <Label className="text-center text-xs mb-1 block text-foreground">Арын зураг URL</Label>
+                                                <Input
+                                                    value={editedOrbitBgImage}
+                                                    onChange={(e) => setEditedOrbitBgImage(e.target.value)}
+                                                    className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
+                                                    placeholder="https://example.com/image.png"
+                                                />
+                                            </div>
+                                            {selectedOrbit.type === 'audio' && (
+                                                <div>
+                                                    <Label className="text-center text-xs mb-1 block text-foreground">YouTube холбоос</Label>
+                                                    <Input
+                                                        value={editedYoutubeUrl}
+                                                        onChange={(e) => setEditedYoutubeUrl(e.target.value)}
+                                                        className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
+                                                        placeholder="https://www.youtube.com/watch?v=..."
+                                                    />
+                                                </div>
+                                            )}
+                                            <div className="flex gap-2 justify-center pt-1">
+                                                <Button onClick={handleSaveOrbitInfo} size="icon" className="h-8 w-8" disabled={saving}>
+                                                    {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}
+                                                </Button>
+                                                <Button onClick={() => setIsEditingOrbit(false)} size="icon" variant="ghost" className="h-8 w-8">
+                                                    <XCircle className="h-4 w-4"/>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div 
+                                        key="view" 
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="relative w-full cursor-pointer z-20 p-4 flex flex-col items-center justify-center text-center" onClick={handleContentClick}>
+                                        <h3 className="text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
+                                         <p className="text-lg text-foreground">{selectedOrbit.content}</p>
+                                        
+                                        {selectedOrbit.type === 'audio' && selectedOrbit.youtubeVideoId && (
+                                            <Button variant="ghost" size="icon" className="mt-4 h-12 w-12" onClick={(e) => { e.stopPropagation(); setIsPlayerOpen(true); }}>
+                                                <PlayCircle className="h-10 w-10 text-primary" />
+                                            </Button>
+                                        )}
+
+                                        {isEditMode && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="absolute top-2 right-2 h-8 w-8 z-30 text-primary hover:text-primary/80"
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                        )}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+                    ) : (
+                        <motion.div
+                            key="avatar"
+                            initial={{ rotateY: 180, opacity: 0, scale: 0.8 }}
+                            animate={{ rotateY: 0, opacity: 1, scale: 1 }}
+                            exit={{ rotateY: -180, opacity: 0, scale: 0.8 }}
+                            transition={{ duration: 0.6, ease: "easeInOut" }}
+                            className="relative w-full h-full group"
+                        >
+                           <div className="avatar-glow-wrapper w-full h-full">
+                                <Avatar className="w-full h-full border-4 border-background">
+                                    <AvatarImage src={profileImage} alt={name} />
+                                    <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
+                                </Avatar>
+                            </div>
+                            {isEditMode && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                     <Button 
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => setIsEditingImage(true)}
+                                        className="h-12 w-12 rounded-full z-10 bg-background/50 backdrop-blur-sm"
+                                    >
+                                        <Upload className="h-5 w-5" />
+                                        <span className="sr-only">Зураг солих</span>
+                                    </Button>
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                {orbitInfo.map((item, index) => (
+                   <OrbitItem 
+                     key={item.id}
+                     item={item}
+                     index={index}
+                     total={orbitInfo.length}
+                     selectedOrbit={selectedOrbit}
+                     onItemClick={orbitItemClick}
+                     isEditing={!!selectedOrbit && isEditingOrbit}
+                   />
+                ))}
+                
+            </div>
+            </div>
+          </div>
+           <div className="flex flex-col items-center lg:items-start justify-center space-y-6 text-center lg:text-left lg:order-1">
             <div className="space-y-4">
                <div className="relative">
                 {isEditingName ? (
@@ -613,181 +790,6 @@ export default function Hero() {
                 )}
             </div>
           </div>
-          <div className="relative flex items-center justify-center w-full max-w-[400px] aspect-square mx-auto lg:max-w-none">
-             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[320px] h-[320px] md:w-[400px] md:h-[400px]" : "w-72 h-72 md:w-80 md:h-80")}>
-                <AnimatePresence>
-                    {selectedOrbit ? (
-                        <motion.div
-                            key="orbit-content"
-                            initial={{ rotateY: -180, opacity: 0, scale: 0.8 }}
-                            animate={{ rotateY: 0, opacity: 1, scale: 1 }}
-                            exit={{ rotateY: 180, opacity: 0, scale: 0.8 }}
-                            transition={{ duration: 0.6, ease: "easeInOut" }}
-                            className="absolute inset-0 flex flex-col items-center justify-center bg-muted rounded-full border-4 border-primary shadow-lg text-center overflow-hidden"
-                            onClick={handleCloseContent}
-                        >
-                           {selectedOrbit.backgroundImage && !isEditingOrbit && (
-                              <>
-                                <Image
-                                    src={selectedOrbit.backgroundImage}
-                                    alt={selectedOrbit.title}
-                                    fill
-                                    objectFit="cover"
-                                    className="z-0 opacity-20"
-                                />
-                                 <div className="absolute inset-0 bg-black/50 z-10" />
-                              </>
-                           )}
-                           
-                            <AnimatePresence mode="wait">
-                                {isEditingOrbit ? (
-                                    <motion.div
-                                        key="edit"
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.9 }}
-                                        className="w-full h-full flex flex-col justify-center items-center"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <div className="w-full max-w-xs mx-auto p-6 space-y-2">
-                                            <div>
-                                                <Label className="text-center text-xs mb-1 block text-foreground">Нэр</Label>
-                                                <Input
-                                                    value={editedOrbitTitle}
-                                                    onChange={(e) => setEditedOrbitTitle(e.target.value)}
-                                                    className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
-                                                    placeholder="Нэр..."
-                                                />
-                                            </div>
-                                            {selectedOrbit.type !== 'audio' && (
-                                                <div className="space-y-2">
-                                                    <Label className="text-center text-xs mb-1 block text-foreground">Icon</Label>
-                                                    <IconPicker 
-                                                        selectedIcon={editedOrbitIcon} 
-                                                        onIconSelect={setEditedOrbitIcon}
-                                                    >
-                                                        <Button type="button" variant="outline" className="w-full h-8 text-sm justify-center gap-2 bg-transparent border-primary/50 focus:ring-primary text-foreground">
-                                                            {getIcon(editedOrbitIcon, {className: "h-4 w-4"})}
-                                                            <span>{editedOrbitIcon}</span>
-                                                        </Button>
-                                                    </IconPicker>
-                                                </div>
-                                            )}
-                                            <div>
-                                                <Label className="text-center text-xs mb-1 block text-foreground">Тайлбар</Label>
-                                                <Textarea 
-                                                    value={editedOrbitContent}
-                                                    onChange={(e) => setEditedOrbitContent(e.target.value)}
-                                                    className="text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
-                                                    rows={2}
-                                                    placeholder="Тайлбар..."
-                                                />
-                                            </div>
-                                            
-                                            <div>
-                                                <Label className="text-center text-xs mb-1 block text-foreground">Арын зураг URL</Label>
-                                                <Input
-                                                    value={editedOrbitBgImage}
-                                                    onChange={(e) => setEditedOrbitBgImage(e.target.value)}
-                                                    className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
-                                                    placeholder="https://example.com/image.png"
-                                                />
-                                            </div>
-                                            {selectedOrbit.type === 'audio' && (
-                                                <div>
-                                                    <Label className="text-center text-xs mb-1 block text-foreground">YouTube холбоос</Label>
-                                                    <Input
-                                                        value={editedYoutubeUrl}
-                                                        onChange={(e) => setEditedYoutubeUrl(e.target.value)}
-                                                        className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
-                                                        placeholder="https://www.youtube.com/watch?v=..."
-                                                    />
-                                                </div>
-                                            )}
-                                            <div className="flex gap-2 justify-center pt-1">
-                                                <Button onClick={handleSaveOrbitInfo} size="icon" className="h-8 w-8" disabled={saving}>
-                                                    {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4"/>}
-                                                </Button>
-                                                <Button onClick={() => setIsEditingOrbit(false)} size="icon" variant="ghost" className="h-8 w-8">
-                                                    <XCircle className="h-4 w-4"/>
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                ) : (
-                                    <motion.div 
-                                        key="view" 
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="relative w-full cursor-pointer z-20 p-4 flex flex-col items-center justify-center text-center" onClick={handleContentClick}>
-                                        <h3 className="text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
-                                         <p className="text-lg text-foreground">{selectedOrbit.content}</p>
-                                        
-                                        {selectedOrbit.type === 'audio' && selectedOrbit.youtubeVideoId && (
-                                            <Button variant="ghost" size="icon" className="mt-4 h-12 w-12" onClick={(e) => { e.stopPropagation(); setIsPlayerOpen(true); }}>
-                                                <PlayCircle className="h-10 w-10 text-primary" />
-                                            </Button>
-                                        )}
-
-                                        {isEditMode && (
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="absolute top-2 right-2 h-8 w-8 z-30 text-primary hover:text-primary/80"
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                        )}
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </motion.div>
-                    ) : (
-                        <motion.div
-                            key="avatar"
-                            initial={{ rotateY: 180, opacity: 0, scale: 0.8 }}
-                            animate={{ rotateY: 0, opacity: 1, scale: 1 }}
-                            exit={{ rotateY: -180, opacity: 0, scale: 0.8 }}
-                            transition={{ duration: 0.6, ease: "easeInOut" }}
-                            className="relative w-full h-full group"
-                        >
-                           <div className="avatar-glow-wrapper w-full h-full">
-                                <Avatar className="w-full h-full border-4 border-background">
-                                    <AvatarImage src={profileImage} alt={name} />
-                                    <AvatarFallback>{name?.charAt(0) || 'K'}</AvatarFallback>
-                                </Avatar>
-                            </div>
-                            {isEditMode && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                     <Button 
-                                        variant="outline"
-                                        size="icon"
-                                        onClick={() => setIsEditingImage(true)}
-                                        className="h-12 w-12 rounded-full z-10 bg-background/50 backdrop-blur-sm"
-                                    >
-                                        <Upload className="h-5 w-5" />
-                                        <span className="sr-only">Зураг солих</span>
-                                    </Button>
-                                </div>
-                            )}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-                {orbitInfo.map((item, index) => (
-                   <OrbitItem 
-                     key={item.id}
-                     item={item}
-                     index={index}
-                     total={orbitInfo.length}
-                     selectedOrbit={selectedOrbit}
-                     onItemClick={orbitItemClick}
-                     isEditing={!!selectedOrbit && isEditingOrbit}
-                   />
-                ))}
-                
-            </div>
-          </div>
         </div>
       </div>
 
@@ -853,3 +855,4 @@ export default function Hero() {
 
 
     
+
