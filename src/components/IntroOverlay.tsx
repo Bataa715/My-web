@@ -11,7 +11,11 @@ const IntroOverlay = () => {
         setIsClient(true);
     }, []);
 
-    if (!isClient || animationComplete) {
+    if (!isClient) {
+        return null;
+    }
+    
+    if (animationComplete) {
         return null;
     }
 
