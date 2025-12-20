@@ -1,56 +1,35 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 const IntroOverlay = () => {
-    const [isMounted, setIsMounted] = useState(false);
     const [animationComplete, setAnimationComplete] = useState(false);
-    const pathname = usePathname();
     
-    useEffect(() => {
-        setIsMounted(true);
-    }, []);
-
-    useEffect(() => {
-        if(isMounted) {
-            setAnimationComplete(false);
-            const timer = setTimeout(() => setAnimationComplete(true), 1500); // Total animation duration
-            return () => clearTimeout(timer);
-        }
-    }, [pathname, isMounted]);
-
-
-    if (!isMounted || animationComplete) {
+    // If animation is complete, don't render anything
+    if (animationComplete) {
         return null;
     }
 
-    const slideIn = {
-        initial: { x: '0%' },
-        animate: { x: '100%' },
-    };
-
-     const slideOut = {
-        initial: { x: '-100%' },
-        animate: { x: '0%' },
+    const slideUp = {
+        initial: { y: 0 },
+        exit: { y: "-100%" }
     };
 
     return (
         <>
             <motion.div
                 className="fixed top-0 left-0 w-full h-full bg-primary z-[101]"
-                variants={slideIn}
-                initial="initial"
-                animate="animate"
-                transition={{ duration: 0.8, ease: [0.83, 0, 0.17, 1] }}
+                initial={{ y: '0%' }}
+                animate={{ y: '-100%' }}
+                transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.2 }}
             />
             <motion.div
                 className="fixed top-0 left-0 w-full h-full bg-black z-[100]"
-                variants={slideOut}
-                initial="initial"
-                animate="animate"
-                transition={{ duration: 0.8, ease: [0.83, 0, 0.17, 1] }}
+                initial={{ y: '0%' }}
+                animate={{ y: '-100%' }}
+                transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+                onAnimationComplete={() => setAnimationComplete(true)}
             />
         </>
     );
