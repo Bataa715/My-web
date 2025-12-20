@@ -8,7 +8,7 @@ import { useState, useEffect, useCallback, type CSSProperties, useMemo } from 'r
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
-import type { UserProfile, Hobby } from '@/lib/types';
+import type { UserProfile, Hobby, PersonalInfoItem as PersonalInfoType } from '@/lib/types';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
@@ -24,10 +24,6 @@ import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
-type PersonalInfoItem = {
-    label: string;
-    value: string;
-};
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -37,9 +33,9 @@ export default function AboutPage() {
   const [heroImage, setHeroImage] = useState<string | undefined>(undefined);
   const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
   const [editedImageUrl, setEditedImageUrl] = useState('');
-  const [personalInfo, setPersonalInfo] = useState<PersonalInfoItem[]>([]);
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfoType[]>([]);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
-  const [editingInfoItem, setEditingInfoItem] = useState<PersonalInfoItem | null>(null);
+  const [editingInfoItem, setEditingInfoItem] = useState<PersonalInfoType | null>(null);
   const [editingInfoValue, setEditingInfoValue] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -73,7 +69,19 @@ export default function AboutPage() {
             const data = docSnap.data() as UserProfile;
             imageUrl = data.aboutHeroImage;
             setEditedImageUrl(data.aboutHeroImage || '');
-            setPersonalInfo(data.personalInfo || []);
+            
+            if (data.personalInfo && data.personalInfo.length > 0) {
+              setPersonalInfo(data.personalInfo);
+            } else {
+              const defaultInfo: PersonalInfoType[] = [
+                  { value: "21", label: "Нас" },
+                  { value: "Мэлхий", label: "Орд" },
+                  { value: "INTP-T", label: "MBTI" },
+              ];
+              await updateDoc(userDocRef, { personalInfo: defaultInfo });
+              setPersonalInfo(defaultInfo);
+            }
+
           }
         } catch (error) {
             console.error("Error fetching user data:", error);
@@ -121,7 +129,7 @@ export default function AboutPage() {
       }
   };
 
-  const handleEditInfoClick = (info: PersonalInfoItem) => {
+  const handleEditInfoClick = (info: PersonalInfoType) => {
     setEditingInfoItem(info);
     setEditingInfoValue(info.value);
     setIsEditingInfo(true);
