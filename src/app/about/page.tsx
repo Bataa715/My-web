@@ -27,7 +27,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const personalInfo = [
     { value: "21", label: "Нас" },
-    { value: "2003.07.15", label: "Төрсөн огноо" },
     { value: "Мэлхий", label: "Орд" },
     { value: "INTP-T", label: "MBTI" },
 ];
@@ -185,7 +184,7 @@ export default function AboutPage() {
             </div>
             
             <section className="w-full max-w-4xl">
-                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {personalInfo.map((info, index) => (
                         <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-4 shadow-lg">
                             <p className="text-4xl font-bold text-primary">{info.value}</p>
