@@ -24,12 +24,10 @@ import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 
-
-const personalInfo = [
-    { value: "21", label: "Нас" },
-    { value: "Мэлхий", label: "Орд" },
-    { value: "INTP-T", label: "MBTI" },
-];
+type PersonalInfoItem = {
+    label: string;
+    value: string;
+};
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -39,6 +37,10 @@ export default function AboutPage() {
   const [heroImage, setHeroImage] = useState<string | undefined>(undefined);
   const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
   const [editedImageUrl, setEditedImageUrl] = useState('');
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfoItem[]>([]);
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
+  const [editingInfoItem, setEditingInfoItem] = useState<PersonalInfoItem | null>(null);
+  const [editingInfoValue, setEditingInfoValue] = useState('');
   const [saving, setSaving] = useState(false);
 
   const displayItems = useMemo(() => {
@@ -61,7 +63,7 @@ export default function AboutPage() {
   useEffect(() => {
     if (isUserLoading) return;
 
-    const fetchHeroImage = async () => {
+    const fetchUserData = async () => {
       let imageUrl;
       if (user && firestore) {
         try {
@@ -71,9 +73,10 @@ export default function AboutPage() {
             const data = docSnap.data() as UserProfile;
             imageUrl = data.aboutHeroImage;
             setEditedImageUrl(data.aboutHeroImage || '');
+            setPersonalInfo(data.personalInfo || []);
           }
         } catch (error) {
-            console.error("Error fetching user's hero image:", error);
+            console.error("Error fetching user data:", error);
         }
       }
       
@@ -86,7 +89,7 @@ export default function AboutPage() {
       setHeroImage(imageUrl);
     };
 
-    fetchHeroImage();
+    fetchUserData();
   }, [user, firestore, isUserLoading]);
   
   const handleSaveImage = async () => {
@@ -116,6 +119,38 @@ export default function AboutPage() {
               variant: 'destructive',
           });
       }
+  };
+
+  const handleEditInfoClick = (info: PersonalInfoItem) => {
+    setEditingInfoItem(info);
+    setEditingInfoValue(info.value);
+    setIsEditingInfo(true);
+  };
+  
+  const handleSavePersonalInfo = async () => {
+    if (!user || !firestore || !editingInfoItem) {
+        toast({ title: "Алдаа", description: "Нэвтэрч орно уу.", variant: "destructive" });
+        return;
+    }
+    setSaving(true);
+    try {
+        const updatedInfo = personalInfo.map(info => 
+            info.label === editingInfoItem.label ? { ...info, value: editingInfoValue } : info
+        );
+        const userDocRef = doc(firestore, 'users', user.uid);
+        await updateDoc(userDocRef, { personalInfo: updatedInfo });
+        
+        setPersonalInfo(updatedInfo);
+        setSaving(false);
+        setIsEditingInfo(false);
+        setEditingInfoItem(null);
+        toast({ title: "Амжилттай", description: "Мэдээлэл шинэчлэгдлээ." });
+
+    } catch (error) {
+        console.error("Error saving personal info:", error);
+        setSaving(false);
+        toast({ title: "Алдаа", description: "Мэдээлэл хадгалахад алдаа гарлаа.", variant: "destructive" });
+    }
   };
 
   const name = "Batuka";
@@ -186,7 +221,12 @@ export default function AboutPage() {
             <section className="w-full max-w-4xl">
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {personalInfo.map((info, index) => (
-                        <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-4 shadow-lg">
+                        <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-4 shadow-lg relative group">
+                            {isEditMode && (
+                                <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => handleEditInfoClick(info)}>
+                                    <Edit className="h-4 w-4" />
+                                </Button>
+                            )}
                             <p className="text-4xl font-bold text-primary">{info.value}</p>
                             <p className="text-sm uppercase text-muted-foreground mt-1">{info.label}</p>
                         </Card>
@@ -196,6 +236,34 @@ export default function AboutPage() {
           </div>
       </div>
       
+      <Dialog open={isEditingInfo} onOpenChange={setIsEditingInfo}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>"{editingInfoItem?.label}"-г засах</DialogTitle>
+            </DialogHeader>
+             <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="info-value" className="text-right">
+                        Утга
+                    </Label>
+                    <Input
+                        id="info-value"
+                        value={editingInfoValue}
+                        onChange={(e) => setEditingInfoValue(e.target.value)}
+                        className="col-span-3"
+                    />
+                </div>
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                    <Button type="button" variant="secondary" onClick={() => { setIsEditingInfo(false); setEditingInfoItem(null); }}>Цуцлах</Button>
+                </DialogClose>
+                <Button type="button" onClick={handleSavePersonalInfo} disabled={saving}>
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+      </Dialog>
       
       <section className="py-16 md:py-24 bg-background">
         <div className="container px-4 md:px-6">

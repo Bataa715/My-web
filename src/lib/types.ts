@@ -143,11 +143,17 @@ export type OrbitInfo = {
   youtubeVideoId?: string;
 };
 
+export type PersonalInfoItem = {
+    label: string;
+    value: string;
+};
+
 export type UserProfile = {
     appName?: string;
     name: string;
     bio: string;
     profileImage: string;
+    personalInfo?: PersonalInfoItem[];
     homeHeroImage?: string;
     aboutHeroImage?: string;
     toolsHeroImage?: string;

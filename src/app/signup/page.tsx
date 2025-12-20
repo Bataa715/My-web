@@ -62,6 +62,12 @@ export default function SignupPage() {
       const defaultAboutHeroImage = aboutHeroPlaceholder?.imageUrl;
       const defaultToolsHeroImage = toolsHeroPlaceholder?.imageUrl;
 
+      const defaultPersonalInfo = [
+          { value: "21", label: "Нас" },
+          { value: "Мэлхий", label: "Орд" },
+          { value: "INTP-T", label: "MBTI" },
+      ];
+
       const defaultOrbitInfo: OrbitInfo[] = [
           { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Энд байршлаа оруулна уу.', type: 'info' },
           { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Энд хоббигоо оруулна уу.', type: 'info' },
@@ -86,6 +92,7 @@ export default function SignupPage() {
         email: values.email,
         bio: "Энд өөрийнхөө тухай товч танилцуулга бичээрэй.",
         profileImage: defaultProfileImage,
+        personalInfo: defaultPersonalInfo,
         homeHeroImage: defaultHomeHeroImage,
         aboutHeroImage: defaultAboutHeroImage,
         toolsHeroImage: defaultToolsHeroImage,
