@@ -1,4 +1,3 @@
-
 "use client";
 
 import { motion } from 'framer-motion';
@@ -11,7 +10,7 @@ const IntroOverlay = () => {
 
     useEffect(() => {
         setAnimationComplete(false);
-        const timer = setTimeout(() => setAnimationComplete(true), 1400); // Animation duration + delay
+        const timer = setTimeout(() => setAnimationComplete(true), 1500); // Total animation duration
         return () => clearTimeout(timer);
     }, [pathname]);
 
@@ -20,21 +19,31 @@ const IntroOverlay = () => {
         return null;
     }
 
+    const slideIn = {
+        initial: { x: '0%' },
+        animate: { x: '100%' },
+    };
+
+     const slideOut = {
+        initial: { x: '-100%' },
+        animate: { x: '0%' },
+    };
+
     return (
         <>
-            {/* First layer */}
             <motion.div
-                className="fixed top-0 left-0 w-full h-full bg-black z-[101]"
-                initial={{ height: '100vh' }}
-                animate={{ height: 0 }}
-                transition={{ duration: 0.6, ease: [0.83, 0, 0.17, 1], delay: 0.6 }}
+                className="fixed top-0 left-0 w-full h-full bg-primary z-[101]"
+                variants={slideIn}
+                initial="initial"
+                animate="animate"
+                transition={{ duration: 0.8, ease: [0.83, 0, 0.17, 1] }}
             />
-            {/* Second layer */}
-             <motion.div
-                className="fixed top-0 left-0 w-full h-full bg-primary z-[100]"
-                initial={{ height: '100vh' }}
-                animate={{ height: 0 }}
-                transition={{ duration: 0.6, ease: [0.83, 0, 0.17, 1], delay: 0.8 }}
+            <motion.div
+                className="fixed top-0 left-0 w-full h-full bg-black z-[100]"
+                variants={slideOut}
+                initial="initial"
+                animate="animate"
+                transition={{ duration: 0.8, ease: [0.83, 0, 0.17, 1] }}
             />
         </>
     );
