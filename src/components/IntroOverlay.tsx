@@ -5,17 +5,24 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 const IntroOverlay = () => {
+    const [isMounted, setIsMounted] = useState(false);
     const [animationComplete, setAnimationComplete] = useState(false);
     const pathname = usePathname();
+    
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     useEffect(() => {
-        setAnimationComplete(false);
-        const timer = setTimeout(() => setAnimationComplete(true), 1500); // Total animation duration
-        return () => clearTimeout(timer);
-    }, [pathname]);
+        if(isMounted) {
+            setAnimationComplete(false);
+            const timer = setTimeout(() => setAnimationComplete(true), 1500); // Total animation duration
+            return () => clearTimeout(timer);
+        }
+    }, [pathname, isMounted]);
 
 
-    if (animationComplete) {
+    if (!isMounted || animationComplete) {
         return null;
     }
 
