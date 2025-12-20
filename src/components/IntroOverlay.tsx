@@ -1,20 +1,19 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const IntroOverlay = () => {
     const [animationComplete, setAnimationComplete] = useState(false);
-    
-    // If animation is complete, don't render anything
-    if (animationComplete) {
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    if (!isClient || animationComplete) {
         return null;
     }
-
-    const slideUp = {
-        initial: { y: 0 },
-        exit: { y: "-100%" }
-    };
 
     return (
         <>
