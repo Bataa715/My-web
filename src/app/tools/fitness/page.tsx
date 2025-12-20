@@ -276,7 +276,6 @@ export default function FitnessPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><BarChart/> Статистик</CardTitle>
-                        <CardDescription>Дасгал тус бүрийн нийт гүйцэтгэл.</CardDescription>
                     </CardHeader>
                      <CardContent className="space-y-2">
                         {Object.keys(stats).length > 0 ? (
@@ -303,5 +302,3 @@ export default function FitnessPage() {
         </div>
     )
 }
-
-    
