@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useEditMode } from '@/contexts/EditModeContext';
 
-export default function NotePage({ params }: { params: { noteId: string } }) {
+export default function NotePage({ params }: { params: Promise<{ noteId: string }> }) {
   const { firestore, user } = useFirebase();
   const { isEditMode } = useEditMode();
   const [note, setNote] = useState<Note | null>(null);
@@ -41,7 +41,7 @@ export default function NotePage({ params }: { params: { noteId: string } }) {
   
   const { toast } = useToast();
   const router = useRouter();
-  const { noteId } = params;
+  const { noteId } = React.use(params);
 
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
 
