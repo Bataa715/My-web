@@ -193,19 +193,23 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
       
        {isFlipped && (
           <motion.div 
-            className="mt-6 grid grid-cols-2 gap-4"
+            className="mt-6 grid grid-cols-2 gap-6"
           >
               <Button 
-                className="h-20 text-lg font-bold bg-red-500/10 border-2 border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-300 hover:text-red-200 transition-all duration-300 transform hover:scale-105"
+                variant="outline"
+                size="icon"
+                className="w-24 h-24 rounded-full mx-auto bg-red-500/10 border-2 border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-300 hover:text-red-200 transition-all duration-300 transform hover:scale-105"
                 onClick={() => handleNextCard(false)}
               >
-                <X className="mr-3 h-8 w-8" /> Мэдээгүй
+                <X className="h-10 w-10" />
               </Button>
               <Button 
-                className="h-20 text-lg font-bold bg-green-500/10 border-2 border-green-500/20 hover:bg-green-500/20 hover:border-green-500/40 text-green-300 hover:text-green-200 transition-all duration-300 transform hover:scale-105"
+                variant="outline"
+                size="icon"
+                className="w-24 h-24 rounded-full mx-auto bg-green-500/10 border-2 border-green-500/20 hover:bg-green-500/20 hover:border-green-500/40 text-green-300 hover:text-green-200 transition-all duration-300 transform hover:scale-105"
                 onClick={() => handleNextCard(true)}
               >
-                Мэдсэн <Check className="ml-3 h-8 w-8" />
+                <Check className="h-10 w-10" />
               </Button>
           </motion.div>
         )}
