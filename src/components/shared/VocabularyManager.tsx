@@ -36,7 +36,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { PlusCircle, Edit, Trash2, X, Heart, Loader2, Wand2, BookOpen, Brain, Bot, ChevronLeft, ChevronRight, ArrowLeft, ArrowRight } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, X, Heart, Loader2, Wand2, BookOpen, Brain, Bot, ChevronLeft, ChevronRight, Link as LinkIcon } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
 import { useFirebase } from '@/firebase';
@@ -51,6 +51,7 @@ import { Textarea } from '../ui/textarea';
 import { generateVocabulary } from '@/ai/flows/generate-vocabulary-flow';
 import FlashcardGame from './FlashcardGame';
 import TestGame from './TestGame';
+import MatchingGame from './MatchingGame';
 
 type Word = EnglishWord | JapaneseWord;
 
@@ -148,7 +149,7 @@ export default function VocabularyManager<T extends Word>({
   const [filter, setFilter] = useState<'all' | 'memorized' | 'not-memorized' | 'favorite'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [alphabetFilter, setAlphabetFilter] = useState<string | 'all'>('all');
-  const [gameMode, setGameMode] = useState<'flashcard' | 'test' | null>(null);
+  const [gameMode, setGameMode] = useState<'flashcard' | 'test' | 'matching' | null>(null);
   const { toast } = useToast();
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -433,6 +434,16 @@ export default function VocabularyManager<T extends Word>({
     )
   }
 
+  if (gameMode === 'matching') {
+    return (
+        <MatchingGame
+            words={filteredWords}
+            wordType={wordType}
+            onExit={() => setGameMode(null)}
+        />
+    )
+  }
+
   return (
     <>
         <Card>
@@ -674,14 +685,19 @@ export default function VocabularyManager<T extends Word>({
                          </Button>
                     </CardContent>
                 </Card>
-                 <Card className="opacity-50 cursor-not-allowed">
+                 <Card className="hover:shadow-primary/20 hover:shadow-lg transition-shadow">
                     <CardHeader className="flex-row items-center gap-4">
-                        <Bot className="w-8 h-8 text-muted-foreground" />
+                        <LinkIcon className="w-8 h-8 text-primary" />
                         <CardTitle>Холбох Арга</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <CardDescription>AI ашиглан үгсийг өгүүлбэр, түүхэнд холбож цээжлэх.</CardDescription>
-                         <Button className="mt-4 w-full" disabled>Удахгүй...</Button>
+                        <CardDescription>Англи болон Монгол үгсийг зөв хооронд нь холбох.</CardDescription>
+                         <Button className="mt-4 w-full" onClick={() => setGameMode('matching')} disabled={filteredWords.length < 5}>
+                            {filter === 'all' ? 'Бүх үгсээр' : 
+                           filter === 'memorized' ? 'Цээжилсэн үгсээр' : 
+                           filter === 'not-memorized' ? 'Цээжлээгүй үгсээр' : 
+                           filter === 'favorite' ? 'Онцолсон үгсээр' : ''} тоглох
+                         </Button>
                     </CardContent>
                 </Card>
             </div>
@@ -689,5 +705,7 @@ export default function VocabularyManager<T extends Word>({
     </>
   );
 }
+
+    
 
     
