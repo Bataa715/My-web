@@ -98,6 +98,7 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
     }
   };
 
+
   if(isFinished) {
       return (
           <Card className="w-full max-w-2xl mx-auto p-8 text-center">
@@ -110,7 +111,7 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
                         <p className="text-sm text-muted-foreground">Мэдсэн</p>
                     </div>
                     <div className="p-4 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                        <p className="text-4xl font-bold text-red-500 dark:text-red-400">{unknownWords.length}</p>
+                        <p className="text-4xl font-bold text-red-500 dark:red-400">{unknownWords.length}</p>
                         <p className="text-sm text-muted-foreground">Мэдээгүй</p>
                     </div>
                 </div>
