@@ -138,6 +138,18 @@
       },
       "required": ["name", "icon", "items", "createdAt"]
     },
+     "Note": {
+      "title": "Note",
+      "description": "Represents a single note, similar to a Notion page.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string", "description": "The main content of the note, in Markdown format." },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "createdAt", "updatedAt"]
+    },
     "Exercise": {
       "title": "Exercise",
       "description": "Represents a fitness exercise.",
@@ -348,6 +360,10 @@
     "/users/{userId}/skills/{skillId}": {
       "schema": { "$ref": "#/entities/Skill" },
       "description": "Stores user skills."
+    },
+     "/users/{userId}/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/Note" },
+      "description": "Stores user notes."
     },
     "/users/{userId}/fitnessExercises/{exerciseId}": {
       "schema": { "$ref": "#/entities/Exercise" },
