@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Repeat, ArrowLeft, Lightbulb, CheckCircle2 } from 'lucide-react';
+import { X, Check, Repeat, ArrowLeft, Lightbulb, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
@@ -26,10 +26,15 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
   const [knownWords, setKnownWords] = useState<string[]>([]);
   const [unknownWords, setUnknownWords] = useState<Word[]>([]);
   const [isFinished, setIsFinished] = useState(false);
+  
+  const [answeredCorrectly, setAnsweredCorrectly] = useState(0);
+  const [answeredIncorrectly, setAnsweredIncorrectly] = useState(0);
 
   useEffect(() => {
     // Shuffle the words to start
     setDeck([...words].sort(() => Math.random() - 0.5));
+    setAnsweredCorrectly(0);
+    setAnsweredIncorrectly(0);
   }, [words]);
 
   if (deck.length === 0 && !isFinished) {
@@ -44,12 +49,18 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
   const currentWord = deck[currentIndex];
 
   const handleNextCard = (known: boolean) => {
-    if (known && currentWord.id) {
-        if (!currentWord.memorized) { // Only add if it wasn't already memorized
-            setKnownWords(prev => [...prev, currentWord.id!]);
+    if (known) {
+        if (currentWord.id && !knownWords.includes(currentWord.id)) {
+            if (!currentWord.memorized) {
+              setKnownWords(prev => [...prev, currentWord.id!]);
+            }
         }
+        setAnsweredCorrectly(prev => prev + 1);
     } else {
-        setUnknownWords(prev => [...prev, currentWord]);
+        if (!unknownWords.some(w => w.id === currentWord.id)) {
+            setUnknownWords(prev => [...prev, currentWord]);
+        }
+        setAnsweredIncorrectly(prev => prev + 1);
     }
 
     setIsFlipped(false);
@@ -70,6 +81,8 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
     setKnownWords([]);
     setUnknownWords([]);
     setIsFinished(false);
+    setAnsweredCorrectly(0);
+    setAnsweredIncorrectly(0);
   }
 
   const getCardContent = (word: Word, side: 'front' | 'back') => {
@@ -108,11 +121,11 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
                 <p className="text-lg text-muted-foreground mb-6">Та энэ удаагийн давтлагыг дуусгалаа.</p>
                 <div className="grid grid-cols-2 gap-4 mb-8">
                     <div className="p-4 bg-green-900/30 rounded-lg">
-                        <p className="text-4xl font-bold text-green-400">{knownWords.length + deck.filter(w => w.memorized && !unknownWords.some(uw => uw.id === w.id)).length}</p>
+                        <p className="text-4xl font-bold text-green-400">{answeredCorrectly}</p>
                         <p className="text-sm text-muted-foreground">Мэдсэн</p>
                     </div>
                     <div className="p-4 bg-red-900/30 rounded-lg">
-                        <p className="text-4xl font-bold text-red-400">{unknownWords.length}</p>
+                        <p className="text-4xl font-bold text-red-400">{answeredIncorrectly}</p>
                         <p className="text-sm text-muted-foreground">Мэдээгүй</p>
                     </div>
                 </div>
@@ -132,7 +145,17 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
     <div className="w-full max-w-2xl mx-auto">
         <div className="flex items-center gap-4 mb-4">
             <Button variant="ghost" size="icon" onClick={onExit}><ArrowLeft/></Button>
-            <Progress value={progress} className="w-full h-2" />
+            <div className="flex-grow flex items-center gap-4">
+                 <div className="flex items-center gap-2 text-red-400">
+                    <X className="h-5 w-5" />
+                    <span className="font-bold text-lg">{answeredIncorrectly}</span>
+                </div>
+                <Progress value={progress} className="w-full h-2" />
+                 <div className="flex items-center gap-2 text-green-400">
+                    <Check className="h-5 w-5" />
+                    <span className="font-bold text-lg">{answeredCorrectly}</span>
+                </div>
+            </div>
             <span className="text-sm text-muted-foreground font-mono whitespace-nowrap">{currentIndex + 1} / {deck.length}</span>
         </div>
 
@@ -140,13 +163,14 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
             className="w-full h-[350px] [perspective:1200px] cursor-pointer" 
             onClick={() => setIsFlipped(!isFlipped)}
         >
-            <AnimatePresence>
+            <AnimatePresence initial={false}>
                 <motion.div
                     key={currentIndex}
-                    className="relative w-full h-full [transform-style:preserve-3d] transition-transform duration-700"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1, rotateY: isFlipped ? 180 : 0 }}
-                    transition={{ duration: 0.6, ease: "easeInOut" }}
+                    className="relative w-full h-full [transform-style:preserve-3d]"
+                    initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                    animate={{ opacity: 1, scale: 1, y: 0, rotateY: isFlipped ? 180 : 0 }}
+                    exit={{ opacity: 0, scale: 0.8, y: -50}}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
                 >
                     {/* Front of Card */}
                     <div className="absolute w-full h-full [backface-visibility:hidden]">
@@ -166,32 +190,28 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
                 </motion.div>
             </AnimatePresence>
       </div>
-
+      
        {!isFlipped && (
           <div className="text-center text-muted-foreground mt-4 flex items-center justify-center gap-2">
             <Lightbulb className="h-4 w-4" />
             <span>Карт дээр дарж хариултаа хараарай.</span>
           </div>
         )}
-      
+
       <motion.div 
         className="mt-6 grid grid-cols-2 gap-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: isFlipped ? 1 : 0, y: isFlipped ? 0 : 20 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-        style={{ pointerEvents: isFlipped ? 'auto' : 'none' }}
       >
           <Button 
-            className="h-20 text-lg font-bold text-red-200 bg-red-500/20 border-2 border-red-500/30 hover:bg-red-500/40 hover:border-red-500/50 hover:text-white transition-all duration-300 transform hover:scale-105"
+            className="h-20 text-lg font-bold bg-red-500/10 border-2 border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-300 hover:text-red-200 transition-all duration-300 transform hover:scale-105"
             onClick={() => handleNextCard(false)}
           >
-            <X className="mr-3 h-8 w-8" /> Мэдээгүй
+            <ArrowLeft className="mr-3 h-8 w-8" /> Мэдээгүй
           </Button>
           <Button 
-            className="h-20 text-lg font-bold text-green-200 bg-green-500/20 border-2 border-green-500/30 hover:bg-green-500/40 hover:border-green-500/50 hover:text-white transition-all duration-300 transform hover:scale-105"
+            className="h-20 text-lg font-bold bg-green-500/10 border-2 border-green-500/20 hover:bg-green-500/20 hover:border-green-500/40 text-green-300 hover:text-green-200 transition-all duration-300 transform hover:scale-105"
             onClick={() => handleNextCard(true)}
           >
-            <Check className="mr-3 h-8 w-8" /> Мэдсэн
+            Мэдсэн <ArrowRight className="ml-3 h-8 w-8" />
           </Button>
       </motion.div>
 
