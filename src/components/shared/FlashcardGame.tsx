@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Repeat, ArrowLeft, Lightbulb } from 'lucide-react';
+import { X, Check, Repeat, ArrowLeft, Lightbulb, CheckCircle2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
@@ -75,24 +75,24 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
   const getCardContent = (word: Word, side: 'front' | 'back') => {
     if (wordType === 'english') {
       const w = word as EnglishWord;
-      if (side === 'front') return <h2 className="text-4xl md:text-5xl font-bold text-center">{w.word}</h2>;
+      if (side === 'front') return <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground">{w.word}</h2>;
       return (
         <div className="text-center">
-          <p className="text-3xl font-semibold">{w.translation}</p>
-          {w.definition && <p className="text-base text-white/70 mt-4">{w.definition}</p>}
+          <p className="text-3xl font-semibold text-primary">{w.translation}</p>
+          {w.definition && <p className="text-base text-foreground/70 mt-4">{w.definition}</p>}
         </div>
       );
     } else {
       const w = word as JapaneseWord;
       if (side === 'front') return (
         <div className="text-center">
-            <h2 className="text-6xl md:text-7xl font-bold">{w.word}</h2>
-            <p className="text-lg text-white/70 mt-2">{w.romaji}</p>
+            <h2 className="text-6xl md:text-7xl font-bold text-foreground">{w.word}</h2>
+            <p className="text-lg text-foreground/70 mt-2">{w.romaji}</p>
         </div>
       );
       return (
          <div className="text-center">
-             <p className="text-3xl font-semibold">{w.meaning}</p>
+             <p className="text-3xl font-semibold text-primary">{w.meaning}</p>
          </div>
       );
     }
@@ -108,7 +108,7 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
                 <p className="text-lg text-muted-foreground mb-6">Та энэ удаагийн давтлагыг дуусгалаа.</p>
                 <div className="grid grid-cols-2 gap-4 mb-8">
                     <div className="p-4 bg-green-900/30 rounded-lg">
-                        <p className="text-4xl font-bold text-green-400">{knownWords.length}</p>
+                        <p className="text-4xl font-bold text-green-400">{knownWords.length + deck.filter(w => w.memorized && !unknownWords.some(uw => uw.id === w.id)).length}</p>
                         <p className="text-sm text-muted-foreground">Мэдсэн</p>
                     </div>
                     <div className="p-4 bg-red-900/30 rounded-lg">
@@ -137,30 +137,29 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
         </div>
 
         <div 
-            className="w-full h-[350px] perspective-[1200px] cursor-pointer" 
+            className="w-full h-[350px] [perspective:1200px] cursor-pointer" 
             onClick={() => setIsFlipped(!isFlipped)}
         >
             <AnimatePresence>
                 <motion.div
                     key={currentIndex}
-                    className="relative w-full h-full preserve-3d"
+                    className="relative w-full h-full [transform-style:preserve-3d] transition-transform duration-700"
                     initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    style={{ transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
+                    animate={{ opacity: 1, scale: 1, rotateY: isFlipped ? 180 : 0 }}
+                    transition={{ duration: 0.6, ease: "easeInOut" }}
                 >
                     {/* Front of Card */}
-                    <div className="absolute w-full h-full backface-hidden">
-                        <div className="card-face card-front flex items-center justify-center p-6 text-white">
+                    <div className="absolute w-full h-full [backface-visibility:hidden]">
+                        <div className="card-face card-front flex items-center justify-center p-6">
                             {currentWord && getCardContent(currentWord, 'front')}
                         </div>
                     </div>
                     {/* Back of Card */}
                     <div
-                        className="absolute w-full h-full backface-hidden"
+                        className="absolute w-full h-full [backface-visibility:hidden]"
                         style={{ transform: 'rotateY(180deg)' }}
                     >
-                        <div className="card-face card-back flex items-center justify-center p-6 text-white">
+                        <div className="card-face card-back flex items-center justify-center p-6">
                             {currentWord && getCardContent(currentWord, 'back')}
                         </div>
                     </div>
@@ -197,15 +196,12 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
       </motion.div>
 
       <style jsx>{`
-        .perspective-1200 { perspective: 1200px; }
-        .preserve-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
         .card-face {
             width: 100%;
             height: 100%;
             border-radius: 1rem;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2), 0 6px 6px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid hsl(var(--border) / 0.5);
             position: relative;
             overflow: hidden;
         }
@@ -216,15 +212,15 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at top left, hsla(var(--primary) / 0.1), transparent 40%),
-                        radial-gradient(circle at bottom right, hsla(var(--accent) / 0.1), transparent 40%);
+            background: radial-gradient(circle at top left, hsl(var(--primary) / 0.1), transparent 40%),
+                        radial-gradient(circle at bottom right, hsl(var(--accent) / 0.1), transparent 40%);
             pointer-events: none;
         }
         .card-front {
-             background: linear-gradient(135deg, hsl(var(--background) / 0.9), hsl(var(--muted) / 0.9));
+             background: linear-gradient(135deg, hsl(var(--card)), hsl(var(--muted)));
         }
         .card-back {
-             background: linear-gradient(135deg, hsl(var(--secondary) / 0.9), hsl(var(--background) / 0.9));
+             background: linear-gradient(135deg, hsl(var(--secondary) / 0.8), hsl(var(--card) / 0.8));
         }
       `}</style>
     </div>
