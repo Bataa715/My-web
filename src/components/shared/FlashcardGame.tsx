@@ -191,29 +191,24 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
             </AnimatePresence>
       </div>
       
-       {!isFlipped && (
-          <div className="text-center text-muted-foreground mt-4 flex items-center justify-center gap-2">
-            <Lightbulb className="h-4 w-4" />
-            <span>Карт дээр дарж хариултаа хараарай.</span>
-          </div>
+       {isFlipped && (
+          <motion.div 
+            className="mt-6 grid grid-cols-2 gap-4"
+          >
+              <Button 
+                className="h-20 text-lg font-bold bg-red-500/10 border-2 border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-300 hover:text-red-200 transition-all duration-300 transform hover:scale-105"
+                onClick={() => handleNextCard(false)}
+              >
+                <X className="mr-3 h-8 w-8" /> Мэдээгүй
+              </Button>
+              <Button 
+                className="h-20 text-lg font-bold bg-green-500/10 border-2 border-green-500/20 hover:bg-green-500/20 hover:border-green-500/40 text-green-300 hover:text-green-200 transition-all duration-300 transform hover:scale-105"
+                onClick={() => handleNextCard(true)}
+              >
+                Мэдсэн <Check className="ml-3 h-8 w-8" />
+              </Button>
+          </motion.div>
         )}
-
-      <motion.div 
-        className="mt-6 grid grid-cols-2 gap-4"
-      >
-          <Button 
-            className="h-20 text-lg font-bold bg-red-500/10 border-2 border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-300 hover:text-red-200 transition-all duration-300 transform hover:scale-105"
-            onClick={() => handleNextCard(false)}
-          >
-            <ArrowLeft className="mr-3 h-8 w-8" /> Мэдээгүй
-          </Button>
-          <Button 
-            className="h-20 text-lg font-bold bg-green-500/10 border-2 border-green-500/20 hover:bg-green-500/20 hover:border-green-500/40 text-green-300 hover:text-green-200 transition-all duration-300 transform hover:scale-105"
-            onClick={() => handleNextCard(true)}
-          >
-            Мэдсэн <ArrowRight className="ml-3 h-8 w-8" />
-          </Button>
-      </motion.div>
 
       <style jsx>{`
         .card-face {
