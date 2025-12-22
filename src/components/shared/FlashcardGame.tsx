@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, Repeat, ArrowLeft } from 'lucide-react';
+import { X, Check, Repeat, ArrowLeft, Lightbulb } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
@@ -75,24 +75,24 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
   const getCardContent = (word: Word, side: 'front' | 'back') => {
     if (wordType === 'english') {
       const w = word as EnglishWord;
-      if (side === 'front') return <h2 className="text-4xl font-bold text-center">{w.word}</h2>;
+      if (side === 'front') return <h2 className="text-4xl md:text-5xl font-bold text-center">{w.word}</h2>;
       return (
         <div className="text-center">
-          <p className="text-2xl font-semibold">{w.translation}</p>
-          {w.definition && <p className="text-sm text-muted-foreground mt-2">{w.definition}</p>}
+          <p className="text-3xl font-semibold">{w.translation}</p>
+          {w.definition && <p className="text-base text-white/70 mt-4">{w.definition}</p>}
         </div>
       );
     } else {
       const w = word as JapaneseWord;
       if (side === 'front') return (
         <div className="text-center">
-            <h2 className="text-6xl font-bold">{w.word}</h2>
-            <p className="text-lg text-muted-foreground">{w.romaji}</p>
+            <h2 className="text-6xl md:text-7xl font-bold">{w.word}</h2>
+            <p className="text-lg text-white/70 mt-2">{w.romaji}</p>
         </div>
       );
       return (
          <div className="text-center">
-             <p className="text-2xl font-semibold">{w.meaning}</p>
+             <p className="text-3xl font-semibold">{w.meaning}</p>
          </div>
       );
     }
@@ -101,17 +101,18 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
 
   if(isFinished) {
       return (
-          <Card className="w-full max-w-2xl mx-auto p-8 text-center">
-            <CardContent>
+          <Card className="w-full max-w-2xl mx-auto p-8 text-center bg-card/80 backdrop-blur-sm border-primary/20">
+            <CardContent className="p-0">
+                <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
                 <h2 className="text-3xl font-bold mb-4">Баяр хүргэе!</h2>
                 <p className="text-lg text-muted-foreground mb-6">Та энэ удаагийн давтлагыг дуусгалаа.</p>
                 <div className="grid grid-cols-2 gap-4 mb-8">
-                    <div className="p-4 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                        <p className="text-4xl font-bold text-green-600 dark:text-green-400">{knownWords.length}</p>
+                    <div className="p-4 bg-green-900/30 rounded-lg">
+                        <p className="text-4xl font-bold text-green-400">{knownWords.length}</p>
                         <p className="text-sm text-muted-foreground">Мэдсэн</p>
                     </div>
-                    <div className="p-4 bg-red-100 dark:bg-red-900/30 rounded-lg">
-                        <p className="text-4xl font-bold text-red-500 dark:red-400">{unknownWords.length}</p>
+                    <div className="p-4 bg-red-900/30 rounded-lg">
+                        <p className="text-4xl font-bold text-red-400">{unknownWords.length}</p>
                         <p className="text-sm text-muted-foreground">Мэдээгүй</p>
                     </div>
                 </div>
@@ -131,61 +132,100 @@ export default function FlashcardGame({ words, wordType, onComplete, onExit }: F
     <div className="w-full max-w-2xl mx-auto">
         <div className="flex items-center gap-4 mb-4">
             <Button variant="ghost" size="icon" onClick={onExit}><ArrowLeft/></Button>
-            <Progress value={progress} className="w-full" />
+            <Progress value={progress} className="w-full h-2" />
             <span className="text-sm text-muted-foreground font-mono whitespace-nowrap">{currentIndex + 1} / {deck.length}</span>
         </div>
 
         <div 
-            className="w-full h-[300px] perspective-[1000px] cursor-pointer" 
+            className="w-full h-[350px] perspective-[1200px] cursor-pointer" 
             onClick={() => setIsFlipped(!isFlipped)}
         >
             <AnimatePresence>
                 <motion.div
                     key={currentIndex}
                     className="relative w-full h-full preserve-3d"
-                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
                     style={{ transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
                 >
                     {/* Front of Card */}
-                    <motion.div className="absolute w-full h-full backface-hidden">
-                        <Card className="w-full h-full flex items-center justify-center p-6">
-                            {getCardContent(currentWord, 'front')}
-                        </Card>
-                    </motion.div>
+                    <div className="absolute w-full h-full backface-hidden">
+                        <div className="card-face card-front flex items-center justify-center p-6 text-white">
+                            {currentWord && getCardContent(currentWord, 'front')}
+                        </div>
+                    </div>
                     {/* Back of Card */}
-                    <motion.div
+                    <div
                         className="absolute w-full h-full backface-hidden"
                         style={{ transform: 'rotateY(180deg)' }}
                     >
-                        <Card className="w-full h-full flex items-center justify-center p-6 bg-muted">
-                            {getCardContent(currentWord, 'back')}
-                        </Card>
-                    </motion.div>
+                        <div className="card-face card-back flex items-center justify-center p-6 text-white">
+                            {currentWord && getCardContent(currentWord, 'back')}
+                        </div>
+                    </div>
                 </motion.div>
             </AnimatePresence>
       </div>
+
+       {!isFlipped && (
+          <div className="text-center text-muted-foreground mt-4 flex items-center justify-center gap-2">
+            <Lightbulb className="h-4 w-4" />
+            <span>Карт дээр дарж хариултаа хараарай.</span>
+          </div>
+        )}
       
-      <div className={cn("mt-6 grid grid-cols-2 gap-4 transition-opacity duration-300", !isFlipped && "opacity-0 pointer-events-none")}>
+      <motion.div 
+        className="mt-6 grid grid-cols-2 gap-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: isFlipped ? 1 : 0, y: isFlipped ? 0 : 20 }}
+        transition={{ duration: 0.3, delay: 0.1 }}
+        style={{ pointerEvents: isFlipped ? 'auto' : 'none' }}
+      >
           <Button 
-            className="bg-red-500 hover:bg-red-600 text-white h-16 text-lg"
+            className="h-20 text-lg font-bold text-red-200 bg-red-500/20 border-2 border-red-500/30 hover:bg-red-500/40 hover:border-red-500/50 hover:text-white transition-all duration-300 transform hover:scale-105"
             onClick={() => handleNextCard(false)}
-        >
-            <X className="mr-2" /> Мэдээгүй
+          >
+            <X className="mr-3 h-8 w-8" /> Мэдээгүй
           </Button>
           <Button 
-            className="bg-green-500 hover:bg-green-600 text-white h-16 text-lg"
+            className="h-20 text-lg font-bold text-green-200 bg-green-500/20 border-2 border-green-500/30 hover:bg-green-500/40 hover:border-green-500/50 hover:text-white transition-all duration-300 transform hover:scale-105"
             onClick={() => handleNextCard(true)}
           >
-            <Check className="mr-2" /> Мэдсэн
+            <Check className="mr-3 h-8 w-8" /> Мэдсэн
           </Button>
-      </div>
+      </motion.div>
 
       <style jsx>{`
-        .perspective-1000 { perspective: 1000px; }
+        .perspective-1200 { perspective: 1200px; }
         .preserve-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+        .card-face {
+            width: 100%;
+            height: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2), 0 6px 6px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .card-face::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top left, hsla(var(--primary) / 0.1), transparent 40%),
+                        radial-gradient(circle at bottom right, hsla(var(--accent) / 0.1), transparent 40%);
+            pointer-events: none;
+        }
+        .card-front {
+             background: linear-gradient(135deg, hsl(var(--background) / 0.9), hsl(var(--muted) / 0.9));
+        }
+        .card-back {
+             background: linear-gradient(135deg, hsl(var(--secondary) / 0.9), hsl(var(--background) / 0.9));
+        }
       `}</style>
     </div>
   );
