@@ -36,7 +36,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { PlusCircle, Edit, Trash2, X, Heart, Loader2, Wand2, BookOpen, Brain, Bot } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, X, Heart, Loader2, Wand2, BookOpen, Brain, Bot, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
 import { useFirebase } from '@/firebase';
@@ -148,6 +148,9 @@ export default function VocabularyManager<T extends Word>({
   const [gameMode, setGameMode] = useState<'flashcard' | null>(null);
   const { toast } = useToast();
   
+  const [currentPage, setCurrentPage] = useState(1);
+  const wordsPerPage = 15;
+
   const collectionPath = wordType === 'english' ? 'englishWords' : 'japaneseWords';
   const initialData = wordType === 'english' ? initialEnglishWords : initialJapaneseWords;
 
@@ -191,6 +194,7 @@ export default function VocabularyManager<T extends Word>({
 
 
   const filteredWords = useMemo(() => {
+    setCurrentPage(1); // Reset to first page whenever filters change
     return words
         .filter(word => {
             if (filter === 'memorized') return word.memorized;
@@ -219,6 +223,11 @@ export default function VocabularyManager<T extends Word>({
                    secondaryValue.toLowerCase().includes(searchQuery.toLowerCase());
         });
   }, [words, filter, alphabetFilter, searchQuery, wordType]);
+
+  const indexOfLastWord = currentPage * wordsPerPage;
+  const indexOfFirstWord = indexOfLastWord - wordsPerPage;
+  const currentWords = filteredWords.slice(indexOfFirstWord, indexOfLastWord);
+  const totalPages = Math.ceil(filteredWords.length / wordsPerPage);
 
 
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -378,6 +387,8 @@ export default function VocabularyManager<T extends Word>({
     }
   };
 
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
   if (loading) {
     return <div className="space-y-4 pt-8">
         <div className="flex justify-between items-center">
@@ -528,7 +539,7 @@ export default function VocabularyManager<T extends Word>({
                 </TableRow>
                 </TableHeader>
                 <TableBody>
-                {filteredWords.map(word => (
+                {currentWords.map(word => (
                     <TableRow key={word.id} className={cn(word.memorized && 'bg-primary/10 hover:bg-primary/20')}>
                     {columns.map(col => <TableCell key={`${word.id}-${col.key as string}`}>{word[col.key as keyof Word] as string}</TableCell>)}
                     <TableCell>
@@ -585,6 +596,36 @@ export default function VocabularyManager<T extends Word>({
                     </div>
                 )}
             </div>
+             {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-4">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => paginate(currentPage - 1)}
+                        disabled={currentPage === 1}
+                    >
+                        <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+                        <Button
+                            key={number}
+                            variant={currentPage === number ? "default" : "outline"}
+                            size="icon"
+                            onClick={() => paginate(number)}
+                        >
+                            {number}
+                        </Button>
+                    ))}
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => paginate(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                    >
+                        <ChevronRight className="h-4 w-4" />
+                    </Button>
+                </div>
+            )}
         </CardContent>
         </Card>
         <div className="mt-8">
@@ -630,3 +671,5 @@ export default function VocabularyManager<T extends Word>({
     </>
   );
 }
+
+    
