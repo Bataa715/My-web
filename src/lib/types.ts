@@ -1,4 +1,5 @@
 
+
 import type { Timestamp } from 'firebase/firestore';
 
 export interface EnglishWord {
@@ -205,4 +206,10 @@ export interface GeneratedWritingTask {
 export interface GeneratedExercises {
   multipleChoiceQuestions: GeneratedMCQ[];
   writingTasks: GeneratedWritingTask[];
+}
+
+export interface GeneratedWord {
+  word: string;
+  translation: string;
+  definition?: string;
 }

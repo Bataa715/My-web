@@ -20,6 +20,7 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -35,7 +36,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { PlusCircle, Edit, Trash2, X, Heart, Loader2 } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, X, Heart, Loader2, Wand2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
 import { useFirebase } from '@/firebase';
@@ -46,6 +47,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { initialEnglishWords } from '@/data/english';
 import { initialJapaneseWords } from '@/data/japanese';
 import { Skeleton } from '../ui/skeleton';
+import { Textarea } from '../ui/textarea';
+import { generateVocabulary } from '@/ai/flows/generate-vocabulary-flow';
 
 type Word = EnglishWord | JapaneseWord;
 
@@ -56,6 +59,76 @@ interface VocabularyManagerProps<T extends Word> {
 }
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+
+const AiAssistantDialog = ({ onAddWords }: { onAddWords: (words: Omit<EnglishWord, 'id' | 'memorized' | 'favorite'>[]) => Promise<void> }) => {
+    const [text, setText] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const { toast } = useToast();
+
+    const handleGenerate = async () => {
+        if (!text.trim()) {
+            toast({ title: "Текст хоосон байна", description: "Үгс нэмэхийн тулд текст оруулна уу.", variant: "destructive" });
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const result = await generateVocabulary({ text });
+            if (result.words && result.words.length > 0) {
+                await onAddWords(result.words);
+                toast({ title: "Амжилттай", description: `${result.words.length} үг нэмэгдлээ.` });
+                setIsOpen(false);
+                setText('');
+            } else {
+                toast({ title: "Үг олдсонгүй", description: "Текстээс ямар ч үг ялгаж чадсангүй.", variant: "destructive" });
+            }
+        } catch (error) {
+            console.error(error);
+            toast({ title: "Алдаа гарлаа", description: "AI туслах ажиллахад алдаа гарлаа.", variant: "destructive" });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                    <Wand2 className="mr-2 h-4 w-4" /> AI Туслах
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>AI Туслахаар үгс нэмэх</DialogTitle>
+                    <DialogDescription>
+                        Англи, монгол үгс, тайлбар агуулсан текстээ хуулж тавина уу. AI автоматаар ялгаж, хүснэгтэд нэмэх болно.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="py-4 space-y-4">
+                    <Label htmlFor="ai-text-input">Текст</Label>
+                    <Textarea
+                        id="ai-text-input"
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        placeholder="e.g. apple - алим&#10;banana: гадил&#10;car: машин (A vehicle with four wheels)"
+                        rows={10}
+                    />
+                </div>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant="secondary" type="button">Цуцлах</Button>
+                    </DialogClose>
+                    <Button onClick={handleGenerate} disabled={isLoading}>
+                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {isLoading ? "Нэмж байна..." : "Үгс нэмэх"}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};
+
 
 export default function VocabularyManager<T extends Word>({
   wordType,
@@ -183,6 +256,41 @@ export default function VocabularyManager<T extends Word>({
     setIsDialogOpen(false);
     setCurrentWord(null);
   };
+  
+    const handleAddWordsBatch = async (newWords: Omit<EnglishWord, 'id' | 'memorized' | 'favorite'>[]) => {
+        if (!user || !firestore) {
+            toast({ title: "Алдаа", description: "Үгс нэмэхийн тулд нэвтэрнэ үү.", variant: "destructive" });
+            return;
+        }
+
+        const userWordsCollection = collection(firestore, `users/${user.uid}/${collectionPath}`);
+        const batch = writeBatch(firestore);
+        const wordsToAddLocally: T[] = [];
+
+        newWords.forEach(word => {
+            const docRef = doc(userWordsCollection);
+            batch.set(docRef, {
+                ...word,
+                memorized: false,
+                favorite: false,
+            });
+            wordsToAddLocally.push({
+                id: docRef.id,
+                ...word,
+                memorized: false,
+                favorite: false,
+            } as T);
+        });
+
+        try {
+            await batch.commit();
+            setWords(prev => [...prev, ...wordsToAddLocally].sort((a,b) => (a.word as string).localeCompare(b.word as string)));
+        } catch (error) {
+            console.error("Error batch adding words:", error);
+            toast({ title: "Алдаа", description: "Үгсийг бөөнөөр нэмэхэд алдаа гарлаа.", variant: "destructive" });
+        }
+    };
+
 
  const handleDelete = async (wordId: string) => {
     if (!user || !firestore) {
@@ -281,6 +389,7 @@ export default function VocabularyManager<T extends Word>({
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="flex-1 sm:w-48"
                  />
+                  {wordType === 'english' && <AiAssistantDialog onAddWords={handleAddWordsBatch} />}
                 <Dialog open={isDialogOpen} onOpenChange={(isOpen) => {
                     if (!isOpen) setCurrentWord(null);
                     setIsDialogOpen(isOpen);
