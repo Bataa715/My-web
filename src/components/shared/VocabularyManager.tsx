@@ -36,7 +36,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
-import { PlusCircle, Edit, Trash2, X, Heart, Loader2, Wand2, BookOpen, Brain, Bot, ChevronLeft, ChevronRight } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, X, Heart, Loader2, Wand2, BookOpen, Brain, Bot, ChevronLeft, ChevronRight, ArrowLeft, ArrowRight } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
 import { useFirebase } from '@/firebase';
@@ -50,6 +50,7 @@ import { Skeleton } from '../ui/skeleton';
 import { Textarea } from '../ui/textarea';
 import { generateVocabulary } from '@/ai/flows/generate-vocabulary-flow';
 import FlashcardGame from './FlashcardGame';
+import TestGame from './TestGame';
 
 type Word = EnglishWord | JapaneseWord;
 
@@ -112,7 +113,9 @@ const AiAssistantDialog = ({ onAddWords }: { onAddWords: (words: Omit<EnglishWor
                         id="ai-text-input"
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        placeholder="e.g. apple - алим&#10;banana: гадил&#10;car: машин (A vehicle with four wheels)"
+                        placeholder="e.g. apple - алим
+banana: гадил
+car: машин (A vehicle with four wheels)"
                         rows={10}
                     />
                 </div>
@@ -145,7 +148,7 @@ export default function VocabularyManager<T extends Word>({
   const [filter, setFilter] = useState<'all' | 'memorized' | 'not-memorized' | 'favorite'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [alphabetFilter, setAlphabetFilter] = useState<string | 'all'>('all');
-  const [gameMode, setGameMode] = useState<'flashcard' | null>(null);
+  const [gameMode, setGameMode] = useState<'flashcard' | 'test' | null>(null);
   const { toast } = useToast();
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -420,6 +423,16 @@ export default function VocabularyManager<T extends Word>({
     )
   }
 
+  if (gameMode === 'test') {
+    return (
+        <TestGame
+            words={filteredWords}
+            wordType={wordType}
+            onExit={() => setGameMode(null)}
+        />
+    )
+  }
+
   return (
     <>
         <Card>
@@ -646,14 +659,19 @@ export default function VocabularyManager<T extends Word>({
                         </Button>
                     </CardContent>
                 </Card>
-                <Card className="opacity-50 cursor-not-allowed">
+                 <Card className="hover:shadow-primary/20 hover:shadow-lg transition-shadow">
                     <CardHeader className="flex-row items-center gap-4">
-                        <Brain className="w-8 h-8 text-muted-foreground" />
+                        <Brain className="w-8 h-8 text-primary" />
                         <CardTitle>Тест</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <CardDescription>Орчуулга, утга зэргийг сонголтот тестээр шалгуулах.</CardDescription>
-                         <Button className="mt-4 w-full" disabled>Удахгүй...</Button>
+                         <Button className="mt-4 w-full" onClick={() => setGameMode('test')} disabled={filteredWords.length < 4}>
+                            {filter === 'all' ? 'Бүх үгсээр' : 
+                           filter === 'memorized' ? 'Цээжилсэн үгсээр' : 
+                           filter === 'not-memorized' ? 'Цээжлээгүй үгсээр' : 
+                           filter === 'favorite' ? 'Онцолсон үгсээр' : ''} тестлэх
+                         </Button>
                     </CardContent>
                 </Card>
                  <Card className="opacity-50 cursor-not-allowed">
