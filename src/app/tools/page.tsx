@@ -33,7 +33,7 @@ const tools = [
   },
    {
     title: "Тэмдэглэл",
-    description: "Notion шиг тэмдэглэл хөтлөх",
+    description: "",
     href: "/tools/notes",
     icon: <Book className="h-6 w-6" />
   },
@@ -198,7 +198,7 @@ export default function ToolsPage() {
                     <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>{tool.description}</CardDescription>
+                  {tool.description && <CardDescription>{tool.description}</CardDescription>}
                 </CardContent>
               </Card>
             </Link>
