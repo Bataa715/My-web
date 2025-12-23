@@ -185,7 +185,6 @@ export default function ToolsPage() {
         <BackButton />
         <div className="text-center pt-8">
             <h1 className="text-4xl font-bold">Хэрэгслүүд</h1>
-            <p className="mt-2 text-muted-foreground">Суралцах үйл явцыг тань дэмжих хэрэгслүүд.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
           {tools.map((tool) => (
