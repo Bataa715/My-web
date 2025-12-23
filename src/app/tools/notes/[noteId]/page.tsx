@@ -8,7 +8,7 @@ import type { Note } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, Trash2, Edit, XCircle } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import BackButton from '@/components/shared/BackButton';
 import { useToast } from '@/hooks/use-toast';
@@ -75,7 +75,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
     fetchNote();
   }, [fetchNote]);
 
-  const saveNote = useCallback(async () => {
+  const saveNote = useCallback(async (showToast = true) => {
     if (!firestore || !user || !note) return;
     setIsSaving(true);
     
@@ -86,7 +86,9 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
         content,
         updatedAt: serverTimestamp()
       });
-      toast({ title: "Хадгаллаа", description: "Өөрчлөлт амжилттай хадгалагдлаа." });
+      if (showToast) {
+        toast({ title: "Хадгаллаа", description: "Өөрчлөлт амжилттай хадгалагдлаа." });
+      }
     } catch (error) {
       console.error("Error saving note: ", error);
       toast({ title: "Алдаа", description: "Хадгалахад алдаа гарлаа.", variant: "destructive" });
@@ -98,7 +100,8 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   const handleDeleteNote = async () => {
      if (!firestore || !user || !note) return;
      try {
-         await deleteDoc(doc(firestore, `users/${user.uid}/notes`, note.id!));
+         const noteDocRef = doc(firestore, `users/${user.uid}/notes`, note.id!);
+         await deleteDoc(noteDocRef);
          toast({title: "Амжилттай", description: "Тэмдэглэл устгагдлаа."});
          router.push('/tools/notes');
      } catch(e) {
@@ -109,14 +112,18 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   // Auto-save logic
   useEffect(() => {
     if (loading || !isEditMode) return;
-    if (saveTimeout.current) {
-      clearTimeout(saveTimeout.current);
-    }
-    saveTimeout.current = setTimeout(() => {
-        if(note?.title !== title || note?.content !== content) {
-            saveNote();
+    
+    // Check if there are actual changes before setting a timeout
+    const hasChanged = note?.title !== title || note?.content !== content;
+
+    if (hasChanged) {
+        if (saveTimeout.current) {
+            clearTimeout(saveTimeout.current);
         }
-    }, 2000); // Save after 2 seconds of inactivity
+        saveTimeout.current = setTimeout(() => {
+            saveNote(false); // Don't show toast on auto-save
+        }, 2000); // Save after 2 seconds of inactivity
+    }
 
     return () => {
       if (saveTimeout.current) {
@@ -146,23 +153,25 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
          <BackButton />
          <div className="flex items-center gap-2">
             {isSaving && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="icon" disabled={!isEditMode}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
-                    <AlertDialogDescription>"{title}" тэмдэглэлийг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.</AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteNote}>Устгах</AlertDialogAction>
-                  </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            {isEditMode && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="icon" disabled={!isEditMode}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
+                        <AlertDialogDescription>"{title}" тэмдэглэлийг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteNote}>Устгах</AlertDialogAction>
+                      </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+            )}
          </div>
       </div>
       
