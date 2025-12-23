@@ -8,7 +8,7 @@ import type { Note } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Trash2, Save, XCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import BackButton from '@/components/shared/BackButton';
 import { useToast } from '@/hooks/use-toast';
@@ -111,10 +111,9 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
 
   // Auto-save logic
   useEffect(() => {
-    if (loading || !isEditMode) return;
+    if (loading || !isEditMode || !note) return;
     
-    // Check if there are actual changes before setting a timeout
-    const hasChanged = note?.title !== title || note?.content !== content;
+    const hasChanged = note.title !== title || note.content !== content;
 
     if (hasChanged) {
         if (saveTimeout.current) {
@@ -136,15 +135,17 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   if (loading) {
     return (
       <div className="space-y-4 pt-8">
-        <Skeleton className="h-6 w-32" />
+        <BackButton />
         <Skeleton className="h-12 w-3/4" />
         <Skeleton className="h-64 w-full" />
       </div>
     );
   }
-
-  if (!note) {
-    return null;
+  
+  if (!note && !loading) {
+      // This case handles when loading is finished but the note is still null,
+      // which means it wasn't found. The toast is handled in fetchNote.
+      return null;
   }
 
   return (
@@ -153,7 +154,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
          <BackButton />
          <div className="flex items-center gap-2">
             {isSaving && <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />}
-            {isEditMode && (
+            {isEditMode && note && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="destructive" size="icon" disabled={!isEditMode}>
@@ -175,7 +176,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
          </div>
       </div>
       
-      {isEditMode ? (
+      {note && isEditMode ? (
         <>
             <div className="flex items-center gap-2">
                  <Input
