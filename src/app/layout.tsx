@@ -11,6 +11,12 @@ import MainLayout from "@/components/MainLayout";
 import { EducationProvider } from "@/contexts/EducationContext";
 import { HobbyProvider } from "@/contexts/HobbyContext";
 import IntroOverlay from "@/components/IntroOverlay";
+import { JetBrains_Mono } from "next/font/google";
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrainsMono',
+})
 
 export const metadata: Metadata = {
   title: "Kaizen",
@@ -26,16 +32,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="mn" suppressHydrationWarning className="dark">
+    <html lang="mn" suppressHydrationWarning>
       <head>
       </head>
-      <body className="min-h-screen bg-background antialiased">
+      <body className={`${jetbrainsMono.variable} min-h-screen bg-background font-body antialiased`}>
         <IntroOverlay />
-        <AppThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          disableTransitionOnChange
-        >
+        <AppThemeProvider>
           <FirebaseClientProvider>
             <EditModeProvider>
                 <EducationProvider>
