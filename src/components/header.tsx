@@ -230,10 +230,10 @@ const Header = () => {
                       </DropdownMenuSubTrigger>
                       <DropdownMenuSubContent>
                         {themes.map((themeOption) => (
-                           <DropdownMenuItem key={themeOption.name} onClick={() => setTheme(themeOption.name === 'default' ? 'light' : `theme-${themeOption.name}`)}>
+                           <DropdownMenuItem key={themeOption.name} onClick={() => setTheme(themeOption.name)}>
                              <span className="mr-2 h-4 w-4 rounded-full" style={{ backgroundColor: `hsl(${themeOption.primary})` }} />
                             <span>{themeOption.name.charAt(0).toUpperCase() + themeOption.name.slice(1)}</span>
-                            {theme === (themeOption.name === 'default' ? 'light' : `theme-${themeOption.name}`) && <Check className="ml-auto h-4 w-4" />}
+                            {theme === themeOption.name && <Check className="ml-auto h-4 w-4" />}
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuSubContent>
