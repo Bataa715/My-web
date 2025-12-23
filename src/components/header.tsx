@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, Save, Loader2, XCircle, Pencil, Settings, Sun, Moon, LogOut } from 'lucide-react';
+import { Menu, PencilRuler, Eye, Save, Loader2, XCircle, Pencil, Settings, Sun, Moon, LogOut, Palette } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -21,8 +21,12 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent
 } from "@/components/ui/dropdown-menu";
 import { useTheme } from 'next-themes';
+import { themes } from '@/lib/themes';
 
 
 const mainLinks = [
@@ -45,7 +49,7 @@ const Header = () => {
     const [isEditingAppName, setIsEditingAppName] = useState(false);
     const [editedAppName, setEditedAppName] = useState(appName);
     
-    const { setTheme } = useTheme();
+    const { theme, setTheme } = useTheme();
 
     useEffect(() => {
         const fetchAppName = async () => {
@@ -218,6 +222,22 @@ const Header = () => {
                         {isEditMode ? <Eye className="mr-2 h-4 w-4" /> : <PencilRuler className="mr-2 h-4 w-4" />}
                         <span>{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
                     </DropdownMenuItem>
+
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>
+                        <Palette className="mr-2 h-4 w-4" />
+                        <span>Theme</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent>
+                        {themes.map((themeOption) => (
+                           <DropdownMenuItem key={themeOption.name} onClick={() => setTheme(themeOption.name)}>
+                             <span className="mr-2 h-4 w-4 rounded-full" style={{ backgroundColor: `hsl(${themeOption.primary})` }} />
+                            <span>{themeOption.name.charAt(0).toUpperCase() + themeOption.name.slice(1)}</span>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
