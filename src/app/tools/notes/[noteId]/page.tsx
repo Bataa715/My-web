@@ -45,7 +45,6 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const fetchNote = useCallback(async () => {
-    // This check is now redundant because of the useEffect check, but good for safety
     if (!noteId || !firestore || !user) {
       setLoading(false);
       return;
@@ -60,9 +59,6 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
         setNote({ id: docSnap.id, ...data });
         setTitle(data.title);
         setContent(data.content || '');
-      } else {
-        toast({ title: "Олдсонгүй", description: "Тэмдэглэл олдсонгүй.", variant: "destructive" });
-        router.push('/tools/notes');
       }
     } catch (err) {
       console.error("Error fetching note:", err);
@@ -70,15 +66,13 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
     } finally {
       setLoading(false);
     }
-  }, [firestore, user, noteId, router, toast]);
+  }, [firestore, user, noteId, toast]);
 
   useEffect(() => {
-    // Only fetch if we have the necessary Firebase context and a noteId
-    if (user && firestore && noteId) {
-        fetchNote();
-    } else {
-        // If we don't have a user yet, don't assume the note doesn't exist. Just wait.
-        setLoading(true);
+    if (noteId && user && firestore) {
+      fetchNote();
+    } else if (!user || !firestore) {
+      setLoading(true);
     }
   }, [noteId, user, firestore, fetchNote]);
 
@@ -148,8 +142,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
       </div>
     );
   }
-  
-  // This now only triggers if loading is false AND the note is confirmed not to exist.
+
   if (!note && !loading) {
       return (
         <div className="space-y-4 pt-8">
