@@ -1,6 +1,6 @@
 
 import type { Metadata } from "next";
-import { AppThemeProvider } from "@/components/AppThemeProvider";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { FirebaseClientProvider } from "@/firebase/client-provider";
@@ -36,31 +36,36 @@ export default function RootLayout({
       <head>
       </head>
       <body className={`${jetbrainsMono.variable} min-h-screen bg-background font-body antialiased`}>
-        <IntroOverlay />
-        <AppThemeProvider>
-          <FirebaseClientProvider>
-            <EditModeProvider>
-                <EducationProvider>
-                  <ProjectProvider>
-                    <SkillsProvider>
-                      <HobbyProvider>
-                        <MainLayout>
-                          <div className="page-container-wrapper">
-                            <div className="page-container">
-                              <div className="p-4 sm:p-6 lg:p-8">
-                                {children}
-                              </div>
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="dracula"
+            enableSystem
+            disableTransitionOnChange
+        >
+            <IntroOverlay />
+            <FirebaseClientProvider>
+                <EditModeProvider>
+                    <EducationProvider>
+                    <ProjectProvider>
+                        <SkillsProvider>
+                        <HobbyProvider>
+                            <MainLayout>
+                            <div className="page-container-wrapper">
+                                <div className="page-container">
+                                <div className="p-4 sm:p-6 lg:p-8">
+                                    {children}
+                                </div>
+                                </div>
                             </div>
-                          </div>
-                        </MainLayout>
-                        <Toaster />
-                      </HobbyProvider>
-                    </SkillsProvider>
-                  </ProjectProvider>
-                </EducationProvider>
-            </EditModeProvider>
-          </FirebaseClientProvider>
-        </AppThemeProvider>
+                            </MainLayout>
+                            <Toaster />
+                        </HobbyProvider>
+                        </SkillsProvider>
+                    </ProjectProvider>
+                    </EducationProvider>
+                </EditModeProvider>
+            </FirebaseClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
