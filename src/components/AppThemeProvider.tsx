@@ -13,7 +13,7 @@ export function AppThemeProvider({ children, ...props }: ThemeProviderProps) {
       {...props} 
       themes={[...themeNames, 'dark', 'light']}
       attribute="class"
-      defaultTheme="theme-dracula"
+      defaultTheme="light"
     >
         {children}
     </NextThemesProvider>

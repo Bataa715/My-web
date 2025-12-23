@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, Save, Loader2, XCircle, Pencil, Settings, Sun, Moon, LogOut, Palette } from 'lucide-react';
+import { Menu, PencilRuler, Eye, Save, Loader2, XCircle, Pencil, Settings, Sun, Moon, LogOut, Palette, Check } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -230,9 +230,10 @@ const Header = () => {
                       </DropdownMenuSubTrigger>
                       <DropdownMenuSubContent>
                         {themes.map((themeOption) => (
-                           <DropdownMenuItem key={themeOption.name} onClick={() => setTheme(themeOption.name)}>
+                           <DropdownMenuItem key={themeOption.name} onClick={() => setTheme(themeOption.name === 'default' ? 'light' : `theme-${themeOption.name}`)}>
                              <span className="mr-2 h-4 w-4 rounded-full" style={{ backgroundColor: `hsl(${themeOption.primary})` }} />
                             <span>{themeOption.name.charAt(0).toUpperCase() + themeOption.name.slice(1)}</span>
+                            {theme === (themeOption.name === 'default' ? 'light' : `theme-${themeOption.name}`) && <Check className="ml-auto h-4 w-4" />}
                           </DropdownMenuItem>
                         ))}
                       </DropdownMenuSubContent>
