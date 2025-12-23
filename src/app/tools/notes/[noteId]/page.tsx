@@ -34,7 +34,6 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   const [note, setNote] = useState<Note | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
