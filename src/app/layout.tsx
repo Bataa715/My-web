@@ -38,8 +38,8 @@ export default function RootLayout({
       <body className={`${jetbrainsMono.variable} min-h-screen bg-background font-body antialiased`}>
         <ThemeProvider
             attribute="class"
-            defaultTheme="dracula"
-            enableSystem
+            defaultTheme="default"
+            enableSystem={false}
             disableTransitionOnChange
         >
             <IntroOverlay />
