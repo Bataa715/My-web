@@ -108,6 +108,11 @@ const Header = () => {
         }
     };
     
+    const handleThemeChange = (newTheme: string) => {
+      setTheme(newTheme);
+      window.location.reload();
+    };
+
     const headerContent = (
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
@@ -230,7 +235,7 @@ const Header = () => {
                       </DropdownMenuSubTrigger>
                       <DropdownMenuSubContent>
                         {themes.map((themeOption) => (
-                           <DropdownMenuItem key={themeOption.name} onClick={() => setTheme(themeOption.name)}>
+                           <DropdownMenuItem key={themeOption.name} onClick={() => handleThemeChange(themeOption.name)}>
                              <span className="mr-2 h-4 w-4 rounded-full" style={{ backgroundColor: `hsl(${themeOption.primary})` }} />
                             <span>{themeOption.name.charAt(0).toUpperCase() + themeOption.name.slice(1)}</span>
                             {theme === themeOption.name && <Check className="ml-auto h-4 w-4" />}
