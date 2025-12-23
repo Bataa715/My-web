@@ -1,13 +1,13 @@
 
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import BackButton from "@/components/shared/BackButton";
 import { useFirebase, useMemoFirebase } from '@/firebase';
-import { collection, doc, addDoc, getDocs, query, orderBy, writeBatch, serverTimestamp } from 'firebase/firestore';
+import { collection, doc, addDoc, getDocs, query, orderBy, writeBatch, serverTimestamp, deleteDoc, updateDoc } from 'firebase/firestore';
 import type { Exercise, WorkoutLog } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Trash2, Edit, Dumbbell, History, BarChart } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, Dumbbell, History, BarChart, CalendarDays, LineChart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -34,7 +34,10 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-    
+import { format, subDays, eachDayOfInterval } from 'date-fns';
+import { Bar, BarChart as RechartsBarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { Timestamp } from 'firebase/firestore';
+
 
 const AddExerciseDialog = ({ onAdd }: { onAdd: (exercise: Omit<Exercise, 'id' | 'createdAt'>) => void }) => {
     const [name, setName] = useState('');
@@ -54,7 +57,7 @@ const AddExerciseDialog = ({ onAdd }: { onAdd: (exercise: Omit<Exercise, 'id' | 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline">
+                <Button variant="outline" className="w-full">
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Шинэ дасгал нэмэх
                 </Button>
@@ -107,7 +110,7 @@ const LogWorkoutDialog = ({ exercise, onLog }: { exercise: Exercise, onLog: (log
             <DialogTrigger asChild>
                 <Button size="sm" variant="secondary">
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Тэмдэглэл нэмэх
+                    Тэмдэглэл
                 </Button>
             </DialogTrigger>
             <DialogContent>
@@ -132,6 +135,77 @@ const LogWorkoutDialog = ({ exercise, onLog }: { exercise: Exercise, onLog: (log
         </Dialog>
     )
 }
+
+const WorkoutChart = ({ logs }: { logs: WorkoutLog[] }) => {
+    const data = useMemo(() => {
+        const last7Days = eachDayOfInterval({
+            start: subDays(new Date(), 6),
+            end: new Date(),
+        });
+        
+        return last7Days.map(day => {
+            const dayString = format(day, 'yyyy-MM-dd');
+            const logsForDay = logs.filter(log => format((log.date as Timestamp).toDate(), 'yyyy-MM-dd') === dayString);
+            return {
+                name: format(day, 'EEE'),
+                duration: logsForDay.reduce((sum, log) => sum + log.duration, 0),
+            };
+        });
+    }, [logs]);
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><CalendarDays /> 7 хоногийн идэвх</CardTitle>
+                <CardDescription>Сүүлийн 7 хоногийн дасгалын нийт хугацаа (минутаар).</CardDescription>
+            </CardHeader>
+            <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                    <RechartsBarChart data={data}>
+                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.5)"/>
+                        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip
+                          contentStyle={{
+                            background: "hsl(var(--background))",
+                            borderColor: "hsl(var(--border))",
+                            borderRadius: "var(--radius)"
+                          }}
+                          labelStyle={{ color: "hsl(var(--foreground))" }}
+                        />
+                        <Bar dataKey="duration" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                    </RechartsBarChart>
+                </ResponsiveContainer>
+            </CardContent>
+        </Card>
+    )
+}
+
+const WorkoutHistory = ({ logs }: { logs: WorkoutLog[] }) => {
+    return (
+         <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><History /> Сүүлийн тэмдэглэлүүд</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 max-h-96 overflow-y-auto">
+                {logs.slice(0, 10).map(log => (
+                    <div key={log.id} className="flex justify-between items-center text-sm p-2 rounded-md bg-muted/50">
+                        <div>
+                            <p className="font-semibold">{log.exerciseName}</p>
+                            <p className="text-xs text-muted-foreground">{format((log.date as Timestamp).toDate(), 'yyyy-MM-dd, HH:mm')}</p>
+                        </div>
+                        <div className="text-right">
+                           {log.duration > 0 && <p>{log.duration} мин</p>}
+                           {log.repetitions > 0 && <p>{log.repetitions} давт.</p>}
+                        </div>
+                    </div>
+                ))}
+                {logs.length === 0 && <p className="text-center text-muted-foreground py-4">Тэмдэглэл олдсонгүй.</p>}
+            </CardContent>
+        </Card>
+    )
+}
+
 
 export default function FitnessPage() {
     const { firestore, user } = useFirebase();
@@ -172,22 +246,6 @@ export default function FitnessPage() {
         fetchData();
     }, [exercisesRef, logsRef, toast]);
     
-    const stats = useMemo(() => {
-        const exerciseStats: { [key: string]: { totalDuration: number, totalReps: number, logCount: number } } = {};
-        
-        workoutLogs.forEach(log => {
-            if (!exerciseStats[log.exerciseId]) {
-                exerciseStats[log.exerciseId] = { totalDuration: 0, totalReps: 0, logCount: 0 };
-            }
-            exerciseStats[log.exerciseId].totalDuration += log.duration;
-            exerciseStats[log.exerciseId].totalReps += log.repetitions;
-            exerciseStats[log.exerciseId].logCount += 1;
-        });
-
-        return exerciseStats;
-    }, [workoutLogs]);
-
-
     const handleAddExercise = async (exercise: Omit<Exercise, 'id' | 'createdAt'>) => {
         if (!exercisesRef) return;
         try {
@@ -204,7 +262,7 @@ export default function FitnessPage() {
         if (!logsRef) return;
          try {
             const docRef = await addDoc(logsRef, { ...log, date: serverTimestamp() });
-            setWorkoutLogs(prev => [{ ...log, id: docRef.id, date: new Date() }, ...prev]);
+            setWorkoutLogs(prev => [{ ...log, id: docRef.id, date: new Date() } as WorkoutLog, ...prev]);
             toast({ title: "Амжилттай", description: "Дасгалын тэмдэглэл нэмэгдлээ." });
         } catch (e) {
             console.error(e);
@@ -228,7 +286,6 @@ export default function FitnessPage() {
              <div className="space-y-8">
                 <BackButton />
                 <Skeleton className="h-10 w-1/2 mx-auto" />
-                <Skeleton className="h-8 w-3/4 mx-auto" />
                 <div className="pt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <Skeleton className="h-48 w-full" />
                     <Skeleton className="h-48 w-full" />
@@ -245,58 +302,37 @@ export default function FitnessPage() {
               <h1 className="text-4xl font-bold">Fitness Tracker</h1>
           </div>
           
-           <div className="flex justify-center">
-                <AddExerciseDialog onAdd={handleAddExercise} />
-           </div>
-           
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Dumbbell /> Дасгалууд</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {Object.keys(groupedExercises).map(category => (
-                            <div key={category}>
-                                <h3 className="font-bold mb-2 text-primary">{category}</h3>
-                                <div className="space-y-2">
-                                {groupedExercises[category].map(ex => (
-                                    <Card key={ex.id} className="flex justify-between items-center p-4">
-                                        <p className="font-semibold">{ex.name}</p>
-                                        <LogWorkoutDialog exercise={ex} onLog={handleLogWorkout} />
-                                    </Card>
-                                ))}
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div className="lg:col-span-1 space-y-6">
+                    <AddExerciseDialog onAdd={handleAddExercise} />
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Dumbbell /> Дасгалууд</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4 max-h-[600px] overflow-y-auto">
+                            {Object.keys(groupedExercises).map(category => (
+                                <div key={category}>
+                                    <h3 className="font-bold mb-2 text-primary">{category}</h3>
+                                    <div className="space-y-2">
+                                    {groupedExercises[category].map(ex => (
+                                        <Card key={ex.id} className="flex justify-between items-center p-3 bg-muted/50">
+                                            <p className="font-semibold">{ex.name}</p>
+                                            <LogWorkoutDialog exercise={ex} onLog={handleLogWorkout} />
+                                        </Card>
+                                    ))}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                         {exercises.length === 0 && (
-                            <p className="text-muted-foreground text-center py-4">Дасгал нэмээгүй байна.</p>
-                        )}
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><BarChart/> Статистик</CardTitle>
-                    </CardHeader>
-                     <CardContent className="space-y-2">
-                        {Object.keys(stats).length > 0 ? (
-                           Object.entries(stats).map(([exerciseId, stat]) => {
-                                const exercise = exercises.find(ex => ex.id === exerciseId);
-                                return (
-                                    <Card key={exerciseId} className="p-4">
-                                        <p className="font-semibold mb-2">{exercise?.name || 'Тодорхойгүй дасгал'}</p>
-                                        <div className="flex justify-between text-sm text-muted-foreground">
-                                            <span>Нийт хугацаа: <strong className="text-foreground">{stat.totalDuration} мин</strong></span>
-                                            <span>Нийт давталт: <strong className="text-foreground">{stat.totalReps}</strong></span>
-                                             <span>Нийт удаа: <strong className="text-foreground">{stat.logCount}</strong></span>
-                                        </div>
-                                    </Card>
-                                )
-                           })
-                        ) : (
-                            <p className="text-muted-foreground text-center py-4">Статистик байхгүй байна.</p>
-                        )}
-                    </CardContent>
-                </Card>
+                            ))}
+                            {exercises.length === 0 && (
+                                <p className="text-muted-foreground text-center py-4">Дасгал нэмээгүй байна.</p>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className="lg:col-span-2 space-y-6">
+                    <WorkoutChart logs={workoutLogs} />
+                    <WorkoutHistory logs={workoutLogs} />
+                </div>
            </div>
 
         </div>
