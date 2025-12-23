@@ -5,14 +5,13 @@ import { useEffect, useState, useCallback } from 'react';
 import { collection, getDocs, orderBy, query, writeBatch, doc, addDoc, serverTimestamp, updateDoc, deleteDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import BackButton from '@/components/shared/BackButton';
-import CheatSheet from '@/app/tools/programming/components/CheatSheet';
-import ConceptCards from '@/app/tools/programming/components/ConceptCards';
-import ProgressTracker from '@/app/tools/programming/components/ProgressTracker';
 import type { CheatSheetItem, ProgrammingConcept, ProgressItem } from '@/lib/types';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from '@/components/ui/skeleton';
 import { initialConcepts, initialCheatSheetItems, initialProgressItems } from '@/data/programming';
 import { useToast } from '@/hooks/use-toast';
+import SkillTree from './components/SkillTree';
+import CodePlayground from './components/CodePlayground';
+import DailyQuest from './components/DailyQuest';
 
 export default function ProgrammingPage() {
     const { firestore, user } = useFirebase();
@@ -47,7 +46,6 @@ export default function ProgrammingPage() {
                 initialCheatSheetItems.forEach(item => batch.set(doc(cheatSheetRef), item));
                 initialProgressItems.forEach(item => batch.set(doc(progressItemsRef), { ...item, learned: false, practicing: false }));
                 await batch.commit();
-                // Re-fetch after seeding
                 await fetchData();
                 return;
             }
@@ -148,58 +146,56 @@ export default function ProgrammingPage() {
 
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 p-4 md:p-8">
             <BackButton />
-            <div className="text-center pt-8">
-                <h1 className="text-4xl font-bold">Програмчлал</h1>
-                <p className="mt-2 text-muted-foreground">Үндсэн ойлголтууд, хэрэгтэй кодууд, болон ахиц хянагч.</p>
+            <div className="text-center">
+                <h1 className="text-4xl font-bold tracking-tighter text-primary">Programming Dashboard</h1>
+                <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">Cybernetic learning environment for developers.</p>
             </div>
 
-            <Tabs defaultValue="concepts" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="concepts">Үндсэн ойлголт</TabsTrigger>
-                    <TabsTrigger value="cheatsheet">Cheat Sheet</TabsTrigger>
-                    <TabsTrigger value="progress">Ахиц</TabsTrigger>
-                </TabsList>
-                {loading ? (
-                     <div className="mt-4 space-y-4">
-                        <Skeleton className="h-48 w-full" />
-                        <Skeleton className="h-24 w-full" />
-                        <Skeleton className="h-24 w-full" />
+            {loading ? (
+                <div className="mt-4 grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <Skeleton className="h-96 lg:col-span-1 rounded-lg" />
+                    <Skeleton className="h-96 lg:col-span-2 rounded-lg" />
+                    <Skeleton className="h-96 lg:col-span-1 rounded-lg" />
+                </div>
+            ) : !user ? (
+                <div className="text-center py-20 mt-4 glassmorphism-card">
+                    <p className="text-lg text-muted-foreground">Програмчлалын хэрэгслүүдийг харахын тулд нэвтэрнэ үү.</p>
+                </div>
+            ) : (
+                <div className="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    {/* Left Column: Skill Tree */}
+                    <div className="lg:col-span-1">
+                        <SkillTree
+                            concepts={concepts}
+                            onAddConcept={handleAddConcept}
+                            onUpdateConcept={handleUpdateConcept}
+                            onDeleteConcept={handleDeleteConcept}
+                        />
                     </div>
-                ) : !user ? (
-                    <div className="text-center py-10 mt-4">
-                        <p className="text-muted-foreground">Програмчлалын хэрэгслүүдийг харахын тулд нэвтэрнэ үү.</p>
+
+                    {/* Center Column: Code Playground */}
+                    <div className="lg:col-span-2">
+                        <CodePlayground
+                            items={cheatSheetItems}
+                            onAddItem={handleAddCheatSheetItem}
+                            onUpdateItem={handleUpdateCheatSheetItem}
+                            onDeleteItem={handleDeleteCheatSheetItem}
+                        />
                     </div>
-                ): (
-                    <>
-                        <TabsContent value="concepts">
-                           <ConceptCards 
-                              concepts={concepts} 
-                              onAddConcept={handleAddConcept}
-                              onUpdateConcept={handleUpdateConcept}
-                              onDeleteConcept={handleDeleteConcept}
-                            />
-                        </TabsContent>
-                        <TabsContent value="cheatsheet">
-                           <CheatSheet 
-                              items={cheatSheetItems}
-                              onAddItem={handleAddCheatSheetItem}
-                              onUpdateItem={handleUpdateCheatSheetItem}
-                              onDeleteItem={handleDeleteCheatSheetItem}
-                            />
-                        </TabsContent>
-                        <TabsContent value="progress">
-                            <ProgressTracker 
-                                initialItems={progressItems} 
-                                onAddItem={handleAddProgressItem}
-                                onUpdateItem={handleUpdateProgressItem}
-                                onDeleteItem={handleDeleteProgressItem}
-                            />
-                        </TabsContent>
-                    </>
-                )}
-            </Tabs>
+
+                    {/* Right Column: Daily Quest */}
+                    <div className="lg:col-span-1">
+                        <DailyQuest
+                            initialItems={progressItems}
+                            onAddItem={handleAddProgressItem}
+                            onUpdateItem={handleUpdateProgressItem}
+                            onDeleteItem={handleDeleteProgressItem}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

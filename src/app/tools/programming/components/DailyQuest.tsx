@@ -26,14 +26,14 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-interface ProgressTrackerProps {
+interface DailyQuestProps {
   initialItems: ProgressItem[];
   onAddItem: (item: Omit<ProgressItem, 'id' | 'learned' | 'practicing'>) => void;
   onUpdateItem: (id: string, item: Omit<ProgressItem, 'id' | 'learned' | 'practicing'>) => void;
   onDeleteItem: (id: string) => void;
 }
 
-export default function ProgressTracker({ initialItems, onAddItem, onUpdateItem, onDeleteItem }: ProgressTrackerProps) {
+export default function DailyQuest({ initialItems, onAddItem, onUpdateItem, onDeleteItem }: DailyQuestProps) {
   const { firestore, user } = useFirebase();
   const { isEditMode } = useEditMode();
   const [items, setItems] = useState<ProgressItem[]>(initialItems);

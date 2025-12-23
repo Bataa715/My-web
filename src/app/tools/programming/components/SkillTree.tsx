@@ -18,14 +18,14 @@ import {
 import { AddConceptDialog } from './AddConceptDialog';
 import { EditConceptDialog } from './EditConceptDialog';
 
-interface ConceptCardsProps {
+interface SkillTreeProps {
   concepts: ProgrammingConcept[];
   onAddConcept: (concept: Omit<ProgrammingConcept, 'id'>) => void;
   onUpdateConcept: (id: string, concept: Omit<ProgrammingConcept, 'id'>) => void;
   onDeleteConcept: (id: string) => void;
 }
 
-export default function ConceptCards({ concepts, onAddConcept, onUpdateConcept, onDeleteConcept }: ConceptCardsProps) {
+export default function SkillTree({ concepts, onAddConcept, onUpdateConcept, onDeleteConcept }: SkillTreeProps) {
   const { isEditMode } = useEditMode();
   
   return (
@@ -86,4 +86,3 @@ export default function ConceptCards({ concepts, onAddConcept, onUpdateConcept, 
     </Card>
   );
 }
-

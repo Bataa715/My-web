@@ -23,14 +23,14 @@ import { AddCheatSheetDialog } from './AddCheatSheetDialog';
 import { EditCheatSheetDialog } from './EditCheatSheetDialog';
 
 
-interface CheatSheetProps {
+interface CodePlaygroundProps {
     items: CheatSheetItem[];
     onAddItem: (item: Omit<CheatSheetItem, 'id'>) => void;
     onUpdateItem: (id: string, item: Omit<CheatSheetItem, 'id'>) => void;
     onDeleteItem: (id: string) => void;
 }
 
-export default function CheatSheet({ items, onAddItem, onUpdateItem, onDeleteItem }: CheatSheetProps) {
+export default function CodePlayground({ items, onAddItem, onUpdateItem, onDeleteItem }: CodePlaygroundProps) {
   const { isEditMode } = useEditMode();
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const { toast } = useToast();
