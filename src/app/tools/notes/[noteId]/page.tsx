@@ -8,7 +8,7 @@ import type { Note } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Trash2, Save, XCircle } from 'lucide-react';
+import { Loader2, Trash2, Save, XCircle, Pencil } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import BackButton from '@/components/shared/BackButton';
 import { useToast } from '@/hooks/use-toast';
@@ -72,8 +72,10 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   }, [firestore, user, noteId, router, toast]);
 
   useEffect(() => {
-    fetchNote();
-  }, [fetchNote]);
+    if (noteId) {
+      fetchNote();
+    }
+  }, [noteId, fetchNote]);
 
   const saveNote = useCallback(async (showToast = true) => {
     if (!firestore || !user || !note) return;
@@ -143,9 +145,12 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   }
   
   if (!note && !loading) {
-      // This case handles when loading is finished but the note is still null,
-      // which means it wasn't found. The toast is handled in fetchNote.
-      return null;
+      return (
+        <div className="space-y-4 pt-8">
+          <BackButton />
+          <p>Тэмдэглэл олдсонгүй.</p>
+        </div>
+      );
   }
 
   return (
@@ -157,7 +162,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
             {isEditMode && note && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="icon" disabled={!isEditMode}>
+                    <Button variant="destructive" size="icon">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </AlertDialogTrigger>
