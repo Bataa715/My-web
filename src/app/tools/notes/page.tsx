@@ -95,7 +95,6 @@ export default function NotesPage() {
             <span className="sr-only">Шинэ тэмдэглэл үүсгэх</span>
           </Button>
         </div>
-        <p className="mt-2 text-muted-foreground max-w-2xl">Notion шиг тэмдэглэл хөтөлж, санаагаа цэгцлээрэй.</p>
       </div>
 
       {loading ? (
