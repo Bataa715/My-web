@@ -304,47 +304,36 @@
       },
       "required": ["character", "romaji"]
     },
-    "ProgrammingConcept": {
-      "title": "Programming Concept",
+    "Language": {
+      "title": "Programming Language",
+      "description": "Represents a programming language the user is learning.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "iconUrl": { "type": "string" },
+        "primaryColor": { "type": "string" },
+        "progress": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "iconUrl", "primaryColor", "createdAt"]
+    },
+    "Chapter": {
+      "title": "Chapter",
+      "description": "A chapter or topic within a programming language.",
       "type": "object",
       "properties": {
         "title": { "type": "string" },
-        "emoji": { "type": "string" },
-        "explanation": { "type": "string" }
+        "languageId": { "type": "string" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["title", "emoji", "explanation"]
-    },
-    "CheatSheetItem": {
-      "title": "Cheat Sheet Item",
-      "type": "object",
-      "properties": {
-        "title": { "type": "string" },
-        "snippet": { "type": "string" }
-      },
-      "required": ["title", "snippet"]
-    },
-    "ProgressItem": {
-      "title": "Progress Item",
-      "type": "object",
-      "properties": {
-        "label": { "type": "string" },
-        "learned": { "type": "boolean" },
-        "practicing": { "type": "boolean" }
-      },
-      "required": ["label", "learned", "practicing"]
+      "required": ["title", "languageId", "order", "createdAt"]
     },
     "MemorizedKana": {
         "title": "Memorized Kana",
         "type": "object",
         "properties": {
             "characters": { "type": "array", "items": { "type": "string" } }
-        }
-    },
-    "ProgrammingProgress": {
-        "title": "Programming Progress",
-        "type": "object",
-        "properties": {
-            "items": { "type": "object" }
         }
     }
   },
@@ -393,9 +382,6 @@
      "/users/{userId}/memorized/{kanaType}": {
       "schema": { "$ref": "#/entities/MemorizedKana" }
     },
-    "/users/{userId}/progress/{progressType}": {
-      "schema": { "$ref": "#/entities/ProgrammingProgress" }
-    },
     "/users/{userId}/englishGrammar/{ruleId}": {
       "schema": { "$ref": "#/entities/GrammarRule" }
     },
@@ -423,14 +409,14 @@
     "/users/{userId}/japaneseSpeaking/{materialId}": {
       "schema": { "$ref": "#/entities/ReadingMaterial" }
     },
-    "/users/{userId}/programmingConcepts/{conceptId}": {
-      "schema": { "$ref": "#/entities/ProgrammingConcept" }
+    "/users/{userId}/languages/{langId}": {
+      "schema": { "$ref": "#/entities/Language" }
     },
-    "/users/{userId}/cheatSheetItems/{itemId}": {
-      "schema": { "$ref": "#/entities/CheatSheetItem" }
+    "/users/{userId}/languages/{langId}/chapters/{chapterId}": {
+      "schema": { "$ref": "#/entities/Chapter" }
     },
-    "/users/{userId}/progressItems/{itemId}": {
-      "schema": { "$ref": "#/entities/ProgressItem" }
+    "/users/{userId}/languages/{langId}/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/Note" }
     },
     "/hiragana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } },
     "/katakana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } }

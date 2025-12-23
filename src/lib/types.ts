@@ -76,24 +76,21 @@ export interface Kana {
   romaji: string;
 }
 
-export interface ProgrammingConcept {
-  id?: string;
-  title: string;
-  emoji: string;
-  explanation: string;
+export interface Language {
+    id?: string;
+    name: string;
+    iconUrl: string;
+    primaryColor: string;
+    progress: number;
+    createdAt?: Date | Timestamp;
 }
 
-export interface CheatSheetItem {
-  id?: string;
-  title: string;
-  snippet: string;
-}
-
-export interface ProgressItem {
-  id?: string;
-  label: string;
-  learned: boolean;
-  practicing: boolean;
+export interface Chapter {
+    id?: string;
+    title: string;
+    languageId: string;
+    order: number;
+    createdAt?: Date | Timestamp;
 }
 
 export type Education = {
