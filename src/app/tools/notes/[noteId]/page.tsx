@@ -45,8 +45,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const fetchNote = useCallback(async () => {
-    if (!noteId) return; 
-    if (!firestore || !user) {
+    if (!noteId || !firestore || !user) {
       setLoading(false);
       return;
     }
@@ -73,9 +72,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   }, [firestore, user, noteId, router, toast]);
 
   useEffect(() => {
-    if (noteId) {
-      fetchNote();
-    }
+    fetchNote();
   }, [noteId, fetchNote]);
 
   const saveNote = useCallback(async (showToast = true) => {
@@ -145,7 +142,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
     );
   }
   
-  if (!loading && !note) {
+  if (!note && !loading) {
       return (
         <div className="space-y-4 pt-8">
           <BackButton />
@@ -199,14 +196,14 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
                 placeholder="Энд бичиж эхэлнэ үү. Markdown ашиглах боломжтой..."
             />
         </>
-      ) : (
+      ) : note ? (
         <>
             <h1 className="text-4xl font-bold">{title}</h1>
             <div className="prose dark:prose-invert max-w-none">
                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
             </div>
         </>
-      )}
+      ) : null}
     </div>
   );
 }
