@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, Save, Loader2, XCircle, Pencil, Settings, Sun, Moon, LogOut, Palette, Check } from 'lucide-react';
+import { Menu, PencilRuler, Eye, Save, Loader2, XCircle, Pencil, Settings, LogOut, Palette, Check } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
