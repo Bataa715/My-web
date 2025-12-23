@@ -5,11 +5,10 @@ export type Theme = {
 };
 
 export const themes: Theme[] = [
-  { name: "light", primary: "251 78% 79%" },
-  { name: "dark", primary: "251 78% 79%" },
   { name: "default", primary: "251 78% 79%" },
+  { name: "light", primary: "262 83% 58%" },
   { name: "dracula", primary: "265 89% 78%" },
-  { name: "neo", primary: "130 95% 55%" },
-  { name: "tokyo-night", primary: "191 97% 72%" },
-  { name: "rose-pine", primary: "298 56% 76%" },
+  { name: "neo", primary: "142 76% 56%" },
+  { name: "tokyo-night", primary: "195 100% 75%" },
+  { name: "rose-pine", primary: "343 35% 72%" },
 ];
