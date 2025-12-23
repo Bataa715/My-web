@@ -10,9 +10,6 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        body: ['var(--font-jetbrainsMono)', 'sans-serif'],
-      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

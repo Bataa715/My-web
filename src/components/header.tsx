@@ -219,15 +219,6 @@ const Header = () => {
                         <span>{isEditMode ? "Харах горим" : "Засварлах горим"}</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setTheme("light")}>
-                      <Sun className="mr-2 h-4 w-4" />
-                      <span>Цайвар</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setTheme("dark")}>
-                      <Moon className="mr-2 h-4 w-4" />
-                      <span>Бараан</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Гарах</span>
