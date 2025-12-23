@@ -45,7 +45,8 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
   const saveTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const fetchNote = useCallback(async () => {
-    if (!firestore || !user || !noteId) {
+    if (!noteId) return; 
+    if (!firestore || !user) {
       setLoading(false);
       return;
     }
@@ -144,7 +145,7 @@ export default function NotePage({ params }: { params: Promise<{ noteId: string 
     );
   }
   
-  if (!note && !loading) {
+  if (!loading && !note) {
       return (
         <div className="space-y-4 pt-8">
           <BackButton />
