@@ -30,7 +30,7 @@ import { themes } from '@/lib/themes';
 
 
 const mainLinks = [
-  { href: "/home", label: "Нүүр" },
+  { href: "/", label: "Нүүр" },
   { href: "/about", label: "Миний тухай" },
   { href: "/tools", label: "Хэрэгсэл" },
 ];
@@ -126,7 +126,7 @@ const Header = () => {
                     <SheetHeader>
                       <SheetTitle>
                           <SheetClose asChild>
-                              <Link href="/home" className="flex items-center space-x-2 text-left pl-4">
+                              <Link href="/" className="flex items-center space-x-2 text-left pl-4">
                                   <span className="font-bold text-2xl">{appName}</span>
                               </Link>
                           </SheetClose>
@@ -170,7 +170,7 @@ const Header = () => {
 
            {/* Center Section (App Name) */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-             <div onClick={() => router.push(user ? "/home" : "/")} className="flex items-center space-x-2 cursor-pointer h-8">
+             <div onClick={() => router.push(user ? "/" : "/login")} className="flex items-center space-x-2 cursor-pointer h-8">
                  {isUserLoading && !appName ? (
                     <div />
                  ) : isEditingAppName ? (
