@@ -10,7 +10,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const noHeaderFooterPaths = ['/login', '/signup', '/'];
+  const noHeaderFooterPaths = ['/login', '/signup'];
 
   const showHeaderFooter = !noHeaderFooterPaths.includes(pathname);
 
