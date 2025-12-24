@@ -177,7 +177,7 @@ export default function SignupPage() {
          <CardFooter className="flex-col items-center text-sm">
             <p className="text-muted-foreground">
                 Бүртгэлтэй юу?{' '}
-                <Link href="/" className="underline text-primary">
+                <Link href="/login" className="underline text-primary">
                 Нэвтрэх
                 </Link>
             </p>

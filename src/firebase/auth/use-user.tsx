@@ -9,9 +9,9 @@ interface UseUserResult {
   error: Error | null;
 }
 
-export function useUser(auth: Auth): UseUserResult {
+export function useUser(auth: Auth | null): UseUserResult {
   const [userState, setUserState] = useState<UseUserResult>({
-    user: null, // Start with null user, let onAuthStateChanged determine the state
+    user: null,
     isLoading: true, // Always start in loading state
     error: null,
   });
@@ -24,21 +24,19 @@ export function useUser(auth: Auth): UseUserResult {
       return;
     }
 
-    // Set initial state based on auth service's readiness, not currentUser
-    setUserState({
-        user: auth.currentUser,
-        isLoading: !auth.currentUser, // Only stop loading if currentUser is already available
-        error: null,
-    });
+    // Auth service is available, but we're still waiting for the onAuthStateChanged event.
+    // Stay in the loading state.
+    setUserState(prevState => ({ ...prevState, isLoading: true }));
 
     const unsubscribe = onAuthStateChanged(
       auth,
       (firebaseUser) => {
-        // Auth state is now definitively determined
+        // Auth state is now definitively determined.
+        // Set the user and stop loading.
         setUserState({ user: firebaseUser, isLoading: false, error: null });
       },
       (error) => {
-        // Auth listener encountered an error
+        // Auth listener encountered an error.
         console.error("useUser: onAuthStateChanged error:", error);
         setUserState({ user: null, isLoading: false, error: error });
       }
