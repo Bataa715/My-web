@@ -1,3 +1,4 @@
+
 // Validate that all required environment variables are present
 const requiredEnvVars = [
   'NEXT_PUBLIC_FIREBASE_API_KEY',
@@ -20,7 +21,7 @@ if (missingEnvVars.length > 0 && typeof window !== 'undefined') {
 }
 
 export const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+  apiKey: "AIzaSyDx1EpImAU5zjcv4Sgox6cNa1GNzwk6ffc",
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
