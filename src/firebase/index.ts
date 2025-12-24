@@ -1,3 +1,4 @@
+
 'use client';
 
 import { firebaseConfig } from '@/firebase/config';
@@ -8,20 +9,8 @@ import { getFirestore } from 'firebase/firestore'
 // IMPORTANT: DO NOT MODIFY THIS FUNCTION
 export function initializeFirebase() {
   if (getApps().length === 0) {
-    if (process.env.NODE_ENV === 'development') {
-      // In development, always use the config object
-      return getSdks(initializeApp(firebaseConfig));
-    } else {
-      // In production, try automatic initialization first
-      try {
-        const app = initializeApp();
-        return getSdks(app);
-      } catch (e) {
-        console.warn('Automatic initialization failed in production. Falling back to firebase config object.', e);
-        // Fallback to config object if automatic fails even in production
-        return getSdks(initializeApp(firebaseConfig));
-      }
-    }
+    // Always initialize with the config object for consistency across environments
+    return getSdks(initializeApp(firebaseConfig));
   }
   // If already initialized, return the SDKs with the already initialized App
   return getSdks(getApp());
