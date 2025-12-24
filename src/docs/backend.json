@@ -295,6 +295,18 @@
       },
       "required": ["title", "content", "createdAt"]
     },
+     "ReadingNote": {
+      "title": "Reading Note",
+      "description": "A note associated with a specific piece of reading material.",
+      "type": "object",
+      "properties": {
+        "readingMaterialId": { "type": "string" },
+        "selectedText": { "type": "string" },
+        "note": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["readingMaterialId", "selectedText", "note", "createdAt"]
+    },
     "Kana": {
       "title": "Kana",
       "type": "object",
@@ -304,36 +316,47 @@
       },
       "required": ["character", "romaji"]
     },
-    "Language": {
-      "title": "Programming Language",
-      "description": "Represents a programming language the user is learning.",
-      "type": "object",
-      "properties": {
-        "name": { "type": "string" },
-        "iconUrl": { "type": "string" },
-        "primaryColor": { "type": "string" },
-        "progress": { "type": "number" },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["name", "iconUrl", "primaryColor", "createdAt"]
-    },
-    "Chapter": {
-      "title": "Chapter",
-      "description": "A chapter or topic within a programming language.",
+    "ProgrammingConcept": {
+      "title": "Programming Concept",
       "type": "object",
       "properties": {
         "title": { "type": "string" },
-        "languageId": { "type": "string" },
-        "order": { "type": "number" },
-        "createdAt": { "type": "string", "format": "date-time" }
+        "emoji": { "type": "string" },
+        "explanation": { "type": "string" }
       },
-      "required": ["title", "languageId", "order", "createdAt"]
+      "required": ["title", "emoji", "explanation"]
+    },
+    "CheatSheetItem": {
+      "title": "Cheat Sheet Item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "snippet": { "type": "string" }
+      },
+      "required": ["title", "snippet"]
+    },
+    "ProgressItem": {
+      "title": "Progress Item",
+      "type": "object",
+      "properties": {
+        "label": { "type": "string" },
+        "learned": { "type": "boolean" },
+        "practicing": { "type": "boolean" }
+      },
+      "required": ["label", "learned", "practicing"]
     },
     "MemorizedKana": {
         "title": "Memorized Kana",
         "type": "object",
         "properties": {
             "characters": { "type": "array", "items": { "type": "string" } }
+        }
+    },
+    "ProgrammingProgress": {
+        "title": "Programming Progress",
+        "type": "object",
+        "properties": {
+            "items": { "type": "object" }
         }
     }
   },
@@ -382,6 +405,9 @@
      "/users/{userId}/memorized/{kanaType}": {
       "schema": { "$ref": "#/entities/MemorizedKana" }
     },
+    "/users/{userId}/progress/{progressType}": {
+      "schema": { "$ref": "#/entities/ProgrammingProgress" }
+    },
     "/users/{userId}/englishGrammar/{ruleId}": {
       "schema": { "$ref": "#/entities/GrammarRule" }
     },
@@ -390,6 +416,9 @@
     },
     "/users/{userId}/englishReading/{materialId}": {
       "schema": { "$ref": "#/entities/ReadingMaterial" }
+    },
+    "/users/{userId}/englishReading/{materialId}/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/ReadingNote" }
     },
     "/users/{userId}/englishListening/{materialId}": {
       "schema": { "$ref": "#/entities/ReadingMaterial" }
@@ -409,14 +438,14 @@
     "/users/{userId}/japaneseSpeaking/{materialId}": {
       "schema": { "$ref": "#/entities/ReadingMaterial" }
     },
-    "/users/{userId}/languages/{langId}": {
-      "schema": { "$ref": "#/entities/Language" }
+    "/users/{userId}/programmingConcepts/{conceptId}": {
+      "schema": { "$ref": "#/entities/ProgrammingConcept" }
     },
-    "/users/{userId}/languages/{langId}/chapters/{chapterId}": {
-      "schema": { "$ref": "#/entities/Chapter" }
+    "/users/{userId}/cheatSheetItems/{itemId}": {
+      "schema": { "$ref": "#/entities/CheatSheetItem" }
     },
-    "/users/{userId}/languages/{langId}/notes/{noteId}": {
-      "schema": { "$ref": "#/entities/Note" }
+    "/users/{userId}/progressItems/{itemId}": {
+      "schema": { "$ref": "#/entities/ProgressItem" }
     },
     "/hiragana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } },
     "/katakana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } }

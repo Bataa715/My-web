@@ -69,6 +69,13 @@ export interface ReadingMaterial {
   createdAt?: Date | Timestamp;
 }
 
+export interface ReadingNote {
+  id?: string;
+  readingMaterialId: string;
+  selectedText: string;
+  note: string;
+  createdAt?: Date | Timestamp;
+}
 
 export interface Kana {
   id?: string;
@@ -209,4 +216,12 @@ export interface GeneratedWord {
   word: string;
   translation: string;
   definition?: string;
+}
+
+export type AIAction = 'translate' | 'correct' | null;
+
+export interface AIResponse {
+    correction?: string;
+    explanation?: string;
+    translation?: string;
 }
