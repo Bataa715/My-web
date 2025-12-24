@@ -46,7 +46,7 @@ export default function LoginPage() {
       router.push('/');
 
     } catch (error: any) {
-       let errorMessage = 'И-мэйл эсвэл нууц үг буруу байна.';
+       let errorMessage = 'Нэвтрэхэд тодорхойгүй алдаа гарлаа.';
         if (error.code === 'auth/user-not-found') {
             errorMessage = 'Хэрэглэгч олдсонгүй. Бүртгүүлнэ үү.';
         } else if (error.code === 'auth/wrong-password') {
