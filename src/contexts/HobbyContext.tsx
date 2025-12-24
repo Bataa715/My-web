@@ -17,16 +17,7 @@ interface HobbyContextType {
 
 const HobbyContext = createContext<HobbyContextType | undefined>(undefined);
 
-const initialHobbies: Omit<Hobby, 'id' | 'createdAt'>[] = [
-  { title: 'Хөгжим тоглох', description: 'Бас хаяа гитар, төгөлдөр хуур хөгжим тоглоод интернет дээр тавьчихдаг (๑• ᎑ •๑)', image: 'https://picsum.photos/seed/playing-guitar/600/400', imageHint: 'music instrument' },
-  { title: 'Аниме, ном, дуу, тоглоом', description: 'Өдөр болгон бүхий л ном, роман уншиж, кино үзэж, хөгжим сонсдог. Үүнээс гадна жаахан содон зүйлүүдийг дурдвал Аниме, Вебтүүн, Видео гейм гэх мэтчилэн байнаа. (©w©)', image: 'https://picsum.photos/seed/interstellar/600/400', imageHint: 'movie poster' },
-  { title: 'Спорт', description: 'Яагаад ч юм өглөө болоод гүйх шиг сайхан юм байдаггүй ээ. Тамирчин биш л дээ. Гэхдээ гүйсний дараа жинхэнэ амар амгаланг мэдэрдэг (๑´`๑). Гүйхийн хажуугаар фитнессээр, усан бассейнээр хичээллэх дуртай (๑´`๑).', image: 'https://picsum.photos/seed/running-morning/600/400', imageHint: 'running morning' },
-  { title: 'Полиглот болох мөрөөдөл', description: 'Одоогоор япон хэл үзэж байгаа ба, ирээдүйд герман хэлээр ярьдаг болох бүрэн зорилготой.', image: 'https://picsum.photos/seed/languages/600/400', imageHint: 'languages books' },
-  { title: 'Код бичих', description: 'Шинэ технологи сурч, сонирхолтой төслүүд дээр ажиллах нь миний хамгийн дуртай зүйлсийн нэг.', image: 'https://picsum.photos/seed/coding-desk/600/400', imageHint: 'coding desk' },
-  { title: 'Аялах', description: 'Шинэ газар үзэж, өөр соёлтой танилцах нь ертөнцийг харах өнцгийг минь тэлдэг.', image: 'https://picsum.photos/seed/travel-map/600/400', imageHint: 'travel map' },
-  { title: 'Гэрэл зураг', description: 'Гоё агшинг камерын дуранд буулгаж, тэр мөчийг мөнхлөх дуртай.', image: 'https://picsum.photos/seed/camera-lens/600/400', imageHint: 'camera lens' },
-  { title: 'Хоол хийх', description: 'Янз бүрийн орны хоол туршиж, шинэ амтыг нээх нь надад таашаал өгдөг.', image: 'https://picsum.photos/seed/cooking-kitchen/600/400', imageHint: 'cooking kitchen' },
-];
+const initialHobbies: Omit<Hobby, 'id' | 'createdAt'>[] = [];
 
 export function HobbyProvider({ children }: { children: ReactNode }) {
   const { firestore, user } = useFirebase();
@@ -49,7 +40,6 @@ export function HobbyProvider({ children }: { children: ReactNode }) {
         const snapshot = await getDocs(hobbiesCollectionRef);
 
         if (snapshot.empty) {
-            console.log("No hobbies found, seeding initial hobbies...");
             const batch = writeBatch(firestore);
             initialHobbies.forEach(hobby => {
                 const docRef = doc(hobbiesCollectionRef);

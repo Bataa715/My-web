@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +20,6 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const auth = useAuth();
-  const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,15 +40,23 @@ export default function LoginPage() {
     }
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
-      // Redirection is now handled by MainLayout
+      toast({
+        title: 'Амжилттай нэвтэрлээ',
+        description: 'Таныг нүүр хуудас руу шилжүүлж байна...',
+      });
+      // MainLayout will handle the redirect automatically
     } catch (error: any) {
        let errorMessage = 'Нэвтрэхэд тодорхойгүй алдаа гарлаа.';
-        if (error.code === 'auth/user-not-found') {
+        if (error?.code === 'auth/user-not-found') {
             errorMessage = 'Хэрэглэгч олдсонгүй. Бүртгүүлнэ үү.';
-        } else if (error.code === 'auth/wrong-password') {
+        } else if (error?.code === 'auth/wrong-password') {
             errorMessage = 'Нууц үг буруу байна.';
-        } else if (error.code === 'auth/invalid-credential') {
+        } else if (error?.code === 'auth/invalid-credential') {
             errorMessage = 'И-мэйл эсвэл нууц үг буруу байна.';
+        } else if (error?.code === 'auth/too-many-requests') {
+            errorMessage = 'Хэт олон оролдлого хийсэн байна. Хэсэг хүлээнэ үү.';
+        } else if (error?.code === 'auth/network-request-failed') {
+            errorMessage = 'Интернэт холболтыг шалгана үү.';
         }
 
       toast({

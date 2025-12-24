@@ -8,15 +8,12 @@ import { z } from 'zod';
 import { useAuth, useFirestore } from '@/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile } from '@/lib/types';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import type { OrbitInfo } from '@/lib/types';
 import Link from 'next/link';
 
 const formSchema = z.object({
@@ -28,7 +25,6 @@ const formSchema = z.object({
 export default function SignupPage() {
   const auth = useAuth();
   const firestore = useFirestore();
-  const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -52,61 +48,59 @@ export default function SignupPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
 
-      const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
-      const homeHeroPlaceholder = PlaceHolderImages.find(p => p.id === 'home-hero-background');
-      const aboutHeroPlaceholder = PlaceHolderImages.find(p => p.id === 'about-hero-background');
-      const toolsHeroPlaceholder = PlaceHolderImages.find(p => p.id === 'tools-hero-background');
+      const defaultImage = "https://i.pinimg.com/736x/62/76/34/627634aab8908a7eaa90dce0a11d257d.jpg";
       
-      const defaultProfileImage = avatarPlaceholder?.imageUrl || "https://picsum.photos/seed/avatar/400/400";
-      const defaultHomeHeroImage = homeHeroPlaceholder?.imageUrl;
-      const defaultAboutHeroImage = aboutHeroPlaceholder?.imageUrl;
-      const defaultToolsHeroImage = toolsHeroPlaceholder?.imageUrl;
-
-      const defaultPersonalInfo = [
-          { value: "21", label: "Нас" },
-          { value: "Мэлхий", label: "Орд" },
-          { value: "INTP-T", label: "MBTI" },
-      ];
-
       const defaultOrbitInfo: OrbitInfo[] = [
-          { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Энд байршлаа оруулна уу.', type: 'info' },
-          { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Энд хоббигоо оруулна уу.', type: 'info' },
-          { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Энд зорилгоо оруулна уу.', type: 'info' },
-          { id: 'user', icon: 'User', title: 'Тухай', content: 'Энд өөрийн тухай бичнэ үү.', type: 'info' },
-          { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Энд дуртай дуугаа оруулна уу.', type: 'audio', youtubeVideoId: '' },
-          { id: 'movie', icon: 'Film', title: 'Кино', content: 'Энд дуртай киногоо оруулна уу.', type: 'info', backgroundImage: '' },
-          { id: 'quote', icon: 'MessageSquareQuote', title: 'Ишлэл', content: 'Энд дуртай ишлэлээ оруулна уу.', type: 'info' },
-          { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Энд дуртай зүйлсээ бичнэ үү.', type: 'info' },
+        { id: 'location', icon: 'MapPin', title: 'Байршил', content: '', type: 'info' },
+        { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: '', type: 'info' },
+        { id: 'goals', icon: 'Target', title: 'Зорилго', content: '', type: 'info' },
+        { id: 'user', icon: 'User', title: 'Тухай', content: '', type: 'info' },
+        { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: '', type: 'audio', youtubeVideoId: '' },
+        { id: 'movie', icon: 'Film', title: 'Кино', content: '', type: 'info', backgroundImage: '' },
+        { id: 'quote', icon: 'MessageSquareQuote', title: 'Ишлэл', content: '', type: 'info' },
+        { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: '', type: 'info' },
       ];
-      const defaultLinks = {
-        github: "",
-        instagram: "",
-        email: values.email,
-        cvUrl: "",
-        facebook: "",
-      };
       
       const userProfile: UserProfile = {
         appName: "Kaizen",
         name: values.name,
         email: values.email,
-        bio: "Энд өөрийнхөө тухай товч танилцуулга бичээрэй.",
-        profileImage: defaultProfileImage,
-        personalInfo: defaultPersonalInfo,
-        homeHeroImage: defaultHomeHeroImage,
-        aboutHeroImage: defaultAboutHeroImage,
-        toolsHeroImage: defaultToolsHeroImage,
+        bio: "",
+        profileImage: defaultImage,
+        personalInfo: [],
+        homeHeroImage: defaultImage,
+        aboutHeroImage: defaultImage,
+        toolsHeroImage: defaultImage,
         orbitInfo: defaultOrbitInfo,
-        ...defaultLinks
+        github: "",
+        instagram: "",
+        cvUrl: "",
+        facebook: "",
       };
 
       await setDoc(doc(firestore, 'users', user.uid), userProfile);
-      // Redirection is now handled by MainLayout
+      toast({
+        title: 'Амжилттай бүртгэгдлээ',
+        description: 'Таныг нүүр хуудас руу шилжүүлж байна...',
+      });
+      // MainLayout will handle the redirect automatically
     } catch (error: any) {
-      console.error('Signup error:', error);
+      const errorCode = error?.code;
+      let errorMessage = error?.message || 'Бүртгүүлэхэд алдаа гарлаа.';
+      
+      if (errorCode === 'auth/email-already-in-use') {
+        errorMessage = 'Энэ и-мэйл хаяг бүртгэлтэй байна.';
+      } else if (errorCode === 'auth/invalid-email') {
+        errorMessage = 'И-мэйл хаяг буруу байна.';
+      } else if (errorCode === 'auth/weak-password') {
+        errorMessage = 'Нууц үг хэтэрхий сул байна.';
+      } else if (errorCode === 'auth/network-request-failed') {
+        errorMessage = 'Интернэт холболтыг шалгана үү.';
+      }
+      
       toast({
         title: 'Бүртгүүлэхэд алдаа гарлаа',
-        description: error.code === 'auth/email-already-in-use' ? 'Энэ и-мэйл хаяг бүртгэлтэй байна.' : error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

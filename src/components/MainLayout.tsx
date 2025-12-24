@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { useUser } from '@/firebase';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Loader2 } from 'lucide-react';
 
 export default function MainLayout({
@@ -16,8 +16,9 @@ export default function MainLayout({
   const router = useRouter();
   const { user, isUserLoading } = useUser();
 
-  const noAuthRequiredPaths = ['/login', '/signup'];
-  const isPublicPath = noAuthRequiredPaths.includes(pathname);
+  const isPublicPath = useMemo(() => {
+    return pathname === '/login' || pathname === '/signup';
+  }, [pathname]);
 
   useEffect(() => {
     // If auth state is still loading, don't do anything yet.
@@ -28,14 +29,15 @@ export default function MainLayout({
     // After loading, if there's no user and we are on a protected path, redirect to login.
     if (!user && !isPublicPath) {
       router.push('/login');
+      return;
     }
 
     // After loading, if there is a user and we are on a public path (login/signup), redirect to home.
     if (user && isPublicPath) {
-        router.push('/');
+      router.push('/');
+      return;
     }
-
-  }, [isUserLoading, user, isPublicPath]);
+  }, [isUserLoading, user, isPublicPath, router]);
 
   // While the auth state is loading and we are on a protected path, show a spinner.
   if (isUserLoading && !isPublicPath) {
@@ -56,16 +58,14 @@ export default function MainLayout({
     );
   }
 
-  const showHeaderFooter = !noAuthRequiredPaths.includes(pathname);
-
   // Render the page content.
   return (
     <div className="relative flex min-h-screen flex-col">
-      {showHeaderFooter && <Header />}
+      {!isPublicPath && <Header />}
       <main className="flex-1">
         {children}
       </main>
-      {showHeaderFooter && <Footer />}
+      {!isPublicPath && <Footer />}
     </div>
   );
 }

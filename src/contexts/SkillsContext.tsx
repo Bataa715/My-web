@@ -46,7 +46,6 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
         const skillsSnapshot = await getDocs(q);
 
         if (skillsSnapshot.empty) {
-            console.log("No skills found, seeding initial skills...");
             const batch = writeBatch(firestore);
             initialSkillsData.forEach(skill => {
                 const docRef = doc(skillsCollectionRef);
@@ -77,7 +76,6 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
         }
 
       } catch (error) {
-        console.error("Error fetching skills: ", error);
         toast({ title: "Алдаа", description: "Ур чадваруудыг дуудахад алдаа гарлаа.", variant: "destructive" });
       } finally {
         setLoading(false);
@@ -94,7 +92,6 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
       setSkills(prev => [...prev, { ...group, id: docRef.id, createdAt: new Date() } as Skill]);
       toast({ title: "Амжилттай", description: "Шинэ ур чадварын бүлэг нэмэгдлээ." });
     } catch (error) {
-      console.error("Error adding skill group: ", error);
       toast({ title: "Алдаа", description: "Бүлэг нэмэхэд алдаа гарлаа.", variant: "destructive" });
     }
   };

@@ -40,7 +40,6 @@ export function EducationProvider({ children }: { children: ReactNode }) {
         const educationSnapshot = await getDocs(q);
 
         if (educationSnapshot.empty) {
-            console.log("No education found, seeding initial education...");
             const batch = writeBatch(firestore);
             initialEducation.forEach(edu => {
                 const docRef = doc(educationCollectionRef);

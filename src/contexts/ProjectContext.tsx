@@ -40,7 +40,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         const projectSnapshot = await getDocs(q);
 
         if (projectSnapshot.empty) {
-            console.log("No projects found, seeding initial projects...");
             const batch = writeBatch(firestore);
             initialProjects.forEach(project => {
                 const docRef = doc(projectsCollectionRef);

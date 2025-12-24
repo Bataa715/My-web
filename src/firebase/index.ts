@@ -29,6 +29,7 @@ export * from './provider';
 export * from './client-provider';
 export * from './firestore/use-collection';
 export * from './firestore/use-doc';
-export * from './auth/use-user';
+// Note: useUser is exported from provider, not from auth/use-user
+// The auth/use-user is used internally by the provider
 export * from './errors';
 export * from './error-emitter';

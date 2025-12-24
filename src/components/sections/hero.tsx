@@ -160,21 +160,39 @@ export default function Hero() {
         setLoading(true);
       try {
         const docSnap = await getDoc(userInfoDocRef);
-        if (docSnap.exists() && docSnap.data().name) { 
+        if (docSnap.exists() && docSnap.data()?.name) { 
           const data = docSnap.data() as UserProfile;
-          setBio(data.bio || '');
-          setEditedBio(data.bio || '');
-          setName(data.name || '');
-          setEditedName(data.name || '');
-          const imageUrl = data.profileImage || '';
+          setBio(data.bio ?? '');
+          setEditedBio(data.bio ?? '');
+          setName(data.name ?? '');
+          setEditedName(data.name ?? '');
+          const imageUrl = data.profileImage ?? '';
           setProfileImage(imageUrl);
           setEditedImage(imageUrl);
-          setOrbitInfo(data.orbitInfo || []);
+          
+          // If orbitInfo is empty or doesn't exist, create default orbit elements
+          let orbitData = data.orbitInfo || [];
+          if (orbitData.length === 0) {
+            orbitData = [
+              { id: 'location', icon: 'MapPin', title: 'Байршил', content: '', type: 'info' },
+              { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: '', type: 'info' },
+              { id: 'goals', icon: 'Target', title: 'Зорилго', content: '', type: 'info' },
+              { id: 'user', icon: 'User', title: 'Тухай', content: '', type: 'info' },
+              { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: '', type: 'audio', youtubeVideoId: '' },
+              { id: 'movie', icon: 'Film', title: 'Кино', content: '', type: 'info', backgroundImage: '' },
+              { id: 'quote', icon: 'MessageSquareQuote', title: 'Ишлэл', content: '', type: 'info' },
+              { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: '', type: 'info' },
+            ];
+            // Update firestore with default orbit info
+            await updateDoc(userInfoDocRef, { orbitInfo: orbitData });
+          }
+          setOrbitInfo(orbitData);
+          
           const links = {
-            github: data.github || "https://github.com/Bataa715",
-            instagram: data.instagram || "https://www.instagram.com/ka1__zen/",
-            email: data.email || "batmyagmar715@gmail.com",
-            cvUrl: data.cvUrl || "https://www.google.com/",
+            github: data.github || "",
+            instagram: data.instagram || "",
+            email: data.email || "",
+            cvUrl: data.cvUrl || "",
             facebook: data.facebook || ''
           };
           setSocialLinks(links);
@@ -186,29 +204,29 @@ export default function Hero() {
           const aboutHeroPlaceholder = PlaceHolderImages.find(p => p.id === 'about-hero-background');
           const toolsHeroPlaceholder = PlaceHolderImages.find(p => p.id === 'tools-hero-background');
           
-          const defaultName = "Б.Батмягмар";
-          const defaultBio = "IT инженерийн чиглэлээр суралцаж буй оюутан, програмчлал, вэб хөгжүүлэлт, машин сургалт сонирхдог. Ирээдүйд програм хангамжийн инженер болно.";
+          const defaultName = "";
+          const defaultBio = "";
           const defaultProfileImage = avatarPlaceholder?.imageUrl || "https://picsum.photos/seed/avatar/400/400";
           const defaultHomeHeroImage = homeHeroPlaceholder?.imageUrl;
           const defaultAboutHeroImage = aboutHeroPlaceholder?.imageUrl;
           const defaultToolsHeroImage = toolsHeroPlaceholder?.imageUrl;
 
           const defaultOrbitInfo: OrbitInfo[] = [
-              { id: 'location', icon: 'MapPin', title: 'Байршил', content: 'Улаанбаатар, Монгол', type: 'info' },
-              { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: 'Чөлөөт цагаараа код бичих, ном унших, хөгжим сонсох дуртай.', type: 'info' },
-              { id: 'goals', icon: 'Target', title: 'Зорилго', content: 'Дэлхийн хэмжээний програм хангамжийн компанид ажиллах.', type: 'info' },
-              { id: 'user', icon: 'User', title: 'Тухай', content: 'Би програмчлалд дуртай.', type: 'info' },
-              { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: 'Дуртай дууг сонсох.', type: 'audio', youtubeVideoId: 'dQw4w9WgXcQ' },
-              { id: 'movie', icon: 'Film', title: 'Кино', content: 'Дуртай кино бол The Matrix. Маш олон удаа үзсэн.', type: 'info', backgroundImage: 'https://i.pinimg.com/1200x/81/31/c3/8131c3dccfe8cd2f38ff3798745fbd03.jpg' },
-              { id: 'quote', icon: 'MessageSquareQuote', title: 'Ишлэл', content: '"The best way to predict the future is to invent it." - Alan Kay', type: 'info' },
-              { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: 'Кофе, технологи, аялал.', type: 'info' },
+              { id: 'location', icon: 'MapPin', title: 'Байршил', content: '', type: 'info' },
+              { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: '', type: 'info' },
+              { id: 'goals', icon: 'Target', title: 'Зорилго', content: '', type: 'info' },
+              { id: 'user', icon: 'User', title: 'Тухай', content: '', type: 'info' },
+              { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: '', type: 'audio', youtubeVideoId: '' },
+              { id: 'movie', icon: 'Film', title: 'Кино', content: '', type: 'info', backgroundImage: '' },
+              { id: 'quote', icon: 'MessageSquareQuote', title: 'Ишлэл', content: '', type: 'info' },
+              { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: '', type: 'info' },
           ];
           const defaultLinks = {
-            github: "https://github.com/Bataa715",
-            instagram: "https://www.instagram.com/ka1__zen/",
-            email: "batmyagmar715@gmail.com",
-            cvUrl: 'https://www.google.com/',
-            facebook: "https://www.facebook.com/profile.php?id=100010513223018",
+            github: "",
+            instagram: "",
+            email: "",
+            cvUrl: '',
+            facebook: "",
           };
           const defaultData: UserProfile = {
             name: defaultName,
