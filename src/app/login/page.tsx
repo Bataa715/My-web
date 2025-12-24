@@ -43,7 +43,7 @@ export default function LoginPage() {
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({ title: 'Амжилттай нэвтэрлээ.' });
-      router.push('/');
+      window.location.href = '/';
 
     } catch (error: any) {
        let errorMessage = 'Нэвтрэхэд тодорхойгүй алдаа гарлаа.';

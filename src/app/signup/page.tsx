@@ -103,7 +103,7 @@ export default function SignupPage() {
       await setDoc(doc(firestore, 'users', user.uid), userProfile);
 
       toast({ title: 'Амжилттай бүртгүүллээ.' });
-      router.push('/');
+      window.location.href = '/';
 
     } catch (error: any) {
       console.error('Signup error:', error);
