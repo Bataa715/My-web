@@ -35,7 +35,7 @@ export default function MainLayout({
         router.push('/');
     }
 
-  }, [isUserLoading, user, isPublicPath, pathname, router]);
+  }, [isUserLoading, user, isPublicPath]);
 
   // While the auth state is loading and we are on a protected path, show a spinner.
   if (isUserLoading && !isPublicPath) {
