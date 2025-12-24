@@ -101,7 +101,7 @@ export default function SignupPage() {
       };
 
       await setDoc(doc(firestore, 'users', user.uid), userProfile);
-      window.location.href = '/';
+      // Redirection is now handled by MainLayout
     } catch (error: any) {
       console.error('Signup error:', error);
       toast({

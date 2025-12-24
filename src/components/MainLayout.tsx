@@ -20,11 +20,24 @@ export default function MainLayout({
   const isPublicPath = noAuthRequiredPaths.includes(pathname);
 
   useEffect(() => {
-    if (!isUserLoading && !user && !isPublicPath) {
+    // If auth state is still loading, don't do anything yet.
+    if (isUserLoading) {
+      return;
+    }
+    
+    // After loading, if there's no user and we are on a protected path, redirect to login.
+    if (!user && !isPublicPath) {
       router.push('/login');
     }
-  }, [isUserLoading, user, isPublicPath, router]);
 
+    // After loading, if there is a user and we are on a public path (login/signup), redirect to home.
+    if (user && isPublicPath) {
+        router.push('/');
+    }
+
+  }, [isUserLoading, user, isPublicPath, pathname, router]);
+
+  // While the auth state is loading and we are on a protected path, show a spinner.
   if (isUserLoading && !isPublicPath) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -33,9 +46,8 @@ export default function MainLayout({
     );
   }
 
-  const showHeaderFooter = !noAuthRequiredPaths.includes(pathname);
-
-  // If user is not logged in and it's not a public path, we show nothing until redirect happens
+  // If there's no user and we're on a protected path, the useEffect will trigger a redirect,
+  // so we can render a loader until the redirect happens.
   if (!user && !isPublicPath) {
      return (
       <div className="flex items-center justify-center min-h-screen">
@@ -44,6 +56,9 @@ export default function MainLayout({
     );
   }
 
+  const showHeaderFooter = !noAuthRequiredPaths.includes(pathname);
+
+  // Render the page content.
   return (
     <div className="relative flex min-h-screen flex-col">
       {showHeaderFooter && <Header />}

@@ -42,7 +42,7 @@ export default function LoginPage() {
     }
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
-      window.location.href = '/';
+      // Redirection is now handled by MainLayout
     } catch (error: any) {
        let errorMessage = 'Нэвтрэхэд тодорхойгүй алдаа гарлаа.';
         if (error.code === 'auth/user-not-found') {
