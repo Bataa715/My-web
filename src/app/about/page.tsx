@@ -215,32 +215,30 @@ export default function AboutPage() {
         </div>
       )}
       
-      <div className="flex flex-col items-center justify-center text-center py-12 md:py-24">
-        <div className="flex flex-col items-center justify-center space-y-12 pt-24">
+      <div className="flex h-[50vh] flex-col items-center justify-center space-y-12 text-center">
           <div className="matrix-text-container">
             <h1 className="text-3xl font-bold" style={{textShadow: '0 0 5px rgba(255,255,255,0.5)'}}>
                 Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
               </h1>
           </div>
-          
-          <section className="w-full max-w-4xl">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {personalInfo.map((info, index) => (
-                      <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-4 shadow-lg relative group">
-                          {isEditMode && (
-                              <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => handleEditInfoClick(info)}>
-                                  <Edit className="h-4 w-4" />
-                              </Button>
-                          )}
-                          <p className="text-4xl font-bold text-primary">{info.value}</p>
-                          <p className="text-sm uppercase text-muted-foreground mt-1">{info.label}</p>
-                      </Card>
-                  ))}
-              </div>
-          </section>
-        </div>
       </div>
       
+      <section className="w-full max-w-4xl mx-auto py-16 md:py-24">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {personalInfo.map((info, index) => (
+                  <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-4 shadow-lg relative group">
+                      {isEditMode && (
+                          <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => handleEditInfoClick(info)}>
+                              <Edit className="h-4 w-4" />
+                          </Button>
+                      )}
+                      <p className="text-4xl font-bold text-primary">{info.value}</p>
+                      <p className="text-sm uppercase text-muted-foreground mt-1">{info.label}</p>
+                  </Card>
+              ))}
+          </div>
+      </section>
+
       <Dialog open={isEditingInfo} onOpenChange={setIsEditingInfo}>
         <DialogContent>
             <DialogHeader>
