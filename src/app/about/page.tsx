@@ -214,7 +214,7 @@ export default function AboutPage() {
             className="object-cover"
             data-ai-hint="welcome abstract"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
         </div>
       )}
        <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-114px)]">
