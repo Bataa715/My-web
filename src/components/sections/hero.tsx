@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -414,7 +415,7 @@ export default function Hero() {
         setTimeout(() => {
             setSelectedOrbit(item);
             setEditedOrbitData(item);
-        }, 2000);
+        }, 1000);
     } else if (selectedOrbit && selectedOrbit.id === item.id) {
         // If the same item is clicked, close it
         setSelectedOrbit(null);
@@ -593,7 +594,7 @@ export default function Hero() {
                             animate={{ rotateY: 0, opacity: 1, scale: 1 }}
                             exit={{ rotateY: -180, opacity: 0, scale: 0.8 }}
                             transition={{ duration: 0.6, ease: "easeInOut" }}
-                            className="relative w-full h-full group"
+                            className="relative w-full h-full group [transform-style:preserve-3d]"
                         >
                            <div className="avatar-glow-wrapper w-full h-full">
                                 <Avatar className="w-full h-full border-4 border-background">
@@ -888,5 +889,6 @@ export default function Hero() {
 
 
     
+
 
 
