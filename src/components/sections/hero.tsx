@@ -407,24 +407,37 @@ export default function Hero() {
     );
   }
 
-  const orbitItemClick = (item: OrbitInfo) => {
-    if (selectedOrbit && selectedOrbit.id === item.id) {
+  const handleOrbitItemClick = (item: OrbitInfo) => {
+    if (selectedOrbit && selectedOrbit.id !== item.id) {
+        // If a different item is clicked, first close the current one
         setSelectedOrbit(null);
-        setIsEditingOrbit(false); 
+        // Then open the new one after a short delay to allow the flip-back animation
+        setTimeout(() => {
+            setSelectedOrbit(item);
+            setEditedOrbitData(item);
+        }, 100);
+    } else if (selectedOrbit && selectedOrbit.id === item.id) {
+        // If the same item is clicked, close it
+        setSelectedOrbit(null);
     } else {
+        // If no item is open, open the clicked one
         setSelectedOrbit(item);
-        setEditedOrbitTitle(item.title);
-        setEditedOrbitIcon(item.icon);
-        setEditedOrbitContent(item.content);
-        if(item.type === 'audio') {
-            setEditedYoutubeUrl(item.youtubeVideoId ? `https://www.youtube.com/watch?v=${item.youtubeVideoId}` : '');
-             setEditedOrbitBgImage(item.backgroundImage || "");
-        } else {
-            setEditedOrbitBgImage(item.backgroundImage || "");
-        }
-        setIsEditingOrbit(false);
+        setEditedOrbitData(item);
     }
+    setIsEditingOrbit(false);
   };
+
+  const setEditedOrbitData = (item: OrbitInfo) => {
+    setEditedOrbitTitle(item.title);
+    setEditedOrbitIcon(item.icon);
+    setEditedOrbitContent(item.content);
+    if(item.type === 'audio') {
+        setEditedYoutubeUrl(item.youtubeVideoId ? `https://www.youtube.com/watch?v=${item.youtubeVideoId}` : '');
+         setEditedOrbitBgImage(item.backgroundImage || "");
+    } else {
+        setEditedOrbitBgImage(item.backgroundImage || "");
+    }
+  }
   
   const handleContentClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -446,7 +459,7 @@ export default function Hero() {
         <div className="grid items-center justify-center gap-10 lg:grid-cols-2 lg:gap-20">
           <div className="flex flex-col justify-center space-y-6 lg:order-2">
             <div className="relative flex items-center justify-center w-full max-w-[500px] aspect-square mx-auto">
-             <div className={cn("relative transition-all duration-500", isEditingOrbit ? "w-[360px] h-[360px] md:w-[480px] md:h-[480px]" : "w-80 h-80 md:w-96 md:h-96")}>
+             <div className={cn("relative transition-all duration-500 [transform-style:preserve-3d]", isEditingOrbit ? "w-[360px] h-[360px] md:w-[480px] md:h-[480px]" : "w-80 h-80 md:w-96 md:h-96")}>
                 <AnimatePresence>
                     {selectedOrbit ? (
                         <motion.div
@@ -464,8 +477,7 @@ export default function Hero() {
                                     src={selectedOrbit.backgroundImage}
                                     alt={selectedOrbit.title}
                                     fill
-                                    objectFit="cover"
-                                    className="z-0 opacity-50"
+                                    className="object-cover rounded-full z-0 opacity-50"
                                 />
                                  <div className="absolute inset-0 bg-black/50 z-10" />
                               </>
@@ -613,7 +625,7 @@ export default function Hero() {
                      index={index}
                      total={orbitInfo.length}
                      selectedOrbit={selectedOrbit}
-                     onItemClick={orbitItemClick}
+                     onItemClick={handleOrbitItemClick}
                      isEditing={!!selectedOrbit && isEditingOrbit}
                    />
                 ))}
@@ -877,3 +889,4 @@ export default function Hero() {
 
 
     
+
