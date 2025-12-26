@@ -20,6 +20,7 @@ import { useHobbies } from '@/contexts/HobbyContext';
 import { AddHobbyDialog } from '@/components/AddHobbyDialog';
 import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { ChevronDown } from 'lucide-react';
 
 const getIcon = (iconName?: string) => {
     if (!iconName) return null;
@@ -182,7 +183,7 @@ export default function AboutPage() {
 
       <div className="flex h-[50vh] flex-col items-center justify-center space-y-12 text-center">
         <div className="matrix-text-container">
-            <h1 className="text-3xl font-bold" style={{textShadow: '0 0 5px rgba(255,255,255,0.5)'}}>
+            <h1 className="text-3xl font-bold" style={{textShadow: '1px 1px 2px black, 0 0 1em white, 0 0 0.2em white'}}>
             Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
             </h1>
         </div>
@@ -418,5 +419,4 @@ export default function AboutPage() {
             }
       `}</style>
     </>
-  );
-}
+    
