@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import Link from "next/link";
@@ -20,6 +21,7 @@ import Image from "next/image";
 import { useFirebase } from "@/firebase";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import IconPicker from "../shared/IconPicker";
+import { Skeleton } from "../ui/skeleton";
 
 const getIcon = (iconName: string, props = {}) => {
     // Add BrainCircuit as a special case if the user had 'brain'
@@ -151,6 +153,7 @@ export default function Hero() {
 
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   const [selectedSocial, setSelectedSocial] = useState<SocialInfo | null>(null);
+  const [isQrLoading, setIsQrLoading] = useState(true);
   
   const { toast } = useToast();
   
@@ -479,7 +482,7 @@ export default function Hero() {
                             animate={{ rotateY: 0, opacity: 1, scale: 1 }}
                             exit={{ rotateY: 180, opacity: 0, scale: 0.8 }}
                             transition={{ duration: 0.6, ease: "easeInOut" }}
-                            className="absolute inset-0 flex flex-col items-center justify-center bg-muted rounded-full border-4 border-primary shadow-lg text-center overflow-hidden"
+                            className="absolute inset-0 flex flex-col items-center justify-center bg-muted rounded-full border-4 border-primary shadow-lg text-center overflow-hidden [transform-style:preserve-3d]"
                             onClick={handleCloseContent}
                         >
                            {selectedOrbit.backgroundImage && !isEditingOrbit && (
@@ -490,7 +493,7 @@ export default function Hero() {
                                     fill
                                     className="object-cover rounded-full z-0 opacity-50"
                                 />
-                                 <div className="absolute inset-0 bg-black/50 z-10" />
+                                 <div className="absolute inset-0 z-10" />
                               </>
                            )}
                            
@@ -793,7 +796,7 @@ export default function Hero() {
                                             variant="outline"
                                             size="icon"
                                             className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                                            onClick={() => setSelectedSocial(social)}
+                                            onClick={() => { setSelectedSocial(social); setIsQrLoading(true); }}
                                         >
                                             {social.icon}
                                         </Button>
@@ -810,12 +813,19 @@ export default function Hero() {
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="flex flex-col items-center justify-center py-4">
-                                     <div className="p-2 bg-white rounded-lg">
+                                     <div className="p-2 bg-white rounded-lg relative w-[200px] h-[200px]">
+                                        {isQrLoading && (
+                                            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
+                                                <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
+                                            </div>
+                                        )}
                                           <Image
                                               src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${selectedSocial.type === 'email' ? `mailto:${selectedSocial.url}` : selectedSocial.url}`}
                                               alt={`${selectedSocial.name} QR Code`}
                                               width={200}
                                               height={200}
+                                              onLoad={() => setIsQrLoading(false)}
+                                              className={cn(isQrLoading && "opacity-0")}
                                           />
                                      </div>
                                 </div>
@@ -909,3 +919,4 @@ export default function Hero() {
     </section>
   );
 }
+
