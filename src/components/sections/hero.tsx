@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -415,7 +414,7 @@ export default function Hero() {
         setTimeout(() => {
             setSelectedOrbit(item);
             setEditedOrbitData(item);
-        }, 100);
+        }, 2000);
     } else if (selectedOrbit && selectedOrbit.id === item.id) {
         // If the same item is clicked, close it
         setSelectedOrbit(null);
@@ -889,4 +888,5 @@ export default function Hero() {
 
 
     
+
 
