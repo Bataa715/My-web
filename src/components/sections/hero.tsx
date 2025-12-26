@@ -415,7 +415,7 @@ export default function Hero() {
         setTimeout(() => {
             setSelectedOrbit(item);
             setEditedOrbitData(item);
-        }, 1000);
+        }, 800);
     } else if (selectedOrbit && selectedOrbit.id === item.id) {
         // If the same item is clicked, close it
         setSelectedOrbit(null);
@@ -892,3 +892,6 @@ export default function Hero() {
 
 
 
+
+
+  
