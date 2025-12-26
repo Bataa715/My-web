@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight, ChevronDown } from 'lucide-react';
+import { ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight, Cake, Sun, User as UserIcon } from 'lucide-react';
 import { useState, useEffect, useCallback, type CSSProperties, useMemo } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -20,6 +20,12 @@ import { useHobbies } from '@/contexts/HobbyContext';
 import { AddHobbyDialog } from '@/components/AddHobbyDialog';
 import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+
+const getIcon = (iconName?: string) => {
+    if (!iconName) return null;
+    const LucideIcon = (require('lucide-react') as any)[iconName];
+    return LucideIcon ? <LucideIcon className="h-8 w-8 mb-3 text-primary" /> : null;
+};
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -70,9 +76,9 @@ export default function AboutPage() {
               setPersonalInfo(data.personalInfo);
             } else {
               const defaultInfo: PersonalInfoType[] = [
-                  { value: "21", label: "Нас" },
-                  { value: "Мэлхий", label: "Орд" },
-                  { value: "INTP-T", label: "MBTI" },
+                  { value: "21", label: "Нас", icon: 'Cake' },
+                  { value: "Мэлхий", label: "Орд", icon: 'Sun' },
+                  { value: "INTJ", label: "MBTI", icon: 'UserIcon' },
               ];
               await updateDoc(userDocRef, { personalInfo: defaultInfo });
               setPersonalInfo(defaultInfo);
@@ -224,19 +230,20 @@ export default function AboutPage() {
       )}
 
       <section className="w-full max-w-4xl mx-auto pt-0 text-center">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {personalInfo.map((info, index) => (
-                  <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-8 shadow-lg relative group">
-                      {isEditMode && (
-                          <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => handleEditInfoClick(info)}>
-                              <Edit className="h-4 w-4" />
-                          </Button>
-                      )}
-                      <p className="text-5xl font-bold text-primary">{info.value}</p>
-                      <p className="text-sm uppercase text-muted-foreground mt-1">{info.label}</p>
-                  </Card>
-              ))}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {personalInfo.map((info, index) => (
+                <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-8 shadow-lg relative group h-full min-h-[160px] flex flex-col justify-center">
+                    {isEditMode && (
+                        <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => handleEditInfoClick(info)}>
+                            <Edit className="h-4 w-4" />
+                        </Button>
+                    )}
+                    {getIcon(info.icon)}
+                    <p className="text-4xl font-bold text-primary">{info.value}</p>
+                    <p className="text-sm uppercase text-muted-foreground mt-1">{info.label}</p>
+                </Card>
+            ))}
+        </div>
       </section>
 
       <Dialog open={isEditingInfo} onOpenChange={setIsEditingInfo}>

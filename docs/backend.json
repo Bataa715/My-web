@@ -28,7 +28,8 @@
             "type": "object",
             "properties": {
               "label": { "type": "string" },
-              "value": { "type": "string" }
+              "value": { "type": "string" },
+              "icon": { "type": "string" }
             },
             "required": ["label", "value"]
           }
@@ -295,6 +296,18 @@
       },
       "required": ["title", "content", "createdAt"]
     },
+     "ReadingNote": {
+      "title": "Reading Note",
+      "description": "A note associated with a specific piece of reading material.",
+      "type": "object",
+      "properties": {
+        "readingMaterialId": { "type": "string" },
+        "selectedText": { "type": "string" },
+        "note": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["readingMaterialId", "selectedText", "note", "createdAt"]
+    },
     "Kana": {
       "title": "Kana",
       "type": "object",
@@ -404,6 +417,9 @@
     },
     "/users/{userId}/englishReading/{materialId}": {
       "schema": { "$ref": "#/entities/ReadingMaterial" }
+    },
+    "/users/{userId}/englishReading/{materialId}/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/ReadingNote" }
     },
     "/users/{userId}/englishListening/{materialId}": {
       "schema": { "$ref": "#/entities/ReadingMaterial" }

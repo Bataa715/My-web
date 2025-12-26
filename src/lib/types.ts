@@ -151,6 +151,7 @@ export type OrbitInfo = {
 export type PersonalInfoItem = {
     label: string;
     value: string;
+    icon?: string;
 };
 
 export type UserProfile = {
