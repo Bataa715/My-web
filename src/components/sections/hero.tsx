@@ -465,8 +465,9 @@ export default function Hero() {
                                     alt={selectedOrbit.title}
                                     fill
                                     objectFit="cover"
-                                    className="z-0"
+                                    className="z-0 opacity-50"
                                 />
+                                 <div className="absolute inset-0 bg-black/50 z-10" />
                               </>
                            )}
                            
