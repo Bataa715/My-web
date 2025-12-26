@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -110,6 +110,15 @@ const getYoutubeVideoId = (url: string): string | null => {
     return videoId;
 };
 
+type SocialLinkType = 'github' | 'instagram' | 'facebook' | 'email';
+
+interface SocialInfo {
+    type: SocialLinkType;
+    url: string;
+    icon: React.ReactNode;
+    name: string;
+}
+
 export default function Hero() {
   const { isEditMode } = useEditMode();
   const { firestore, user, isUserLoading } = useFirebase();
@@ -141,6 +150,7 @@ export default function Hero() {
   const [editedLinks, setEditedLinks] = useState({ github: '', instagram: '', email: '', cvUrl: '', facebook: '' });
 
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const [selectedSocial, setSelectedSocial] = useState<SocialInfo | null>(null);
   
   const { toast } = useToast();
   
@@ -170,7 +180,6 @@ export default function Hero() {
           setProfileImage(imageUrl);
           setEditedImage(imageUrl);
           
-          // If orbitInfo is empty or doesn't exist, create default orbit elements
           let orbitData = data.orbitInfo || [];
           if (orbitData.length === 0) {
             orbitData = [
@@ -183,7 +192,6 @@ export default function Hero() {
               { id: 'quote', icon: 'MessageSquareQuote', title: 'Ишлэл', content: '', type: 'info' },
               { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: '', type: 'info' },
             ];
-            // Update firestore with default orbit info
             await updateDoc(userInfoDocRef, { orbitInfo: orbitData });
           }
           setOrbitInfo(orbitData);
@@ -409,18 +417,14 @@ export default function Hero() {
 
   const handleOrbitItemClick = (item: OrbitInfo) => {
     if (selectedOrbit && selectedOrbit.id !== item.id) {
-        // If a different item is clicked, first close the current one
         setSelectedOrbit(null);
-        // Then open the new one after a short delay to allow the flip-back animation
         setTimeout(() => {
             setSelectedOrbit(item);
             setEditedOrbitData(item);
         }, 800);
     } else if (selectedOrbit && selectedOrbit.id === item.id) {
-        // If the same item is clicked, close it
         setSelectedOrbit(null);
     } else {
-        // If no item is open, open the clicked one
         setSelectedOrbit(item);
         setEditedOrbitData(item);
     }
@@ -451,6 +455,13 @@ export default function Hero() {
       setSelectedOrbit(null);
     }
   };
+
+  const socialButtons = [
+    { type: 'github', url: socialLinks.github, icon: <Github className="h-5 w-5" />, name: 'GitHub' },
+    { type: 'instagram', url: socialLinks.instagram, icon: <Instagram className="h-5 w-5" />, name: 'Instagram' },
+    { type: 'facebook', url: socialLinks.facebook, icon: <Facebook className="h-5 w-5" />, name: 'Facebook' },
+    { type: 'email', url: socialLinks.email, icon: <Mail className="h-5 w-5" />, name: 'Email' }
+  ].filter(link => link.url);
 
 
   return (
@@ -774,37 +785,58 @@ export default function Hero() {
                             </Link>
                         </Button>
                         )}
-                        <div className="flex items-center gap-2">
-                        {socialLinks.github && (
-                            <Button asChild variant="outline" size="icon" className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                                <Link href={socialLinks.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-                                    <Github className="h-5 w-5" />
-                                </Link>
-                            </Button>
-                        )}
-                        {socialLinks.instagram && (
-                             <Button asChild variant="outline" size="icon" className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                                <Link href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                                    <Instagram className="h-5 w-5" />
-                                </Link>
-                            </Button>
-                        )}
-                        {socialLinks.facebook && (
-                            <Button asChild variant="outline" size="icon" className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                                <Link href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                                    <Facebook className="h-5 w-5" />
-                                </Link>
-                            </Button>
-                        )}
-                        {socialLinks.email && (
-                            <Button asChild variant="outline" size="icon" className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                                 <Link href={`mailto:${socialLinks.email}`} aria-label="Email">
-                                    <Mail className="h-5 w-5" />
-                                </Link>
-                            </Button>
-                        )}
-                        </div>
-
+                        <Dialog>
+                            <div className="flex items-center gap-2">
+                                {socialButtons.map((social) => (
+                                    <DialogTrigger key={social.type} asChild>
+                                        <Button 
+                                            variant="outline"
+                                            size="icon"
+                                            className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                                            onClick={() => setSelectedSocial(social)}
+                                        >
+                                            {social.icon}
+                                        </Button>
+                                    </DialogTrigger>
+                                ))}
+                            </div>
+                            <DialogContent className="sm:max-w-[425px]">
+                                {selectedSocial && (
+                                <>
+                                <DialogHeader>
+                                    <DialogTitle className="flex items-center gap-2">{selectedSocial.icon} {selectedSocial.name}</DialogTitle>
+                                    <DialogDescription>
+                                        QR кодыг уншуулж эсвэл "Үзэх" товчийг дарж холбогдоно уу.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="flex flex-col items-center justify-center py-4">
+                                     <div className="p-2 bg-white rounded-lg">
+                                          <Image
+                                              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${selectedSocial.type === 'email' ? `mailto:${selectedSocial.url}` : selectedSocial.url}`}
+                                              alt={`${selectedSocial.name} QR Code`}
+                                              width={200}
+                                              height={200}
+                                          />
+                                     </div>
+                                </div>
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button type="button" variant="secondary">
+                                            Хаах
+                                        </Button>
+                                    </DialogClose>
+                                    {selectedSocial.type !== 'email' && (
+                                        <Button asChild>
+                                            <a href={selectedSocial.url} target="_blank" rel="noopener noreferrer">
+                                            Үзэх
+                                            </a>
+                                        </Button>
+                                    )}
+                                </DialogFooter>
+                                </>
+                                )}
+                            </DialogContent>
+                        </Dialog>
                          {isEditMode && (
                             <Button
                                 variant="ghost"
@@ -877,21 +909,3 @@ export default function Hero() {
     </section>
   );
 }
-
-    
-
-    
-
-
-
-    
-
-
-
-    
-
-
-
-
-
-  
