@@ -164,83 +164,85 @@ export default function AboutPage() {
   const name = "Batuka";
   
   return (
-    <div className="relative">
-       {isEditMode && (
-          <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="icon" className="absolute top-4 right-4 z-30">
-                <ImageIcon className="h-4 w-4" />
-                <span className="sr-only">Арын зураг солих</span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Арын зургийн холбоос</DialogTitle>
-                <DialogDescription>
-                  Шинэ зургийнхаа URL хаягийг энд буулгана уу.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="image-url" className="text-right">
-                    URL
-                  </Label>
-                  <Input
-                    id="image-url"
-                    value={editedImageUrl}
-                    onChange={(e) => setEditedImageUrl(e.target.value)}
-                    className="col-span-3"
-                    placeholder="https://example.com/image.png"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button type="button" variant="secondary">Цуцлах</Button>
-                </DialogClose>
-                <Button type="button" onClick={handleSaveImage} disabled={saving}>
-                  {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
+    <>
+      <div className="relative">
+        {isEditMode && (
+            <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon" className="absolute top-4 right-4 z-30">
+                  <ImageIcon className="h-4 w-4" />
+                  <span className="sr-only">Арын зураг солих</span>
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
-      {heroImage && (
-        <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
-          <Image
-            src={heroImage}
-            alt="Welcome background"
-            fill
-            className="object-cover"
-            data-ai-hint="welcome abstract"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-        </div>
-      )}
-       <div className="flex flex-col items-center justify-center text-center min-h-[calc(50vh-57px)]">
-          <div className="flex flex-col items-center justify-center space-y-12">
-            <div className="matrix-text-container">
-               <h1 className="text-3xl font-bold" style={{textShadow: '0 0 5px rgba(255,255,255,0.5)'}}>
-                  Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
-                </h1>
-            </div>
-            
-            <section className="w-full max-w-4xl">
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {personalInfo.map((info, index) => (
-                        <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-4 shadow-lg relative group">
-                            {isEditMode && (
-                                <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => handleEditInfoClick(info)}>
-                                    <Edit className="h-4 w-4" />
-                                </Button>
-                            )}
-                            <p className="text-4xl font-bold text-primary">{info.value}</p>
-                            <p className="text-sm uppercase text-muted-foreground mt-1">{info.label}</p>
-                        </Card>
-                    ))}
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Арын зургийн холбоос</DialogTitle>
+                  <DialogDescription>
+                    Шинэ зургийнхаа URL хаягийг энд буулгана уу.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="image-url" className="text-right">
+                      URL
+                    </Label>
+                    <Input
+                      id="image-url"
+                      value={editedImageUrl}
+                      onChange={(e) => setEditedImageUrl(e.target.value)}
+                      className="col-span-3"
+                      placeholder="https://example.com/image.png"
+                    />
+                  </div>
                 </div>
-            </section>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button type="button" variant="secondary">Цуцлах</Button>
+                  </DialogClose>
+                  <Button type="button" onClick={handleSaveImage} disabled={saving}>
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+        {heroImage && (
+          <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
+            <Image
+              src={heroImage}
+              alt="Welcome background"
+              fill
+              className="object-cover"
+              data-ai-hint="welcome abstract"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
           </div>
+        )}
+        <div className="flex flex-col items-center justify-center text-center min-h-[calc(50vh-57px)]">
+            <div className="flex flex-col items-center justify-center space-y-12">
+              <div className="matrix-text-container">
+                <h1 className="text-3xl font-bold" style={{textShadow: '0 0 5px rgba(255,255,255,0.5)'}}>
+                    Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
+                  </h1>
+              </div>
+              
+              <section className="w-full max-w-4xl">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {personalInfo.map((info, index) => (
+                          <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-4 shadow-lg relative group">
+                              {isEditMode && (
+                                  <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => handleEditInfoClick(info)}>
+                                      <Edit className="h-4 w-4" />
+                                  </Button>
+                              )}
+                              <p className="text-4xl font-bold text-primary">{info.value}</p>
+                              <p className="text-sm uppercase text-muted-foreground mt-1">{info.label}</p>
+                          </Card>
+                      ))}
+                  </div>
+              </section>
+            </div>
+        </div>
       </div>
       
       <Dialog open={isEditingInfo} onOpenChange={setIsEditingInfo}>
@@ -410,6 +412,6 @@ export default function AboutPage() {
                 cursor: pointer;
             }
       `}</style>
-    </div>
+    </>
   );
 }
