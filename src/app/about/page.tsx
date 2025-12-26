@@ -2,8 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { ArrowRight, ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight } from 'lucide-react';
 import { useState, useEffect, useCallback, type CSSProperties, useMemo } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -15,15 +14,12 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useHobbies } from '@/contexts/HobbyContext';
 import { AddHobbyDialog } from '@/components/AddHobbyDialog';
 import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Skeleton } from '@/components/ui/skeleton';
-
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -165,7 +161,7 @@ export default function AboutPage() {
   
   return (
     <>
-       {isEditMode && (
+      {isEditMode && (
         <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
           <DialogTrigger asChild>
             <Button variant="outline" size="icon" className="absolute top-4 right-4 z-30">
