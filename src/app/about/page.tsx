@@ -206,7 +206,7 @@ export default function AboutPage() {
           </Dialog>
         )}
       {heroImage && (
-        <div className="absolute top-0 left-0 w-full h-[100vh] -z-10">
+        <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
           <Image
             src={heroImage}
             alt="Welcome background"
@@ -214,10 +214,10 @@ export default function AboutPage() {
             className="object-cover"
             data-ai-hint="welcome abstract"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
         </div>
       )}
-       <div className="flex flex-col items-center justify-center text-center min-h-[calc(100vh-114px)]">
+       <div className="flex flex-col items-center justify-center text-center min-h-[calc(50vh-57px)]">
           <div className="flex flex-col items-center justify-center space-y-12">
             <div className="matrix-text-container">
                <h1 className="text-3xl font-bold" style={{textShadow: '0 0 5px rgba(255,255,255,0.5)'}}>
