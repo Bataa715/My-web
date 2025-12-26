@@ -24,7 +24,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 const getIcon = (iconName?: string) => {
     if (!iconName) return null;
     const LucideIcon = (require('lucide-react') as any)[iconName];
-    return LucideIcon ? <LucideIcon className="h-8 w-8 mb-3 text-primary" /> : null;
+    return LucideIcon ? <LucideIcon className="h-8 w-8 mb-3 text-white" /> : null;
 };
 
 export default function AboutPage() {
@@ -230,17 +230,21 @@ export default function AboutPage() {
       )}
 
       <section className="w-full max-w-4xl mx-auto pt-0 text-center">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {personalInfo.map((info, index) => (
-                <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-8 shadow-lg relative group h-full min-h-[160px] flex flex-col justify-center">
-                    {isEditMode && (
-                        <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => handleEditInfoClick(info)}>
-                            <Edit className="h-4 w-4" />
-                        </Button>
-                    )}
-                    {getIcon(info.icon)}
-                    <p className="text-4xl font-bold text-primary">{info.value}</p>
-                    <p className="text-sm uppercase text-muted-foreground mt-1">{info.label}</p>
+                <Card key={index} className="relative group overflow-hidden rounded-lg shadow-lg border-white/10 h-full min-h-[160px]">
+                    <CardContent className="p-0 h-full">
+                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center p-4 text-white bg-gradient-to-t from-black/70 to-transparent">
+                            {getIcon(info.icon)}
+                            <p className="text-4xl font-bold">{info.value}</p>
+                            <p className="text-sm uppercase font-semibold mt-1">{info.label}</p>
+                        </div>
+                        {isEditMode && (
+                            <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30" onClick={() => handleEditInfoClick(info)}>
+                                <Edit className="h-4 w-4 text-white" />
+                            </Button>
+                        )}
+                    </CardContent>
                 </Card>
             ))}
         </div>
