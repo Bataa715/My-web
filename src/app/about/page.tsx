@@ -21,10 +21,10 @@ import { AddHobbyDialog } from '@/components/AddHobbyDialog';
 import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
-const getIcon = (iconName?: string) => {
+const getIcon = (iconName?: string, className: string = "h-8 w-8 mb-3 text-white") => {
     if (!iconName) return null;
     const LucideIcon = (require('lucide-react') as any)[iconName];
-    return LucideIcon ? <LucideIcon className="h-8 w-8 mb-3 text-white" /> : null;
+    return LucideIcon ? <LucideIcon className={className} /> : null;
 };
 
 export default function AboutPage() {
@@ -167,25 +167,54 @@ export default function AboutPage() {
   
   return (
     <>
+      {/* Background image with gradient overlay - 50vh like home page */}
       <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
         {heroImage && (
           <Image
             src={heroImage}
-            alt="Welcome background"
+            alt="About background"
             fill
             className="object-cover"
-            data-ai-hint="welcome abstract"
+            priority
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
       </div>
 
-      <div className="flex h-[50vh] flex-col items-center justify-center text-center">
-        <div className="matrix-text-container">
-            <h1 className="text-3xl font-bold" style={{textShadow: '1px 1px 2px black, 0 0 1em white, 0 0 0.2em white'}}>
-            Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
-            </h1>
-        </div>
+      {/* Hero Section */}
+      <div className="flex min-h-[50vh] flex-col items-center justify-center text-center px-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="matrix-text-container"
+        >
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-relaxed tracking-tight flex flex-wrap items-center justify-center gap-3">
+            <span className="bg-gradient-to-r from-primary/60 via-primary to-primary/60 bg-clip-text text-transparent">
+              Сайн уу?
+            </span>
+            <span className="text-foreground/90">
+              Миний нэрийг
+            </span>
+            <span className="matrix-text text-3xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent" 
+                  data-text={name}
+                  style={{
+                    filter: 'drop-shadow(0 0 20px rgba(147, 51, 234, 0.5)) drop-shadow(0 0 40px rgba(59, 130, 246, 0.3))',
+                  }}>
+              {name}
+            </span>
+            <span className="text-foreground/90">
+              гэдэг
+            </span>
+          </h1>
+          
+          {/* Decorative elements */}
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <div className="h-px w-16 md:w-24 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+            <div className="h-px w-16 md:w-24 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+          </div>
+        </motion.div>
       </div>
 
       {isEditMode && (
@@ -229,25 +258,45 @@ export default function AboutPage() {
       </Dialog>
       )}
 
-      <section className="w-full max-w-4xl mx-auto pt-0 text-center">
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <section className="w-full max-w-4xl mx-auto pt-8 pb-12 text-center px-4">
+         <motion.div 
+           initial={{ opacity: 0, y: 20 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ duration: 0.6, delay: 0.2 }}
+           className="grid grid-cols-3 gap-6"
+         >
             {personalInfo.map((info, index) => (
-                <Card key={index} className="relative group overflow-hidden rounded-lg shadow-lg border-white/10 h-full min-h-[160px]">
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.1 * index }}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                >
+                  <Card className="relative group overflow-hidden rounded-xl shadow-xl border-primary/30 bg-card/80 backdrop-blur-md h-full min-h-[180px] hover:border-primary/60 transition-all duration-300">
                     <CardContent className="p-0 h-full">
-                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center p-4 text-white bg-gradient-to-t from-black/70 to-transparent">
-                            {getIcon(info.icon)}
-                            <p className="text-4xl font-bold">{info.value}</p>
-                            <p className="text-sm uppercase font-semibold mt-1">{info.label}</p>
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5"></div>
+                        <div className="relative z-20 flex flex-col items-center justify-center text-center p-6 h-full">
+                            <div className="mb-3 p-3 rounded-full bg-primary/20 backdrop-blur">
+                              {getIcon(info.icon, "h-6 w-6")}
+                            </div>
+                            <p className="text-4xl font-extrabold bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
+                              {info.value}
+                            </p>
+                            <p className="text-sm uppercase font-bold tracking-wider text-muted-foreground">
+                              {info.label}
+                            </p>
                         </div>
                         {isEditMode && (
-                            <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30" onClick={() => handleEditInfoClick(info)}>
-                                <Edit className="h-4 w-4 text-white" />
+                            <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity z-30 hover:bg-primary/20" onClick={() => handleEditInfoClick(info)}>
+                                <Edit className="h-4 w-4" />
                             </Button>
                         )}
                     </CardContent>
-                </Card>
+                  </Card>
+                </motion.div>
             ))}
-        </div>
+        </motion.div>
       </section>
 
       <Dialog open={isEditingInfo} onOpenChange={setIsEditingInfo}>
@@ -354,7 +403,7 @@ export default function AboutPage() {
                                             alt={hobby.title} 
                                             fill 
                                             className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                            data-ai-hint={hobby.imageHint} 
+                                            data-ai-hint={`3D ${hobby.imageHint || hobby.title}`} 
                                           />
                                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                                            <div className="absolute bottom-0 left-0 p-4 text-white">
