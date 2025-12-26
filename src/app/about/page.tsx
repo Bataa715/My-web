@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight, Cake, Sun, User as UserIcon } from 'lucide-react';
+import { ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight } from 'lucide-react';
 import { useState, useEffect, useCallback, type CSSProperties, useMemo } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -20,7 +20,6 @@ import { useHobbies } from '@/contexts/HobbyContext';
 import { AddHobbyDialog } from '@/components/AddHobbyDialog';
 import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { ChevronDown } from 'lucide-react';
 
 const getIcon = (iconName?: string) => {
     if (!iconName) return null;
@@ -181,7 +180,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
       </div>
 
-      <div className="flex h-[50vh] flex-col items-center justify-center space-y-12 text-center">
+      <div className="flex h-[50vh] flex-col items-center justify-center text-center">
         <div className="matrix-text-container">
             <h1 className="text-3xl font-bold" style={{textShadow: '1px 1px 2px black, 0 0 1em white, 0 0 0.2em white'}}>
             Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
