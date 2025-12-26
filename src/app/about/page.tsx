@@ -216,7 +216,7 @@ export default function AboutPage() {
       )}
       
       <div className="flex flex-col items-center justify-center text-center py-12 md:py-24">
-        <div className="flex flex-col items-center justify-center space-y-12">
+        <div className="flex flex-col items-center justify-center space-y-12 pt-24">
           <div className="matrix-text-container">
             <h1 className="text-3xl font-bold" style={{textShadow: '0 0 5px rgba(255,255,255,0.5)'}}>
                 Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
