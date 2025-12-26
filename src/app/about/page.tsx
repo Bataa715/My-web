@@ -2,7 +2,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight } from 'lucide-react';
+import { ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useCallback, type CSSProperties, useMemo } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -215,7 +215,7 @@ export default function AboutPage() {
         </div>
       )}
       
-      <div className="flex h-[50vh] flex-col items-center justify-center space-y-12 text-center">
+      <div className="flex h-[50vh] flex-col items-center justify-center text-center">
           <div className="matrix-text-container">
             <h1 className="text-3xl font-bold" style={{textShadow: '0 0 5px rgba(255,255,255,0.5)'}}>
                 Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
@@ -223,19 +223,24 @@ export default function AboutPage() {
           </div>
       </div>
       
-      <section className="w-full max-w-4xl mx-auto py-16 md:py-24">
+      <section className="w-full max-w-4xl mx-auto pt-0 text-center">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {personalInfo.map((info, index) => (
-                  <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-4 shadow-lg relative group">
+                  <Card key={index} className="border-white/10 bg-black/20 backdrop-blur-sm text-center p-8 shadow-lg relative group">
                       {isEditMode && (
                           <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => handleEditInfoClick(info)}>
                               <Edit className="h-4 w-4" />
                           </Button>
                       )}
-                      <p className="text-4xl font-bold text-primary">{info.value}</p>
+                      <p className="text-5xl font-bold text-primary">{info.value}</p>
                       <p className="text-sm uppercase text-muted-foreground mt-1">{info.label}</p>
                   </Card>
               ))}
+          </div>
+          <div className="mt-16 flex justify-center">
+             <a href="#hobbies" className="animate-bounce">
+                <ChevronDown className="h-8 w-8 text-primary"/>
+             </a>
           </div>
       </section>
 
@@ -268,7 +273,7 @@ export default function AboutPage() {
         </DialogContent>
       </Dialog>
       
-      <section className="py-16 md:py-24">
+      <section id="hobbies" className="py-16 md:py-24">
         <div className="container px-4 md:px-6">
           <div className="text-center mb-24">
             <h2 className="text-4xl md:text-5xl font-bold">Миний хоббинууд</h2>
