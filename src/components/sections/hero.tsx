@@ -725,6 +725,15 @@ export default function Hero() {
                 {isEditingLinks ? (
                     <div className="space-y-3 max-w-sm">
                         <div className="flex items-center gap-2">
+                            <Upload className="h-6 w-6 text-muted-foreground" />
+                            <Input 
+                                value={editedLinks.cvUrl} 
+                                onChange={(e) => setEditedLinks({...editedLinks, cvUrl: e.target.value})}
+                                placeholder="CV-ний холбоос оруулах"
+                                className="h-8 text-sm"
+                            />
+                        </div>
+                        <div className="flex items-center gap-2">
                             <Github className="h-6 w-6 text-muted-foreground" />
                             <Input 
                                 value={editedLinks.github} 
@@ -757,15 +766,6 @@ export default function Hero() {
                                 value={editedLinks.email} 
                                 onChange={(e) => setEditedLinks({...editedLinks, email: e.target.value})}
                                 placeholder="Email address"
-                                className="h-8 text-sm"
-                            />
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Download className="h-6 w-6 text-muted-foreground" />
-                            <Input 
-                                value={editedLinks.cvUrl} 
-                                onChange={(e) => setEditedLinks({...editedLinks, cvUrl: e.target.value})}
-                                placeholder="CV холбоос"
                                 className="h-8 text-sm"
                             />
                         </div>
@@ -919,4 +919,5 @@ export default function Hero() {
     </section>
   );
 }
+
 
