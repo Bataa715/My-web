@@ -50,13 +50,7 @@ export default function RootLayout({
                         <SkillsProvider>
                         <HobbyProvider>
                             <MainLayout>
-                            <div className="page-container-wrapper">
-                                <div className="page-container">
-                                <div className="p-4 sm:p-6 lg:p-8">
-                                    {children}
-                                </div>
-                                </div>
-                            </div>
+                                {children}
                             </MainLayout>
                             <Toaster />
                         </HobbyProvider>
