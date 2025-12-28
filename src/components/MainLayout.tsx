@@ -62,7 +62,7 @@ export default function MainLayout({
   return (
     <div className="relative flex min-h-screen flex-col">
       {!isPublicPath && <Header />}
-      <main className="flex-1">
+      <main className="flex-1 pt-24">
         {children}
       </main>
       {!isPublicPath && <Footer />}
