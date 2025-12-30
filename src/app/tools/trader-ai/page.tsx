@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -119,31 +118,39 @@ export default function TraderAiPage() {
         <CardHeader>
           <CardTitle>Зураг оруулах</CardTitle>
           <CardDescription>
-            Файл сонгох эсвэл зургийн холбоос буулгах.
+            Шинжлэх зургаа доорх талбарт оруулна уу.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <div className="space-y-2">
-                    <Label htmlFor="picture">Зургийн файл</Label>
-                    <div className="flex items-center gap-2">
-                         <Input id="picture" type="file" accept="image/*" onChange={handleFileChange} className="cursor-pointer"/>
-                         <Upload className="h-5 w-5 text-muted-foreground"/>
-                    </div>
+            <div className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-4 h-80 flex items-center justify-center text-center">
+              {previewUrl ? (
+                 <Image src={previewUrl} alt="Chart preview" fill className="object-contain rounded-md" />
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                  <Upload className="h-10 w-10" />
+                  <p>Зургаа энд чирч оруулна уу</p>
+                  <p className="text-xs">эсвэл дарж сонгоно уу</p>
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="image-url">Зургийн холбоос (URL)</Label>
-                     <div className="flex items-center gap-2">
-                        <Input id="image-url" type="text" placeholder="https://example.com/chart.png" value={imageUrl} onChange={handleUrlChange} />
-                        <Link className="h-5 w-5 text-muted-foreground"/>
-                    </div>
-                </div>
+              )}
+               <Input
+                    id="picture"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
             </div>
-            {previewUrl && (
-                <div className="mt-4 border rounded-lg p-2 bg-muted/50 max-h-96 overflow-hidden">
-                    <Image src={previewUrl} alt="Chart preview" width={800} height={400} className="w-full h-auto object-contain rounded-md" />
-                </div>
-            )}
+            <div className="relative flex items-center gap-2">
+                 <Link className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground"/>
+                 <Input 
+                    id="image-url" 
+                    type="text" 
+                    placeholder="Эсвэл зургийн холбоос (URL) буулгах" 
+                    value={imageUrl} 
+                    onChange={handleUrlChange} 
+                    className="pl-10"
+                />
+            </div>
              <Button onClick={handleAnalyze} disabled={isLoading || (!imageFile && !imageUrl)} className="w-full mt-4">
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
                 Шинжилгээ хийх
