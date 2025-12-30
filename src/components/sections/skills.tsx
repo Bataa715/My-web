@@ -68,9 +68,9 @@ const Skills = () => {
                         ))}
                     </div>
                 ) : (
-                     <div className="flex flex-wrap justify-center gap-6 py-12">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-center gap-6 py-12">
                         {skills.map((skillGroup) => (
-                             <div key={skillGroup.id} className="card-glow rounded-lg h-full w-full sm:w-[calc(50%-1.5rem)] md:w-[calc(33.33%-1.5rem)] lg:w-[calc(25%-1.5rem)]" onMouseMove={handleMouseMove}>
+                             <div key={skillGroup.id} className="card-glow rounded-lg h-full" onMouseMove={handleMouseMove}>
                                 <Card className="hover:shadow-lg transition-shadow duration-300 relative group bg-muted/30 h-full flex flex-col">
                                     {isEditMode && (
                                         <div className="absolute top-2 right-2 flex gap-1 z-10">
@@ -118,7 +118,7 @@ const Skills = () => {
                             </div>
                         ))}
                         {isEditMode && (
-                           <motion.div layout initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} className="h-full w-full sm:w-[calc(50%-1.5rem)] md:w-[calc(33.33%-1.5rem)] lg:w-[calc(25%-1.5rem)]">
+                           <motion.div layout initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} className="h-full">
                                 <AddSkillDialog>
                                     <button className="flex h-full min-h-[150px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/20 text-muted-foreground transition-colors hover:border-primary hover:bg-muted/50 hover:text-primary">
                                         <PlusCircle size={40} />
