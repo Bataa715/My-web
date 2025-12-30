@@ -68,7 +68,7 @@ const Skills = () => {
                 )}
 
                 {!loading && (
-                     <div className="mx-auto grid items-start gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                     <div className="mx-auto grid items-start justify-center gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                         {skills.map((skillGroup) => (
                              <div key={skillGroup.id} className="card-glow rounded-lg h-full" onMouseMove={handleMouseMove}>
                                 <Card className="hover:shadow-lg transition-shadow duration-300 relative group bg-muted/30 h-full flex flex-col">
