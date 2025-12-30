@@ -43,7 +43,7 @@ const Skills = () => {
     return (
         <section id="skills" className="py-12 md:py-24 lg:py-32">
             <div className="container">
-                <div className="mb-12 text-center space-y-4">
+                <div className="flex flex-col items-center justify-center space-y-4 text-center">
                     <h2 className="text-4xl font-bold">Ур чадвар &amp; Технологиуд</h2>
                 </div>
 
