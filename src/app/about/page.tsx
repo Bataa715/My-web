@@ -167,7 +167,7 @@ export default function AboutPage() {
   
   return (
     <>
-      <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
+      <div className="absolute top-0 left-0 w-full h-[calc(100vh-150px)] -z-10">
         {heroImage && (
           <Image
             src={heroImage}
@@ -180,7 +180,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
       </div>
 
-       <div className="flex h-[50vh] flex-col items-center justify-center space-y-8 text-center">
+       <div className="flex h-[calc(100vh-150px)] flex-col items-center justify-center space-y-8 text-center">
             <div className="matrix-text-container reveal">
                 <h1 className="text-3xl font-bold" style={{textShadow: '1px 1px 2px black, 0 0 1em white, 0 0 0.2em white'}}>
                 Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
