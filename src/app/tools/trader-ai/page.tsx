@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -13,6 +14,7 @@ import type { ChartAnalysisOutput } from '@/ai/flows/analyze-chart-flow';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 export default function TraderAiPage() {
   const [imageUrl, setImageUrl] = useState('');
@@ -207,6 +209,53 @@ export default function TraderAiPage() {
             </CardContent>
         </Card>
       )}
+
+      <section className="max-w-4xl mx-auto w-full py-12">
+        <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold">Арилжааны гарын авлага</h2>
+            <p className="text-muted-foreground">Техник шинжилгээний үндсэн ойлголтууд.</p>
+        </div>
+        <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="item-1">
+                <AccordionTrigger>Техник шинжилгээний үндэс</AccordionTrigger>
+                <AccordionContent>
+                Техник шинжилгээ гэдэг нь ирээдүйн ханшийн хөдөлгөөнийг таамаглахын тулд өнгөрсөн үеийн ханшийн мэдээлэл, арилжааны эзлэхүүн зэргийг судалдаг арга юм. Энэ нь "түүх давтагддаг" гэсэн зарчимд үндэслэдэг. Гол хэрэгслүүд нь трендийн шугам, дэмжих ба эсэргүүцэх түвшин, канделстик патерн, мөн төрөл бүрийн индикаторууд юм.
+                </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+                <AccordionTrigger>Дэмжих ба Эсэргүүцэх түвшин (Support & Resistance)</AccordionTrigger>
+                <AccordionContent>
+                <p><strong>Дэмжих түвшин (Support):</strong> Эрэлт нийлүүлэлтээсээ ихсэж, ханшийн уналтыг зогсоодог цэгийг хэлнэ. Энэ түвшинд худалдан авах сонирхол ихэсдэг.</p>
+                <p className='mt-2'><strong>Эсэргүүцэх түвшин (Resistance):</strong> Нийлүүлэлт эрэлтээсээ давж, ханшийн өсөлтийг зогсоодог цэгийг хэлнэ. Энэ түвшинд худалдах сонирхол ихэсдэг.</p>
+                <p className='mt-2'>Эдгээр түвшнүүд эвдэгдэх үед ханш ихэвчлэн хүчтэй хөдөлгөөн хийдэг. Жишээ нь, эсэргүүцэх түвшинг эвдэж дээшилбэл энэ нь цаашид өсөх дохио болдог.</p>
+                </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+                <AccordionTrigger>Тренд ба Трендийн шугам (Trend & Trendlines)</AccordionTrigger>
+                <AccordionContent>
+                <p><strong>Тренд:</strong> Зах зээлийн ерөнхий чиглэлийг тренд гэнэ. Өсөх (Uptrend), унах (Downtrend), хэвтээ (Sideways/Range) гэсэн 3 төрөлтэй.</p>
+                <p className='mt-2'><strong>Өсөх тренд:</strong> Ханшийн оргилууд (highs) болон ёроолууд (lows) нь тасралтгүй дээшилж байвал. Трендийн шугамыг ёроолуудыг холбож зурна.</p>
+                <p className='mt-2'><strong>Унах тренд:</strong> Ханшийн оргилууд болон ёроолууд нь тасралтгүй доошилж байвал. Трендийн шугамыг оргилуудыг холбож зурна.</p>
+                <p className='mt-2'>"The trend is your friend" буюу "Тренд бол чиний найз" гэдэг зарчмын дагуу трендийн дагуу арилжаа хийх нь эрсдэл багатай байдаг.</p>
+                </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-4">
+                <AccordionTrigger>Канделстик патерн (Candlestick Patterns)</AccordionTrigger>
+                <AccordionContent>
+                Канделстик (лаа) нь тухайн цаг хугацааны ханшийн нээлт, хаалт, оргил, ёроолын цэгийг харуулдаг. Ганц болон хэд хэдэн лаа нийлж үүсгэсэн хэлбэрүүд (патерн) нь ирээдүйн ханшийн хөдөлгөөнийг таамаглах дохио болдог. Жишээ нь: Doji, Hammer, Engulfing, Head and Shoulders гэх мэт олон төрлийн патерн байдаг.
+                </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-5">
+                <AccordionTrigger>Эрсдэлийн удирдлага (Risk Management)</AccordionTrigger>
+                <AccordionContent>
+                <p>Амжилттай арилжааны хамгийн чухал хэсэг бол эрсдэлийн удирдлага юм.</p>
+                <p className='mt-2'><strong>Stop-Loss (SL):</strong> Болзошгүй алдагдлыг хязгаарлахын тулд арилжааг автоматаар хаах үнэ. Энэ нь таны таамаглал буруу байсан тохиолдолд их хэмжээний алдагдал хүлээхээс сэргийлнэ.</p>
+                <p className='mt-2'><strong>Take-Profit (TP):</strong> Төлөвлөсөн ашгийн хэмжээнд хүрэх үед арилжааг автоматаар хаах үнэ. Энэ нь зах зээл буцаж эргэхээс өмнө ашгаа баталгаажуулахад тусална.</p>
+                <p className='mt-2'>Ерөнхий дүрэм бол арилжаа бүрт нийт хөрөнгийнхөө 1-2%-иас илүүг эрсдэлд оруулахгүй байх явдал юм.</p>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+      </section>
     </div>
   );
 }
