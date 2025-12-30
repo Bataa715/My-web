@@ -55,10 +55,10 @@ const Header = () => {
                 const docSnap = await getDoc(userDocRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data() as UserProfile;
-                     setAppName(data.appName || "Kaizen");
+                     setAppName(data.name || "Batmyagmar");
                 }
             } else if (!isUserLoading) {
-                 setAppName("Kaizen");
+                 setAppName("Batmyagmar");
             }
         };
         fetchAppName();
@@ -88,8 +88,8 @@ const Header = () => {
     return (
       <header className="fixed top-0 left-0 w-full z-50 p-4">
         <Card className="container mx-auto flex items-center justify-between p-2 bg-background/80 backdrop-blur-sm">
-          {/* Left Side: Settings & Mobile Menu */}
-          <div className="flex items-center gap-2">
+          {/* Left Side: Desktop Navigation & Mobile Menu */}
+          <div className="flex-1 flex justify-start items-center gap-2">
             {/* Mobile Menu Sheet */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger asChild>
@@ -127,7 +127,35 @@ const Header = () => {
                 </SheetContent>
             </Sheet>
 
-            {/* Settings Dropdown */}
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-4">
+              {mainLinks.map(link => {
+                  const isActive = (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href;
+                  return (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className={cn(
+                              "text-sm font-medium transition-colors hover:text-primary",
+                              isActive ? "text-primary" : "text-muted-foreground"
+                          )}
+                        >
+                          {link.label}
+                        </Link>
+                  )
+              })}
+            </nav>
+          </div>
+          
+          {/* Center: App Name (Desktop) */}
+          <div className="flex-1 flex justify-center">
+             <Link href="/" className="font-bold text-2xl tracking-tighter text-foreground hover:text-primary transition-colors">
+                {appName}
+            </Link>
+          </div>
+
+          {/* Right Side: Settings */}
+          <div className="flex-1 flex justify-end items-center">
             {user && !isUserLoading && (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -136,7 +164,7 @@ const Header = () => {
                         <span className="sr-only">Тохиргоо</span>
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
+                    <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => setIsEditMode(!isEditMode)}>
                             {isEditMode ? <Eye className="mr-2 h-4 w-4" /> : <PencilRuler className="mr-2 h-4 w-4" />}
                             <span>{isEditMode ? "Харах" : "Засварлах"}</span>
@@ -165,32 +193,6 @@ const Header = () => {
                 </DropdownMenu>
             )}
           </div>
-          
-          {/* Center: App Name (Desktop) */}
-          <div className="hidden md:flex">
-             <Link href="/" className="font-bold text-2xl tracking-tighter text-foreground hover:text-primary transition-colors">
-                {appName}
-            </Link>
-          </div>
-
-          {/* Right Side: Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-4">
-              {mainLinks.map(link => {
-                  const isActive = (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href;
-                  return (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className={cn(
-                              "text-sm font-medium transition-colors hover:text-primary",
-                              isActive ? "text-primary" : "text-muted-foreground"
-                          )}
-                        >
-                          {link.label}
-                        </Link>
-                  )
-              })}
-          </nav>
         </Card>
       </header>
     );
