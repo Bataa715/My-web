@@ -87,7 +87,10 @@ const Header = () => {
 
     return (
       <header className="fixed top-0 left-0 w-full z-50 p-4">
-        <Card className="container mx-auto grid grid-cols-[1fr_auto_1fr] items-center p-2 bg-background/80 backdrop-blur-sm">
+        <Card 
+          className="container mx-auto grid grid-cols-[1fr_auto_1fr] items-center p-2 bg-background/80 backdrop-blur-sm"
+          style={{ paddingRight: 'var(--removed-body-scroll-bar-size)' }}
+        >
           {/* Left Side: Desktop Navigation & Mobile Menu */}
           <div className="flex justify-self-start items-center gap-2">
             {/* Mobile Menu Sheet */}
