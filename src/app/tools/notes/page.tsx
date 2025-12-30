@@ -1,139 +1,340 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import { collection, getDocs, addDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
-import { useFirebase } from '@/firebase';
-import type { Note } from '@/lib/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import BackButton from "@/components/shared/BackButton";
+import { useFirebase, useMemoFirebase } from '@/firebase';
+import { collection, doc, addDoc, getDocs, query, orderBy, writeBatch, serverTimestamp, deleteDoc, updateDoc } from 'firebase/firestore';
+import type { Exercise, WorkoutLog } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import BackButton from '@/components/shared/BackButton';
+import { PlusCircle, Trash2, Edit, Dumbbell, History, BarChart, CalendarDays, LineChart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+  DialogDescription
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import Link from 'next/link';
-import { format } from 'date-fns';
-import { useRouter } from 'next/navigation';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { format, subDays, eachDayOfInterval } from 'date-fns';
+import { Bar, BarChart as RechartsBarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { Timestamp } from 'firebase/firestore';
 
-export default function NotesPage() {
-  const { firestore, user } = useFirebase();
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (!user || !firestore) {
-      setLoading(false);
-      return;
+const AddExerciseDialog = ({ onAdd }: { onAdd: (exercise: Omit<Exercise, 'id' | 'createdAt'>) => void }) => {
+    const [name, setName] = useState('');
+    const [category, setCategory] = useState('');
+    const [open, setOpen] = useState(false);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if(name && category) {
+            onAdd({ name, category });
+            setName('');
+            setCategory('');
+            setOpen(false);
+        }
     }
 
-    const fetchNotes = async () => {
-      setLoading(true);
-      try {
-        const notesCollection = collection(firestore, `users/${user.uid}/notes`);
-        const q = query(notesCollection, orderBy('updatedAt', 'desc'));
-        const notesSnapshot = await getDocs(q);
-        const notesList = notesSnapshot.docs.map(doc => {
-            const data = doc.data();
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant="outline" className="w-full">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Шинэ дасгал нэмэх
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Шинэ дасгал нэмэх</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4 py-4">
+                    <div>
+                        <Label htmlFor="ex-name">Дасгалын нэр</Label>
+                        <Input id="ex-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Суниалт" required />
+                    </div>
+                    <div>
+                        <Label htmlFor="ex-category">Ангилал</Label>
+                        <Input id="ex-category" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="Цээж, Гар..." required />
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild><Button type="button" variant="secondary">Цуцлах</Button></DialogClose>
+                        <Button type="submit">Нэмэх</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+const LogWorkoutDialog = ({ exercise, onLog }: { exercise: Exercise, onLog: (log: Omit<WorkoutLog, 'id' | 'date'>) => void }) => {
+    const [duration, setDuration] = useState('');
+    const [repetitions, setRepetitions] = useState('');
+    const [open, setOpen] = useState(false);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if(duration || repetitions) {
+            onLog({ 
+                exerciseId: exercise.id!,
+                exerciseName: exercise.name,
+                duration: Number(duration) || 0,
+                repetitions: Number(repetitions) || 0,
+            });
+            setDuration('');
+            setRepetitions('');
+            setOpen(false);
+        }
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button size="sm" variant="secondary">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Тэмдэглэл
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>"{exercise.name}" дасгалын тэмдэглэл</DialogTitle>
+                </DialogHeader>
+                 <form onSubmit={handleSubmit} className="space-y-4 py-4">
+                    <div>
+                        <Label htmlFor="log-duration">Хугацаа (минут)</Label>
+                        <Input id="log-duration" type="number" value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="10" />
+                    </div>
+                    <div>
+                        <Label htmlFor="log-reps">Давталт</Label>
+                        <Input id="log-reps" type="number" value={repetitions} onChange={(e) => setRepetitions(e.target.value)} placeholder="12" />
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild><Button type="button" variant="secondary">Цуцлах</Button></DialogClose>
+                        <Button type="submit">Хадгалах</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+const WorkoutChart = ({ logs }: { logs: WorkoutLog[] }) => {
+    const data = useMemo(() => {
+        const last7Days = eachDayOfInterval({
+            start: subDays(new Date(), 6),
+            end: new Date(),
+        });
+        
+        return last7Days.map(day => {
+            const dayString = format(day, 'yyyy-MM-dd');
+            const logsForDay = logs.filter(log => format((log.date as Timestamp).toDate(), 'yyyy-MM-dd') === dayString);
             return {
-                id: doc.id,
-                ...data,
-                createdAt: (data.createdAt as any)?.toDate(),
-                updatedAt: (data.updatedAt as any)?.toDate(),
-            } as Note;
+                name: format(day, 'EEE'),
+                duration: logsForDay.reduce((sum, log) => sum + log.duration, 0),
+            };
         });
-        setNotes(notesList);
-      } catch (error) {
-        console.error("Error fetching notes: ", error);
-        toast({ title: "Алдаа", description: "Тэмдэглэл татахад алдаа гарлаа.", variant: "destructive" });
-      } finally {
-        setLoading(false);
-      }
+    }, [logs]);
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><CalendarDays /> 7 хоногийн идэвх</CardTitle>
+                <CardDescription>Сүүлийн 7 хоногийн дасгалын нийт хугацаа (минутаар).</CardDescription>
+            </CardHeader>
+            <CardContent className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                    <RechartsBarChart data={data}>
+                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.5)"/>
+                        <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip
+                          contentStyle={{
+                            background: "hsl(var(--background))",
+                            borderColor: "hsl(var(--border))",
+                            borderRadius: "var(--radius)"
+                          }}
+                          labelStyle={{ color: "hsl(var(--foreground))" }}
+                        />
+                        <Bar dataKey="duration" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                    </RechartsBarChart>
+                </ResponsiveContainer>
+            </CardContent>
+        </Card>
+    )
+}
+
+const WorkoutHistory = ({ logs }: { logs: WorkoutLog[] }) => {
+    return (
+         <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><History /> Сүүлийн тэмдэглэлүүд</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 max-h-96 overflow-y-auto">
+                {logs.slice(0, 10).map(log => (
+                    <div key={log.id} className="flex justify-between items-center text-sm p-2 rounded-md bg-muted/50">
+                        <div>
+                            <p className="font-semibold">{log.exerciseName}</p>
+                            <p className="text-xs text-muted-foreground">{format((log.date as Timestamp).toDate(), 'yyyy-MM-dd, HH:mm')}</p>
+                        </div>
+                        <div className="text-right">
+                           {log.duration > 0 && <p>{log.duration} мин</p>}
+                           {log.repetitions > 0 && <p>{log.repetitions} давт.</p>}
+                        </div>
+                    </div>
+                ))}
+                {logs.length === 0 && <p className="text-center text-muted-foreground py-4">Тэмдэглэл олдсонгүй.</p>}
+            </CardContent>
+        </Card>
+    )
+}
+
+
+export default function FitnessPage() {
+    const { firestore, user } = useFirebase();
+    const { toast } = useToast();
+    const [exercises, setExercises] = useState<Exercise[]>([]);
+    const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const exercisesRef = useMemoFirebase(() => user && firestore ? collection(firestore, `users/${user.uid}/fitnessExercises`) : null, [user, firestore]);
+    const logsRef = useMemoFirebase(() => user && firestore ? collection(firestore, `users/${user.uid}/workoutLogs`) : null, [user, firestore]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (!exercisesRef || !logsRef) {
+                setLoading(false);
+                return;
+            }
+            setLoading(true);
+            try {
+                const [exSnap, logSnap] = await Promise.all([
+                    getDocs(query(exercisesRef, orderBy('createdAt', 'desc'))),
+                    getDocs(query(logsRef, orderBy('date', 'desc')))
+                ]);
+                
+                const exList = exSnap.docs.map(d => ({ id: d.id, ...d.data() } as Exercise));
+                const logList = logSnap.docs.map(d => ({ id: d.id, ...d.data() } as WorkoutLog));
+
+                setExercises(exList);
+                setWorkoutLogs(logList);
+
+            } catch (error) {
+                console.error("Error fetching fitness data:", error);
+                toast({ title: "Алдаа", description: "Фитнесс мэдээлэл татахад алдаа гарлаа.", variant: "destructive" });
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [exercisesRef, logsRef, toast]);
+    
+    const handleAddExercise = async (exercise: Omit<Exercise, 'id' | 'createdAt'>) => {
+        if (!exercisesRef) return;
+        try {
+            const docRef = await addDoc(exercisesRef, { ...exercise, createdAt: serverTimestamp() });
+            setExercises(prev => [{ ...exercise, id: docRef.id, createdAt: new Date() }, ...prev]);
+            toast({ title: "Амжилттай", description: "Шинэ дасгал нэмэгдлээ." });
+        } catch (e) {
+            console.error(e);
+            toast({ title: "Алдаа", description: "Дасгал нэмэхэд алдаа гарлаа.", variant: "destructive" });
+        }
     };
-    fetchNotes();
-  }, [firestore, user, toast]);
-
-  const handleCreateNewNote = async () => {
-    if (!firestore || !user) {
-        toast({ title: "Алдаа", description: "Тэмдэглэл үүсгэхийн тулд нэвтэрнэ үү.", variant: "destructive" });
-        return;
+    
+    const handleLogWorkout = async (log: Omit<WorkoutLog, 'id' | 'date'>) => {
+        if (!logsRef) return;
+         try {
+            const docRef = await addDoc(logsRef, { ...log, date: serverTimestamp() });
+            setWorkoutLogs(prev => [{ ...log, id: docRef.id, date: new Date() } as WorkoutLog, ...prev]);
+            toast({ title: "Амжилттай", description: "Дасгалын тэмдэглэл нэмэгдлээ." });
+        } catch (e) {
+            console.error(e);
+            toast({ title: "Алдаа", description: "Тэмдэглэл нэмэхэд алдаа гарлаа.", variant: "destructive" });
+        }
     }
-    try {
-        const notesCollection = collection(firestore, `users/${user.uid}/notes`);
-        const docRef = await addDoc(notesCollection, { 
-            title: "Гарчиггүй тэмдэглэл",
-            content: "# Эндээс эхэлнэ үү...",
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
-        });
-        toast({ title: "Амжилттай", description: "Шинэ тэмдэглэл үүслээ." });
-        router.push(`/tools/notes/${docRef.id}`);
-    } catch (error) {
-        console.error("Error creating new note: ", error);
-        toast({ title: "Алдаа", description: "Тэмдэглэл үүсгэхэд алдаа гарлаа.", variant: "destructive" });
-    }
-  };
-  
-  const formatDate = (date: any) => {
-    if (!date) return 'Unknown date';
-    try {
-      return format(date, 'yyyy-MM-dd HH:mm');
-    } catch (e) {
-      return 'Invalid date';
-    }
-  }
-
-  return (
-    <div className="space-y-8">
-      <BackButton />
-      <div className="text-center pt-8 flex flex-col items-center justify-center gap-4">
-        <div className="flex items-center gap-4">
-          <h1 className="text-4xl font-bold font-headline">Тэмдэглэл</h1>
-          <Button variant="outline" size="icon" onClick={handleCreateNewNote}>
-            <PlusCircle className="h-5 w-5" />
-            <span className="sr-only">Шинэ тэмдэглэл үүсгэх</span>
-          </Button>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-8">
-          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-32 w-full" />)}
-        </div>
-      ) : !user ? (
-        <div className="text-center py-10">
-          <p className="text-muted-foreground">Тэмдэглэл харахын тулд нэвтэрнэ үү.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-8">
-          {notes.length > 0 ? (
-            notes.map((note) => (
-              <Link href={`/tools/notes/${note.id}`} key={note.id}>
-                <Card className="hover:border-primary/50 transition-colors h-full flex flex-col">
-                  <CardHeader>
-                    <CardTitle className="truncate">{note.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                     <p className="text-sm text-muted-foreground line-clamp-3">
-                        {note.content?.replace(/^#+\s*/, '').substring(0, 100) || 'Агуулгагүй...'}
-                     </p>
-                  </CardContent>
-                   <CardContent className="pt-2">
-                        <p className="text-xs text-muted-foreground">
-                            Last updated: {formatDate(note.updatedAt)}
-                        </p>
-                   </CardContent>
-                </Card>
-              </Link>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-10">
-              <p className="text-muted-foreground">Одоогоор тэмдэглэл байхгүй байна. Шинээр үүсгэнэ үү.</p>
+    
+    const groupedExercises = useMemo(() => {
+        return exercises.reduce((acc, ex) => {
+            const category = ex.category || 'Uncategorized';
+            if (!acc[category]) {
+                acc[category] = [];
+            }
+            acc[category].push(ex);
+            return acc;
+        }, {} as Record<string, Exercise[]>);
+    }, [exercises]);
+    
+    if (loading) {
+        return (
+             <div className="space-y-8">
+                <BackButton />
+                <Skeleton className="h-10 w-1/2 mx-auto" />
+                <div className="pt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <Skeleton className="h-48 w-full" />
+                    <Skeleton className="h-48 w-full" />
+                    <Skeleton className="h-48 w-full" />
+                </div>
             </div>
-          )}
+        )
+    }
+
+    return (
+        <div className="space-y-8">
+          <BackButton />
+          <div className="text-center pt-8">
+              <h1 className="text-4xl font-bold">Хувийн Workspace</h1>
+          </div>
+          
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div className="lg:col-span-1 space-y-6">
+                    <AddExerciseDialog onAdd={handleAddExercise} />
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Dumbbell /> Дасгалууд</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4 max-h-[600px] overflow-y-auto">
+                            {Object.keys(groupedExercises).map(category => (
+                                <div key={category}>
+                                    <h3 className="font-bold mb-2 text-primary">{category}</h3>
+                                    <div className="space-y-2">
+                                    {groupedExercises[category].map(ex => (
+                                        <Card key={ex.id} className="flex justify-between items-center p-3 bg-muted/50">
+                                            <p className="font-semibold">{ex.name}</p>
+                                            <LogWorkoutDialog exercise={ex} onLog={handleLogWorkout} />
+                                        </Card>
+                                    ))}
+                                    </div>
+                                </div>
+                            ))}
+                            {exercises.length === 0 && (
+                                <p className="text-muted-foreground text-center py-4">Дасгал нэмээгүй байна.</p>
+                            )}
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className="lg:col-span-2 space-y-6">
+                    <WorkoutChart logs={workoutLogs} />
+                    <WorkoutHistory logs={workoutLogs} />
+                </div>
+           </div>
+
         </div>
-      )}
-    </div>
-  );
+    )
 }

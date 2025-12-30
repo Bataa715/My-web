@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { ArrowRight, Timer, Code as CodeIcon, BookOpen, ImageIcon, Save, Loader2, HeartPulse, Book, TrendingUp } from "lucide-react";
+import { ArrowRight, Timer, Code as CodeIcon, BookOpen, ImageIcon, Save, Loader2, HeartPulse, LayoutGrid, TrendingUp } from "lucide-react";
 import BackButton from "@/components/shared/BackButton";
 import { useFirebase } from '@/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -32,10 +32,10 @@ const tools = [
     icon: <BookOpen className="h-6 w-6" />
   },
    {
-    title: "Тэмдэглэл",
-    description: "",
+    title: "Workspace",
+    description: "Хувийн ажлын самбар, төлөвлөгч",
     href: "/tools/notes",
-    icon: <Book className="h-6 w-6" />
+    icon: <LayoutGrid className="h-6 w-6" />
   },
   {
     title: "Програмчлал",
@@ -54,12 +54,6 @@ const tools = [
     description: "Төвлөрлийг сайжруулах цаг",
     href: "/tools/pomodoro",
     icon: <Timer className="h-6 w-6" />
-  },
-   {
-    title: "Fitness",
-    description: "Биеийн тамирын дасгал хийх",
-    href: "/tools/fitness",
-    icon: <HeartPulse className="h-6 w-6" />
   },
 ];
 
