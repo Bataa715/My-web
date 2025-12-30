@@ -73,7 +73,7 @@ export default function Projects() {
 
 
         {!loading && (
-            <motion.div layout className="grid items-start gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <motion.div layout className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               <AnimatePresence>
                 {filteredProjects.map((project, index) => (
                   <motion.div
