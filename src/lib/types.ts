@@ -171,6 +171,15 @@ export type UserProfile = {
     cvUrl?: string;
 };
 
+export type Note = {
+  id?: string;
+  title: string;
+  content: string;
+  createdAt?: Date | Timestamp;
+  updatedAt?: Date | Timestamp;
+};
+
+
 export type Exercise = {
     id?: string;
     name: string;

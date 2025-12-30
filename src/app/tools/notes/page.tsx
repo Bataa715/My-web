@@ -1,13 +1,13 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import BackButton from "@/components/shared/BackButton";
 import { useFirebase, useMemoFirebase } from '@/firebase';
-import { collection, doc, addDoc, getDocs, query, orderBy, writeBatch, serverTimestamp, deleteDoc, updateDoc } from 'firebase/firestore';
-import type { Exercise, WorkoutLog } from '@/lib/types';
+import { collection, doc, addDoc, getDocs, query, orderBy, serverTimestamp, deleteDoc } from 'firebase/firestore';
+import type { Exercise, WorkoutLog, Note } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { PlusCircle, Trash2, Edit, Dumbbell, History, BarChart, CalendarDays, LineChart } from 'lucide-react';
+import { PlusCircle, Trash2, Dumbbell, History, CalendarDays, Notebook } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -37,6 +37,53 @@ import {
 import { format, subDays, eachDayOfInterval } from 'date-fns';
 import { Bar, BarChart as RechartsBarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { Timestamp } from 'firebase/firestore';
+import { Textarea } from '@/components/ui/textarea';
+
+const AddNoteDialog = ({ onAdd }: { onAdd: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => void }) => {
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
+    const [open, setOpen] = useState(false);
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (title && content) {
+            onAdd({ title, content });
+            setTitle('');
+            setContent('');
+            setOpen(false);
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant="outline" className="w-full">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Шинэ тэмдэглэл нэмэх
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Шинэ тэмдэглэл нэмэх</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4 py-4">
+                    <div>
+                        <Label htmlFor="note-title">Гарчиг</Label>
+                        <Input id="note-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Тэмдэглэлийн гарчиг" required />
+                    </div>
+                    <div>
+                        <Label htmlFor="note-content">Агуулга</Label>
+                        <Textarea id="note-content" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Тэмдэглэлээ энд бичнэ үү..." required />
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild><Button type="button" variant="secondary">Цуцлах</Button></DialogClose>
+                        <Button type="submit">Хадгалах</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 
 const AddExerciseDialog = ({ onAdd }: { onAdd: (exercise: Omit<Exercise, 'id' | 'createdAt'>) => void }) => {
@@ -207,45 +254,76 @@ const WorkoutHistory = ({ logs }: { logs: WorkoutLog[] }) => {
 }
 
 
-export default function FitnessPage() {
+export default function WorkspacePage() {
     const { firestore, user } = useFirebase();
     const { toast } = useToast();
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
+    const [notes, setNotes] = useState<Note[]>([]);
     const [loading, setLoading] = useState(true);
 
     const exercisesRef = useMemoFirebase(() => user && firestore ? collection(firestore, `users/${user.uid}/fitnessExercises`) : null, [user, firestore]);
     const logsRef = useMemoFirebase(() => user && firestore ? collection(firestore, `users/${user.uid}/workoutLogs`) : null, [user, firestore]);
+    const notesRef = useMemoFirebase(() => user && firestore ? collection(firestore, `users/${user.uid}/notes`) : null, [user, firestore]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!exercisesRef || !logsRef) {
-                setLoading(false);
-                return;
-            }
-            setLoading(true);
-            try {
-                const [exSnap, logSnap] = await Promise.all([
-                    getDocs(query(exercisesRef, orderBy('createdAt', 'desc'))),
-                    getDocs(query(logsRef, orderBy('date', 'desc')))
-                ]);
-                
-                const exList = exSnap.docs.map(d => ({ id: d.id, ...d.data() } as Exercise));
-                const logList = logSnap.docs.map(d => ({ id: d.id, ...d.data() } as WorkoutLog));
+    const fetchData = useCallback(async () => {
+        if (!user || !firestore) {
+            setLoading(false);
+            return;
+        }
+        setLoading(true);
+        try {
+            const [exSnap, logSnap, noteSnap] = await Promise.all([
+                getDocs(query(exercisesRef!, orderBy('createdAt', 'desc'))),
+                getDocs(query(logsRef!, orderBy('date', 'desc'))),
+                getDocs(query(notesRef!, orderBy('createdAt', 'desc')))
+            ]);
+            
+            const exList = exSnap.docs.map(d => ({ id: d.id, ...d.data() } as Exercise));
+            const logList = logSnap.docs.map(d => ({ id: d.id, ...d.data() } as WorkoutLog));
+            const noteList = noteSnap.docs.map(d => ({ id: d.id, ...d.data() } as Note));
 
-                setExercises(exList);
-                setWorkoutLogs(logList);
+            setExercises(exList);
+            setWorkoutLogs(logList);
+            setNotes(noteList);
 
-            } catch (error) {
-                console.error("Error fetching fitness data:", error);
-                toast({ title: "Алдаа", description: "Фитнесс мэдээлэл татахад алдаа гарлаа.", variant: "destructive" });
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, [exercisesRef, logsRef, toast]);
+        } catch (error) {
+            console.error("Error fetching workspace data:", error);
+            toast({ title: "Алдаа", description: "Workspace мэдээлэл татахад алдаа гарлаа.", variant: "destructive" });
+        } finally {
+            setLoading(false);
+        }
+    }, [user, firestore, exercisesRef, logsRef, notesRef, toast]);
     
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+    
+    const handleAddNote = async (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => {
+        if (!notesRef) return;
+        try {
+            const timestamp = serverTimestamp();
+            const docRef = await addDoc(notesRef, { ...note, createdAt: timestamp, updatedAt: timestamp });
+            setNotes(prev => [{ ...note, id: docRef.id, createdAt: new Date(), updatedAt: new Date() }, ...prev]);
+            toast({ title: "Амжилттай", description: "Шинэ тэмдэглэл нэмэгдлээ." });
+        } catch (e) {
+            console.error(e);
+            toast({ title: "Алдаа", description: "Тэмдэглэл нэмэхэд алдаа гарлаа.", variant: "destructive" });
+        }
+    };
+    
+    const handleDeleteNote = async (noteId: string) => {
+         if (!notesRef) return;
+        try {
+            await deleteDoc(doc(notesRef, noteId));
+            setNotes(prev => prev.filter(n => n.id !== noteId));
+            toast({ title: "Амжилттай", description: "Тэмдэглэл устгагдлаа." });
+        } catch (e) {
+             console.error(e);
+            toast({ title: "Алдаа", description: "Тэмдэглэл устгахад алдаа гарлаа.", variant: "destructive" });
+        }
+    }
+
     const handleAddExercise = async (exercise: Omit<Exercise, 'id' | 'createdAt'>) => {
         if (!exercisesRef) return;
         try {
@@ -304,12 +382,47 @@ export default function FitnessPage() {
           
            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                 <div className="lg:col-span-1 space-y-6">
-                    <AddExerciseDialog onAdd={handleAddExercise} />
                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Notebook /> Тэмдэглэлүүд</CardTitle>
+                        </CardHeader>
+                         <CardContent className="space-y-4 max-h-[600px] overflow-y-auto">
+                            <AddNoteDialog onAdd={handleAddNote} />
+                            <div className="space-y-2">
+                                {notes.map(note => (
+                                     <Card key={note.id} className="flex justify-between items-center p-3 bg-muted/50 group">
+                                        <p className="font-semibold">{note.title}</p>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                 <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100">
+                                                    <Trash2 className="h-4 w-4 text-destructive"/>
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
+                                                    <AlertDialogDescription>"{note.title}" тэмдэглэлийг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.</AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDeleteNote(note.id!)}>Устгах</AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </Card>
+                                ))}
+                                {notes.length === 0 && (
+                                    <p className="text-muted-foreground text-center py-4">Тэмдэглэл алга байна.</p>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2"><Dumbbell /> Дасгалууд</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4 max-h-[600px] overflow-y-auto">
+                             <AddExerciseDialog onAdd={handleAddExercise} />
                             {Object.keys(groupedExercises).map(category => (
                                 <div key={category}>
                                     <h3 className="font-bold mb-2 text-primary">{category}</h3>
