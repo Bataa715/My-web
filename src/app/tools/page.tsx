@@ -44,9 +44,9 @@ const tools = [
     icon: <CodeIcon className="h-6 w-6" />
   },
   {
-    title: "Chart Analyzer",
-    description: "AI-аар биржийн зураг шинжлэх",
-    href: "/tools/chart-analyzer",
+    title: "TraderAi",
+    description: "AI-аар алтны ханшийн зураг шинжлэх",
+    href: "/tools/trader-ai",
     icon: <TrendingUp className="h-6 w-6" />
   },
   {
