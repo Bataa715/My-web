@@ -87,9 +87,9 @@ const Header = () => {
 
     return (
       <header className="fixed top-0 left-0 w-full z-50 p-4">
-        <Card className="container mx-auto flex items-center p-2 bg-background/80 backdrop-blur-sm">
+        <Card className="container mx-auto grid grid-cols-[1fr_auto_1fr] items-center p-2 bg-background/80 backdrop-blur-sm">
           {/* Left Side: Desktop Navigation & Mobile Menu */}
-          <div className="flex-1 flex justify-start items-center gap-2">
+          <div className="flex justify-self-start items-center gap-2">
             {/* Mobile Menu Sheet */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger asChild>
@@ -148,14 +148,14 @@ const Header = () => {
           </div>
           
           {/* Center: App Name (Desktop) */}
-          <div className="flex-1 flex justify-center">
+          <div className="justify-self-center">
              <Link href="/" className="font-bold text-2xl tracking-tighter text-foreground hover:text-primary transition-colors">
                 {appName}
             </Link>
           </div>
 
           {/* Right Side: Settings */}
-          <div className="flex-1 flex justify-end items-center">
+          <div className="justify-self-end flex items-center">
             {user && !isUserLoading && (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
