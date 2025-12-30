@@ -48,7 +48,7 @@ const Skills = () => {
                 </div>
 
                 {loading && (
-                    <div className="mx-auto grid gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                    <div className="mx-auto grid gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-center">
                         {Array.from({ length: 4 }).map((_, i) => (
                             <Card key={i}>
                                 <CardHeader className="flex flex-row items-center gap-4 pb-2">
@@ -68,7 +68,7 @@ const Skills = () => {
                 )}
 
                 {!loading && (
-                     <div className="mx-auto grid gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                     <div className="mx-auto grid gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-center">
                         {skills.map((skillGroup) => (
                              <div key={skillGroup.id} className="card-glow rounded-lg h-full" onMouseMove={handleMouseMove}>
                                 <Card className="hover:shadow-lg transition-shadow duration-300 relative group bg-muted/30 h-full flex flex-col">
