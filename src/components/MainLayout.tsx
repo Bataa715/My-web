@@ -21,25 +21,21 @@ export default function MainLayout({
   }, [pathname]);
 
   useEffect(() => {
-    // If auth state is still loading, don't do anything yet.
     if (isUserLoading) {
       return;
     }
     
-    // After loading, if there's no user and we are on a protected path, redirect to login.
     if (!user && !isPublicPath) {
       router.push('/login');
       return;
     }
 
-    // After loading, if there is a user and we are on a public path (login/signup), redirect to home.
     if (user && isPublicPath) {
       router.push('/');
       return;
     }
   }, [isUserLoading, user, isPublicPath, router]);
 
-  // While the auth state is loading and we are on a protected path, show a spinner.
   if (isUserLoading && !isPublicPath) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -48,8 +44,6 @@ export default function MainLayout({
     );
   }
 
-  // If there's no user and we're on a protected path, the useEffect will trigger a redirect,
-  // so we can render a loader until the redirect happens.
   if (!user && !isPublicPath) {
      return (
       <div className="flex items-center justify-center min-h-screen">
@@ -58,14 +52,17 @@ export default function MainLayout({
     );
   }
 
-  // Render the page content.
+  if (isPublicPath) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col">
-      {!isPublicPath && <Header />}
+      <Header />
       <main className="flex-1 pt-24">
         {children}
       </main>
-      {!isPublicPath && <Footer />}
+      <Footer />
     </div>
   );
 }
