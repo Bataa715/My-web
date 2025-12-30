@@ -87,7 +87,7 @@ const Header = () => {
 
     return (
       <header className="fixed top-0 left-0 w-full z-50 p-4">
-        <Card className="container mx-auto flex items-center justify-between p-2 bg-background/80 backdrop-blur-sm">
+        <Card className="container mx-auto flex items-center p-2 bg-background/80 backdrop-blur-sm">
           {/* Left Side: Desktop Navigation & Mobile Menu */}
           <div className="flex-1 flex justify-start items-center gap-2">
             {/* Mobile Menu Sheet */}
