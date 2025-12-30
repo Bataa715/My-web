@@ -180,39 +180,46 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
       </div>
 
-      <div className="flex h-[50vh] flex-col items-center justify-center text-center">
-        <div className="matrix-text-container">
-            <h1 className="text-3xl font-bold" style={{textShadow: '1px 1px 2px black, 0 0 1em white, 0 0 0.2em white'}}>
-            Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
-            </h1>
-        </div>
+       <div className="flex h-[50vh] flex-col items-center justify-center space-y-8 text-center">
+            <div className="matrix-text-container reveal">
+                <h1 className="text-3xl font-bold" style={{textShadow: '1px 1px 2px black, 0 0 1em white, 0 0 0.2em white'}}>
+                Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
+                </h1>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mx-auto px-4 reveal" style={{animationDelay: '0.2s'}}>
+                {personalInfo.map((info, index) => (
+                    <motion.div 
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                        className="h-full"
+                    >
+                    <Card className="relative group overflow-hidden rounded-lg shadow-lg border-white/10 h-full min-h-[160px] glassmorphism-card neon-glow">
+                        <CardContent className="p-0 h-full">
+                            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center p-4 text-white">
+                                {getIcon(info.icon)}
+                                <p className="text-4xl font-bold">{info.value}</p>
+                                <p className="text-sm uppercase font-semibold mt-1">{info.label}</p>
+                            </div>
+                            {isEditMode && (
+                                <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30" onClick={() => handleEditInfoClick(info)}>
+                                    <Edit className="h-4 w-4 text-white" />
+                                </Button>
+                            )}
+                        </CardContent>
+                    </Card>
+                    </motion.div>
+                ))}
+            </div>
       </div>
       
-       <section className="w-full max-w-4xl mx-auto pt-0 text-center">
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {personalInfo.map((info, index) => (
-                <Card key={index} className="relative group overflow-hidden rounded-lg shadow-lg border-white/10 h-full min-h-[160px]">
-                    <CardContent className="p-0 h-full">
-                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center p-4 text-white bg-gradient-to-t from-black/70 to-transparent">
-                            {getIcon(info.icon)}
-                            <p className="text-4xl font-bold">{info.value}</p>
-                            <p className="text-sm uppercase font-semibold mt-1">{info.label}</p>
-                        </div>
-                        {isEditMode && (
-                            <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30" onClick={() => handleEditInfoClick(info)}>
-                                <Edit className="h-4 w-4 text-white" />
-                            </Button>
-                        )}
-                    </CardContent>
-                </Card>
-            ))}
-        </div>
-      </section>
+      
 
       {isEditMode && (
       <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
           <DialogTrigger asChild>
-          <Button variant="outline" size="icon" className="absolute top-4 right-4 z-50">
+          <Button variant="outline" size="icon" className="absolute top-28 right-4 z-50">
               <ImageIcon className="h-4 w-4" />
               <span className="sr-only">Арын зураг солих</span>
           </Button>
@@ -279,7 +286,7 @@ export default function AboutPage() {
         </DialogContent>
       </Dialog>
       
-      <section id="hobbies" className="py-16 md:py-24">
+      <section id="hobbies" className="py-16 md:py-24 reveal">
         <div className="container px-4 md:px-6">
           <div className="text-center mb-24">
             <h2 className="text-4xl md:text-5xl font-bold">Миний хоббинууд</h2>
