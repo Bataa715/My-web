@@ -50,29 +50,29 @@ export default function Projects() {
     <section id="projects" className="py-12 md:py-24 lg:py-32">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="space-y-2">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Миний төслүүд</h2>
-          </div>
+             {loading ? (
+                <div className="flex justify-center items-center py-8">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                </div>
+            ) : (
+                <div className="flex justify-center flex-wrap gap-2 py-8">
+                    {categories.map((category) => (
+                        <Button
+                            key={category}
+                            variant={selectedCategory === category ? "default" : "outline"}
+                            onClick={() => setSelectedCategory(category)}
+                            className="rounded-full transition-colors duration-300"
+                        >
+                            {category}
+                        </Button>
+                    ))}
+                </div>
+            )}
         </div>
 
-        {loading ? (
-          <div className="flex justify-center items-center py-8">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          </div>
-        ) : (
-          <>
-            <div className="flex justify-center flex-wrap gap-2 py-8">
-                {categories.map((category) => (
-                  <Button
-                    key={category}
-                    variant={selectedCategory === category ? "default" : "outline"}
-                    onClick={() => setSelectedCategory(category)}
-                    className="rounded-full transition-colors duration-300"
-                  >
-                    {category}
-                  </Button>
-                ))}
-            </div>
+
+        {!loading && (
             <motion.div layout className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               <AnimatePresence>
                 {filteredProjects.map((project, index) => (
@@ -166,7 +166,6 @@ export default function Projects() {
                 )}
               </AnimatePresence>
             </motion.div>
-          </>
         )}
       </div>
     </section>
