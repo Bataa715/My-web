@@ -93,7 +93,7 @@ export default function HomePage() {
        {isEditMode && (
           <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="icon" className="absolute top-4 right-4 z-10">
+              <Button variant="outline" size="icon" className="absolute top-4 right-4 z-50">
                 <ImageIcon className="h-4 w-4" />
                 <span className="sr-only">Арын зураг солих</span>
               </Button>
