@@ -95,6 +95,19 @@
       },
       "required": ["word", "translation"]
     },
+    "ChartAnalysisResult": {
+      "title": "Chart Analysis Result",
+      "description": "Represents the result of an AI chart analysis.",
+      "type": "object",
+      "properties": {
+        "analysis": { "type": "string" },
+        "signal": { "type": "string", "enum": ["BUY", "SELL", "HOLD"] },
+        "confidence": { "type": "number" },
+        "suggestedStopLoss": { "type": "number" },
+        "suggestedTakeProfit": { "type": "number" }
+      },
+      "required": ["analysis", "signal", "confidence"]
+    },
     "Education": {
       "title": "Education",
       "description": "Represents an education entry in the portfolio.",

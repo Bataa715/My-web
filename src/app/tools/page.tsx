@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { ArrowRight, Timer, Code as CodeIcon, BookOpen, ImageIcon, Save, Loader2, HeartPulse, Book } from "lucide-react";
+import { ArrowRight, Timer, Code as CodeIcon, BookOpen, ImageIcon, Save, Loader2, HeartPulse, Book, TrendingUp } from "lucide-react";
 import BackButton from "@/components/shared/BackButton";
 import { useFirebase } from '@/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -42,6 +42,12 @@ const tools = [
     description: "Код бичиж сурах хэрэгслүүд",
     href: "/tools/programming",
     icon: <CodeIcon className="h-6 w-6" />
+  },
+  {
+    title: "Chart Analyzer",
+    description: "AI-аар биржийн зураг шинжлэх",
+    href: "/tools/chart-analyzer",
+    icon: <TrendingUp className="h-6 w-6" />
   },
   {
     title: "Pomodoro Timer",
