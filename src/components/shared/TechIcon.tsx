@@ -36,7 +36,7 @@ const TechIcon = ({ techName, className }: TechIconProps) => {
             <Tooltip>
                 <TooltipTrigger asChild>
                     <div className={cn(
-                        "relative flex h-8 w-8 items-center justify-center rounded-full border border-neutral-700 bg-black/50 p-1", 
+                        "relative flex h-8 w-8 items-center justify-center rounded-full border border-neutral-700 bg-black/50 p-1 overflow-hidden", 
                         className
                     )}>
                         <Image
