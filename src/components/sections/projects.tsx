@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Link from "next/link";
 import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit } from "lucide-react";
 import Image from "next/image";
@@ -29,47 +29,103 @@ import TechIcon from "../shared/TechIcon";
 
 
 const ProjectCard = ({ project }: { project: Project }) => {
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    const mouseXSpring = useSpring(x);
+    const mouseYSpring = useSpring(y);
+
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12.5deg", "-12.5deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12.5deg", "12.5deg"]);
+    
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+    
+        const width = rect.width;
+        const height = rect.height;
+    
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+    
+        const xPct = mouseX / width - 0.5;
+        const yPct = mouseY / height - 0.5;
+    
+        x.set(xPct);
+        y.set(yPct);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
 
   return (
-    <motion.div 
-        className="group relative h-[450px] w-full cursor-pointer overflow-hidden rounded-2xl border border-neutral-700/50 bg-neutral-900 shadow-lg transition-transform duration-300 hover:-translate-y-2"
+    <motion.div
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+            rotateY,
+            rotateX,
+            transformStyle: "preserve-3d",
+        }}
+        className="group relative h-[450px] w-full cursor-pointer rounded-2xl border border-neutral-700/50 bg-neutral-900 shadow-lg"
     >
-       <div className="relative h-1/2 w-full overflow-hidden bg-neutral-800">
-           <Image
-                src={project.image || "https://i.ibb.co/hK7f2g9/Screenshot-2024-07-27-at-21-42-01.png"}
-                alt={project.name}
-                fill
-                className="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
-            />
-       </div>
+       <div 
+        style={{
+            transform: "translateZ(35px)",
+            transformStyle: "preserve-3d",
+        }}
+        className="absolute inset-4 grid h-[calc(100%-2rem)] grid-rows-2 rounded-xl border border-neutral-700/50 bg-neutral-950 shadow-lg"
+       >
+           <div 
+                style={{
+                    transform: "translateZ(30px)",
+                }}
+                className="relative h-full w-full overflow-hidden rounded-t-xl bg-neutral-800"
+            >
+                <Image
+                    src={project.image || "https://i.ibb.co/hK7f2g9/Screenshot-2024-07-27-at-21-42-01.png"}
+                    alt={project.name}
+                    fill
+                    className="object-contain p-2 transition-transform duration-500 group-hover:scale-110"
+                />
+           </div>
 
-      <div className="flex h-1/2 flex-col p-6">
-        <h3 className="text-xl font-bold text-white">{project.name}</h3>
-        <p className="mt-2 flex-grow text-sm text-neutral-400 line-clamp-3">{project.description}</p>
-        <div className="mt-4 flex items-end justify-between">
-            <div className="flex items-center gap-2">
-                {project.technologies.slice(0, 5).map((techName) => (
-                    <TechIcon key={techName} techName={techName} />
-                ))}
+          <div 
+            style={{
+                transform: "translateZ(20px)",
+            }}
+            className="flex h-full flex-col justify-between rounded-b-xl p-4 bg-neutral-950/80"
+          >
+            <div>
+                <h3 className="text-xl font-bold text-white">{project.name}</h3>
+                <p className="mt-1 flex-grow text-sm text-neutral-400 line-clamp-2">{project.description}</p>
             </div>
-            <div className="flex items-center gap-1">
-                {project.link && (
-                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-white/10 hover:text-white">
-                        <Link href={project.link} target="_blank" rel="noopener noreferrer">
-                            <Github className="h-5 w-5" />
-                        </Link>
-                    </Button>
-                )}
-                {project.live && (
-                     <Button asChild variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-white/10 hover:text-white">
-                        <Link href={project.live} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-5 w-5" />
-                        </Link>
-                    </Button>
-                )}
+            <div className="mt-2 flex items-end justify-between">
+                <div className="flex items-center gap-2">
+                    {project.technologies.slice(0, 5).map((techName) => (
+                        <TechIcon key={techName} techName={techName} />
+                    ))}
+                </div>
+                <div className="flex items-center gap-1">
+                    {project.link && (
+                        <Button asChild variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-white/10 hover:text-white">
+                            <Link href={project.link} target="_blank" rel="noopener noreferrer">
+                                <Github className="h-5 w-5" />
+                            </Link>
+                        </Button>
+                    )}
+                    {project.live && (
+                         <Button asChild variant="ghost" size="icon" className="h-8 w-8 rounded-full text-neutral-300 hover:bg-white/10 hover:text-white">
+                            <Link href={project.live} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-5 w-5" />
+                            </Link>
+                        </Button>
+                    )}
+                </div>
             </div>
-        </div>
-      </div>
+          </div>
+       </div>
     </motion.div>
   );
 };
@@ -113,12 +169,12 @@ export default function Projects() {
 
 
         {!loading && (
-            <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style={{ perspective: "2000px" }}>
                 {filteredProjects.map((project) => (
                   <div key={project.id} className="relative group">
                     <ProjectCard project={project} />
                      {isEditMode && (
-                         <div className="absolute top-4 right-4 z-10 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                         <div className="absolute top-4 right-4 z-[100] flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
                             <EditProjectDialog project={project}>
                                 <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-black/50 text-white hover:bg-black/70">
                                     <Edit className="h-4 w-4" />
