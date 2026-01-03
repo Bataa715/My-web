@@ -231,7 +231,11 @@ export default function AboutPage() {
                   </div>
                 {' '} гэдэг
             </h1>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mx-auto px-4 reveal" style={{animationDelay: '0.2s'}}>
+            <motion.div 
+              layout 
+              className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mx-auto px-4 reveal"
+            >
+              <AnimatePresence>
                 {personalInfo.map((info, index) => (
                     <motion.div 
                         key={index}
@@ -256,7 +260,8 @@ export default function AboutPage() {
                     </Card>
                     </motion.div>
                 ))}
-            </div>
+              </AnimatePresence>
+            </motion.div>
       </div>
       
       
@@ -328,7 +333,7 @@ export default function AboutPage() {
                     {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
                 </Button>
             </DialogFooter>
-        </Dialog>
+        </DialogContent>
       </Dialog>
       
       <section id="hobbies" className="py-16 md:py-24 reveal">
