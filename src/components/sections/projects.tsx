@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit } from "lucide-react";
 import Image from "next/image";
 
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useProjects } from "@/contexts/ProjectContext";
@@ -34,8 +34,8 @@ const ProjectCard = ({ project }: { project: Project }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 20 });
-  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 20 });
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
 
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
@@ -49,6 +49,10 @@ const ProjectCard = ({ project }: { project: Project }) => {
     const mouseY = e.clientY - rect.top;
     const xPct = mouseX / width - 0.5;
     const yPct = mouseY / height - 0.5;
+    
+    e.currentTarget.style.setProperty('--mouse-x', `${mouseX}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${mouseY}px`);
+
     x.set(xPct);
     y.set(yPct);
   };
@@ -72,12 +76,18 @@ const ProjectCard = ({ project }: { project: Project }) => {
     >
         <div
             style={{
-                transform: "translateZ(75px)",
+                transform: "translateZ(50px)",
                 transformStyle: "preserve-3d",
             }}
-            className="absolute inset-4 grid grid-rows-[auto_1fr_auto] place-content-center rounded-xl bg-neutral-950/80 backdrop-blur-sm shadow-2xl border border-neutral-800"
+            className="absolute inset-4 grid grid-rows-[auto_1fr_auto] place-content-center rounded-xl bg-neutral-950/80 backdrop-blur-sm shadow-lg border border-neutral-800/50"
         >
-            <div style={{ transform: "translateZ(50px)" }}>
+             <div 
+                className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{
+                    background: `radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.08), transparent 40%)`,
+                }}
+            />
+            <div style={{ transform: "translateZ(40px)" }}>
                  <div className="relative w-full h-40">
                     <Image
                         src="https://i.ibb.co/hK7f2g9/Screenshot-2024-07-27-at-21-42-01.png"
@@ -88,29 +98,29 @@ const ProjectCard = ({ project }: { project: Project }) => {
                 </div>
                 <div className="p-4 space-y-2">
                     <CardTitle className="text-white">{project.name}</CardTitle>
-                    <CardDescription className="text-neutral-400">{project.description}</CardDescription>
+                    <CardDescription className="text-neutral-400 text-sm line-clamp-3">{project.description}</CardDescription>
                 </div>
             </div>
-             <div className="p-4 self-end" style={{ transform: "translateZ(50px)" }}>
+             <div className="p-4 self-end" style={{ transform: "translateZ(30px)" }}>
                 <div className="flex flex-wrap gap-2 mb-4">
                     {project.technologies.map((tech) => (
-                        <Badge key={tech} variant="secondary" className="bg-cyan-900/50 text-cyan-300 border-cyan-700">
+                        <Badge key={tech} variant="secondary" className="bg-cyan-900/50 text-cyan-300 border-cyan-700/50">
                         {tech}
                         </Badge>
                     ))}
                 </div>
                  <div className="flex justify-end gap-2">
                     {project.link && (
-                        <Button asChild variant="ghost" size="icon">
+                        <Button asChild variant="ghost" size="icon" className="text-white/70 hover:text-white">
                             <Link href={project.link} target="_blank" rel="noopener noreferrer">
-                            <Github className="h-4 w-4 text-white" />
+                            <Github className="h-4 w-4" />
                             </Link>
                         </Button>
                     )}
                     {project.live && (
-                        <Button asChild variant="ghost" size="icon">
+                        <Button asChild variant="ghost" size="icon" className="text-white/70 hover:text-white">
                             <Link href={project.live} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4 text-white" />
+                            <ExternalLink className="h-4 w-4" />
                             </Link>
                         </Button>
                     )}
