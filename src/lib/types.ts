@@ -127,6 +127,7 @@ export type Project = {
   link?: string;
   live?: string;
   category: string;
+  image?: string;
   createdAt?: Date | Timestamp;
 };
 

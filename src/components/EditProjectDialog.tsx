@@ -24,6 +24,7 @@ const projectSchema = z.object({
   link: z.string().url("Github холбоос буруу байна.").optional().or(z.literal('')),
   live: z.string().url("Live хувилбарын холбоос буруу байна.").optional().or(z.literal('')),
   category: z.string().min(1, "Төслийн ангилал заавал байх ёстой."),
+  image: z.string().url("Зургийн холбоос буруу байна.").optional().or(z.literal('')),
 });
 
 
@@ -40,6 +41,7 @@ export function EditProjectDialog({ children, project }: EditProjectDialogProps)
             category: project.category,
             link: project.link || '',
             live: project.live || '',
+            image: project.image || '',
         },
     });
 
@@ -52,6 +54,7 @@ export function EditProjectDialog({ children, project }: EditProjectDialogProps)
                 category: project.category,
                 link: project.link || '',
                 live: project.live || '',
+                image: project.image || '',
             });
         }
     }, [open, project, form]);
@@ -100,6 +103,19 @@ export function EditProjectDialog({ children, project }: EditProjectDialogProps)
                           <FormLabel>Тайлбар</FormLabel>
                           <FormControl>
                             <Textarea rows={4} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="image"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Зургийн холбоос</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://example.com/image.png" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

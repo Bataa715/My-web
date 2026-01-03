@@ -146,6 +146,7 @@
         "category": { "type": "string" },
         "link": { "type": "string" },
         "live": { "type": "string" },
+        "image": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["name", "description", "technologies", "category", "createdAt"]
