@@ -304,6 +304,7 @@ export default function AboutPage() {
                 </Button>
             </DialogFooter>
         </Dialog>
+      </Dialog>
       
       <section id="hobbies" className="py-16 md:py-24 reveal">
         <div className="container px-4 md:px-6">
