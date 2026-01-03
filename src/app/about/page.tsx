@@ -322,8 +322,6 @@ export default function AboutPage() {
             </motion.div>
       </div>
       
-      
-
       {isEditMode && (
         <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
             <DialogTrigger asChild>
