@@ -98,7 +98,7 @@ export default function AboutPage() {
               const defaultInfo: PersonalInfoType[] = [
                   { value: "21", label: "Нас", icon: 'Cake' },
                   { value: "Мэлхий", label: "Орд", icon: 'Sun' },
-                  { value: "INTJ", label: "MBTI", icon: 'UserIcon' },
+                  { value: "INTJ", label: "MBTI", icon: 'User' },
               ];
               await updateDoc(userDocRef, { personalInfo: defaultInfo });
               setPersonalInfo(defaultInfo);
@@ -304,7 +304,6 @@ export default function AboutPage() {
                 </Button>
             </DialogFooter>
         </Dialog>
-      </Dialog>
       
       <section id="hobbies" className="py-16 md:py-24 reveal">
         <div className="container px-4 md:px-6">
