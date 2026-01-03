@@ -18,42 +18,42 @@ const englishSkillsConfig = [
     title: "Vocabulary",
     description: "Үгсийн сангаа баяжуулах",
     href: "/tools/english/vocabulary",
-    icon: <Brain className="h-8 w-8" />,
+    icon: <Brain className="h-6 w-6 md:h-8 md:w-8" />,
   },
   {
     id: 'grammar',
     title: "Grammar",
     description: "Дүрмийн мэдлэгээ бататгах",
     href: "/tools/english/grammar",
-    icon: <BookCopy className="h-8 w-8" />,
+    icon: <BookCopy className="h-6 w-6 md:h-8 md:w-8" />,
   },
     {
     id: 'reading',
     title: "Reading",
     description: "Унших чадвараа дээшлүүлэх",
     href: "/tools/english/reading",
-    icon: <BookOpen className="h-8 w-8" />,
+    icon: <BookOpen className="h-6 w-6 md:h-8 md:w-8" />,
   },
   {
     id: 'listening',
     title: "Listening",
     description: "Сонсох чадвараа сайжруулах",
     href: "/tools/english/listening",
-    icon: <Ear className="h-8 w-8" />,
+    icon: <Ear className="h-6 w-6 md:h-8 md:w-8" />,
   },
   {
     id: 'speaking',
     title: "Speaking",
     description: "Ярих чадвараа нэмэгдүүлэх",
     href: "/tools/english/speaking",
-    icon: <Mic className="h-8 w-8" />,
+    icon: <Mic className="h-6 w-6 md:h-8 md:w-8" />,
   },
   {
     id: 'writing',
     title: "Writing",
     description: "Бичих чадвараа хөгжүүлэх",
     href: "/tools/english/writing",
-    icon: <Pencil className="h-8 w-8" />,
+    icon: <Pencil className="h-6 w-6 md:h-8 md:w-8" />,
   },
 ];
 
@@ -69,8 +69,8 @@ const SkillCard = ({ icon, title, description, href }: SkillCardProps) => (
         <Card className="h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
         <CardHeader className="flex-row items-center justify-between gap-4 space-y-0">
             <div className="space-y-1">
-                <CardTitle className="text-xl font-bold">{title}</CardTitle>
-                <CardDescription>{description}</CardDescription>
+                <CardTitle className="text-lg sm:text-xl font-bold">{title}</CardTitle>
+                <CardDescription className="text-sm">{description}</CardDescription>
             </div>
             <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
                 {icon}
@@ -88,7 +88,7 @@ export default function EnglishDashboardPage() {
     <div className="space-y-8">
       <BackButton />
       <div className="text-center pt-8">
-          <h1 className="text-4xl font-bold">English Dashboard</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold">English Dashboard</h1>
           <p className="mt-2 text-muted-foreground">Таны сурлагын явц болон өдөр тутмын зорилго.</p>
       </div>
 
@@ -116,7 +116,7 @@ export default function EnglishDashboardPage() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 pt-8">
             {englishSkillsConfig.map((skill) => (
               <SkillCard 
                 key={skill.id} 

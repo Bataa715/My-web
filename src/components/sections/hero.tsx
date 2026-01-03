@@ -43,9 +43,9 @@ interface OrbitItemProps {
 const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick, isEditing }) => {
     const angle = (index / total) * 2 * Math.PI;
     
-    const baseRadius = 200;
+    const baseRadius = 140; // Reduced for mobile
     const mdBaseRadius = 240;
-    const editingRadius = 230;
+    const editingRadius = 160; // Reduced for mobile
     const mdEditingRadius = 270;
 
     const [currentRadius, setCurrentRadius] = useState(baseRadius);
@@ -70,7 +70,7 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
     return (
         <motion.div
             key={item.id}
-            className="absolute h-16 w-16"
+            className="absolute h-14 w-14 md:h-16 md:w-16"
             style={{
                 top: '50%',
                 left: '50%',
@@ -89,12 +89,12 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
                 variant="outline"
                 size="icon"
                 className={cn(
-                    "rounded-full h-16 w-16 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-110",
+                    "rounded-full h-14 w-14 md:h-16 md:w-16 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-110",
                     selectedOrbit?.id === item.id && "bg-primary text-primary-foreground scale-110"
                 )}
                 onClick={() => onItemClick(item)}
             >
-                {getIcon(item.icon)}
+                {getIcon(item.icon, { className: "h-6 w-6 md:h-8 md:w-8" })}
                 <span className="sr-only">{item.title}</span>
             </Button>
         </motion.div>
@@ -472,8 +472,8 @@ export default function Hero() {
       <div className="container px-4 md:px-6">
         <div className="grid items-center justify-center gap-10 lg:grid-cols-2 lg:gap-20">
           <div className="flex flex-col justify-center space-y-6 lg:order-2">
-            <div className="relative flex items-center justify-center w-full max-w-[500px] aspect-square mx-auto">
-             <div className={cn("relative transition-all duration-500 [transform-style:preserve-3d]", isEditingOrbit ? "w-[360px] h-[360px] md:w-[480px] md:h-[480px]" : "w-80 h-80 md:w-96 md:h-96")}>
+            <div className="relative flex items-center justify-center w-full max-w-[300px] sm:max-w-[500px] aspect-square mx-auto">
+             <div className={cn("relative transition-all duration-500 [transform-style:preserve-3d]", isEditingOrbit ? "w-[260px] h-[260px] sm:w-[360px] sm:h-[360px] md:w-[480px] md:h-[480px]" : "w-56 h-56 sm:w-80 sm:h-80 md:w-96 md:h-96")}>
                 <AnimatePresence>
                     {selectedOrbit ? (
                         <motion.div
@@ -579,8 +579,8 @@ export default function Hero() {
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
                                         className="relative w-full cursor-pointer z-20 p-4 flex flex-col items-center justify-center text-center" onClick={handleContentClick}>
-                                        <h3 className="text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
-                                         <p className="text-lg text-foreground">{selectedOrbit.content}</p>
+                                        <h3 className="text-xl md:text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
+                                         <p className="text-sm md:text-lg text-foreground">{selectedOrbit.content}</p>
                                         
                                         {selectedOrbit.type === 'audio' && selectedOrbit.youtubeVideoId && (
                                             <Button variant="ghost" size="icon" className="mt-4 h-12 w-12" onClick={(e) => { e.stopPropagation(); setIsPlayerOpen(true); }}>
@@ -655,7 +655,7 @@ export default function Hero() {
                     <Input
                       value={editedName}
                       onChange={(e) => setEditedName(e.target.value)}
-                      className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none h-auto p-0 border-0 focus-visible:ring-0 bg-transparent"
+                      className="text-3xl sm:text-4xl font-bold tracking-tighter xl:text-6xl/none h-auto p-0 border-0 focus-visible:ring-0 bg-transparent"
                     />
                     <Button onClick={handleSaveName} size="icon" className="h-8 w-8" disabled={saving}>
                       {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4" />}
@@ -666,7 +666,7 @@ export default function Hero() {
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                    <h1 className="text-3xl sm:text-4xl font-bold tracking-tighter xl:text-6xl/none">
                       {name}
                     </h1>
                     {isEditMode && (
@@ -688,7 +688,7 @@ export default function Hero() {
                     <Textarea
                       value={editedBio}
                       onChange={(e) => setEditedBio(e.target.value)}
-                      className="max-w-[600px] md:text-xl bg-muted/50"
+                      className="max-w-[600px] text-lg md:text-xl bg-muted/50"
                       rows={4}
                     />
                     <div className="flex gap-2">
@@ -702,7 +702,7 @@ export default function Hero() {
                   </div>
                 ) : (
                   <div className="flex items-start gap-2">
-                    <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                    <p className="max-w-[600px] text-muted-foreground text-lg md:text-xl">
                       {bio}
                     </p>
                     {isEditMode && (
@@ -779,7 +779,7 @@ export default function Hero() {
                         </div>
                     </div>
                 ) : (
-                   <div className="flex flex-wrap items-center gap-4">
+                   <div className="flex flex-wrap items-center gap-2 lg:gap-4">
                         {socialLinks.cvUrl && (
                         <Button asChild variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground transition-transform hover:scale-105">
                             <Link href={socialLinks.cvUrl} target="_blank" rel="noopener noreferrer">
@@ -919,5 +919,3 @@ export default function Hero() {
     </section>
   );
 }
-
-

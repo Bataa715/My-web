@@ -112,7 +112,7 @@ export default function TraderAiPage() {
     <div className="space-y-8">
       <BackButton />
       <div className="text-center pt-8">
-        <h1 className="text-4xl font-bold">TraderAi</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold">TraderAi</h1>
         <p className="mt-2 text-muted-foreground">Алтны (XAU/USD) ханшийн зураг оруулаад, AI-аар техник шинжилгээ хийлгээрэй.</p>
       </div>
 
@@ -124,7 +124,7 @@ export default function TraderAiPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-            <div className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-4 h-80 flex items-center justify-center text-center">
+            <div className="relative border-2 border-dashed border-muted-foreground/50 rounded-lg p-4 h-60 sm:h-80 flex items-center justify-center text-center">
               {previewUrl ? (
                  <Image src={previewUrl} alt="Chart preview" fill className="object-contain rounded-md" />
               ) : (
@@ -212,7 +212,7 @@ export default function TraderAiPage() {
 
       <section className="max-w-4xl mx-auto w-full py-12">
         <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold">Арилжааны гарын авлага</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold">Арилжааны гарын авлага</h2>
             <p className="text-muted-foreground">Техник шинжилгээний үндсэн ойлголтууд.</p>
         </div>
         <Accordion type="single" collapsible className="w-full">

@@ -24,7 +24,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 const getIcon = (iconName?: string) => {
     if (!iconName) return null;
     const LucideIcon = (require('lucide-react') as any)[iconName];
-    return LucideIcon ? <LucideIcon className="h-8 w-8 mb-3 text-white" /> : null;
+    return LucideIcon ? <LucideIcon className="h-6 w-6 md:h-8 md:w-8 mb-3 text-white" /> : null;
 };
 
 export default function AboutPage() {
@@ -52,8 +52,28 @@ export default function AboutPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const totalItems = displayItems.length > 0 ? displayItems.length : 1;
   const anglePerItem = 360 / totalItems;
-  const CIRCLE_RADIUS = 400; // Controls the circle's radius
-  const ITEM_WIDTH = 250; // Width of a card
+  const CIRCLE_RADIUS_DESKTOP = 400; // Controls the circle's radius
+  const ITEM_WIDTH_DESKTOP = 250; // Width of a card
+  const CIRCLE_RADIUS_MOBILE = 220; 
+  const ITEM_WIDTH_MOBILE = 180;
+
+  const [carouselRadius, setCarouselRadius] = useState(CIRCLE_RADIUS_DESKTOP);
+  const [itemWidth, setItemWidth] = useState(ITEM_WIDTH_DESKTOP);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setCarouselRadius(CIRCLE_RADIUS_MOBILE);
+        setItemWidth(ITEM_WIDTH_MOBILE);
+      } else {
+        setCarouselRadius(CIRCLE_RADIUS_DESKTOP);
+        setItemWidth(ITEM_WIDTH_DESKTOP);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const scrollNext = () => setActiveIndex((prev) => (prev + 1) % totalItems);
   const scrollPrev = () => setActiveIndex((prev) => (prev - 1 + totalItems) % totalItems);
@@ -182,7 +202,7 @@ export default function AboutPage() {
 
        <div className="flex h-[calc(100vh-150px)] flex-col items-center justify-center space-y-8 text-center">
             <div className="matrix-text-container reveal">
-                <h1 className="text-3xl font-bold" style={{textShadow: '1px 1px 2px black, 0 0 1em white, 0 0 0.2em white'}}>
+                <h1 className="text-2xl sm:text-3xl font-bold" style={{textShadow: '1px 1px 2px black, 0 0 1em white, 0 0 0.2em white'}}>
                 Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
                 </h1>
             </div>
@@ -195,12 +215,12 @@ export default function AboutPage() {
                         transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
                         className="h-full"
                     >
-                    <Card className="relative group overflow-hidden rounded-lg shadow-lg border-white/10 h-full min-h-[160px] glassmorphism-card neon-glow">
+                    <Card className="relative group overflow-hidden rounded-lg shadow-lg border-white/10 h-full min-h-[140px] md:min-h-[160px] glassmorphism-card neon-glow">
                         <CardContent className="p-0 h-full">
                             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center p-4 text-white">
                                 {getIcon(info.icon)}
-                                <p className="text-4xl font-bold">{info.value}</p>
-                                <p className="text-sm uppercase font-semibold mt-1">{info.label}</p>
+                                <p className="text-3xl md:text-4xl font-bold">{info.value}</p>
+                                <p className="text-xs md:text-sm uppercase font-semibold mt-1">{info.label}</p>
                             </div>
                             {isEditMode && (
                                 <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30" onClick={() => handleEditInfoClick(info)}>
@@ -283,13 +303,13 @@ export default function AboutPage() {
                     {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
                 </Button>
             </DialogFooter>
-        </DialogContent>
+        </Dialog>
       </Dialog>
       
       <section id="hobbies" className="py-16 md:py-24 reveal">
         <div className="container px-4 md:px-6">
-          <div className="text-center mb-24">
-            <h2 className="text-4xl md:text-5xl font-bold">Миний хоббинууд</h2>
+          <div className="text-center mb-12 sm:mb-24">
+            <h2 className="text-3xl md:text-5xl font-bold">Миний хоббинууд</h2>
           </div>
 
           {hobbiesLoading ? (
@@ -304,14 +324,14 @@ export default function AboutPage() {
                         {user && <p className="text-sm text-muted-foreground mt-2">Засварлах горимд шинээр нэмнэ үү.</p>}
                     </div>
                 ) : (
-                <div className="carousel-container">
+                <div className="carousel-container" style={{ width: `${itemWidth}px`}}>
                     <div className="carousel" style={{ transform: `rotateY(${-activeIndex * anglePerItem}deg)` }}>
                         <AnimatePresence>
                            {displayItems.map((hobby, index) => {
                               const angle = index * anglePerItem;
                               const isVisible = Math.abs((activeIndex - index + totalItems) % totalItems) <= 2 || Math.abs((activeIndex - index - totalItems) % totalItems) <= 2;
                               const style: CSSProperties = {
-                                  transform: `rotateY(${angle}deg) translateZ(${CIRCLE_RADIUS}px)`,
+                                  transform: `rotateY(${angle}deg) translateZ(${carouselRadius}px)`,
                                   opacity: isVisible ? 1 : 0.2,
                                   pointerEvents: isVisible ? 'auto' : 'none',
                               };
@@ -365,8 +385,8 @@ export default function AboutPage() {
                                           />
                                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                                            <div className="absolute bottom-0 left-0 p-4 text-white">
-                                              <CardTitle className="text-lg font-bold">{hobby.title}</CardTitle>
-                                              <p className="text-sm text-white/80 mt-1">{hobby.description}</p>
+                                              <CardTitle className="text-base md:text-lg font-bold">{hobby.title}</CardTitle>
+                                              <p className="text-xs md:text-sm text-white/80 mt-1">{hobby.description}</p>
                                            </div>
                                        </Card>
                                    </div>
@@ -378,7 +398,7 @@ export default function AboutPage() {
                 )}
                 <Button
                     onClick={scrollPrev}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10"
+                    className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-10"
                     variant="outline"
                     size="icon"
                     disabled={displayItems.length === 0}
@@ -387,7 +407,7 @@ export default function AboutPage() {
                 </Button>
                 <Button
                     onClick={scrollNext}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10"
+                    className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-10"
                     variant="outline"
                     size="icon"
                      disabled={displayItems.length === 0}
@@ -402,7 +422,6 @@ export default function AboutPage() {
        <style jsx>{`
             .carousel-container {
                 perspective: 2000px;
-                width: ${ITEM_WIDTH}px;
                 height: 350px;
                 position: relative;
             }
@@ -415,7 +434,7 @@ export default function AboutPage() {
             }
             .carousel-item {
                 position: absolute;
-                width: ${ITEM_WIDTH}px;
+                width: ${itemWidth}px;
                 height: 320px;
                 top: 15px;
                 left: 0;
