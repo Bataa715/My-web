@@ -355,3 +355,42 @@
 .neon-glow {
     box-shadow: 0 0 5px hsla(var(--primary) / 0.5), 0 0 10px hsla(var(--primary) / 0.3), 0 0 15px hsla(var(--primary) / 0.2);
 }
+
+/* Beam Animation */
+@keyframes beam-gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+.animated-beam {
+  --beam-width: 50px;
+  background-image: conic-gradient(
+    from 180deg at 50% 50%,
+    rgba(255, 255, 255, 0) 0deg,
+    hsl(var(--primary)) 20deg,
+    hsl(var(--primary) / 0.5) 50deg,
+    hsl(var(--primary)) 90deg,
+    rgba(255, 255, 255, 0) 180deg,
+    rgba(255, 255, 255, 0) 360deg
+  );
+  background-size: 200% 200%;
+  animation: beam-gradient 8s linear infinite;
+  mask-image: radial-gradient(
+    ellipse 100% 100% at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    black var(--beam-width),
+    transparent calc(var(--beam-width) + 20px)
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 100% at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    black var(--beam-width),
+    transparent calc(var(--beam-width) + 20px)
+  );
+  pointer-events: none;
+}

@@ -3,7 +3,7 @@
 
 import { Button } from '@/components/ui/button';
 import { ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight } from 'lucide-react';
-import { useState, useEffect, useCallback, type CSSProperties, useMemo } from 'react';
+import { useState, useEffect, useCallback, type CSSProperties, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
@@ -40,6 +40,27 @@ export default function AboutPage() {
   const [editingInfoItem, setEditingInfoItem] = useState<PersonalInfoType | null>(null);
   const [editingInfoValue, setEditingInfoValue] = useState('');
   const [saving, setSaving] = useState(false);
+
+  const nameRef = useRef<HTMLDivElement>(null);
+  const [name, setName] = useState("Batuka");
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!nameRef.current) return;
+      const rect = nameRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      nameRef.current.style.setProperty("--mouse-x", `${x}px`);
+      nameRef.current.style.setProperty("--mouse-y", `${y}px`);
+    };
+
+    const currentRef = nameRef.current;
+    currentRef?.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      currentRef?.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
 
   const displayItems = useMemo(() => {
      if (isEditMode) {
@@ -91,6 +112,7 @@ export default function AboutPage() {
             const data = docSnap.data() as UserProfile;
             imageUrl = data.aboutHeroImage;
             setEditedImageUrl(data.aboutHeroImage || '');
+            setName(data.name || 'Batuka');
             
             if (data.personalInfo && data.personalInfo.length > 0) {
               setPersonalInfo(data.personalInfo);
@@ -182,8 +204,6 @@ export default function AboutPage() {
         toast({ title: "Алдаа", description: "Мэдээлэл хадгалахад алдаа гарлаа.", variant: "destructive" });
     }
   };
-
-  const name = "Batuka";
   
   return (
     <>
@@ -201,11 +221,16 @@ export default function AboutPage() {
       </div>
 
        <div className="flex h-[calc(100vh-150px)] flex-col items-center justify-center space-y-8 text-center">
-            <div className="matrix-text-container reveal">
-                <h1 className="text-2xl sm:text-3xl font-bold" style={{textShadow: '1px 1px 2px black, 0 0 1em white, 0 0 0.2em white'}}>
-                Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
-                </h1>
-            </div>
+             <h1 className="text-2xl sm:text-3xl font-bold" style={{textShadow: '1px 1px 2px black, 0 0 1em white, 0 0 0.2em white'}}>
+                Сайн уу? Миний нэрийг {' '}
+                  <div ref={nameRef} className="relative inline-block group">
+                    <span className="relative z-10 text-primary transition-colors duration-500 group-hover:text-white">
+                      {name}
+                    </span>
+                    <div className="animated-beam absolute -inset-2 z-0 scale-x-[0.3] scale-y-[0.8] rounded-full bg-primary/20 blur-lg transition-transform duration-500 group-hover:scale-100" />
+                  </div>
+                {' '} гэдэг
+            </h1>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mx-auto px-4 reveal" style={{animationDelay: '0.2s'}}>
                 {personalInfo.map((info, index) => (
                     <motion.div 
@@ -303,7 +328,7 @@ export default function AboutPage() {
                     {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
                 </Button>
             </DialogFooter>
-        </DialogContent>
+        </Dialog>
       </Dialog>
       
       <section id="hobbies" className="py-16 md:py-24 reveal">
