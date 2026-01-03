@@ -71,8 +71,8 @@ const ProjectCard = ({ project }: { project: Project }) => {
   const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
   const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
   
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!ref.current) return;
@@ -102,24 +102,6 @@ const ProjectCard = ({ project }: { project: Project }) => {
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
     >
-       <AnimatePresence>
-            {isHovered && project.link && (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 20 }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    className="absolute -top-14 left-1/2 -translate-x-1/2 z-20"
-                >
-                    <Link href={project.link} target="_blank" rel="noopener noreferrer" className="block">
-                         <div className="px-4 py-2 bg-neutral-800/80 backdrop-blur-md rounded-lg text-neutral-300 text-sm border border-neutral-700 shadow-lg">
-                            {project.link}
-                        </div>
-                    </Link>
-                </motion.div>
-            )}
-        </AnimatePresence>
-        
       <motion.div
         ref={ref}
         onMouseMove={handleMouseMove}
@@ -158,9 +140,9 @@ const ProjectCard = ({ project }: { project: Project }) => {
                     </div>
                      <div className="flex items-center gap-2">
                         {project.link && (
-                             <Button asChild variant="ghost" className="text-neutral-300 hover:text-white hover:bg-white/10 rounded-full px-4 py-2 text-sm">
+                             <Button asChild variant="ghost" size="icon" className="text-neutral-300 hover:text-white hover:bg-white/10 rounded-full">
                                 <Link href={project.link} target="_blank" rel="noopener noreferrer">
-                                Гитхаб <ArrowUpRight className="h-4 w-4 ml-1" />
+                                   <Github />
                                 </Link>
                             </Button>
                         )}
