@@ -303,7 +303,7 @@ export default function AboutPage() {
                     {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
                 </Button>
             </DialogFooter>
-        </Dialog>
+        </DialogContent>
       </Dialog>
       
       <section id="hobbies" className="py-16 md:py-24 reveal">
