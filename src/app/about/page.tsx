@@ -14,7 +14,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useHobbies } from '@/contexts/HobbyContext';
 import { AddHobbyDialog } from '@/components/AddHobbyDialog';
@@ -26,6 +26,70 @@ const getIcon = (iconName?: string) => {
     const LucideIcon = (require('lucide-react') as any)[iconName];
     return LucideIcon ? <LucideIcon className="h-6 w-6 md:h-8 md:w-8 mb-3 text-white" /> : null;
 };
+
+const PersonalInfoCard = ({ info, onEditClick, isEditMode }: { info: PersonalInfoType, onEditClick: () => void, isEditMode: boolean }) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x);
+  const mouseYSpring = useSpring(y);
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["20deg", "-20deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-20deg", "20deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateY,
+        rotateX,
+        transformStyle: "preserve-3d",
+      }}
+      className="relative h-full w-full rounded-xl bg-gradient-to-br from-neutral-900 to-neutral-950"
+    >
+      <div
+        style={{ transform: "translateZ(30px)" }}
+        className="relative group h-full w-full rounded-xl p-4 flex flex-col items-center justify-center text-center text-white"
+      >
+        {getIcon(info.icon)}
+        <p className="text-3xl md:text-4xl font-bold">{info.value}</p>
+        <p className="text-xs md:text-sm uppercase font-semibold mt-1">{info.label}</p>
+        
+        {isEditMode && (
+          <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30" onClick={(e) => { e.stopPropagation(); onEditClick(); }}>
+              <Edit className="h-4 w-4 text-white" />
+          </Button>
+        )}
+      </div>
+
+       <div 
+        className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        style={{
+            background: `radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(139, 92, 246, 0.15), transparent 80%)`
+        }}
+      />
+    </motion.div>
+  );
+};
+
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -233,7 +297,8 @@ export default function AboutPage() {
             </h1>
             <motion.div 
               layout 
-              className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mx-auto px-4 reveal"
+              className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl mx-auto px-4 reveal h-[160px] md:h-[180px]"
+              style={{ perspective: "1000px" }}
             >
               <AnimatePresence>
                 {personalInfo.map((info, index) => (
@@ -244,20 +309,11 @@ export default function AboutPage() {
                         transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
                         className="h-full"
                     >
-                    <Card className="relative group overflow-hidden rounded-lg shadow-lg border-white/10 h-full min-h-[140px] md:min-h-[160px] glassmorphism-card neon-glow">
-                        <CardContent className="p-0 h-full">
-                            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center p-4 text-white">
-                                {getIcon(info.icon)}
-                                <p className="text-3xl md:text-4xl font-bold">{info.value}</p>
-                                <p className="text-xs md:text-sm uppercase font-semibold mt-1">{info.label}</p>
-                            </div>
-                            {isEditMode && (
-                                <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30" onClick={() => handleEditInfoClick(info)}>
-                                    <Edit className="h-4 w-4 text-white" />
-                                </Button>
-                            )}
-                        </CardContent>
-                    </Card>
+                       <PersonalInfoCard 
+                          info={info} 
+                          onEditClick={() => handleEditInfoClick(info)} 
+                          isEditMode={isEditMode} 
+                       />
                     </motion.div>
                 ))}
               </AnimatePresence>
@@ -303,7 +359,6 @@ export default function AboutPage() {
               {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
               </Button>
           </DialogFooter>
-          </DialogContent>
       </Dialog>
       )}
 
@@ -333,7 +388,7 @@ export default function AboutPage() {
                     {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
                 </Button>
             </DialogFooter>
-        </DialogContent>
+        </Dialog>
       </Dialog>
       
       <section id="hobbies" className="py-16 md:py-24 reveal">
