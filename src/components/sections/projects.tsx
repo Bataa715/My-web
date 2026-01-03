@@ -4,7 +4,7 @@
 import { useState, useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Link from "next/link";
-import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit } from "lucide-react";
+import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -34,11 +34,11 @@ const ProjectCard = ({ project }: { project: Project }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
-  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 20 });
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!ref.current) return;
@@ -72,61 +72,62 @@ const ProjectCard = ({ project }: { project: Project }) => {
         rotateX,
         transformStyle: "preserve-3d",
       }}
-      className="relative h-full w-full rounded-2xl bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800"
+      className="relative h-[450px] w-full rounded-2xl bg-gradient-to-br from-neutral-800 to-neutral-950 border border-neutral-700/50 group"
     >
-        <div
-            style={{
-                transform: "translateZ(75px)",
-                transformStyle: "preserve-3d",
-            }}
-            className="absolute inset-4 grid grid-rows-[auto_1fr_auto] place-content-center rounded-xl bg-neutral-900/80 backdrop-blur-sm shadow-lg border border-neutral-800/50"
-        >
-             <div 
-                className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{
-                    background: `radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.08), transparent 40%)`,
-                }}
-            />
-            <div style={{ transform: "translateZ(40px)" }}>
-                 <div className="relative w-full h-40">
-                    <Image
-                        src="https://i.ibb.co/hK7f2g9/Screenshot-2024-07-27-at-21-42-01.png"
-                        alt={project.name}
-                        fill
-                        className="object-cover rounded-t-xl"
-                    />
-                </div>
-                <div className="p-4 space-y-2">
-                    <CardTitle className="text-white">{project.name}</CardTitle>
-                    <CardDescription className="text-neutral-400 text-sm line-clamp-3">{project.description}</CardDescription>
-                </div>
+        <div style={{ transform: "translateZ(50px)", transformStyle: "preserve-3d" }} className="absolute inset-0">
+            {/* Image */}
+            <div className="absolute inset-0 overflow-hidden rounded-2xl">
+                 <Image
+                    src="https://i.ibb.co/hK7f2g9/Screenshot-2024-07-27-at-21-42-01.png"
+                    alt={project.name}
+                    fill
+                    className="object-cover rounded-2xl transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent"/>
             </div>
-             <div className="p-4 self-end" style={{ transform: "translateZ(30px)" }}>
-                <div className="flex flex-wrap gap-2 mb-4">
-                    {project.technologies.map((tech) => (
-                        <Badge key={tech} variant="secondary" className="bg-cyan-900/50 text-cyan-300 border-cyan-700/50">
-                        {tech}
-                        </Badge>
-                    ))}
+
+             {/* Content */}
+             <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col justify-end h-full">
+                <div style={{ transform: "translateZ(50px)" }}>
+                    <h3 className="text-xl lg:text-2xl font-bold text-white">{project.name}</h3>
+                    <p className="mt-2 text-sm text-neutral-400 line-clamp-2">{project.description}</p>
                 </div>
-                 <div className="flex justify-end gap-2">
-                    {project.link && (
-                        <Button asChild variant="ghost" size="icon" className="text-white/70 hover:text-white">
-                            <Link href={project.link} target="_blank" rel="noopener noreferrer">
-                            <Github className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                    )}
-                    {project.live && (
-                        <Button asChild variant="ghost" size="icon" className="text-white/70 hover:text-white">
-                            <Link href={project.live} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                    )}
-                 </div>
+                
+                 <div className="mt-4 flex items-end justify-between" style={{ transform: "translateZ(30px)" }}>
+                    <div className="flex gap-2">
+                        {project.technologies.slice(0, 4).map((tech) => (
+                            <div key={tech} className="h-9 w-9 bg-black/50 rounded-full flex items-center justify-center text-xs font-bold text-neutral-300 border border-neutral-700">
+                                {tech.slice(0, 2).toUpperCase()}
+                            </div>
+                        ))}
+                    </div>
+                     <div className="flex items-center gap-2">
+                        {project.link && (
+                            <Button asChild variant="ghost" size="icon" className="h-9 w-9 text-neutral-400 hover:text-white hover:bg-white/10 rounded-full">
+                                <Link href={project.link} target="_blank" rel="noopener noreferrer">
+                                <Github className="h-5 w-5" />
+                                </Link>
+                            </Button>
+                        )}
+                        {project.live && (
+                            <Button asChild variant="ghost" className="text-neutral-300 hover:text-white hover:bg-white/10 rounded-full px-4 py-2 text-sm">
+                                <Link href={project.live} target="_blank" rel="noopener noreferrer">
+                                Лайв <ArrowUpRight className="h-4 w-4 ml-1" />
+                                </Link>
+                            </Button>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
+
+        {/* Spotlight Effect */}
+         <div 
+            className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            style={{
+                background: `radial-gradient(500px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.1), transparent 40%)`,
+            }}
+        />
     </motion.div>
   );
 };
@@ -170,14 +171,14 @@ export default function Projects() {
 
 
         {!loading && (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mt-8" style={{ perspective: "1000px" }}>
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mt-8" style={{ perspective: "2000px" }}>
                 {filteredProjects.map((project) => (
-                  <div key={project.id} className="relative h-[450px] group">
+                  <div key={project.id} className="relative group">
                     <ProjectCard project={project} />
                      {isEditMode && (
-                         <div className="absolute top-2 right-2 flex gap-1 z-50 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <div className="absolute top-4 right-4 flex gap-2 z-50 opacity-0 group-hover:opacity-100 transition-opacity">
                             <EditProjectDialog project={project}>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-white bg-black/50 hover:bg-black/70">
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-white bg-black/50 hover:bg-black/70 rounded-full">
                                     <Edit className="h-4 w-4" />
                                 </Button>
                             </EditProjectDialog>
@@ -186,7 +187,7 @@ export default function Projects() {
                                     <Button 
                                       variant="ghost" 
                                       size="icon" 
-                                      className="h-8 w-8 text-white bg-black/50 hover:bg-destructive/80"
+                                      className="h-8 w-8 text-white bg-black/50 hover:bg-destructive/80 rounded-full"
                                       aria-label="Delete project"
                                     >
                                       <Trash2 className="h-4 w-4" />
