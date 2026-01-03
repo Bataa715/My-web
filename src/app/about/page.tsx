@@ -47,6 +47,8 @@ const PersonalInfoCard = ({ info, onEditClick, isEditMode }: { info: PersonalInf
     const yPct = mouseY / height - 0.5;
     x.set(xPct);
     y.set(yPct);
+    e.currentTarget.style.setProperty("--mouse-x", `${mouseX}px`);
+    e.currentTarget.style.setProperty("--mouse-y", `${mouseY}px`);
   };
 
   const handleMouseLeave = () => {
@@ -323,43 +325,43 @@ export default function AboutPage() {
       
 
       {isEditMode && (
-      <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
-          <DialogTrigger asChild>
-          <Button variant="outline" size="icon" className="absolute top-28 right-4 z-50">
-              <ImageIcon className="h-4 w-4" />
-              <span className="sr-only">Арын зураг солих</span>
-          </Button>
-          </DialogTrigger>
-          <DialogContent>
-          <DialogHeader>
-              <DialogTitle>Арын зургийн холбоос</DialogTitle>
-              <DialogDescription>
-              Шинэ зургийнхаа URL хаягийг энд буулгана уу.
-              </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image-url" className="text-right">
-                  URL
-              </Label>
-              <Input
-                  id="image-url"
-                  value={editedImageUrl}
-                  onChange={(e) => setEditedImageUrl(e.target.value)}
-                  className="col-span-3"
-                  placeholder="https://example.com/image.png"
-              />
-              </div>
-          </div>
-          <DialogFooter>
-              <DialogClose asChild>
-              <Button type="button" variant="secondary">Цуцлах</Button>
-              </DialogClose>
-              <Button type="button" onClick={handleSaveImage} disabled={saving}>
-              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
-              </Button>
-          </DialogFooter>
-      </Dialog>
+        <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
+            <DialogTrigger asChild>
+            <Button variant="outline" size="icon" className="absolute top-28 right-4 z-50">
+                <ImageIcon className="h-4 w-4" />
+                <span className="sr-only">Арын зураг солих</span>
+            </Button>
+            </DialogTrigger>
+            <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Арын зургийн холбоос</DialogTitle>
+                <DialogDescription>
+                Шинэ зургийнхаа URL хаягийг энд буулгана уу.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="image-url" className="text-right">
+                    URL
+                </Label>
+                <Input
+                    id="image-url"
+                    value={editedImageUrl}
+                    onChange={(e) => setEditedImageUrl(e.target.value)}
+                    className="col-span-3"
+                    placeholder="https://example.com/image.png"
+                />
+                </div>
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                <Button type="button" variant="secondary">Цуцлах</Button>
+                </DialogClose>
+                <Button type="button" onClick={handleSaveImage} disabled={saving}>
+                {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
+                </Button>
+            </DialogFooter>
+        </Dialog>
       )}
 
       <Dialog open={isEditingInfo} onOpenChange={setIsEditingInfo}>
