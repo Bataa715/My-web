@@ -1,22 +1,26 @@
+
 "use client";
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { PlusCircle } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useProjects } from "@/contexts/ProjectContext";
 import type { Project } from '@/lib/types';
+import { ScrollArea } from '../ui/scroll-area';
+import { technologyList } from '@/data/technologies';
+import TechIcon from '../shared/TechIcon';
+import { cn } from '@/lib/utils';
 
 const projectSchema = z.object({
   name: z.string().min(2, "Төслийн нэр дор хаяж 2 тэмдэгттэй байх ёстой."),
   description: z.string().min(10, "Төслийн тайлбар дор хаяж 10 тэмдэгттэй байх ёстой."),
-  technologies: z.string().min(1, "Дор хаяж нэг технологи оруулах ёстой."),
+  technologies: z.array(z.string()).min(1, "Дор хаяж нэг технологи сонгох ёстой."),
   link: z.string().url("Github холбоос буруу байна.").optional().or(z.literal('')),
   live: z.string().url("Live хувилбарын холбоос буруу байна.").optional().or(z.literal('')),
   category: z.string().min(1, "Төслийн ангилал заавал байх ёстой."),
@@ -29,14 +33,13 @@ interface AddProjectProps {
 
 export default function AddProject({ setDialogOpen }: AddProjectProps) {
   const { addProject } = useProjects();
-  const formRef = useRef<HTMLFormElement>(null);
   
   const form = useForm<z.infer<typeof projectSchema>>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
       name: "",
       description: "",
-      technologies: "",
+      technologies: [],
       link: "",
       live: "",
       category: "",
@@ -45,18 +48,25 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
   });
 
   async function onSubmit(values: z.infer<typeof projectSchema>) {
-    const newProject: Omit<Project, 'id' | 'createdAt'> = {
-      ...values,
-      technologies: values.technologies.split(',').map(tech => tech.trim()),
-    };
-    await addProject(newProject);
+    await addProject(values);
     form.reset();
     setDialogOpen?.(false);
   }
 
+  const selectedTechs = form.watch('technologies') || [];
+
+  const handleTechToggle = (techName: string) => {
+    const currentTechs = form.getValues('technologies') || [];
+    const newTechs = currentTechs.includes(techName)
+      ? currentTechs.filter(t => t !== techName)
+      : [...currentTechs, techName];
+    form.setValue('technologies', newTechs, { shouldValidate: true });
+  };
+
+
   return (
     <Form {...form}>
-      <form ref={formRef} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -100,19 +110,38 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
             </FormItem>
           )}
         />
+        
         <FormField
           control={form.control}
           name="technologies"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <FormLabel>Ашигласан технологиуд</FormLabel>
-              <FormControl>
-                <Input placeholder="Жишээ нь: React, Node.js, MongoDB (таслалаар тусгаарлана)" {...field} />
-              </FormControl>
+                <ScrollArea className="h-32 w-full rounded-md border p-4">
+                    <div className="flex flex-wrap gap-4">
+                        {technologyList.map(tech => (
+                            <button
+                                key={tech.name}
+                                type="button"
+                                onClick={() => handleTechToggle(tech.name)}
+                                className={cn(
+                                    "flex flex-col items-center gap-2 p-2 rounded-md border transition-colors w-20",
+                                    selectedTechs.includes(tech.name) 
+                                        ? "bg-primary/10 border-primary" 
+                                        : "bg-muted/50 hover:bg-muted"
+                                )}
+                            >
+                                <TechIcon techName={tech.name} className="h-6 w-6" />
+                                <span className="text-xs text-center">{tech.name}</span>
+                            </button>
+                        ))}
+                    </div>
+                </ScrollArea>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="category"
