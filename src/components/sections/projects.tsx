@@ -37,7 +37,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
   const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
   const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
 
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -76,13 +76,13 @@ const ProjectCard = ({ project }: { project: Project }) => {
     >
         <div
             style={{
-                transform: "translateZ(50px)",
+                transform: "translateZ(75px)",
                 transformStyle: "preserve-3d",
             }}
-            className="absolute inset-4 grid grid-rows-[auto_1fr_auto] place-content-center rounded-xl bg-neutral-950/80 backdrop-blur-sm shadow-lg border border-neutral-800/50"
+            className="absolute inset-4 grid grid-rows-[auto_1fr_auto] place-content-center rounded-xl bg-neutral-900/80 backdrop-blur-sm shadow-lg border border-neutral-800/50"
         >
              <div 
-                className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 style={{
                     background: `radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.08), transparent 40%)`,
                 }}
@@ -227,4 +227,3 @@ export default function Projects() {
     </section>
   );
 }
-
