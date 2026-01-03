@@ -1,10 +1,11 @@
 
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Link from "next/link";
 import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit } from "lucide-react";
+import Image from "next/image";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,100 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import type { Project } from "@/lib/types";
+
+
+const ProjectCard = ({ project }: { project: Project }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 20 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateY,
+        rotateX,
+        transformStyle: "preserve-3d",
+      }}
+      className="relative h-full w-full rounded-2xl bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800"
+    >
+        <div
+            style={{
+                transform: "translateZ(75px)",
+                transformStyle: "preserve-3d",
+            }}
+            className="absolute inset-4 grid grid-rows-[auto_1fr_auto] place-content-center rounded-xl bg-neutral-950/80 backdrop-blur-sm shadow-2xl border border-neutral-800"
+        >
+            <div style={{ transform: "translateZ(50px)" }}>
+                 <div className="relative w-full h-40">
+                    <Image
+                        src="https://i.ibb.co/hK7f2g9/Screenshot-2024-07-27-at-21-42-01.png"
+                        alt={project.name}
+                        fill
+                        className="object-cover rounded-t-xl"
+                    />
+                </div>
+                <div className="p-4 space-y-2">
+                    <CardTitle className="text-white">{project.name}</CardTitle>
+                    <CardDescription className="text-neutral-400">{project.description}</CardDescription>
+                </div>
+            </div>
+             <div className="p-4 self-end" style={{ transform: "translateZ(50px)" }}>
+                <div className="flex flex-wrap gap-2 mb-4">
+                    {project.technologies.map((tech) => (
+                        <Badge key={tech} variant="secondary" className="bg-cyan-900/50 text-cyan-300 border-cyan-700">
+                        {tech}
+                        </Badge>
+                    ))}
+                </div>
+                 <div className="flex justify-end gap-2">
+                    {project.link && (
+                        <Button asChild variant="ghost" size="icon">
+                            <Link href={project.link} target="_blank" rel="noopener noreferrer">
+                            <Github className="h-4 w-4 text-white" />
+                            </Link>
+                        </Button>
+                    )}
+                    {project.live && (
+                        <Button asChild variant="ghost" size="icon">
+                            <Link href={project.live} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-4 w-4 text-white" />
+                            </Link>
+                        </Button>
+                    )}
+                 </div>
+            </div>
+        </div>
+    </motion.div>
+  );
+};
 
 
 export default function Projects() {
@@ -38,14 +133,6 @@ export default function Projects() {
       ? projects
       : projects.filter((p) => p.category === selectedCategory);
       
-   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
-    e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
-  };
-
   return (
     <section id="projects" className="py-12 md:py-24 lg:py-32">
       <div className="container px-4 md:px-6">
@@ -73,24 +160,14 @@ export default function Projects() {
 
 
         {!loading && (
-            <motion.div layout className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <AnimatePresence>
-                {filteredProjects.map((project, index) => (
-                  <motion.div
-                    key={project.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.2, delay: index * 0.05 }}
-                    onMouseMove={handleMouseMove}
-                    className="card-glow rounded-lg"
-                  >
-                    <Card className={cn("flex h-full flex-col overflow-hidden transition-shadow duration-300 bg-muted/30 backdrop-blur-sm group", isEditMode ? "hover:shadow-lg" : "")}>
-                      {isEditMode && (
-                         <div className="absolute top-2 right-2 flex gap-1 z-10">
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mt-8" style={{ perspective: "1000px" }}>
+                {filteredProjects.map((project) => (
+                  <div key={project.id} className="relative h-[450px] group">
+                    <ProjectCard project={project} />
+                     {isEditMode && (
+                         <div className="absolute top-2 right-2 flex gap-1 z-50 opacity-0 group-hover:opacity-100 transition-opacity">
                             <EditProjectDialog project={project}>
-                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-muted/50 hover:text-foreground">
+                                <Button variant="ghost" size="icon" className="h-8 w-8 text-white bg-black/50 hover:bg-black/70">
                                     <Edit className="h-4 w-4" />
                                 </Button>
                             </EditProjectDialog>
@@ -99,7 +176,7 @@ export default function Projects() {
                                     <Button 
                                       variant="ghost" 
                                       size="icon" 
-                                      className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                      className="h-8 w-8 text-white bg-black/50 hover:bg-destructive/80"
                                       aria-label="Delete project"
                                     >
                                       <Trash2 className="h-4 w-4" />
@@ -122,52 +199,22 @@ export default function Projects() {
                             </AlertDialog>
                         </div>
                       )}
-                      <CardHeader>
-                        <CardTitle>{project.name}</CardTitle>
-                        <CardDescription>{project.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="flex-grow">
-                        <div className="flex flex-wrap gap-2">
-                          {project.technologies.map((tech) => (
-                            <Badge key={tech} variant="secondary">
-                              {tech}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex justify-end gap-2 bg-muted/50 p-4">
-                        {project.link && (
-                          <Button asChild variant="ghost" size="icon">
-                            <Link href={project.link} target="_blank" rel="noopener noreferrer" aria-label="GitHub Repository">
-                              <Github className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                        )}
-                        {project.live && (
-                          <Button asChild variant="ghost" size="icon">
-                            <Link href={project.live} target="_blank" rel="noopener noreferrer" aria-label="Live Demo">
-                              <ExternalLink className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                        )}
-                      </CardFooter>
-                    </Card>
-                  </motion.div>
+                  </div>
                 ))}
                  {isEditMode && (
                    <motion.div layout initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
                     <AddProjectDialog>
-                      <button className="flex h-full min-h-[400px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/20 text-muted-foreground transition-colors hover:border-primary hover:bg-muted/50 hover:text-primary">
+                      <button className="flex h-[450px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-700 bg-neutral-950/50 text-neutral-500 transition-colors hover:border-primary hover:bg-neutral-900 hover:text-primary">
                         <PlusCircle size={48} />
                         <span className="mt-4 font-semibold">Шинэ төсөл нэмэх</span>
                       </button>
                     </AddProjectDialog>
                   </motion.div>
                 )}
-              </AnimatePresence>
-            </motion.div>
+            </div>
         )}
       </div>
     </section>
   );
 }
+
