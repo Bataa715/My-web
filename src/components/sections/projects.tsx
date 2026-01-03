@@ -68,7 +68,7 @@ const ProjectCard = ({ project }: { project: Project }) => {
             rotateX,
             transformStyle: "preserve-3d",
         }}
-        className="group relative h-[450px] w-full cursor-pointer rounded-2xl border border-neutral-700/50 bg-neutral-900 shadow-lg"
+        className="group relative h-[450px] w-full cursor-pointer rounded-2xl border border-border/50 bg-neutral-900 shadow-lg"
     >
        <div 
         style={{
