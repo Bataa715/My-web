@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from 'react';
-import { PlusCircle, X, Search } from "lucide-react";
+import { PlusCircle, X, Search, Upload } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,6 +15,7 @@ import { ScrollArea } from '../ui/scroll-area';
 import { cn } from '@/lib/utils';
 import TechIcon from '../shared/TechIcon';
 import { Badge } from '../ui/badge';
+import Image from 'next/image';
 
 // Popular technologies list for quick selection
 const popularTechnologies = [
@@ -34,7 +35,7 @@ const projectSchema = z.object({
   link: z.string().url("Github холбоос буруу байна.").optional().or(z.literal('')),
   live: z.string().url("Live хувилбарын холбоос буруу байна.").optional().or(z.literal('')),
   category: z.string().min(1, "Төслийн ангилал заавал байх ёстой."),
-  image: z.string().url("Зургийн холбоос буруу байна.").optional().or(z.literal('')),
+  image: z.string().optional().or(z.literal('')),
 });
 
 interface AddProjectProps {
@@ -58,6 +59,19 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
       image: "",
     },
   });
+
+  const imageValue = form.watch('image');
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        form.setValue('image', reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   async function onSubmit(values: z.infer<typeof projectSchema>) {
     await addProject(values);
@@ -126,15 +140,39 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
             </FormItem>
           )}
         />
-         <FormField
+        <FormField
           control={form.control}
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Зургийн холбоос</FormLabel>
-              <FormControl>
-                <Input placeholder="https://example.com/image.png" {...field} />
-              </FormControl>
+              <FormLabel>Зураг</FormLabel>
+              <div className="flex items-center gap-4">
+                <div className="w-24 h-24 rounded-md border bg-muted flex items-center justify-center shrink-0">
+                  {imageValue ? (
+                    <Image src={imageValue} alt="Project preview" width={96} height={96} className="w-full h-full object-cover rounded-md" />
+                  ) : (
+                    <Upload className="w-8 h-8 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="w-full space-y-2">
+                   <Input 
+                      placeholder="Зургийн холбоос..." 
+                      value={field.value || ''}
+                      onChange={field.onChange}
+                   />
+                   <div className="relative">
+                     <Button type="button" variant="outline" size="sm" className="w-full">
+                       Компьютерээс сонгох
+                     </Button>
+                     <Input 
+                      type="file" 
+                      accept="image/*"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      onChange={handleImageUpload}
+                    />
+                   </div>
+                </div>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -147,7 +185,6 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
             <FormItem>
               <FormLabel>Ашигласан технологиуд</FormLabel>
               
-              {/* Selected technologies */}
               {selectedTechs.length > 0 && (
                 <div className="flex flex-wrap gap-2 pb-2">
                   {selectedTechs.map(tech => (
@@ -170,7 +207,6 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
                 </div>
               )}
 
-              {/* Add custom technology */}
               <div className="flex gap-2 pb-2">
                 <Input
                   placeholder="Өөр технологи нэмэх..."
@@ -195,7 +231,6 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
                 </Button>
               </div>
 
-              {/* Search */}
               <div className="relative pb-2">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input

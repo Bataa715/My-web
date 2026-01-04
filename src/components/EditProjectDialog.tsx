@@ -5,7 +5,7 @@ import { useState, type ReactNode, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { PlusCircle, X, Search } from "lucide-react";
+import { PlusCircle, X, Search, Upload } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "./ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "./ui/button";
@@ -17,6 +17,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
 import TechIcon from "./shared/TechIcon";
 import { Badge } from "./ui/badge";
+import Image from "next/image";
 
 // Popular technologies list for quick selection
 const popularTechnologies = [
@@ -41,7 +42,7 @@ const projectSchema = z.object({
   link: z.string().url("Github холбоос буруу байна.").optional().or(z.literal('')),
   live: z.string().url("Live хувилбарын холбоос буруу байна.").optional().or(z.literal('')),
   category: z.string().min(1, "Төслийн ангилал заавал байх ёстой."),
-  image: z.string().url("Зургийн холбоос буруу байна.").optional().or(z.literal('')),
+  image: z.string().optional().or(z.literal('')),
 });
 
 
@@ -52,6 +53,19 @@ export function EditProjectDialog({ children, project }: EditProjectDialogProps)
     const form = useForm<z.infer<typeof projectSchema>>({
         resolver: zodResolver(projectSchema),
     });
+
+    const imageValue = form.watch('image');
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                form.setValue('image', reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
      useEffect(() => {
         if (open) {
@@ -143,18 +157,42 @@ export function EditProjectDialog({ children, project }: EditProjectDialogProps)
                           )}
                         />
                          <FormField
-                          control={form.control}
-                          name="image"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Зургийн холбоос</FormLabel>
-                              <FormControl>
-                                <Input placeholder="https://example.com/image.png" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                            control={form.control}
+                            name="image"
+                            render={({ field }) => (
+                                <FormItem>
+                                <FormLabel>Зураг</FormLabel>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-24 h-24 rounded-md border bg-muted flex items-center justify-center shrink-0">
+                                    {imageValue ? (
+                                        <Image src={imageValue} alt="Project preview" width={96} height={96} className="w-full h-full object-cover rounded-md" />
+                                    ) : (
+                                        <Upload className="w-8 h-8 text-muted-foreground" />
+                                    )}
+                                    </div>
+                                    <div className="w-full space-y-2">
+                                    <Input 
+                                        placeholder="Зургийн холбоос..." 
+                                        value={field.value || ''}
+                                        onChange={field.onChange}
+                                    />
+                                    <div className="relative">
+                                        <Button type="button" variant="outline" size="sm" className="w-full">
+                                        Компьютерээс сонгох
+                                        </Button>
+                                        <Input 
+                                        type="file" 
+                                        accept="image/*"
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        onChange={handleImageUpload}
+                                        />
+                                    </div>
+                                    </div>
+                                </div>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
                          <FormField
                           control={form.control}
                           name="technologies"
