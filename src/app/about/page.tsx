@@ -203,32 +203,21 @@ export default function AboutPage() {
   };
   
 const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) => {
-    const layoutConfig = [
-        { y: -80, x: 0, z: 50, scale: 1.1 },   // Front: Нас
-        { y: 0, x: -130, z: 0, scale: 1 },     // Middle Left: Төрсөн өдөр
-        { y: 0, x: 130, z: 0, scale: 1 },      // Middle Right: Орд
-        { y: 80, x: -200, z: -50, scale: 0.9 }, // Back Left: Өндөр
-        { y: 80, x: 200, z: -50, scale: 0.9 },  // Back Right: MBTI
-    ];
-
-    const {y: yOffset, x: xOffset, z, scale} = layoutConfig[index] || { y: 0, x: 0, z: 0, scale: 1 };
-
     return (
         <motion.div
-            initial={{ opacity: 0, y: yOffset + 40, x: xOffset, scale: scale * 0.8 }}
-            animate={{ opacity: 1, y: yOffset, x: xOffset, scale }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{
                 type: 'spring',
                 stiffness: 100,
                 damping: 15,
                 delay: 0.3 + index * 0.1,
             }}
-            whileHover={{ y: yOffset - 10, scale: scale * 1.05 }}
-            className="group absolute w-56 h-24"
-            style={{ zIndex: Math.round(z) }}
+            whileHover={{ y: -5, scale: 1.02 }}
+            className="group w-full max-w-md"
         >
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" />
-            <div className="relative p-4 h-full rounded-xl bg-neutral-900/60 backdrop-blur-md border border-neutral-800 transition-all duration-300 group-hover:border-primary/50 flex items-center justify-between">
+            <div className="relative p-4 h-20 rounded-xl bg-neutral-900/60 backdrop-blur-md border border-neutral-800 transition-all duration-300 group-hover:border-primary/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="p-3 rounded-full bg-primary/10 text-primary border border-primary/20">
                         {getIcon(info.icon, { className: "h-5 w-5" })}
@@ -265,7 +254,7 @@ const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) =>
           <div className="max-w-7xl mx-auto w-full">
             <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-12 lg:gap-20 w-full">
               {/* Personal Info Cards */}
-              <div className="relative w-full lg:w-1/2 h-[450px] flex items-center justify-center" style={{ perspective: '1000px' }}>
+              <div className="flex flex-col gap-6 items-center lg:items-start w-full lg:w-1/2">
                     {personalInfo.map((info, index) => (
                         <InfoCard key={info.label} info={info} index={index} />
                     ))}
