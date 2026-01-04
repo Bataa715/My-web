@@ -43,7 +43,7 @@ export default function AboutPage() {
   const nameRef = useRef<HTMLDivElement>(null);
   const [name, setName] = useState("Batuka");
 
-  const greetings = ["Сайн уу", "こんにちは", "Hello", "안녕하세요", "Привет", "Hallo"];
+  const greetings = useMemo(() => ["Сайн уу", "こんにちは", "Hello", "안녕하세요", "Привет", "Hallo"], []);
   const [greetingIndex, setGreetingIndex] = useState(0);
 
   useEffect(() => {
@@ -230,7 +230,7 @@ const InfoCardArrowLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
 
     }, [infos]);
 
-    if (orderedInfo.length < 5) {
+    if (!orderedInfo || orderedInfo.length < 5) {
         // Not enough data to render the arrow layout, render a simple list instead
         return (
             <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
