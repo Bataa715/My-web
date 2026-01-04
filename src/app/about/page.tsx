@@ -3,7 +3,7 @@
 
 import { Button } from '@/components/ui/button';
 import { ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight } from 'lucide-react';
-import { useState, useEffect, useCallback, type CSSProperties, useMemo } from 'react';
+import { useState, useEffect, useCallback, type CSSProperties, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
@@ -14,7 +14,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useHobbies } from '@/contexts/HobbyContext';
 import { AddHobbyDialog } from '@/components/AddHobbyDialog';
@@ -24,8 +24,74 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 const getIcon = (iconName?: string, className: string = "h-8 w-8 mb-3 text-white") => {
     if (!iconName) return null;
     const LucideIcon = (require('lucide-react') as any)[iconName];
-    return LucideIcon ? <LucideIcon className={className} /> : null;
+    return LucideIcon ? <LucideIcon className="h-8 w-8 mb-3 text-white" /> : null;
 };
+
+const PersonalInfoCard = ({ info, onEditClick, isEditMode }: { info: PersonalInfoType, onEditClick: () => void, isEditMode: boolean }) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x);
+  const mouseYSpring = useSpring(y);
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["20deg", "-20deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-20deg", "20deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+    e.currentTarget.style.setProperty("--mouse-x", `${mouseX}px`);
+    e.currentTarget.style.setProperty("--mouse-y", `${mouseY}px`);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateY,
+        rotateX,
+        transformStyle: "preserve-3d",
+      }}
+      className="relative h-full w-full rounded-xl bg-gradient-to-br from-neutral-900 to-neutral-950"
+    >
+      <div
+        style={{ transform: "translateZ(30px)" }}
+        className="relative group h-full w-full rounded-xl p-4 flex flex-col items-center justify-center text-center text-white"
+      >
+        {getIcon(info.icon)}
+        <p className="text-3xl md:text-4xl font-bold">{info.value}</p>
+        <p className="text-xs md:text-sm uppercase font-semibold mt-1">{info.label}</p>
+        
+        {isEditMode && (
+          <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30" onClick={(e) => { e.stopPropagation(); onEditClick(); }}>
+              <Edit className="h-4 w-4 text-white" />
+          </Button>
+        )}
+      </div>
+
+       <div 
+        className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        style={{
+            background: `radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(139, 92, 246, 0.15), transparent 80%)`
+        }}
+      />
+    </motion.div>
+  );
+};
+
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -41,6 +107,27 @@ export default function AboutPage() {
   const [editingInfoValue, setEditingInfoValue] = useState('');
   const [saving, setSaving] = useState(false);
 
+  const nameRef = useRef<HTMLDivElement>(null);
+  const [name, setName] = useState("Batuka");
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!nameRef.current) return;
+      const rect = nameRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      nameRef.current.style.setProperty("--mouse-x", `${x}px`);
+      nameRef.current.style.setProperty("--mouse-y", `${y}px`);
+    };
+
+    const currentRef = nameRef.current;
+    currentRef?.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      currentRef?.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
   const displayItems = useMemo(() => {
      if (isEditMode) {
       return [...hobbies, { id: 'add-new-hobby', title: '', description: '', image: '', imageHint: '', createdAt: new Date() }];
@@ -52,8 +139,28 @@ export default function AboutPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const totalItems = displayItems.length > 0 ? displayItems.length : 1;
   const anglePerItem = 360 / totalItems;
-  const CIRCLE_RADIUS = 400; // Controls the circle's radius
-  const ITEM_WIDTH = 250; // Width of a card
+  const CIRCLE_RADIUS_DESKTOP = 400; // Controls the circle's radius
+  const ITEM_WIDTH_DESKTOP = 250; // Width of a card
+  const CIRCLE_RADIUS_MOBILE = 220; 
+  const ITEM_WIDTH_MOBILE = 180;
+
+  const [carouselRadius, setCarouselRadius] = useState(CIRCLE_RADIUS_DESKTOP);
+  const [itemWidth, setItemWidth] = useState(ITEM_WIDTH_DESKTOP);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setCarouselRadius(CIRCLE_RADIUS_MOBILE);
+        setItemWidth(ITEM_WIDTH_MOBILE);
+      } else {
+        setCarouselRadius(CIRCLE_RADIUS_DESKTOP);
+        setItemWidth(ITEM_WIDTH_DESKTOP);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const scrollNext = () => setActiveIndex((prev) => (prev + 1) % totalItems);
   const scrollPrev = () => setActiveIndex((prev) => (prev - 1 + totalItems) % totalItems);
@@ -71,6 +178,7 @@ export default function AboutPage() {
             const data = docSnap.data() as UserProfile;
             imageUrl = data.aboutHeroImage;
             setEditedImageUrl(data.aboutHeroImage || '');
+            setName(data.name || 'Batuka');
             
             if (data.personalInfo && data.personalInfo.length > 0) {
               setPersonalInfo(data.personalInfo);
@@ -78,7 +186,7 @@ export default function AboutPage() {
               const defaultInfo: PersonalInfoType[] = [
                   { value: "21", label: "Нас", icon: 'Cake' },
                   { value: "Мэлхий", label: "Орд", icon: 'Sun' },
-                  { value: "INTJ", label: "MBTI", icon: 'UserIcon' },
+                  { value: "INTJ", label: "MBTI", icon: 'User' },
               ];
               await updateDoc(userDocRef, { personalInfo: defaultInfo });
               setPersonalInfo(defaultInfo);
@@ -162,12 +270,9 @@ export default function AboutPage() {
         toast({ title: "Алдаа", description: "Мэдээлэл хадгалахад алдаа гарлаа.", variant: "destructive" });
     }
   };
-
-  const name = "Batuka";
   
   return (
     <>
-      {/* Background image with gradient overlay - 50vh like home page */}
       <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
         {heroImage && (
           <Image
@@ -181,122 +286,74 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
       </div>
 
-      {/* Hero Section */}
-      <div className="flex min-h-[50vh] flex-col items-center justify-center text-center px-4">
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="matrix-text-container"
-        >
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-relaxed tracking-tight flex flex-wrap items-center justify-center gap-3">
-            <span className="bg-gradient-to-r from-primary/60 via-primary to-primary/60 bg-clip-text text-transparent">
-              Сайн уу?
-            </span>
-            <span className="text-foreground/90">
-              Миний нэрийг
-            </span>
-            <span className="matrix-text text-3xl md:text-4xl lg:text-5xl font-extrabold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent" 
-                  data-text={name}
-                  style={{
-                    filter: 'drop-shadow(0 0 20px rgba(147, 51, 234, 0.5)) drop-shadow(0 0 40px rgba(59, 130, 246, 0.3))',
-                  }}>
-              {name}
-            </span>
-            <span className="text-foreground/90">
-              гэдэг
-            </span>
-          </h1>
-          
-          {/* Decorative elements */}
-          <div className="flex justify-center items-center gap-4 mt-8">
-            <div className="h-px w-16 md:w-24 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
-            <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-            <div className="h-px w-16 md:w-24 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
-          </div>
-        </motion.div>
+      <div className="flex h-[50vh] flex-col items-center justify-center text-center">
+        <div className="matrix-text-container">
+            <h1 className="text-3xl font-bold" style={{textShadow: '1px 1px 2px black, 0 0 1em white, 0 0 0.2em white'}}>
+            Сайн уу? Миний нэрийг <span className="matrix-text" data-text={name}>{name}</span> гэдэг
+            </h1>
+        </div>
       </div>
-
+      
       {isEditMode && (
-      <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
-          <DialogTrigger asChild>
-          <Button variant="outline" size="icon" className="absolute top-4 right-4 z-30">
-              <ImageIcon className="h-4 w-4" />
-              <span className="sr-only">Арын зураг солих</span>
-          </Button>
-          </DialogTrigger>
-          <DialogContent>
-          <DialogHeader>
-              <DialogTitle>Арын зургийн холбоос</DialogTitle>
-              <DialogDescription>
-              Шинэ зургийнхаа URL хаягийг энд буулгана уу.
-              </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image-url" className="text-right">
-                  URL
-              </Label>
-              <Input
-                  id="image-url"
-                  value={editedImageUrl}
-                  onChange={(e) => setEditedImageUrl(e.target.value)}
-                  className="col-span-3"
-                  placeholder="https://example.com/image.png"
-              />
-              </div>
-          </div>
-          <DialogFooter>
-              <DialogClose asChild>
-              <Button type="button" variant="secondary">Цуцлах</Button>
-              </DialogClose>
-              <Button type="button" onClick={handleSaveImage} disabled={saving}>
-              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
-              </Button>
-          </DialogFooter>
-          </DialogContent>
-      </Dialog>
+        <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
+            <DialogTrigger asChild>
+            <Button variant="outline" size="icon" className="absolute top-28 right-4 z-50">
+                <ImageIcon className="h-4 w-4" />
+                <span className="sr-only">Арын зураг солих</span>
+            </Button>
+            </DialogTrigger>
+            <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Арын зургийн холбоос</DialogTitle>
+                <DialogDescription>
+                Шинэ зургийнхаа URL хаягийг энд буулгана уу.
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="image-url" className="text-right">
+                    URL
+                </Label>
+                <Input
+                    id="image-url"
+                    value={editedImageUrl}
+                    onChange={(e) => setEditedImageUrl(e.target.value)}
+                    className="col-span-3"
+                    placeholder="https://example.com/image.png"
+                />
+                </div>
+            </div>
+            <DialogFooter>
+                <DialogClose asChild>
+                <Button type="button" variant="secondary">Цуцлах</Button>
+                </DialogClose>
+                <Button type="button" onClick={handleSaveImage} disabled={saving}>
+                {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
+                </Button>
+            </DialogFooter>
+            </DialogContent>
+        </Dialog>
       )}
 
-      <section className="w-full max-w-4xl mx-auto pt-8 pb-12 text-center px-4">
-         <motion.div 
-           initial={{ opacity: 0, y: 20 }}
-           animate={{ opacity: 1, y: 0 }}
-           transition={{ duration: 0.6, delay: 0.2 }}
-           className="grid grid-cols-3 gap-6"
-         >
+      <section className="w-full max-w-4xl mx-auto pt-0 text-center">
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {personalInfo.map((info, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: 0.1 * index }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                >
-                  <Card className="relative group overflow-hidden rounded-xl shadow-xl border-primary/30 bg-card/80 backdrop-blur-md h-full min-h-[180px] hover:border-primary/60 transition-all duration-300">
+                <Card key={index} className="relative group overflow-hidden rounded-lg shadow-lg border-white/10 h-full min-h-[160px]">
                     <CardContent className="p-0 h-full">
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5"></div>
-                        <div className="relative z-20 flex flex-col items-center justify-center text-center p-6 h-full">
-                            <div className="mb-3 p-3 rounded-full bg-primary/20 backdrop-blur">
-                              {getIcon(info.icon, "h-6 w-6")}
-                            </div>
-                            <p className="text-4xl font-extrabold bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent mb-2">
-                              {info.value}
-                            </p>
-                            <p className="text-sm uppercase font-bold tracking-wider text-muted-foreground">
-                              {info.label}
-                            </p>
+                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center p-4 text-white bg-gradient-to-t from-black/70 to-transparent">
+                            {getIcon(info.icon)}
+                            <p className="text-4xl font-bold">{info.value}</p>
+                            <p className="text-sm uppercase font-semibold mt-1">{info.label}</p>
                         </div>
                         {isEditMode && (
-                            <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity z-30 hover:bg-primary/20" onClick={() => handleEditInfoClick(info)}>
-                                <Edit className="h-4 w-4" />
+                            <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30" onClick={() => handleEditInfoClick(info)}>
+                                <Edit className="h-4 w-4 text-white" />
                             </Button>
                         )}
                     </CardContent>
-                  </Card>
-                </motion.div>
+                </Card>
             ))}
-        </motion.div>
+        </div>
       </section>
 
       <Dialog open={isEditingInfo} onOpenChange={setIsEditingInfo}>
@@ -328,10 +385,10 @@ export default function AboutPage() {
         </DialogContent>
       </Dialog>
       
-      <section id="hobbies" className="py-16 md:py-24">
+      <section id="hobbies" className="py-16 md:py-24 reveal">
         <div className="container px-4 md:px-6">
-          <div className="text-center mb-24">
-            <h2 className="text-4xl md:text-5xl font-bold">Миний хоббинууд</h2>
+          <div className="text-center mb-12 sm:mb-24">
+            <h2 className="text-3xl md:text-5xl font-bold">Миний хоббинууд</h2>
           </div>
 
           {hobbiesLoading ? (
@@ -346,14 +403,14 @@ export default function AboutPage() {
                         {user && <p className="text-sm text-muted-foreground mt-2">Засварлах горимд шинээр нэмнэ үү.</p>}
                     </div>
                 ) : (
-                <div className="carousel-container">
+                <div className="carousel-container" style={{ width: `${itemWidth}px`}}>
                     <div className="carousel" style={{ transform: `rotateY(${-activeIndex * anglePerItem}deg)` }}>
                         <AnimatePresence>
                            {displayItems.map((hobby, index) => {
                               const angle = index * anglePerItem;
                               const isVisible = Math.abs((activeIndex - index + totalItems) % totalItems) <= 2 || Math.abs((activeIndex - index - totalItems) % totalItems) <= 2;
                               const style: CSSProperties = {
-                                  transform: `rotateY(${angle}deg) translateZ(${CIRCLE_RADIUS}px)`,
+                                  transform: `rotateY(${angle}deg) translateZ(${carouselRadius}px)`,
                                   opacity: isVisible ? 1 : 0.2,
                                   pointerEvents: isVisible ? 'auto' : 'none',
                               };
@@ -407,8 +464,8 @@ export default function AboutPage() {
                                           />
                                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                                            <div className="absolute bottom-0 left-0 p-4 text-white">
-                                              <CardTitle className="text-lg font-bold">{hobby.title}</CardTitle>
-                                              <p className="text-sm text-white/80 mt-1">{hobby.description}</p>
+                                              <CardTitle className="text-base md:text-lg font-bold">{hobby.title}</CardTitle>
+                                              <p className="text-xs md:text-sm text-white/80 mt-1">{hobby.description}</p>
                                            </div>
                                        </Card>
                                    </div>
@@ -420,7 +477,7 @@ export default function AboutPage() {
                 )}
                 <Button
                     onClick={scrollPrev}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10"
+                    className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-10"
                     variant="outline"
                     size="icon"
                     disabled={displayItems.length === 0}
@@ -429,7 +486,7 @@ export default function AboutPage() {
                 </Button>
                 <Button
                     onClick={scrollNext}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10"
+                    className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-10"
                     variant="outline"
                     size="icon"
                      disabled={displayItems.length === 0}
@@ -444,7 +501,6 @@ export default function AboutPage() {
        <style jsx>{`
             .carousel-container {
                 perspective: 2000px;
-                width: ${ITEM_WIDTH}px;
                 height: 350px;
                 position: relative;
             }
@@ -457,7 +513,7 @@ export default function AboutPage() {
             }
             .carousel-item {
                 position: absolute;
-                width: ${ITEM_WIDTH}px;
+                width: ${itemWidth}px;
                 height: 320px;
                 top: 15px;
                 left: 0;

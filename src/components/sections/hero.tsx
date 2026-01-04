@@ -43,9 +43,9 @@ interface OrbitItemProps {
 const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick, isEditing }) => {
     const angle = (index / total) * 2 * Math.PI;
     
-    const baseRadius = 200;
+    const baseRadius = 140; // Reduced for mobile
     const mdBaseRadius = 240;
-    const editingRadius = 230;
+    const editingRadius = 160; // Reduced for mobile
     const mdEditingRadius = 270;
 
     const [currentRadius, setCurrentRadius] = useState(baseRadius);
@@ -70,7 +70,7 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
     return (
         <motion.div
             key={item.id}
-            className="absolute h-16 w-16"
+            className="absolute h-14 w-14 md:h-16 md:w-16"
             style={{
                 top: '50%',
                 left: '50%',
@@ -89,12 +89,12 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
                 variant="outline"
                 size="icon"
                 className={cn(
-                    "rounded-full h-16 w-16 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-110",
+                    "rounded-full h-14 w-14 md:h-16 md:w-16 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-110",
                     selectedOrbit?.id === item.id && "bg-primary text-primary-foreground scale-110"
                 )}
                 onClick={() => onItemClick(item)}
             >
-                {getIcon(item.icon)}
+                {getIcon(item.icon, { className: "h-6 w-6 md:h-8 md:w-8" })}
                 <span className="sr-only">{item.title}</span>
             </Button>
         </motion.div>
@@ -154,6 +154,7 @@ export default function Hero() {
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   const [selectedSocial, setSelectedSocial] = useState<SocialInfo | null>(null);
   const [isQrLoading, setIsQrLoading] = useState(true);
+  const [heroBackground, setHeroBackground] = useState<string | undefined>(undefined);
   
   const { toast } = useToast();
   
@@ -166,11 +167,13 @@ export default function Hero() {
 
         if (!user || !firestore) {
             setLoading(false);
+            setHeroBackground(undefined);
             return;
         }
 
         const userInfoDocRef = doc(firestore, "users", user.uid);
         setLoading(true);
+        setHeroBackground(undefined); // Clear previous background before loading new one
       try {
         const docSnap = await getDoc(userInfoDocRef);
         if (docSnap.exists() && docSnap.data()?.name) { 
@@ -208,6 +211,14 @@ export default function Hero() {
           };
           setSocialLinks(links);
           setEditedLinks(links);
+          
+          // Set hero background
+          let bgImage = data.homeHeroImage;
+          if (!bgImage) {
+            const placeholder = PlaceHolderImages.find(p => p.id === 'home-hero-background');
+            bgImage = placeholder?.imageUrl;
+          }
+          setHeroBackground(bgImage);
 
         } else {
           const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
@@ -459,21 +470,52 @@ export default function Hero() {
     }
   };
 
-  const socialButtons = [
-    { type: 'github', url: socialLinks.github, icon: <Github className="h-5 w-5" />, name: 'GitHub' },
-    { type: 'instagram', url: socialLinks.instagram, icon: <Instagram className="h-5 w-5" />, name: 'Instagram' },
-    { type: 'facebook', url: socialLinks.facebook, icon: <Facebook className="h-5 w-5" />, name: 'Facebook' },
-    { type: 'email', url: socialLinks.email, icon: <Mail className="h-5 w-5" />, name: 'Email' }
-  ].filter(link => link.url);
-
+  const socialButtons: SocialInfo[] = ([
+    { type: 'github' as SocialLinkType, url: socialLinks.github, icon: <Github className="h-5 w-5" />, name: 'GitHub' },
+    { type: 'instagram' as SocialLinkType, url: socialLinks.instagram, icon: <Instagram className="h-5 w-5" />, name: 'Instagram' },
+    { type: 'facebook' as SocialLinkType, url: socialLinks.facebook, icon: <Facebook className="h-5 w-5" />, name: 'Facebook' },
+    { type: 'email' as SocialLinkType, url: socialLinks.email, icon: <Mail className="h-5 w-5" />, name: 'Email' }
+  ] as SocialInfo[]).filter(link => link.url);
 
   return (
-     <section id="home" className="w-full flex items-center min-h-[calc(100vh-200px)] py-12">
-      <div className="container px-4 md:px-6">
+     <section id="home" className="relative w-full flex items-center min-h-[calc(100vh-200px)] py-12 overflow-hidden">
+      {/* Hero Background Image */}
+      <AnimatePresence mode="wait">
+        {heroBackground && (
+          <motion.div 
+            key={heroBackground}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0 z-0 pointer-events-none"
+          >
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
+              style={{
+                backgroundImage: `url('${heroBackground}')`,
+                maskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.3) 70%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.3) 70%, transparent 100%)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                imageRendering: 'crisp-edges',
+              }}
+            />
+            {/* Gradient overlay to blend with background */}
+            <div 
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(to bottom, transparent 0%, transparent 40%, hsl(var(--background)) 100%)',
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <div className="container relative z-10 px-4 md:px-6">
         <div className="grid items-center justify-center gap-10 lg:grid-cols-2 lg:gap-20">
           <div className="flex flex-col justify-center space-y-6 lg:order-2">
-            <div className="relative flex items-center justify-center w-full max-w-[500px] aspect-square mx-auto">
-             <div className={cn("relative transition-all duration-500 [transform-style:preserve-3d]", isEditingOrbit ? "w-[360px] h-[360px] md:w-[480px] md:h-[480px]" : "w-80 h-80 md:w-96 md:h-96")}>
+            <div className="relative flex items-center justify-center w-full max-w-[300px] sm:max-w-[500px] aspect-square mx-auto">
+             <div className={cn("relative transition-all duration-500 [transform-style:preserve-3d]", isEditingOrbit ? "w-[260px] h-[260px] sm:w-[360px] sm:h-[360px] md:w-[480px] md:h-[480px]" : "w-56 h-56 sm:w-80 sm:h-80 md:w-96 md:h-96")}>
                 <AnimatePresence>
                     {selectedOrbit ? (
                         <motion.div
@@ -579,8 +621,8 @@ export default function Hero() {
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
                                         className="relative w-full cursor-pointer z-20 p-4 flex flex-col items-center justify-center text-center" onClick={handleContentClick}>
-                                        <h3 className="text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
-                                         <p className="text-lg text-foreground">{selectedOrbit.content}</p>
+                                        <h3 className="text-xl md:text-2xl font-bold mb-2 text-primary">{selectedOrbit.title}</h3>
+                                         <p className="text-sm md:text-lg text-foreground">{selectedOrbit.content}</p>
                                         
                                         {selectedOrbit.type === 'audio' && selectedOrbit.youtubeVideoId && (
                                             <Button variant="ghost" size="icon" className="mt-4 h-12 w-12" onClick={(e) => { e.stopPropagation(); setIsPlayerOpen(true); }}>
@@ -648,14 +690,27 @@ export default function Hero() {
             </div>
           </div>
            <div className="flex flex-col items-center lg:items-start justify-center space-y-6 text-center lg:text-left lg:order-1">
-            <div className="space-y-4">
-               <div className="relative">
+            <div className="space-y-5">
+              {/* Role badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  Програм хангамжийн инженер
+                </span>
+              </motion.div>
+
+              {/* Greeting and Name */}
+              <div className="relative">
                 {isEditingName ? (
                   <div className="flex items-center gap-2">
                     <Input
                       value={editedName}
                       onChange={(e) => setEditedName(e.target.value)}
-                      className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none h-auto p-0 border-0 focus-visible:ring-0 bg-transparent"
+                      className="text-3xl sm:text-4xl font-bold tracking-tighter xl:text-6xl/none h-auto p-0 border-0 focus-visible:ring-0 bg-transparent"
                     />
                     <Button onClick={handleSaveName} size="icon" className="h-8 w-8" disabled={saving}>
                       {saving ? <Loader2 className="h-4 w-4 animate-spin"/> : <Save className="h-4 w-4" />}
@@ -665,30 +720,44 @@ export default function Hero() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                      {name}
-                    </h1>
-                    {isEditMode && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => setIsEditingName(true)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
+                  <motion.div 
+                    className="flex flex-col gap-1"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                  >
+                    <span className="text-2xl sm:text-3xl font-medium text-muted-foreground">
+                      Сайн уу, Би
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight">
+                        <span className="text-primary">
+                          {name}
+                        </span>
+                      </h1>
+                      {isEditMode && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => setIsEditingName(true)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </motion.div>
                 )}
               </div>
+
+              {/* Bio with pipe separators */}
               <div className="relative">
                 {isEditingBio ? (
                   <div className="space-y-2">
                     <Textarea
                       value={editedBio}
                       onChange={(e) => setEditedBio(e.target.value)}
-                      className="max-w-[600px] md:text-xl bg-muted/50"
+                      className="max-w-[600px] text-lg md:text-xl bg-muted/50"
                       rows={4}
                     />
                     <div className="flex gap-2">
@@ -701,9 +770,16 @@ export default function Hero() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-start gap-2">
-                    <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                      {bio}
+                  <motion.div 
+                    className="flex items-start gap-2"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                  >
+                    <p className="max-w-[650px] text-muted-foreground text-base md:text-lg leading-relaxed">
+                      <span className="text-foreground font-medium">Fullstack хөгжүүлэгч</span>
+                      <span className="mx-2 text-primary">|</span>
+                      <span>{bio}</span>
                     </p>
                     {isEditMode && (
                       <Button
@@ -716,7 +792,7 @@ export default function Hero() {
                         <span className="sr-only">Танилцуулга засах</span>
                       </Button>
                     )}
-                  </div>
+                  </motion.div>
                 )}
               </div>
             </div>
@@ -779,7 +855,7 @@ export default function Hero() {
                         </div>
                     </div>
                 ) : (
-                   <div className="flex flex-wrap items-center gap-4">
+                   <div className="flex flex-wrap items-center gap-2 lg:gap-4">
                         {socialLinks.cvUrl && (
                         <Button asChild variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground transition-transform hover:scale-105">
                             <Link href={socialLinks.cvUrl} target="_blank" rel="noopener noreferrer">
@@ -919,5 +995,3 @@ export default function Hero() {
     </section>
   );
 }
-
-

@@ -553,7 +553,7 @@ export default function VocabularyManager<T extends Word>({
 
         </CardHeader>
         <CardContent>
-            <div className="border rounded-md">
+            <div className="border rounded-md overflow-auto">
             <Table>
                 <TableHeader>
                 <TableRow>
@@ -705,7 +705,3 @@ export default function VocabularyManager<T extends Word>({
     </>
   );
 }
-
-    
-
-    

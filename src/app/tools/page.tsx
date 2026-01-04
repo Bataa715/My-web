@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { ArrowRight, Timer, Code as CodeIcon, BookOpen, ImageIcon, Save, Loader2, HeartPulse, Book } from "lucide-react";
+import { ArrowRight, Timer, Code as CodeIcon, BookOpen, ImageIcon, Save, Loader2, HeartPulse, LayoutGrid, TrendingUp } from "lucide-react";
 import BackButton from "@/components/shared/BackButton";
 import { useFirebase } from '@/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -32,10 +32,10 @@ const tools = [
     icon: <BookOpen className="h-6 w-6" />
   },
    {
-    title: "Тэмдэглэл",
-    description: "",
+    title: "Workspace",
+    description: "Хувийн ажлын самбар, төлөвлөгч",
     href: "/tools/notes",
-    icon: <Book className="h-6 w-6" />
+    icon: <LayoutGrid className="h-6 w-6" />
   },
   {
     title: "Програмчлал",
@@ -44,16 +44,16 @@ const tools = [
     icon: <CodeIcon className="h-6 w-6" />
   },
   {
+    title: "TraderAi",
+    description: "AI-аар алтны ханшийн зураг шинжлэх",
+    href: "/tools/trader-ai",
+    icon: <TrendingUp className="h-6 w-6" />
+  },
+  {
     title: "Pomodoro Timer",
     description: "Төвлөрлийг сайжруулах цаг",
     href: "/tools/pomodoro",
     icon: <Timer className="h-6 w-6" />
-  },
-   {
-    title: "Fitness",
-    description: "Биеийн тамирын дасгал хийх",
-    href: "/tools/fitness",
-    icon: <HeartPulse className="h-6 w-6" />
   },
 ];
 
@@ -131,7 +131,7 @@ export default function ToolsPage() {
       {isEditMode && (
           <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="icon" className="absolute top-4 right-4 z-10">
+              <Button variant="outline" size="icon" className="absolute top-28 right-4 z-50">
                 <ImageIcon className="h-4 w-4" />
                 <span className="sr-only">Арын зураг солих</span>
               </Button>
@@ -184,16 +184,16 @@ export default function ToolsPage() {
       <div className="space-y-8">
         <BackButton />
         <div className="text-center pt-8">
-            <h1 className="text-4xl font-bold">Хэрэгслүүд</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold">Хэрэгслүүд</h1>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 pt-8">
           {tools.map((tool) => (
             <Link href={tool.href} key={tool.title} className="group">
               <Card className="h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
                 <CardHeader className="flex-row items-center justify-between">
                     <div className="flex items-center gap-4">
                         {tool.icon}
-                        <CardTitle>{tool.title}</CardTitle>
+                        <CardTitle className="text-lg sm:text-xl">{tool.title}</CardTitle>
                     </div>
                     <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
                 </CardHeader>

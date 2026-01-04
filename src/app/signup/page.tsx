@@ -48,7 +48,7 @@ export default function SignupPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
       const user = userCredential.user;
 
-      const defaultImage = "https://i.pinimg.com/736x/62/76/34/627634aab8908a7eaa90dce0a11d257d.jpg";
+      const defaultImage = "https://api.dicebear.com/7.x/avataaars/svg?seed=default";
       
       const defaultOrbitInfo: OrbitInfo[] = [
         { id: 'location', icon: 'MapPin', title: 'Байршил', content: '', type: 'info' },

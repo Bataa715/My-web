@@ -10,6 +10,7 @@ import Hero from '@/components/sections/hero';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Projects from '@/components/sections/projects';
 import Skills from '@/components/sections/skills';
+import Experience from '@/components/sections/Experience';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -93,7 +94,7 @@ export default function HomePage() {
        {isEditMode && (
           <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="icon" className="absolute top-4 right-4 z-10">
+              <Button variant="outline" size="icon" className="absolute top-28 right-4 z-50">
                 <ImageIcon className="h-4 w-4" />
                 <span className="sr-only">Арын зураг солих</span>
               </Button>
@@ -143,6 +144,7 @@ export default function HomePage() {
         </div>
       )}
       <Hero />
+      <Experience />
       <Education />
       <Projects />
       <Skills />

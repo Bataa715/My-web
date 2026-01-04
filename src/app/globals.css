@@ -89,7 +89,7 @@
     --secondary-foreground: 214 33% 91%;
     --muted: 222 47% 20%;
     --muted-foreground: 220 15% 60%;
-    --accent: 329 100% 70%;
+    --accent: 195 100% 75%;
     --accent-foreground: 222 47% 5%;
     --destructive: 354 70% 54%;
     --destructive-foreground: 214 33% 91%;
@@ -368,3 +368,87 @@
 .animate-pulse-slow {
   animation: pulse-slow 3s ease-in-out infinite;
 }
+
+/* Beam Animation */
+@keyframes beam-gradient {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+.animated-beam {
+  --beam-width: 50px;
+  background-image: conic-gradient(
+    from 180deg at 50% 50%,
+    rgba(255, 255, 255, 0) 0deg,
+    hsl(var(--primary)) 20deg,
+    hsl(var(--primary) / 0.5) 50deg,
+    hsl(var(--primary)) 90deg,
+    rgba(255, 255, 255, 0) 180deg,
+    rgba(255, 255, 255, 0) 360deg
+  );
+  background-size: 200% 200%;
+  animation: beam-gradient 8s linear infinite;
+  mask-image: radial-gradient(
+    ellipse 100% 100% at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    black var(--beam-width),
+    transparent calc(var(--beam-width) + 20px)
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 100% at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    black var(--beam-width),
+    transparent calc(var(--beam-width) + 20px)
+  );
+  pointer-events: none;
+}
+
+/* Rotating border animation for layout */
+.animated-border-wrapper {
+  @apply relative overflow-hidden rounded-3xl p-[2px];
+}
+
+.animated-border-wrapper::before,
+.animated-border-wrapper::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  border-radius: inherit;
+}
+
+.animated-border-wrapper::before {
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 90deg at 50% 50%,
+    hsl(var(--primary) / 0.8),
+    20deg,
+    transparent,
+    40deg,
+    hsl(var(--primary) / 0.8),
+    60deg,
+    transparent,
+    80deg,
+    hsl(var(--primary) / 0.8),
+    transparent
+  );
+  animation: rotate-glow-circle-cw 8s linear infinite;
+}
+
+.animated-border-wrapper::after {
+  inset: 0;
+  background: hsl(var(--background));
+  border-radius: calc(1.5rem - 2px);
+}
+
+.animated-border-wrapper > * {
+  position: relative;
+  z-index: 1;
+}
+

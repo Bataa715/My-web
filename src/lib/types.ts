@@ -127,6 +127,7 @@ export type Project = {
   link?: string;
   live?: string;
   category: string;
+  image?: string;
   createdAt?: Date | Timestamp;
 };
 
@@ -171,6 +172,15 @@ export type UserProfile = {
     cvUrl?: string;
 };
 
+export type Note = {
+  id?: string;
+  title: string;
+  content: string;
+  createdAt?: Date | Timestamp;
+  updatedAt?: Date | Timestamp;
+};
+
+
 export type Exercise = {
     id?: string;
     name: string;
@@ -186,15 +196,6 @@ export type WorkoutLog = {
     repetitions: number;
     date: Date | Timestamp;
 }
-
-export type Note = {
-  id?: string;
-  title: string;
-  content?: string;
-  createdAt?: Date | Timestamp;
-  updatedAt?: Date | Timestamp;
-};
-
 
 export interface GeneratedMCQ {
   question: string;

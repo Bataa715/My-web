@@ -1,8 +1,6 @@
 
 'use client';
 import { useSkills } from '@/contexts/SkillsContext';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
 import { Skeleton } from '../ui/skeleton';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { Button } from '../ui/button';
@@ -20,108 +18,208 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useRef, useState } from 'react';
+
+interface SkillCardProps {
+  skillGroup: {
+    id: string;
+    name: string;
+    icon: string;
+    items: string[];
+  };
+  index: number;
+  isEditMode: boolean;
+  deleteSkillGroup: (id: string) => void;
+}
+
+const SkillCard = ({ skillGroup, index, isEditMode, deleteSkillGroup }: SkillCardProps) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
+  
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["8deg", "-8deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-8deg", "8deg"]);
+
+  const getIcon = (iconName: string) => {
+    const LucideIcon = (require('lucide-react') as any)[iconName];
+    return LucideIcon ? <LucideIcon className="h-8 w-8" /> : <AlertTriangle className="h-8 w-8 text-destructive" />;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    const xPct = mouseX / rect.width - 0.5;
+    const yPct = mouseY / rect.height - 0.5;
+    
+    x.set(xPct);
+    y.set(yPct);
+    setMousePosition({ x: mouseX, y: mouseY });
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      className="group relative h-full"
+    >
+      {/* Card */}
+      <div className="relative overflow-hidden rounded-2xl bg-neutral-900/80 backdrop-blur-sm border border-neutral-800 p-6 h-full transition-all duration-300 hover:border-neutral-700">
+        
+        {/* Glowing accent line at top */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-primary rounded-b-full blur-sm" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-primary rounded-b-full" />
+        
+        {/* Spotlight effect */}
+        <div 
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{
+            background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, hsl(var(--primary) / 0.1), transparent 40%)`
+          }}
+        />
+        
+        {/* Edit buttons */}
+        {isEditMode && (
+          <div className="absolute top-3 right-3 flex gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+            <EditSkillDialog skillGroup={skillGroup}>
+              <Button variant="ghost" size="icon" className="h-7 w-7 bg-black/50 hover:bg-black/70 text-white">
+                <Edit className="h-4 w-4" />
+              </Button>
+            </EditSkillDialog>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 bg-black/50 hover:bg-destructive/80 text-white">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    "{skillGroup.name}" бүлгийг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => deleteSkillGroup(skillGroup.id)}>Устгах</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
+        
+        {/* Content */}
+        <div className="relative z-10">
+          {/* Icon and Title */}
+          <div className="flex items-center gap-4 mb-5">
+            <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 text-primary border border-primary/20">
+              {getIcon(skillGroup.icon)}
+            </div>
+            <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors duration-300">
+              {skillGroup.name}
+            </h3>
+          </div>
+          
+          {/* Skills tags */}
+          <div className="flex flex-wrap gap-2">
+            {skillGroup.items.map((item, idx) => (
+              <span 
+                key={idx} 
+                className="px-3 py-1.5 rounded-full text-sm font-medium bg-neutral-800 text-neutral-300 border border-neutral-700 hover:border-primary/50 hover:text-primary transition-all duration-300"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 
 const Skills = () => {
     const { skills, loading, deleteSkillGroup } = useSkills();
     const { isEditMode } = useEditMode();
 
-    const getIcon = (iconName: string) => {
-        const LucideIcon = (require('lucide-react') as any)[iconName];
-        return LucideIcon ? <LucideIcon className="h-8 w-8 text-primary" /> : <AlertTriangle className="h-8 w-8 text-destructive" />;
-    };
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
-        e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
-    };
-
     return (
         <section id="skills" className="py-12 md:py-24 lg:py-32">
-            <div className="container">
-                <div className="mb-12 text-center space-y-4">
-                    <h2 className="text-4xl font-bold">Ур чадвар &amp; Технологиуд</h2>
-                </div>
+            <div className="container px-4 md:px-6">
+                {/* Section Title */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="text-center mb-12 md:mb-16"
+                >
+                    <h2 className="text-3xl md:text-5xl font-bold">
+                        Ур чадвар &amp; <span className="text-primary">Технологиуд</span>
+                    </h2>
+                </motion.div>
 
-                {loading && (
-                    <div className="mx-auto grid items-start gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                        {Array.from({ length: 4 }).map((_, i) => (
-                            <Card key={i}>
-                                <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                                    <Skeleton className="h-8 w-8 rounded-full" />
-                                    <Skeleton className="h-6 w-3/4" />
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="flex flex-wrap gap-2">
-                                        <Skeleton className="h-6 w-20 rounded-full" />
-                                        <Skeleton className="h-6 w-16 rounded-full" />
-                                        <Skeleton className="h-6 w-24 rounded-full" />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                )}
-
-                {!loading && (
-                     <div className="mx-auto grid items-start gap-6 py-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                        {skills.map((skillGroup) => (
-                             <div key={skillGroup.id} className="card-glow rounded-lg h-full" onMouseMove={handleMouseMove}>
-                                <Card className="hover:shadow-lg transition-shadow duration-300 relative group bg-muted/30 h-full flex flex-col">
-                                    {isEditMode && (
-                                        <div className="absolute top-2 right-2 flex gap-1 z-10">
-                                            <EditSkillDialog skillGroup={skillGroup}>
-                                                <Button variant="ghost" size="icon" className="h-7 w-7">
-                                                    <Edit className="h-4 w-4" />
-                                                </Button>
-                                            </EditSkillDialog>
-
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive/10 hover:text-destructive">
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            "{skillGroup.name}" бүлгийг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                                                        <AlertDialogAction onClick={() => deleteSkillGroup(skillGroup.id)}>Устгах</AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        </div>
-                                    )}
-                                    <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                                        {getIcon(skillGroup.icon)}
-                                        <CardTitle className="text-lg">{skillGroup.name}</CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="flex-grow">
-                                        <div className="flex flex-wrap gap-2">
-                                            {skillGroup.items.map((item, index) => (
-                                                <Badge key={index} variant="secondary" className="text-sm font-medium">
-                                                    {item}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                {loading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        {Array.from({ length: 6 }).map((_, i) => (
+                            <div key={i} className="rounded-2xl bg-neutral-900/50 border border-neutral-800 p-6">
+                                <div className="flex items-center gap-4 mb-5">
+                                    <Skeleton className="h-14 w-14 rounded-xl" />
+                                    <Skeleton className="h-6 w-32" />
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    <Skeleton className="h-8 w-20 rounded-full" />
+                                    <Skeleton className="h-8 w-24 rounded-full" />
+                                    <Skeleton className="h-8 w-16 rounded-full" />
+                                </div>
                             </div>
                         ))}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" style={{ perspective: "1000px" }}>
+                        {skills.map((skillGroup, index) => (
+                            <SkillCard 
+                              key={skillGroup.id} 
+                              skillGroup={skillGroup} 
+                              index={index}
+                              isEditMode={isEditMode}
+                              deleteSkillGroup={deleteSkillGroup}
+                            />
+                        ))}
                         {isEditMode && (
-                           <motion.div layout initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }} className="h-full">
+                           <motion.div 
+                             layout 
+                             initial={{ opacity: 0, scale: 0.8 }} 
+                             animate={{ opacity: 1, scale: 1 }} 
+                             transition={{ duration: 0.3 }} 
+                             className="h-full min-h-[200px]"
+                           >
                                 <AddSkillDialog>
-                                    <button className="flex h-full min-h-[150px] w-full flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/50 bg-muted/20 text-muted-foreground transition-colors hover:border-primary hover:bg-muted/50 hover:text-primary">
-                                        <PlusCircle size={40} />
+                                    <button className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-700 bg-neutral-900/30 text-neutral-500 transition-all duration-300 hover:border-primary hover:bg-neutral-900/50 hover:text-primary hover:shadow-lg hover:shadow-primary/10">
+                                        <PlusCircle size={48} />
                                         <span className="mt-4 font-semibold">Шинэ ур чадвар нэмэх</span>
                                     </button>
                                 </AddSkillDialog>

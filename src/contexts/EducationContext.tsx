@@ -7,6 +7,15 @@ import { useToast } from "@/hooks/use-toast";
 import { useFirebase } from '@/firebase';
 import { collection, getDocs, doc, query, orderBy, Timestamp, serverTimestamp, writeBatch, addDoc, deleteDoc, updateDoc } from "firebase/firestore";
 
+// Helper function to convert Timestamp or Date to Date
+const toDate = (value: Date | Timestamp | undefined): Date => {
+  if (!value) return new Date();
+  if (value instanceof Timestamp) {
+    return value.toDate();
+  }
+  return value;
+};
+
 interface EducationContextType {
   education: Education[];
   addEducation: (education: Omit<Education, 'id' | 'createdAt'>) => Promise<void>;
@@ -98,8 +107,8 @@ export function EducationProvider({ children }: { children: ReactNode }) {
     try {
         const newEducationData = { 
             ...edu, 
-            startDate: new Date(edu.startDate),
-            endDate: new Date(edu.endDate),
+            startDate: toDate(edu.startDate),
+            endDate: toDate(edu.endDate),
             createdAt: serverTimestamp() 
         };
         
@@ -107,12 +116,12 @@ export function EducationProvider({ children }: { children: ReactNode }) {
         const newEducation = { 
             ...edu, 
             id: docRef.id, 
-            startDate: new Date(edu.startDate),
-            endDate: new Date(edu.endDate),
+            startDate: toDate(edu.startDate),
+            endDate: toDate(edu.endDate),
             createdAt: new Date() 
         } as Education;
       
-        setEducation((prev) => [...prev, newEducation].sort((a, b) => (a.startDate as Date).getTime() - (b.startDate as Date).getTime()));
+        setEducation((prev) => [...prev, newEducation].sort((a, b) => toDate(a.startDate).getTime() - toDate(b.startDate).getTime()));
 
         toast({
             title: "Амжилттай нэмэгдлээ",
@@ -136,11 +145,11 @@ export function EducationProvider({ children }: { children: ReactNode }) {
     const originalEducation = education;
     const formattedUpdate = {
         ...eduUpdate,
-        ...(eduUpdate.startDate && { startDate: new Date(eduUpdate.startDate) }),
-        ...(eduUpdate.endDate && { endDate: new Date(eduUpdate.endDate) }),
+        ...(eduUpdate.startDate && { startDate: toDate(eduUpdate.startDate) }),
+        ...(eduUpdate.endDate && { endDate: toDate(eduUpdate.endDate) }),
     }
 
-    setEducation(prev => prev.map(e => e.id === educationId ? { ...e, ...formattedUpdate } as Education : e).sort((a, b) => (a.startDate as Date).getTime() - (b.startDate as Date).getTime()));
+    setEducation(prev => prev.map(e => e.id === educationId ? { ...e, ...formattedUpdate } as Education : e).sort((a, b) => toDate(a.startDate).getTime() - toDate(b.startDate).getTime()));
 
     try {
       const educationDoc = doc(firestore, `users/${user.uid}/education`, educationId);
