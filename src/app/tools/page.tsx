@@ -168,18 +168,6 @@ export default function ToolsPage() {
             </DialogContent>
           </Dialog>
         )}
-      {heroImage && (
-          <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
-              <Image
-                  src={heroImage}
-                  alt="Abstract technology background"
-                  fill
-                  className="object-cover"
-                  data-ai-hint="abstract technology"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
-          </div>
-      )}
       
       <div className="space-y-8">
         <BackButton />

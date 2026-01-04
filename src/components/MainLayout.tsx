@@ -4,8 +4,12 @@ import { usePathname, useRouter } from 'next/navigation';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { useFirebase } from '@/firebase';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { doc, getDoc } from 'firebase/firestore';
+import type { UserProfile } from '@/lib/types';
 
 export default function MainLayout({
   children,
@@ -14,7 +18,8 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isUserLoading } = useFirebase();
+  const { user, isUserLoading, firestore } = useFirebase();
+  const [heroImage, setHeroImage] = useState<string | undefined>(undefined);
 
   const isPublicPath = useMemo(() => {
     return pathname === '/login' || pathname === '/signup';
@@ -35,6 +40,53 @@ export default function MainLayout({
       return;
     }
   }, [isUserLoading, user, isPublicPath, router]);
+
+  useEffect(() => {
+    if (isUserLoading || !firestore) return;
+
+    const fetchHeroImage = async () => {
+      let imageUrl;
+      let placeholderId = 'home-hero-background';
+      let userImageProp: keyof UserProfile | undefined = 'homeHeroImage';
+
+      if (pathname === '/about') {
+        placeholderId = 'about-hero-background';
+        userImageProp = 'aboutHeroImage';
+      } else if (pathname === '/tools') {
+        placeholderId = 'tools-hero-background';
+        userImageProp = 'toolsHeroImage';
+      } else if (pathname !== '/') {
+        userImageProp = undefined; // No specific background for other pages
+      }
+      
+      if (user && userImageProp) {
+        try {
+          const userDocRef = doc(firestore, 'users', user.uid);
+          const docSnap = await getDoc(userDocRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data() as UserProfile;
+            imageUrl = data[userImageProp];
+          }
+        } catch (error) {
+            console.error("Error fetching user's hero image:", error);
+        }
+      }
+      
+      if (!imageUrl) {
+        const placeholder = PlaceHolderImages.find(p => p.id === placeholderId);
+        imageUrl = placeholder?.imageUrl;
+      }
+      
+      if (userImageProp) {
+        setHeroImage(imageUrl);
+      } else {
+        setHeroImage(undefined);
+      }
+    };
+
+    fetchHeroImage();
+  }, [user, isUserLoading, firestore, pathname]);
+
 
   if (isUserLoading && !isPublicPath) {
     return (
@@ -62,6 +114,18 @@ export default function MainLayout({
       <div className="animated-border-wrapper">
         <div className="relative z-10 flex min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] flex-col rounded-3xl bg-background overflow-hidden shadow-2xl shadow-primary/5">
           
+          {heroImage && (
+            <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
+              <Image
+                src={heroImage}
+                alt="Background"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+            </div>
+          )}
+
           {/* Background pattern */}
           <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
             {/* Grid pattern */}

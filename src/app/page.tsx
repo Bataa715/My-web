@@ -131,18 +131,6 @@ export default function HomePage() {
             </DialogContent>
           </Dialog>
         )}
-       {heroImage && (
-        <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
-          <Image
-            src={heroImage}
-            alt="Abstract background"
-            fill
-            className="object-cover"
-            data-ai-hint="abstract library"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent"></div>
-        </div>
-      )}
       <Hero />
       <Experience />
       <Education />
