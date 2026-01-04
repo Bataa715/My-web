@@ -179,27 +179,21 @@ export default function AboutPage() {
   };
   
 const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) => {
-    const positions = [
-        { x: -150, y: -160 },
-        { x: -50, y: -80 },
-        { x: 0, y: 0 },
-        { x: -50, y: 80 },
-        { x: -150, y: 160 },
-    ];
-    const pos = positions[index] || { x: 0, y: 0 };
+    const yOffset = -160 + index * 80;
+    const xOffset = index % 2 === 0 ? -50 : 50;
 
 
     return (
         <motion.div
-            initial={{ opacity: 0, x: 0, y: 0 }}
-            animate={{ opacity: 1, x: pos.x, y: pos.y }}
+            initial={{ opacity: 0, y: yOffset + 40, x: xOffset }}
+            animate={{ opacity: 1, y: yOffset, x: xOffset }}
             transition={{
                 type: 'spring',
                 stiffness: 100,
                 damping: 15,
                 delay: 0.3 + index * 0.1,
             }}
-            whileHover={{ y: pos.y - 10, x: pos.x + 10, scale: 1.05 }}
+            whileHover={{ y: yOffset - 10, scale: 1.05 }}
             className="group absolute w-56 h-24"
         >
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" />
