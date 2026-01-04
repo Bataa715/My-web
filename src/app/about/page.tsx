@@ -179,22 +179,28 @@ export default function AboutPage() {
   };
   
 const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) => {
-    const total = 5;
-    const angle = -60 + (index * 30); // Spread from -60 to +60 degrees
-    const yOffset = Math.abs(index - (total - 1) / 2) * 20;
+    const positions = [
+        { x: -150, y: -160 },
+        { x: -50, y: -80 },
+        { x: 0, y: 0 },
+        { x: -50, y: 80 },
+        { x: -150, y: 160 },
+    ];
+    const pos = positions[index] || { x: 0, y: 0 };
+
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 50, rotate: 0 }}
-            animate={{ opacity: 1, y: yOffset, rotate: angle }}
+            initial={{ opacity: 0, x: 0, y: 0 }}
+            animate={{ opacity: 1, x: pos.x, y: pos.y }}
             transition={{
                 type: 'spring',
                 stiffness: 100,
                 damping: 15,
                 delay: 0.3 + index * 0.1,
             }}
-            whileHover={{ y: yOffset - 10, scale: 1.05 }}
-            className="group relative w-56 h-24"
+            whileHover={{ y: pos.y - 10, x: pos.x + 10, scale: 1.05 }}
+            className="group absolute w-56 h-24"
         >
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" />
             <div className="relative p-4 h-full rounded-xl bg-neutral-900/60 backdrop-blur-md border border-neutral-800 transition-all duration-300 group-hover:border-primary/50 flex items-center justify-between">
