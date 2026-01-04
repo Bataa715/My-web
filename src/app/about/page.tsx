@@ -20,6 +20,7 @@ import { AddHobbyDialog } from '@/components/AddHobbyDialog';
 import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
+import InteractiveParticles from '@/components/shared/InteractiveParticles';
 
 const getIcon = (iconName?: string, props = {}) => {
     if (!iconName) return null;
@@ -178,308 +179,302 @@ export default function AboutPage() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
   return (
-    <div className="relative min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-12 lg:gap-20 w-full">
-            {/* Personal Info Cards */}
-             <div className="flex flex-col gap-6 items-center lg:items-start w-full lg:w-1/2">
-                {personalInfo.map((info, index) => (
-                   <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 30, x: -20 }}
-                    animate={{ opacity: 1, y: 0, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 + index * 0.15, ease: 'easeOut' }}
-                    className="w-full max-w-sm"
-                    onHoverStart={() => setHoveredCard(index)}
-                    onHoverEnd={() => setHoveredCard(null)}
-                >
-                    <Card className="card-glow relative overflow-hidden bg-slate-900/50 backdrop-blur-lg border border-white/10 group">
-                        <AnimatePresence>
-                        {hoveredCard === index && (
-                             <motion.div
-                                className="absolute inset-0 z-0"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                            >
-                                <div className="absolute inset-0 animated-beam" />
-                            </motion.div>
-                        )}
-                        </AnimatePresence>
-                        <CardContent className="relative z-10 p-6">
-                            <motion.div 
-                                layout="position"
-                                className="flex items-center justify-between gap-4"
-                            >
-                                <div className="flex items-center gap-4">
-                                    <div className="text-cyan-400">
-                                      {getIcon(info.icon, {className: "h-8 w-8"})}
+    <>
+      <InteractiveParticles />
+      <div className="relative z-10">
+        {/* Hero Section */}
+        <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
+          <div className="max-w-7xl mx-auto w-full">
+            <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-12 lg:gap-20 w-full">
+              {/* Personal Info Cards */}
+               <div className="flex flex-col gap-6 items-center lg:items-start w-full lg:w-1/2">
+                  {personalInfo.map((info, index) => (
+                     <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 30, x: -20 }}
+                      animate={{ opacity: 1, y: 0, x: 0 }}
+                      transition={{ duration: 0.5, delay: 0.3 + index * 0.15, ease: 'easeOut' }}
+                      className="w-full max-w-sm"
+                      onHoverStart={() => setHoveredCard(index)}
+                      onHoverEnd={() => setHoveredCard(null)}
+                  >
+                      <Card className="card-glow relative overflow-hidden bg-slate-900/50 backdrop-blur-lg border border-white/10 group">
+                          <AnimatePresence>
+                          {hoveredCard === index && (
+                               <motion.div
+                                  className="absolute inset-0 z-0"
+                                  initial={{ opacity: 0 }}
+                                  animate={{ opacity: 1 }}
+                                  exit={{ opacity: 0 }}
+                              >
+                                  <div className="absolute inset-0 animated-beam" />
+                              </motion.div>
+                          )}
+                          </AnimatePresence>
+                          <CardContent className="relative z-10 p-6">
+                              <motion.div 
+                                  layout="position"
+                                  className="flex items-center justify-between gap-4"
+                              >
+                                  <div className="flex items-center gap-4">
+                                      <div className="text-cyan-400">
+                                        {getIcon(info.icon, {className: "h-8 w-8"})}
+                                      </div>
+                                      <h3 className="text-xl font-bold uppercase tracking-wider text-gray-300">
+                                          {info.label}
+                                      </h3>
+                                  </div>
+                                  <span className="text-3xl font-bold text-white tracking-tight">
+                                      {info.value}
+                                  </span>
+                              </motion.div>
+                              <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: hoveredCard === index ? 'auto' : 0, opacity: hoveredCard === index ? 1 : 0 }}
+                                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                                  className="overflow-hidden"
+                              >
+                                  <div className="pt-4 mt-4 border-t border-white/10">
+                                      <p className="text-sm text-gray-400">
+                                          This is some extra information that appears on hover. 
+                                          You can customize this for each card.
+                                      </p>
+                                  </div>
+                              </motion.div>
+                          </CardContent>
+                           {isEditMode && (
+                              <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-black/80 hover:bg-black rounded-full border border-cyan-400/50"
+                                  onClick={() => handleEditInfoClick(info)}
+                              >
+                                  <Edit className="h-3.5 w-3.5 text-cyan-400" />
+                              </Button>
+                          )}
+                      </Card>
+                  </motion.div>
+                  ))}
+              </div>
+
+              {/* Text Content */}
+              <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 lg:w-1/2">
+                  <AnimatePresence mode="wait">
+                      <motion.h1
+                          key={greetingIndex}
+                          className="text-4xl md:text-5xl font-bold tracking-tighter text-white/50"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -20 }}
+                          transition={{ duration: 0.5, ease: 'easeInOut' }}
+                      >
+                          {greetings[greetingIndex]}
+                      </motion.h1>
+                  </AnimatePresence>
+                  <div className="relative group" ref={nameRef}>
+                      <motion.div
+                          initial={{ opacity: 0, y: 40 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.9, delay: 0.4, ease: [0.2, 0.65, 0.3, 0.9] }}
+                          className="flex flex-wrap items-baseline justify-center lg:justify-start"
+                      >
+                          <h2 className="text-xl md:text-2xl text-gray-300 mr-3">
+                              Миний нэрийг
+                          </h2>
+                          <p className="spotlight-text text-5xl md:text-6xl lg:text-7xl font-extrabold">
+                              {name}
+                          </p>
+                          <h2 className="text-xl md:text-2xl text-gray-300 ml-3">
+                              гэдэг
+                          </h2>
+                      </motion.div>
+                      <div
+                          className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      />
+                  </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <Dialog open={isEditingInfo} onOpenChange={setIsEditingInfo}>
+          <DialogContent>
+              <DialogHeader>
+                  <DialogTitle>"{editingInfoItem?.label}"-г засах</DialogTitle>
+              </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="info-value" className="text-right">
+                          Утга
+                      </Label>
+                      <Input
+                          id="info-value"
+                          value={editingInfoValue}
+                          onChange={(e) => setEditingInfoValue(e.target.value)}
+                          className="col-span-3"
+                      />
+                  </div>
+              </div>
+              <DialogFooter>
+                  <DialogClose asChild>
+                      <Button type="button" variant="secondary" onClick={() => { setIsEditingInfo(false); setEditingInfoItem(null); }}>Цуцлах</Button>
+                  </DialogClose>
+                  <Button type="button" onClick={handleSavePersonalInfo} disabled={saving}>
+                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
+                  </Button>
+              </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        
+        <section id="hobbies" className="relative py-24 md:py-32 mt-16 md:mt-24 reveal z-10">
+          <div className="container px-4 md:px-6">
+            <div className="text-center mb-12 sm:mb-24">
+              <h2 className="text-3xl md:text-5xl font-bold">Миний хоббинууд</h2>
+            </div>
+
+            {hobbiesLoading ? (
+              <div className="flex justify-center items-center h-[350px]">
+                <Loader2 className="h-12 w-12 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="relative flex items-center justify-center h-[350px]">
+                  {displayItems.length === 0 && !isEditMode ? (
+                        <div className="text-center">
+                          <p className="text-muted-foreground">Хобби олдсонгүй.</p>
+                          {user && <p className="text-sm text-muted-foreground mt-2">Засварлах горимд шинээр нэмнэ үү.</p>}
+                      </div>
+                  ) : (
+                  <div className="carousel-container" style={{ width: `${itemWidth}px`}}>
+                      <div className="carousel" style={{ transform: `rotateY(${-activeIndex * anglePerItem}deg)` }}>
+                          <AnimatePresence>
+                              {displayItems.map((hobby, index) => {
+                                const angle = index * anglePerItem;
+                                const isVisible = Math.abs((activeIndex - index + totalItems) % totalItems) <= 2 || Math.abs((activeIndex - index - totalItems) % totalItems) <= 2;
+                                const style: CSSProperties = {
+                                    transform: `rotateY(${angle}deg) translateZ(${carouselRadius}px)`,
+                                    opacity: isVisible ? 1 : 0.2,
+                                    pointerEvents: isVisible ? 'auto' : 'none',
+                                };
+                                if (hobby.id === 'add-new-hobby') {
+                                  return (
+                                      <div className="carousel-item" style={style} key={hobby.id} onClick={() => setActiveIndex(index)}>
+                                        <AddHobbyDialog>
+                                          <button className="flex h-full w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/50 bg-card/50 text-muted-foreground transition-colors hover:border-primary hover:bg-card/80 hover:text-primary">
+                                              <PlusCircle size={48} />
+                                              <span className="mt-4 font-semibold">Хобби нэмэх</span>
+                                          </button>
+                                      </AddHobbyDialog>
                                     </div>
-                                    <h3 className="text-xl font-bold uppercase tracking-wider text-gray-300">
-                                        {info.label}
-                                    </h3>
-                                </div>
-                                <span className="text-3xl font-bold text-white tracking-tight">
-                                    {info.value}
-                                </span>
-                            </motion.div>
-                            <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: hoveredCard === index ? 'auto' : 0, opacity: hoveredCard === index ? 1 : 0 }}
-                                transition={{ duration: 0.3, ease: 'easeOut' }}
-                                className="overflow-hidden"
-                            >
-                                <div className="pt-4 mt-4 border-t border-white/10">
-                                    <p className="text-sm text-gray-400">
-                                        This is some extra information that appears on hover. 
-                                        You can customize this for each card.
-                                    </p>
-                                </div>
-                            </motion.div>
-                        </CardContent>
-                         {isEditMode && (
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-black/80 hover:bg-black rounded-full border border-cyan-400/50"
-                                onClick={() => handleEditInfoClick(info)}
-                            >
-                                <Edit className="h-3.5 w-3.5 text-cyan-400" />
-                            </Button>
-                        )}
-                    </Card>
-                </motion.div>
-                ))}
-            </div>
-
-            {/* Text Content */}
-            <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 lg:w-1/2">
-                <AnimatePresence mode="wait">
-                    <motion.h1
-                        key={greetingIndex}
-                        className="text-4xl md:text-5xl font-bold tracking-tighter text-white/50"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ duration: 0.5, ease: 'easeInOut' }}
-                    >
-                        {greetings[greetingIndex]}
-                    </motion.h1>
-                </AnimatePresence>
-                <div className="relative group" ref={nameRef}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.9, delay: 0.4, ease: [0.2, 0.65, 0.3, 0.9] }}
-                        className="flex flex-wrap items-baseline justify-center lg:justify-start"
-                    >
-                        <h2 className="text-xl md:text-2xl text-gray-300 mr-3">
-                            Миний нэрийг
-                        </h2>
-                        <p className="spotlight-text text-5xl md:text-6xl lg:text-7xl font-extrabold">
-                            {name}
-                        </p>
-                        <h2 className="text-xl md:text-2xl text-gray-300 ml-3">
-                            гэдэг
-                        </h2>
-                    </motion.div>
-                    <div
-                        className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    />
-                </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Dialog open={isEditingInfo} onOpenChange={setIsEditingInfo}>
-        <DialogContent>
-            <DialogHeader>
-                <DialogTitle>"{editingInfoItem?.label}"-г засах</DialogTitle>
-            </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="info-value" className="text-right">
-                        Утга
-                    </Label>
-                    <Input
-                        id="info-value"
-                        value={editingInfoValue}
-                        onChange={(e) => setEditingInfoValue(e.target.value)}
-                        className="col-span-3"
-                    />
-                </div>
-            </div>
-            <DialogFooter>
-                <DialogClose asChild>
-                    <Button type="button" variant="secondary" onClick={() => { setIsEditingInfo(false); setEditingInfoItem(null); }}>Цуцлах</Button>
-                </DialogClose>
-                <Button type="button" onClick={handleSavePersonalInfo} disabled={saving}>
-                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
-                </Button>
-            </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      <section id="hobbies" className="relative py-24 md:py-32 mt-16 md:mt-24 reveal z-10">
-        <div className="container px-4 md:px-6">
-          <div className="text-center mb-12 sm:mb-24">
-            <h2 className="text-3xl md:text-5xl font-bold">Миний хоббинууд</h2>
-          </div>
-
-          {hobbiesLoading ? (
-            <div className="flex justify-center items-center h-[350px]">
-              <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            </div>
-          ) : (
-            <div className="relative flex items-center justify-center h-[350px]">
-                {displayItems.length === 0 && !isEditMode ? (
-                      <div className="text-center">
-                        <p className="text-muted-foreground">Хобби олдсонгүй.</p>
-                        {user && <p className="text-sm text-muted-foreground mt-2">Засварлах горимд шинээр нэмнэ үү.</p>}
-                    </div>
-                ) : (
-                <div className="carousel-container" style={{ width: `${itemWidth}px`}}>
-                    <div className="carousel" style={{ transform: `rotateY(${-activeIndex * anglePerItem}deg)` }}>
-                        <AnimatePresence>
-                            {displayItems.map((hobby, index) => {
-                              const angle = index * anglePerItem;
-                              const isVisible = Math.abs((activeIndex - index + totalItems) % totalItems) <= 2 || Math.abs((activeIndex - index - totalItems) % totalItems) <= 2;
-                              const style: CSSProperties = {
-                                  transform: `rotateY(${angle}deg) translateZ(${carouselRadius}px)`,
-                                  opacity: isVisible ? 1 : 0.2,
-                                  pointerEvents: isVisible ? 'auto' : 'none',
-                              };
-                              if (hobby.id === 'add-new-hobby') {
+                                  )
+                                }
                                 return (
-                                    <div className="carousel-item" style={style} key={hobby.id} onClick={() => setActiveIndex(index)}>
-                                      <AddHobbyDialog>
-                                        <button className="flex h-full w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/50 bg-card/50 text-muted-foreground transition-colors hover:border-primary hover:bg-card/80 hover:text-primary">
-                                            <PlusCircle size={48} />
-                                            <span className="mt-4 font-semibold">Хобби нэмэх</span>
-                                        </button>
-                                    </AddHobbyDialog>
-                                  </div>
-                                )
-                              }
-                              return (
-                                  <div className="carousel-item group" key={hobby.id} style={style} onClick={() => setActiveIndex(index)}>
-                                        <Card className="relative bg-card border-[3px] border-primary/50 h-full w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
-                                          {isEditMode && (
-                                            <div className="absolute top-2 right-2 flex gap-1 z-20">
-                                              <EditHobbyDialog hobby={hobby}>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-white bg-black/30 hover:bg-black/50 hover:text-white">
-                                                  <Edit className="h-4 w-4" />
-                                                </Button>
-                                              </EditHobbyDialog>
-                                              <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-white bg-black/30 hover:bg-destructive/80 hover:text-white">
-                                                    <Trash2 className="h-4 w-4" />
+                                    <div className="carousel-item group" key={hobby.id} style={style} onClick={() => setActiveIndex(index)}>
+                                          <Card className="relative bg-card border-[3px] border-primary/50 h-full w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
+                                            {isEditMode && (
+                                              <div className="absolute top-2 right-2 flex gap-1 z-20">
+                                                <EditHobbyDialog hobby={hobby}>
+                                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-white bg-black/30 hover:bg-black/50 hover:text-white">
+                                                    <Edit className="h-4 w-4" />
                                                   </Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                  <AlertDialogHeader>
-                                                    <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
-                                                    <AlertDialogDescription>"{hobby.title}" хоббиг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.</AlertDialogDescription>
-                                                  </AlertDialogHeader>
-                                                  <AlertDialogFooter>
-                                                    <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => hobby.id && deleteHobby(hobby.id)}>Устгах</AlertDialogAction>
-                                                  </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                              </AlertDialog>
-                                            </div>
-                                          )}
-                                          <Image 
-                                            src={hobby.image} 
-                                            alt={hobby.title} 
-                                            fill 
-                                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                            data-ai-hint={`3D ${hobby.imageHint || hobby.title}`} 
-                                          />
-                                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                                            <div className="absolute bottom-0 left-0 p-4 text-white">
-                                              <CardTitle className="text-base md:text-lg font-bold">{hobby.title}</CardTitle>
-                                              <p className="text-xs md:text-sm text-white/80 mt-1">{hobby.description}</p>
-                                            </div>
-                                        </Card>
-                                  </div>
-                              )
-                          })}
-                        </AnimatePresence>
-                    </div>
-                </div>
-                )}
-                <Button
-                    onClick={scrollPrev}
-                    className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-10"
-                    variant="outline"
-                    size="icon"
-                    disabled={displayItems.length === 0}
-                >
-                    <ArrowLeft/>
-                </Button>
-                <Button
-                    onClick={scrollNext}
-                    className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-10"
-                    variant="outline"
-                    size="icon"
+                                                </EditHobbyDialog>
+                                                <AlertDialog>
+                                                  <AlertDialogTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white bg-black/30 hover:bg-destructive/80 hover:text-white">
+                                                      <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                  </AlertDialogTrigger>
+                                                  <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                      <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
+                                                      <AlertDialogDescription>"{hobby.title}" хоббиг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.</AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                      <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                                                      <AlertDialogAction onClick={() => hobby.id && deleteHobby(hobby.id)}>Устгах</AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                  </AlertDialogContent>
+                                                </AlertDialog>
+                                              </div>
+                                            )}
+                                            <Image 
+                                              src={hobby.image} 
+                                              alt={hobby.title} 
+                                              fill 
+                                              className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                              data-ai-hint={`3D ${hobby.imageHint || hobby.title}`} 
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                                              <div className="absolute bottom-0 left-0 p-4 text-white">
+                                                <CardTitle className="text-base md:text-lg font-bold">{hobby.title}</CardTitle>
+                                                <p className="text-xs md:text-sm text-white/80 mt-1">{hobby.description}</p>
+                                              </div>
+                                          </Card>
+                                    </div>
+                                )
+                            })}
+                          </AnimatePresence>
+                      </div>
+                  </div>
+                  )}
+                  <Button
+                      onClick={scrollPrev}
+                      className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-10"
+                      variant="outline"
+                      size="icon"
                       disabled={displayItems.length === 0}
-                >
-                    <ArrowRight/>
-                </Button>
-            </div>
-           )}
-        </div>
-      </section>
-      
-        <style jsx>{`
-            .carousel-container {
-                perspective: 2000px;
-                height: 350px;
-                position: relative;
-            }
-            .carousel {
-                width: 100%;
-                height: 100%;
-                position: absolute;
-                transform-style: preserve-3d;
-                transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
-            }
-            .carousel-item {
-                position: absolute;
-                width: ${itemWidth}px;
-                height: 320px;
-                top: 15px;
-                left: 0;
-                background: transparent;
-                transition: opacity 0.6s, transform 0.6s;
-                cursor: pointer;
-            }
-            .spotlight-text {
-                color: transparent;
-                background-clip: text;
-                -webkit-background-clip: text;
-                background-image: radial-gradient(
-                    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-                    hsl(var(--primary)) 20%,
-                    white 80%
-                );
-                transition: background-image 0.3s;
-            }
-      `}</style>
-    </div>
+                  >
+                      <ArrowLeft/>
+                  </Button>
+                  <Button
+                      onClick={scrollNext}
+                      className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-10"
+                      variant="outline"
+                      size="icon"
+                        disabled={displayItems.length === 0}
+                  >
+                      <ArrowRight/>
+                  </Button>
+              </div>
+             )}
+          </div>
+        </section>
+        
+          <style jsx>{`
+              .carousel-container {
+                  perspective: 2000px;
+                  height: 350px;
+                  position: relative;
+              }
+              .carousel {
+                  width: 100%;
+                  height: 100%;
+                  position: absolute;
+                  transform-style: preserve-3d;
+                  transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+              }
+              .carousel-item {
+                  position: absolute;
+                  width: ${itemWidth}px;
+                  height: 320px;
+                  top: 15px;
+                  left: 0;
+                  background: transparent;
+                  transition: opacity 0.6s, transform 0.6s;
+                  cursor: pointer;
+              }
+              .spotlight-text {
+                  color: transparent;
+                  background-clip: text;
+                  -webkit-background-clip: text;
+                  background-image: radial-gradient(
+                      circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                      hsl(var(--primary)) 20%,
+                      white 80%
+                  );
+                  transition: background-image 0.3s;
+              }
+        `}</style>
+      </div>
+    </>
   );
 }
-
-    
-
-    
-
-
-
-
-
