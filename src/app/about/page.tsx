@@ -218,7 +218,7 @@ export default function AboutPage() {
             {/* Text Content */}
             <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 lg:w-1/2">
                 <motion.h1 
-                    className="text-5xl md:text-6xl font-bold tracking-tighter text-white/50"
+                    className="text-4xl md:text-5xl font-bold tracking-tighter text-white/50"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2, ease: [0.2, 0.65, 0.3, 0.9] }}
@@ -226,7 +226,7 @@ export default function AboutPage() {
                     Hello
                 </motion.h1>
                 <motion.h2 
-                    className="text-2xl md:text-3xl text-gray-300"
+                    className="text-xl md:text-2xl text-gray-300"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.3, ease: [0.2, 0.65, 0.3, 0.9] }}
@@ -238,7 +238,7 @@ export default function AboutPage() {
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.9, delay: 0.4, ease: [0.2, 0.65, 0.3, 0.9] }}
-                        className="spotlight-text text-6xl md:text-8xl lg:text-9xl font-extrabold"
+                        className="spotlight-text text-5xl md:text-7xl lg:text-8xl font-extrabold"
                     >
                         {name}
                     </motion.p>
@@ -431,5 +431,7 @@ export default function AboutPage() {
     </motion.div>
   );
 }
+
+    
 
     
