@@ -226,13 +226,12 @@ export default function Education() {
           viewport={{ once: true }}
           className="flex flex-col items-center justify-center space-y-4 text-center mb-12"
         >
-          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
-            <GraduationCap className="w-5 h-5 text-primary" />
-            <span className="text-sm font-medium text-primary"></span>
+          <div className="flex items-center gap-4 justify-center">
+            <GraduationCap className="w-8 h-8 md:w-10 md:h-10 text-primary" />
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-white via-neutral-200 to-neutral-400 bg-clip-text text-transparent">
+              Боловсрол
+            </h2>
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-white via-neutral-200 to-neutral-400 bg-clip-text text-transparent">
-            Боловсрол
-          </h2>
         </motion.div>
 
         {loading ? (
