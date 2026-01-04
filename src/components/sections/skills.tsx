@@ -20,20 +20,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
+import type { Skill } from '@/lib/types';
 
 interface SkillCardProps {
-  skillGroup: {
-    id: string;
-    name: string;
-    icon: string;
-    items: string[];
-  };
+  skillGroup: Skill;
   index: number;
-  isEditMode: boolean;
-  deleteSkillGroup: (id: string) => void;
 }
 
-const SkillCard = ({ skillGroup, index, isEditMode, deleteSkillGroup }: SkillCardProps) => {
+const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   
@@ -101,36 +95,6 @@ const SkillCard = ({ skillGroup, index, isEditMode, deleteSkillGroup }: SkillCar
             background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, hsl(var(--primary) / 0.1), transparent 40%)`
           }}
         />
-        
-        {/* Edit buttons */}
-        {isEditMode && (
-          <div className="absolute top-3 right-3 flex gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-            <EditSkillDialog skillGroup={skillGroup}>
-              <Button variant="ghost" size="icon" className="h-7 w-7 bg-black/50 hover:bg-black/70 text-white">
-                <Edit className="h-4 w-4" />
-              </Button>
-            </EditSkillDialog>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 bg-black/50 hover:bg-destructive/80 text-white">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    "{skillGroup.name}" бүлгийг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => deleteSkillGroup(skillGroup.id)}>Устгах</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        )}
         
         {/* Content */}
         <div className="relative z-10">
@@ -201,13 +165,40 @@ const Skills = () => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" style={{ perspective: "1000px" }}>
                         {skills.map((skillGroup, index) => (
-                            <SkillCard 
-                              key={skillGroup.id} 
-                              skillGroup={skillGroup} 
-                              index={index}
-                              isEditMode={isEditMode}
-                              deleteSkillGroup={deleteSkillGroup}
-                            />
+                           <div key={skillGroup.id} className="relative group">
+                              <SkillCard 
+                                skillGroup={skillGroup} 
+                                index={index}
+                              />
+                               {isEditMode && (
+                                <div className="absolute top-3 right-3 flex gap-1 z-20">
+                                    <EditSkillDialog skillGroup={skillGroup}>
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 bg-black/50 hover:bg-black/70 text-white rounded-md">
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                    </EditSkillDialog>
+                                    <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-7 w-7 bg-black/50 hover:bg-destructive/80 text-white rounded-md">
+                                        <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                        <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            "{skillGroup.name}" бүлгийг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.
+                                        </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                        <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => deleteSkillGroup(skillGroup.id)}>Устгах</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                    </AlertDialog>
+                                </div>
+                                )}
+                           </div>
                         ))}
                         {isEditMode && (
                            <motion.div 
