@@ -13,37 +13,37 @@ const tools = [
     title: "Англи хэл",
     description: "Англи хэл сурах хэрэгслүүд",
     href: "/tools/english",
-    icon: <BookOpen className="h-6 w-6" />
+    icon: <BookOpen className="h-8 w-8" />
   },
   {
     title: "Япон хэл",
     description: "Япон хэл сурах хэрэгслүүд",
     href: "/tools/japanese",
-    icon: <BookOpen className="h-6 w-6" />
+    icon: <BookOpen className="h-8 w-8" />
   },
    {
     title: "Workspace",
     description: "Хувийн ажлын самбар, төлөвлөгч",
     href: "/tools/notes",
-    icon: <LayoutGrid className="h-6 w-6" />
+    icon: <LayoutGrid className="h-8 w-8" />
   },
   {
     title: "Програмчлал",
     description: "Код бичиж сурах хэрэгслүүд",
     href: "/tools/programming",
-    icon: <CodeIcon className="h-6 w-6" />
+    icon: <CodeIcon className="h-8 w-8" />
   },
   {
     title: "TraderAi",
     description: "AI-аар алтны ханшийн зураг шинжлэх",
     href: "/tools/trader-ai",
-    icon: <TrendingUp className="h-6 w-6" />
+    icon: <TrendingUp className="h-8 w-8" />
   },
   {
     title: "Pomodoro Timer",
     description: "Төвлөрлийг сайжруулах цаг",
     href: "/tools/pomodoro",
-    icon: <Timer className="h-6 w-6" />
+    icon: <Timer className="h-8 w-8" />
   },
 ];
 
@@ -61,22 +61,31 @@ export default function ToolsPage() {
         <div className="text-center pt-8">
             <h1 className="text-3xl sm:text-4xl font-bold">Хэрэгслүүд</h1>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 pt-8">
-          {tools.map((tool) => (
-            <Link href={tool.href} key={tool.title} className="group">
-              <Card className="h-full transition-all duration-300 hover:shadow-lg hover:border-primary/50 hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
-                <CardHeader className="flex-row items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        {tool.icon}
-                        <CardTitle className="text-lg sm:text-xl">{tool.title}</CardTitle>
-                    </div>
-                    <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
-                </CardHeader>
-                <CardContent>
-                  {tool.description && <CardDescription>{tool.description}</CardDescription>}
-                </CardContent>
-              </Card>
-            </Link>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 pt-8">
+          {tools.map((tool, i) => (
+            <motion.div
+                key={tool.title}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+            >
+              <Link href={tool.href} className="group block h-full">
+                <Card className="glassmorphism-card h-full transition-all duration-300 hover:border-primary/60 hover:scale-105 hover:neon-glow flex flex-col">
+                    <CardHeader>
+                        <div className="flex items-start justify-between">
+                            <div className="p-3 bg-primary/10 rounded-xl text-primary mb-4">
+                                {tool.icon}
+                            </div>
+                            <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-primary" />
+                        </div>
+                        <CardTitle className="text-xl font-bold">{tool.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-grow">
+                      {tool.description && <CardDescription>{tool.description}</CardDescription>}
+                    </CardContent>
+                </Card>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </div>
