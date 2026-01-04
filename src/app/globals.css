@@ -410,41 +410,29 @@
 
 /* Rotating border animation for layout */
 .animated-border-wrapper {
-  @apply relative overflow-hidden rounded-3xl p-[2px];
-}
-
-.animated-border-wrapper::before,
-.animated-border-wrapper::after {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  border-radius: inherit;
+  @apply relative overflow-hidden rounded-[1.75rem] p-1;
 }
 
 .animated-border-wrapper::before {
-  inset: -50%;
-  width: 200%;
-  height: 200%;
+  content: '';
+  position: absolute;
+  inset: -100%;
+  width: 300%;
+  height: 300%;
+  z-index: 0;
   background: conic-gradient(
     from 90deg at 50% 50%,
     hsl(var(--primary) / 0.8),
-    20deg,
+    45deg,
     transparent,
-    40deg,
-    hsl(var(--primary) / 0.8),
-    60deg,
+    90deg,
+    hsl(var(--primary) / 0.6),
+    135deg,
     transparent,
-    80deg,
-    hsl(var(--primary) / 0.8),
-    transparent
+    180deg,
+    hsl(var(--primary) / 0.8)
   );
   animation: rotate-glow-circle-cw 8s linear infinite;
-}
-
-.animated-border-wrapper::after {
-  inset: 0;
-  background: hsl(var(--background));
-  border-radius: calc(1.5rem - 2px);
 }
 
 .animated-border-wrapper > * {
