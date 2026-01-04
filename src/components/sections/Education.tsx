@@ -228,7 +228,7 @@ export default function Education() {
         >
           <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4">
             <GraduationCap className="w-5 h-5 text-primary" />
-            <span className="text-sm font-medium text-primary">Боловсрол</span>
+            <span className="text-sm font-medium text-primary"></span>
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-white via-neutral-200 to-neutral-400 bg-clip-text text-transparent">
             Боловсрол
