@@ -132,7 +132,7 @@ export default function HomePage() {
           </Dialog>
         )}
        {heroImage && (
-        <div className="absolute top-0 left-0 w-full h-full -z-10">
+        <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
           <Image
             src={heroImage}
             alt="Abstract background"
