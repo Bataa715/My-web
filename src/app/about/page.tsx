@@ -127,8 +127,10 @@ export default function AboutPage() {
             } else {
               const defaultInfo: PersonalInfoType[] = [
                   { value: "21", label: "Нас", icon: 'Cake' },
-                  { value: "Ихэр", label: "Орд", icon: 'Gemini' },
+                  { value: "6-р сарын 16", label: "Төрсөн өдөр", icon: 'CalendarDays' },
                   { value: "INTJ", label: "MBTI", icon: 'User' },
+                  { value: "Ихэр", label: "Орд", icon: 'Gemini' },
+                  { value: "175cm", label: "Өндөр", icon: 'Scaling' },
               ];
               await updateDoc(userDocRef, { personalInfo: defaultInfo });
               setPersonalInfo(defaultInfo);
@@ -176,80 +178,52 @@ export default function AboutPage() {
     }
   };
   
-  const InfoCard = ({ info, index }: { info: PersonalInfoType, index: number }) => {
-    const cardRef = useRef<HTMLDivElement>(null);
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-    
-    const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15 });
-    const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15 });
-    
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["6deg", "-6deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-6deg", "6deg"]);
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!cardRef.current) return;
-      const rect = cardRef.current.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-      const xPct = mouseX / width - 0.5;
-      const yPct = mouseY / height - 0.5;
-      x.set(xPct);
-      y.set(yPct);
-    };
-
-    const handleMouseLeave = () => {
-      x.set(0);
-      y.set(0);
-    };
+const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) => {
+    const total = 5;
+    const angle = -60 + (index * 30); // Spread from -60 to +60 degrees
+    const yOffset = Math.abs(index - (total - 1) / 2) * 20;
 
     return (
-      <motion.div
-        ref={cardRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        initial={{ opacity: 0, y: 30, x: -20 }}
-        animate={{ opacity: 1, y: 0, x: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 + index * 0.15, ease: 'easeOut' }}
-        className="w-full max-w-sm group relative"
-      >
-        <div 
-            className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg"
-        />
-        <div 
-            className="relative p-6 rounded-2xl bg-neutral-900/60 backdrop-blur-md border border-neutral-800 transition-all duration-300 group-hover:border-primary/50"
-            style={{ transform: "translateZ(30px)" }}
+        <motion.div
+            initial={{ opacity: 0, y: 50, rotate: 0 }}
+            animate={{ opacity: 1, y: yOffset, rotate: angle }}
+            transition={{
+                type: 'spring',
+                stiffness: 100,
+                damping: 15,
+                delay: 0.3 + index * 0.1,
+            }}
+            whileHover={{ y: yOffset - 10, scale: 1.05 }}
+            className="group relative w-56 h-24"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-primary/10 text-primary border border-primary/20">
-                {getIcon(info.icon, { className: "h-6 w-6" })}
-              </div>
-              <h3 className="text-lg font-semibold uppercase tracking-wider text-neutral-300">
-                {info.label}
-              </h3>
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" />
+            <div className="relative p-4 h-full rounded-xl bg-neutral-900/60 backdrop-blur-md border border-neutral-800 transition-all duration-300 group-hover:border-primary/50 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-full bg-primary/10 text-primary border border-primary/20">
+                        {getIcon(info.icon, { className: "h-5 w-5" })}
+                    </div>
+                    <h3 className="text-base font-semibold uppercase tracking-wider text-neutral-300">
+                        {info.label}
+                    </h3>
+                </div>
+                <span className="text-2xl font-bold text-white tracking-tighter">
+                    {info.value}
+                </span>
+                 {isEditMode && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 z-30 bg-black/80 hover:bg-black rounded-full border border-cyan-400/50"
+                    onClick={(e) => { e.stopPropagation(); handleEditInfoClick(info); }}
+                  >
+                    <Edit className="h-3 w-3 text-cyan-400" />
+                  </Button>
+                )}
             </div>
-            <span className="text-4xl font-bold text-white tracking-tighter">
-              {info.value}
-            </span>
-          </div>
-        </div>
-        {isEditMode && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-black/80 hover:bg-black rounded-full border border-cyan-400/50"
-            onClick={() => handleEditInfoClick(info)}
-          >
-            <Edit className="h-3.5 w-3.5 text-cyan-400" />
-          </Button>
-        )}
-      </motion.div>
-    )
-  }
+        </motion.div>
+    );
+};
+
 
   return (
     <>
@@ -260,10 +234,10 @@ export default function AboutPage() {
           <div className="max-w-7xl mx-auto w-full">
             <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-12 lg:gap-20 w-full">
               {/* Personal Info Cards */}
-               <div className="flex flex-col gap-6 items-center lg:items-start w-full lg:w-1/2">
-                  {personalInfo.map((info, index) => (
-                     <InfoCard key={index} info={info} index={index} />
-                  ))}
+              <div className="relative w-full lg:w-1/2 h-[450px] flex items-center justify-center">
+                    {personalInfo.map((info, index) => (
+                        <InfoCard key={index} info={info} index={index} />
+                    ))}
               </div>
 
               {/* Text Content */}

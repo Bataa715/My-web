@@ -96,19 +96,6 @@
       },
       "required": ["word", "translation"]
     },
-    "ChartAnalysisResult": {
-      "title": "Chart Analysis Result",
-      "description": "Represents the result of an AI chart analysis.",
-      "type": "object",
-      "properties": {
-        "analysis": { "type": "string" },
-        "signal": { "type": "string", "enum": ["BUY", "SELL", "HOLD"] },
-        "confidence": { "type": "number" },
-        "suggestedStopLoss": { "type": "number" },
-        "suggestedTakeProfit": { "type": "number" }
-      },
-      "required": ["analysis", "signal", "confidence"]
-    },
     "Education": {
       "title": "Education",
       "description": "Represents an education entry in the portfolio.",
@@ -147,7 +134,6 @@
         "category": { "type": "string" },
         "link": { "type": "string" },
         "live": { "type": "string" },
-        "image": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["name", "description", "technologies", "category", "createdAt"]
@@ -432,7 +418,7 @@
     "/users/{userId}/englishReading/{materialId}": {
       "schema": { "$ref": "#/entities/ReadingMaterial" }
     },
-    "/users/{userId}/readingNotes/{noteId}": {
+    "/users/{userId}/englishReading/{materialId}/notes/{noteId}": {
       "schema": { "$ref": "#/entities/ReadingNote" }
     },
     "/users/{userId}/englishListening/{materialId}": {
@@ -466,5 +452,3 @@
     "/katakana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } }
   }
 }
-
-    

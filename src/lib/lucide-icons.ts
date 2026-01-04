@@ -29,5 +29,5 @@ export const iconList = [
   "Timer", "ToggleLeft", "ToggleRight", "Tornado", "Train", "Trash", "Trello", "TrendingDown", "TrendingUp",
   "Triangle", "Truck", "Twitch", "Twitter", "Type", "Underline", "Undo", "Unlink", "Unlock", "Upload", "User", "Users",
   "Utensils", "Vault", "Vegan", "Verified", "Video", "Voicemail", "Volume2", "Wallet", "Watch", "Webhook", "Wifi",
-  "Wind", "Wrench", "X", "Youtube", "Zap", "ZoomIn", "ZoomOut"
+  "Wind", "Wrench", "X", "Youtube", "Zap", "ZoomIn", "ZoomOut", "Gemini", "CalendarDays", "Scaling"
 ];
