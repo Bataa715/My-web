@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useRef, useEffect } from 'react';
@@ -123,7 +122,7 @@ export default function InteractiveParticles({
       context.current.translate(translateX, translateY);
       context.current.beginPath();
       context.current.arc(x, y, size, 0, 2 * Math.PI);
-      context.current.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+      context.current.fillStyle = `rgba(139, 92, 246, ${alpha})`;
       context.current.fill();
       context.current.setTransform(dpr, 0, 0, dpr, 0, 0);
 
@@ -243,7 +242,7 @@ export default function InteractiveParticles({
                     context.current.beginPath();
                     context.current.moveTo(A.x + A.translateX, A.y + A.translateY);
                     context.current.lineTo(B.x + B.translateX, B.y + B.translateY);
-                    context.current.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+                    context.current.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
                     context.current.lineWidth = 0.5;
                     context.current.stroke();
                 }
