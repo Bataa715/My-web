@@ -25,7 +25,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/t
 const FloatingNav = () => {
     const { scrollYProgress } = useScroll();
     const [visible, setVisible] = useState(false);
-    const { isEditMode, setIsEditMode } = useEditMode();
 
     useMotionValueEvent(scrollYProgress, "change", (current) => {
         if (typeof current === "number") {
@@ -98,35 +97,6 @@ const FloatingNav = () => {
                             </TooltipContent>
                         </Tooltip>
                     ))}
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <button
-                                onClick={() => setIsEditMode(!isEditMode)}
-                                className={cn(
-                                    "relative flex items-center justify-center w-12 h-12 rounded-full text-sm font-medium transition-colors duration-300",
-                                    isEditMode
-                                        ? "text-primary"
-                                        : "text-neutral-400 hover:text-neutral-200"
-                                )}
-                            >
-                                 {isEditMode && (
-                                    <motion.span
-                                        className="absolute inset-0 z-0 bg-neutral-800 rounded-full"
-                                        layoutId="active-nav-item"
-                                        transition={{
-                                            type: "spring",
-                                            stiffness: 350,
-                                            damping: 30,
-                                        }}
-                                    />
-                                )}
-                                <span className="relative z-10"><Pencil className="h-5 w-5" /></span>
-                            </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Засварлах</p>
-                        </TooltipContent>
-                    </Tooltip>
                     </TooltipProvider>
                 </div>
             </motion.div>
