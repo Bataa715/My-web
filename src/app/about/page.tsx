@@ -19,11 +19,12 @@ import { useHobbies } from '@/contexts/HobbyContext';
 import { AddHobbyDialog } from '@/components/AddHobbyDialog';
 import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { cn } from '@/lib/utils';
 
-const getIcon = (iconName?: string, className: string = "h-8 w-8 mb-3 text-white") => {
+const getIcon = (iconName?: string, props = {}) => {
     if (!iconName) return null;
     const LucideIcon = (require('lucide-react') as any)[iconName];
-    return LucideIcon ? <LucideIcon className="h-8 w-8 mb-3 text-white" /> : null;
+    return LucideIcon ? <LucideIcon {...props} /> : null;
 };
 
 
@@ -183,39 +184,71 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto w-full">
           <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-12 lg:gap-20 w-full">
             {/* Personal Info Cards */}
-            <div className="flex flex-col gap-6 items-center lg:items-start">
+             <div className="flex flex-col gap-6 items-center lg:items-start w-full lg:w-1/2">
                 {personalInfo.map((info, index) => (
-                <motion.div
+                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 30, x: -20 }}
                     animate={{ opacity: 1, y: 0, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.3 + index * 0.15, ease: 'easeOut' }}
                     className="w-full max-w-sm"
+                    onHoverStart={() => setHoveredCard(index)}
+                    onHoverEnd={() => setHoveredCard(null)}
                 >
-                    <Card className="bg-slate-900/50 backdrop-blur-lg border-2 border-cyan-400/30 hover:border-cyan-400/60 transition-colors duration-300 group">
-                          <CardContent className="p-6 flex items-center justify-between gap-4">
-                            <div className="flex items-center gap-4">
-                                <div className="text-cyan-400">
-                                {getIcon(info.icon, "h-8 w-8")}
+                    <Card className="card-glow relative overflow-hidden bg-slate-900/50 backdrop-blur-lg border border-white/10 group">
+                        <AnimatePresence>
+                        {hoveredCard === index && (
+                             <motion.div
+                                className="absolute inset-0 z-0"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                            >
+                                <div className="absolute inset-0 animated-beam" />
+                            </motion.div>
+                        )}
+                        </AnimatePresence>
+                        <CardContent className="relative z-10 p-6">
+                            <motion.div 
+                                layout="position"
+                                className="flex items-center justify-between gap-4"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="text-cyan-400">
+                                      {getIcon(info.icon, {className: "h-8 w-8"})}
+                                    </div>
+                                    <h3 className="text-xl font-bold uppercase tracking-wider text-gray-300">
+                                        {info.label}
+                                    </h3>
                                 </div>
-                                <h3 className="text-xl font-bold uppercase tracking-wider text-gray-300">
-                                {info.label}
-                                </h3>
-                            </div>
-                            <span className="text-3xl font-bold text-white tracking-tight">
-                                {info.value}
-                            </span>
-                            {isEditMode && (
-                                <Button 
-                                    variant="ghost" 
-                                    size="icon" 
-                                    className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-black/80 hover:bg-black rounded-full border border-cyan-400/50" 
-                                    onClick={() => handleEditInfoClick(info)}
-                                >
-                                    <Edit className="h-3.5 w-3.5 text-cyan-400" />
-                                </Button>
-                            )}
+                                <span className="text-3xl font-bold text-white tracking-tight">
+                                    {info.value}
+                                </span>
+                            </motion.div>
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: hoveredCard === index ? 'auto' : 0, opacity: hoveredCard === index ? 1 : 0 }}
+                                transition={{ duration: 0.3, ease: 'easeOut' }}
+                                className="overflow-hidden"
+                            >
+                                <div className="pt-4 mt-4 border-t border-white/10">
+                                    <p className="text-sm text-gray-400">
+                                        This is some extra information that appears on hover. 
+                                        You can customize this for each card.
+                                    </p>
+                                </div>
+                            </motion.div>
                         </CardContent>
+                         {isEditMode && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-black/80 hover:bg-black rounded-full border border-cyan-400/50"
+                                onClick={() => handleEditInfoClick(info)}
+                            >
+                                <Edit className="h-3.5 w-3.5 text-cyan-400" />
+                            </Button>
+                        )}
                     </Card>
                 </motion.div>
                 ))}
@@ -226,7 +259,7 @@ export default function AboutPage() {
                 <AnimatePresence mode="wait">
                     <motion.h1
                         key={greetingIndex}
-                        className="text-5xl md:text-6xl font-bold tracking-tighter text-white/50"
+                        className="text-4xl md:text-5xl font-bold tracking-tighter text-white/50"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
@@ -245,7 +278,7 @@ export default function AboutPage() {
                         <h2 className="text-xl md:text-2xl text-gray-300 mr-3">
                             Миний нэрийг
                         </h2>
-                        <p className="spotlight-text text-5xl md:text-7xl lg:text-8xl font-extrabold">
+                        <p className="spotlight-text text-5xl md:text-6xl lg:text-7xl font-extrabold">
                             {name}
                         </p>
                         <h2 className="text-xl md:text-2xl text-gray-300 ml-3">
@@ -445,6 +478,7 @@ export default function AboutPage() {
     
 
     
+
 
 
 
