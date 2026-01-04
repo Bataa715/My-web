@@ -154,7 +154,6 @@ export default function Hero() {
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   const [selectedSocial, setSelectedSocial] = useState<SocialInfo | null>(null);
   const [isQrLoading, setIsQrLoading] = useState(true);
-  const [heroBackground, setHeroBackground] = useState<string | undefined>(undefined);
   
   const { toast } = useToast();
   
@@ -167,13 +166,11 @@ export default function Hero() {
 
         if (!user || !firestore) {
             setLoading(false);
-            setHeroBackground(undefined);
             return;
         }
 
         const userInfoDocRef = doc(firestore, "users", user.uid);
         setLoading(true);
-        setHeroBackground(undefined); // Clear previous background before loading new one
       try {
         const docSnap = await getDoc(userInfoDocRef);
         if (docSnap.exists() && docSnap.data()?.name) { 
@@ -211,14 +208,6 @@ export default function Hero() {
           };
           setSocialLinks(links);
           setEditedLinks(links);
-          
-          // Set hero background
-          let bgImage = data.homeHeroImage;
-          if (!bgImage) {
-            const placeholder = PlaceHolderImages.find(p => p.id === 'home-hero-background');
-            bgImage = placeholder?.imageUrl;
-          }
-          setHeroBackground(bgImage);
 
         } else {
           const avatarPlaceholder = PlaceHolderImages.find(p => p.id === 'avatar');
@@ -479,38 +468,6 @@ export default function Hero() {
 
   return (
      <section id="home" className="relative w-full flex items-center min-h-[calc(100vh-200px)] py-12 overflow-hidden">
-      {/* Hero Background Image */}
-      <AnimatePresence mode="wait">
-        {heroBackground && (
-          <motion.div 
-            key={heroBackground}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="absolute inset-0 z-0 pointer-events-none"
-          >
-            <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
-              style={{
-                backgroundImage: `url('${heroBackground}')`,
-                maskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.3) 70%, transparent 100%)',
-                WebkitMaskImage: 'linear-gradient(to bottom, black 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.3) 70%, transparent 100%)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                imageRendering: 'crisp-edges',
-              }}
-            />
-            {/* Gradient overlay to blend with background */}
-            <div 
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(to bottom, transparent 0%, transparent 40%, hsl(var(--background)) 100%)',
-              }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
       <div className="container relative z-10 px-4 md:px-6">
         <div className="grid items-center justify-center gap-10 lg:grid-cols-2 lg:gap-20">
           <div className="flex flex-col justify-center space-y-6 lg:order-2">
