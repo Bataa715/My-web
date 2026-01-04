@@ -109,190 +109,192 @@ export function EditProjectDialog({ children, project }: EditProjectDialogProps)
             <DialogTrigger asChild>
                 {children}
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>"{project.name}" төслийг засах</DialogTitle>
                 </DialogHeader>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Төслийн нэр</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Тайлбар</FormLabel>
-                          <FormControl>
-                            <Textarea rows={4} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="image"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Зургийн холбоос</FormLabel>
-                          <FormControl>
-                            <Input placeholder="https://example.com/image.png" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="technologies"
-                      render={() => (
-                        <FormItem>
-                          <FormLabel>Ашигласан технологиуд</FormLabel>
-                          
-                          {/* Selected technologies */}
-                          {selectedTechs.length > 0 && (
-                            <div className="flex flex-wrap gap-2 pb-2">
-                              {selectedTechs.map(tech => (
-                                <Badge 
-                                  key={tech} 
-                                  variant="secondary"
-                                  className="flex items-center gap-1.5 pr-1 bg-primary/20 text-primary border border-primary/30"
-                                >
-                                  <TechIcon techName={tech} className="h-5 w-5" />
-                                  <span className="text-xs">{tech}</span>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRemoveTech(tech)}
-                                    className="ml-1 p-0.5 rounded-full hover:bg-primary/30 transition-colors"
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </button>
-                                </Badge>
-                              ))}
-                            </div>
+                <ScrollArea className="max-h-[70vh] -mr-6 pr-6">
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pl-1">
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Төслийн нэр</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
                           )}
-
-                          {/* Add custom technology */}
-                          <div className="flex gap-2 pb-2">
-                            <Input
-                              placeholder="Өөр технологи нэмэх..."
-                              value={customTech}
-                              onChange={(e) => setCustomTech(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault();
-                                  handleAddCustomTech();
-                                }
-                              }}
-                              className="flex-1 h-9"
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={handleAddCustomTech}
-                              disabled={!customTech.trim()}
-                            >
-                              <PlusCircle className="h-4 w-4" />
-                            </Button>
-                          </div>
-
-                          {/* Search */}
-                          <div className="relative pb-2">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                            <Input
-                              placeholder="Технологи хайх..."
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              className="pl-9 h-9"
-                            />
-                          </div>
-
-                          <ScrollArea className="h-40 w-full rounded-md border p-3">
-                            <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
-                              {filteredTechnologies.map(tech => (
-                                <button
-                                  key={tech}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="description"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Тайлбар</FormLabel>
+                              <FormControl>
+                                <Textarea rows={4} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                         <FormField
+                          control={form.control}
+                          name="image"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Зургийн холбоос</FormLabel>
+                              <FormControl>
+                                <Input placeholder="https://example.com/image.png" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                         <FormField
+                          control={form.control}
+                          name="technologies"
+                          render={() => (
+                            <FormItem>
+                              <FormLabel>Ашигласан технологиуд</FormLabel>
+                              
+                              {/* Selected technologies */}
+                              {selectedTechs.length > 0 && (
+                                <div className="flex flex-wrap gap-2 pb-2">
+                                  {selectedTechs.map(tech => (
+                                    <Badge 
+                                      key={tech} 
+                                      variant="secondary"
+                                      className="flex items-center gap-1.5 pr-1 bg-primary/20 text-primary border border-primary/30"
+                                    >
+                                      <TechIcon techName={tech} className="h-5 w-5" />
+                                      <span className="text-xs">{tech}</span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoveTech(tech)}
+                                        className="ml-1 p-0.5 rounded-full hover:bg-primary/30 transition-colors"
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </button>
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+    
+                              {/* Add custom technology */}
+                              <div className="flex gap-2 pb-2">
+                                <Input
+                                  placeholder="Өөр технологи нэмэх..."
+                                  value={customTech}
+                                  onChange={(e) => setCustomTech(e.target.value)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      handleAddCustomTech();
+                                    }
+                                  }}
+                                  className="flex-1 h-9"
+                                />
+                                <Button
                                   type="button"
-                                  onClick={() => handleTechToggle(tech)}
-                                  className={cn(
-                                    "flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all duration-200",
-                                    selectedTechs.includes(tech)
-                                      ? "bg-primary/20 border-primary shadow-md shadow-primary/20 scale-105"
-                                      : "bg-muted/30 border-transparent hover:bg-muted hover:border-muted-foreground/30"
-                                  )}
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={handleAddCustomTech}
+                                  disabled={!customTech.trim()}
                                 >
-                                  <TechIcon techName={tech} className="h-8 w-8" />
-                                  <span className="text-[10px] text-center font-medium truncate w-full">{tech}</span>
-                                </button>
-                              ))}
-                            </div>
-                          </ScrollArea>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="category"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Ангилал</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Web Development" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                      <FormField
-                      control={form.control}
-                      name="link"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Github холбоос</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                      <FormField
-                      control={form.control}
-                      name="live"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Live хувилбарын холбоос</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button type="button" variant="secondary">Цуцлах</Button>
-                        </DialogClose>
-                        <Button type="submit" disabled={form.formState.isSubmitting}>
-                            {form.formState.isSubmitting ? 'Хадгалж байна...' : 'Хадгалах'}
-                        </Button>
-                    </DialogFooter>
-                  </form>
-                </Form>
+                                  <PlusCircle className="h-4 w-4" />
+                                </Button>
+                              </div>
+    
+                              {/* Search */}
+                              <div className="relative pb-2">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                  placeholder="Технологи хайх..."
+                                  value={searchQuery}
+                                  onChange={(e) => setSearchQuery(e.target.value)}
+                                  className="pl-9 h-9"
+                                />
+                              </div>
+    
+                              <ScrollArea className="h-40 w-full rounded-md border p-3">
+                                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
+                                  {filteredTechnologies.map(tech => (
+                                    <button
+                                      key={tech}
+                                      type="button"
+                                      onClick={() => handleTechToggle(tech)}
+                                      className={cn(
+                                        "flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all duration-200",
+                                        selectedTechs.includes(tech)
+                                          ? "bg-primary/20 border-primary shadow-md shadow-primary/20 scale-105"
+                                          : "bg-muted/30 border-transparent hover:bg-muted hover:border-muted-foreground/30"
+                                      )}
+                                    >
+                                      <TechIcon techName={tech} className="h-8 w-8" />
+                                      <span className="text-[10px] text-center font-medium truncate w-full">{tech}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </ScrollArea>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="category"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Ангилал</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Web Development" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                          <FormField
+                          control={form.control}
+                          name="link"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Github холбоос</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                          <FormField
+                          control={form.control}
+                          name="live"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Live хувилбарын холбоос</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <DialogFooter className="pr-1 pt-4">
+                            <DialogClose asChild>
+                                <Button type="button" variant="secondary">Цуцлах</Button>
+                            </DialogClose>
+                            <Button type="submit" disabled={form.formState.isSubmitting}>
+                                {form.formState.isSubmitting ? 'Хадгалж байна...' : 'Хадгалах'}
+                            </Button>
+                        </DialogFooter>
+                      </form>
+                    </Form>
+                </ScrollArea>
             </DialogContent>
         </Dialog>
     );
