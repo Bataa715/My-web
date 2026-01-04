@@ -179,8 +179,8 @@ export default function AboutPage() {
   };
   
 const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) => {
-    const yOffset = -160 + index * 80;
-    const xOffset = index % 2 === 0 ? -50 : 50;
+    const yOffset = -200 + index * 100;
+    const xOffset = index % 2 === 0 ? -60 : 60;
 
 
     return (
