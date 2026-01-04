@@ -2,13 +2,12 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ImageIcon, Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight } from 'lucide-react';
+import { Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight } from 'lucide-react';
 import { useState, useEffect, useCallback, type CSSProperties, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { UserProfile, Hobby, PersonalInfoItem as PersonalInfoType } from '@/lib/types';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -27,80 +26,12 @@ const getIcon = (iconName?: string, className: string = "h-8 w-8 mb-3 text-white
     return LucideIcon ? <LucideIcon className="h-8 w-8 mb-3 text-white" /> : null;
 };
 
-const PersonalInfoCard = ({ info, onEditClick, isEditMode }: { info: PersonalInfoType, onEditClick: () => void, isEditMode: boolean }) => {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const mouseXSpring = useSpring(x);
-  const mouseYSpring = useSpring(y);
-
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["20deg", "-20deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-20deg", "20deg"]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = mouseX / width - 0.5;
-    const yPct = mouseY / height - 0.5;
-    x.set(xPct);
-    y.set(yPct);
-    e.currentTarget.style.setProperty("--mouse-x", `${mouseX}px`);
-    e.currentTarget.style.setProperty("--mouse-y", `${mouseY}px`);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  return (
-    <motion.div
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateY,
-        rotateX,
-        transformStyle: "preserve-3d",
-      }}
-      className="relative h-full w-full rounded-xl bg-gradient-to-br from-neutral-900 to-neutral-950"
-    >
-      <div
-        style={{ transform: "translateZ(30px)" }}
-        className="relative group h-full w-full rounded-xl p-4 flex flex-col items-center justify-center text-center text-white"
-      >
-        {getIcon(info.icon)}
-        <p className="text-3xl md:text-4xl font-bold">{info.value}</p>
-        <p className="text-xs md:text-sm uppercase font-semibold mt-1">{info.label}</p>
-        
-        {isEditMode && (
-          <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30" onClick={(e) => { e.stopPropagation(); onEditClick(); }}>
-              <Edit className="h-4 w-4 text-white" />
-          </Button>
-        )}
-      </div>
-
-       <div 
-        className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-        style={{
-            background: `radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(139, 92, 246, 0.15), transparent 80%)`
-        }}
-      />
-    </motion.div>
-  );
-};
-
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
   const { isEditMode } = useEditMode();
   const { hobbies, loading: hobbiesLoading, deleteHobby } = useHobbies();
   const { toast } = useToast();
-  const [heroImage, setHeroImage] = useState<string | undefined>(undefined);
-  const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
-  const [editedImageUrl, setEditedImageUrl] = useState('');
   const [personalInfo, setPersonalInfo] = useState<PersonalInfoType[]>([]);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [editingInfoItem, setEditingInfoItem] = useState<PersonalInfoType | null>(null);
@@ -169,15 +100,12 @@ export default function AboutPage() {
     if (isUserLoading) return;
 
     const fetchUserData = async () => {
-      let imageUrl;
       if (user && firestore) {
         try {
           const userDocRef = doc(firestore, 'users', user.uid);
           const docSnap = await getDoc(userDocRef);
           if (docSnap.exists()) {
             const data = docSnap.data() as UserProfile;
-            imageUrl = data.aboutHeroImage;
-            setEditedImageUrl(data.aboutHeroImage || '');
             setName(data.name || 'Batuka');
             
             if (data.personalInfo && data.personalInfo.length > 0) {
@@ -197,47 +125,10 @@ export default function AboutPage() {
             console.error("Error fetching user data:", error);
         }
       }
-      
-      if (!imageUrl) {
-        const placeholder = PlaceHolderImages.find(p => p.id === 'about-hero-background');
-        imageUrl = placeholder?.imageUrl;
-        setEditedImageUrl(placeholder?.imageUrl || '');
-      }
-
-      setHeroImage(imageUrl);
     };
 
     fetchUserData();
   }, [user, firestore, isUserLoading]);
-  
-  const handleSaveImage = async () => {
-      if (!user || !firestore) {
-           toast({ title: "Алдаа", description: "Нэвтэрч орно уу.", variant: "destructive" });
-           return;
-      }
-      
-      setSaving(true);
-      try {
-          const userDocRef = doc(firestore, 'users', user.uid);
-          await updateDoc(userDocRef, { aboutHeroImage: editedImageUrl });
-          
-          setSaving(false);
-          setIsImageEditingOpen(false);
-          toast({
-              title: 'Амжилттай',
-              description: 'Арын зураг шинэчлэгдлээ.',
-          });
-          setHeroImage(editedImageUrl);
-      } catch (error) {
-          console.error("Error saving hero image:", error);
-          setSaving(false);
-          toast({
-              title: 'Алдаа',
-              description: 'Арын зураг хадгалахад алдаа гарлаа.',
-              variant: 'destructive',
-          });
-      }
-  };
 
   const handleEditInfoClick = (info: PersonalInfoType) => {
     setEditingInfoItem(info);
@@ -281,47 +172,6 @@ export default function AboutPage() {
         </div>
       </div>
       
-      {isEditMode && (
-        <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
-            <DialogTrigger asChild>
-            <Button variant="outline" size="icon" className="absolute top-28 right-4 z-50">
-                <ImageIcon className="h-4 w-4" />
-                <span className="sr-only">Арын зураг солих</span>
-            </Button>
-            </DialogTrigger>
-            <DialogContent>
-            <DialogHeader>
-                <DialogTitle>Арын зургийн холбоос</DialogTitle>
-                <DialogDescription>
-                Шинэ зургийнхаа URL хаягийг энд буулгана уу.
-                </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="image-url" className="text-right">
-                    URL
-                </Label>
-                <Input
-                    id="image-url"
-                    value={editedImageUrl}
-                    onChange={(e) => setEditedImageUrl(e.target.value)}
-                    className="col-span-3"
-                    placeholder="https://example.com/image.png"
-                />
-                </div>
-            </div>
-            <DialogFooter>
-                <DialogClose asChild>
-                <Button type="button" variant="secondary">Цуцлах</Button>
-                </DialogClose>
-                <Button type="button" onClick={handleSaveImage} disabled={saving}>
-                {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
-                </Button>
-            </DialogFooter>
-            </DialogContent>
-        </Dialog>
-      )}
-
       <section className="w-full max-w-4xl mx-auto pt-0 text-center">
          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {personalInfo.map((info, index) => (

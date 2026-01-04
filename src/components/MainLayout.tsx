@@ -1,3 +1,4 @@
+
 "use client";
 
 import { usePathname, useRouter } from 'next/navigation';
@@ -5,11 +6,17 @@ import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { useFirebase } from '@/firebase';
 import { useEffect, useMemo, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ImageIcon, Save } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import type { UserProfile } from '@/lib/types';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Button } from './ui/button';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+import { useToast } from '@/hooks/use-toast';
+import { useEditMode } from '@/contexts/EditModeContext';
 
 export default function MainLayout({
   children,
@@ -19,16 +26,27 @@ export default function MainLayout({
   const pathname = usePathname();
   const router = useRouter();
   const { user, isUserLoading, firestore } = useFirebase();
+  const { isEditMode } = useEditMode();
+  const { toast } = useToast();
+  
   const [heroImage, setHeroImage] = useState<string | undefined>(undefined);
+  const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
+  const [editedImageUrl, setEditedImageUrl] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const isPublicPath = useMemo(() => {
     return pathname === '/login' || pathname === '/signup';
   }, [pathname]);
 
+  const userImageProp = useMemo((): keyof UserProfile | undefined => {
+    if (pathname === '/about') return 'aboutHeroImage';
+    if (pathname === '/tools') return 'toolsHeroImage';
+    if (pathname === '/') return 'homeHeroImage';
+    return undefined;
+  }, [pathname]);
+
   useEffect(() => {
-    if (isUserLoading) {
-      return;
-    }
+    if (isUserLoading) return;
     
     if (!user && !isPublicPath) {
       router.push('/login');
@@ -47,16 +65,11 @@ export default function MainLayout({
     const fetchHeroImage = async () => {
       let imageUrl;
       let placeholderId = 'home-hero-background';
-      let userImageProp: keyof UserProfile | undefined = 'homeHeroImage';
 
       if (pathname === '/about') {
         placeholderId = 'about-hero-background';
-        userImageProp = 'aboutHeroImage';
       } else if (pathname === '/tools') {
         placeholderId = 'tools-hero-background';
-        userImageProp = 'toolsHeroImage';
-      } else if (pathname !== '/') {
-        userImageProp = undefined; // No specific background for other pages
       }
       
       if (user && userImageProp) {
@@ -79,25 +92,48 @@ export default function MainLayout({
       
       if (userImageProp) {
         setHeroImage(imageUrl);
+        setEditedImageUrl(imageUrl || '');
       } else {
         setHeroImage(undefined);
+        setEditedImageUrl('');
       }
     };
 
     fetchHeroImage();
-  }, [user, isUserLoading, firestore, pathname]);
+  }, [user, isUserLoading, firestore, pathname, userImageProp]);
+  
+  const handleSaveImage = async () => {
+      if (!user || !firestore || !userImageProp) {
+           toast({ title: "Алдаа", description: "Нэвтэрч орно уу.", variant: "destructive" });
+           return;
+      }
+      
+      setSaving(true);
+      try {
+          const userDocRef = doc(firestore, 'users', user.uid);
+          await updateDoc(userDocRef, { [userImageProp]: editedImageUrl });
+          
+          setSaving(false);
+          setIsImageEditingOpen(false);
+          toast({
+              title: 'Амжилттай',
+              description: 'Арын зураг шинэчлэгдлээ.',
+          });
+          setHeroImage(editedImageUrl);
+      } catch (error) {
+          console.error("Error saving hero image:", error);
+          setSaving(false);
+          toast({
+              title: 'Алдаа',
+              description: 'Арын зураг хадгалахад алдаа гарлаа.',
+              variant: 'destructive',
+          });
+      }
+  };
 
 
-  if (isUserLoading && !isPublicPath) {
+  if ((isUserLoading || !user) && !isPublicPath) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!user && !isPublicPath) {
-     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
@@ -110,7 +146,6 @@ export default function MainLayout({
 
   return (
     <div className="min-h-screen p-3 md:p-4 lg:p-6 bg-neutral-950">
-      {/* Animated border wrapper */}
       <div className="animated-border-wrapper">
         <div className="relative z-10 flex min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] flex-col rounded-3xl bg-background overflow-hidden shadow-2xl shadow-primary/5">
           
@@ -121,14 +156,54 @@ export default function MainLayout({
                 alt="Background"
                 fill
                 className="object-cover"
+                priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
             </div>
           )}
+          
+           {isEditMode && userImageProp && (
+              <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="icon" className="absolute top-28 right-4 z-50">
+                    <ImageIcon className="h-4 w-4" />
+                    <span className="sr-only">Арын зураг солих</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Арын зургийн холбоос</DialogTitle>
+                    <DialogDescription>
+                      Шинэ зургийнхаа URL хаягийг энд буулгана уу.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                      <Label htmlFor="image-url" className="text-right">
+                        URL
+                      </Label>
+                      <Input
+                        id="image-url"
+                        value={editedImageUrl}
+                        onChange={(e) => setEditedImageUrl(e.target.value)}
+                        className="col-span-3"
+                        placeholder="https://example.com/image.png"
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button type="button" variant="secondary">Цуцлах</Button>
+                    </DialogClose>
+                    <Button type="button" onClick={handleSaveImage} disabled={saving}>
+                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
 
-          {/* Background pattern */}
           <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
-            {/* Grid pattern */}
             <div 
               className="absolute inset-0 opacity-[0.02]"
               style={{
@@ -136,13 +211,11 @@ export default function MainLayout({
                 backgroundSize: '50px 50px'
               }}
             />
-            {/* Gradient orbs */}
             <div className="absolute -top-20 -right-20 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px]" />
             <div className="absolute top-1/3 -left-40 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl" />
             <div className="absolute -bottom-40 right-1/4 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl" />
           </div>
           
-          {/* Header - z-10 so it's above background but background shows through */}
           <div className="relative z-10">
             <Header />
           </div>
