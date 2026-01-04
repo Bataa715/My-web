@@ -214,19 +214,19 @@ const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) =>
                 delay: 0.2 + index * 0.08,
             }}
             whileHover={{ x: 10, scale: 1.02 }}
-            className="group w-full max-w-lg"
+            className="group w-full"
         >
-            <div className="relative p-3 h-16 rounded-2xl bg-black/80 backdrop-blur-sm border border-neutral-800/50 transition-all duration-300 group-hover:border-primary/30 flex items-center justify-between overflow-hidden">
+            <div className="relative p-4 h-20 rounded-3xl bg-black/90 backdrop-blur-sm border border-neutral-800/50 transition-all duration-300 group-hover:border-primary/30 flex items-center justify-between overflow-hidden shadow-lg">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="flex items-center gap-3 relative z-10">
-                    <div className="p-2 rounded-full bg-neutral-800/80 text-neutral-400 border border-neutral-700/50">
-                        {getIcon(info.icon, { className: "h-4 w-4" })}
+                <div className="flex items-center gap-4 relative z-10">
+                    <div className="p-3 rounded-full bg-neutral-800/80 text-neutral-400 border border-neutral-700/50">
+                        {getIcon(info.icon, { className: "h-5 w-5" })}
                     </div>
-                    <h3 className="text-sm font-medium uppercase tracking-wide text-neutral-400">
+                    <h3 className="text-base md:text-lg font-medium uppercase tracking-wide text-neutral-300">
                         {info.label}
                     </h3>
                 </div>
-                <span className="text-xl font-bold text-white tracking-tight relative z-10">
+                <span className="text-2xl md:text-3xl font-bold text-white tracking-tight relative z-10">
                     {info.value}
                 </span>
                  {isEditMode && (
