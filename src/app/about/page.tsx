@@ -203,79 +203,96 @@ export default function AboutPage() {
   };
   
 const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) => {
-    // Өөр өөр өргөн өгөх - сум шиг харагдах
-    const widths = ['w-[85%]', 'w-[75%]', 'w-[90%]', 'w-[70%]', 'w-[80%]'];
-    const width = widths[index] || 'w-full';
-    
-    return (
-        <motion.div
-            initial={{ opacity: 0, x: -100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{
-                type: 'spring',
-                stiffness: 80,
-                damping: 20,
-                delay: 0.15 + index * 0.1,
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -60 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{
+        type: 'spring',
+        stiffness: 90,
+        damping: 18,
+        delay: 0.15 + index * 0.1,
+      }}
+      whileHover={{ x: 12, scale: 1.03 }}
+      className="group w-full"
+    >
+      <div className="relative p-4 h-20 rounded-3xl bg-black/95 backdrop-blur-sm border border-neutral-800/60 transition-all duration-300 group-hover:border-primary/40 flex items-center justify-between overflow-hidden shadow-lg">
+        
+        {/* hover glow */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="p-3 rounded-full bg-neutral-800/90 text-neutral-400 border border-neutral-700/60">
+            {getIcon(info.icon, { className: "h-5 w-5" })}
+          </div>
+
+          <h3 className="text-base md:text-lg font-medium uppercase tracking-wide text-neutral-300">
+            {info.label}
+          </h3>
+        </div>
+
+        <span className="text-2xl md:text-3xl font-bold text-white tracking-tight relative z-10">
+          {info.value}
+        </span>
+
+        {isEditMode && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-black/80 hover:bg-black rounded-full border border-cyan-400/50"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEditInfoClick(info);
             }}
-            whileHover={{ x: 15, scale: 1.03 }}
-            className={`group ${width}`}
-        >
-            <div className="relative p-4 h-20 rounded-3xl bg-black/95 backdrop-blur-sm border border-neutral-800/60 transition-all duration-300 group-hover:border-primary/40 group-hover:shadow-xl flex items-center justify-between overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/8 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="flex items-center gap-4 relative z-10">
-                    <div className="p-3 rounded-full bg-neutral-800/90 text-neutral-400 border border-neutral-700/60 flex-shrink-0">
-                        {getIcon(info.icon, { className: "h-5 w-5" })}
-                    </div>
-                    <h3 className="text-base md:text-lg font-medium uppercase tracking-wide text-neutral-300">
-                        {info.label}
-                    </h3>
-                </div>
-                <span className="text-2xl md:text-3xl font-bold text-white tracking-tight relative z-10 flex-shrink-0">
-                    {info.value}
-                </span>
-                 {isEditMode && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-black/80 hover:bg-black rounded-full border border-cyan-400/50"
-                    onClick={(e) => { e.stopPropagation(); handleEditInfoClick(info); }}
-                  >
-                    <Edit className="h-3.5 w-3.5 text-cyan-400" />
-                  </Button>
-                )}
-            </div>
-        </motion.div>
-    );
+          >
+            <Edit className="h-3.5 w-3.5 text-cyan-400" />
+          </Button>
+        )}
+      </div>
+    </motion.div>
+  );
 };
 
-const InfoCardLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
+const InfoCardArrowLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
     if (infos.length < 5) return null;
     return (
         <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
-            {/* 1 */}
-            <div className="flex justify-start">
-              <InfoCard info={infos[0]} index={0} />
+        
+        {/* [1] */}
+        <div className="flex justify-start">
+            <div className="w-[85%]">
+            <InfoCard info={infos[0]} index={0} />
             </div>
+        </div>
 
-            {/* 2 */}
-            <div className="flex justify-center -mt-8 ml-10">
-               <InfoCard info={infos[1]} index={1} />
+        {/* [2] */}
+        <div className="flex justify-center -ml-12 sm:-ml-16">
+            <div className="w-[75%]">
+            <InfoCard info={infos[1]} index={1} />
             </div>
+        </div>
 
-            {/* 3 */}
-            <div className="flex justify-center -mt-8">
-               <InfoCard info={infos[2]} index={2} />
+        {/* [3] */}
+        <div className="flex justify-end">
+            <div className="w-[85%]">
+            <InfoCard info={infos[2]} index={2} />
             </div>
+        </div>
 
-            {/* 4 */}
-            <div className="flex justify-center -mt-8 mr-10">
-               <InfoCard info={infos[3]} index={3} />
+        {/* [4] */}
+        <div className="flex justify-center -mr-12 sm:-mr-16">
+            <div className="w-[75%]">
+            <InfoCard info={infos[3]} index={3} />
             </div>
+        </div>
 
-            {/* 5 */}
-            <div className="flex justify-end -mt-8">
-              <InfoCard info={infos[4]} index={4} />
+        {/* [5] */}
+        <div className="flex justify-start">
+            <div className="w-[85%]">
+            <InfoCard info={infos[4]} index={4} />
             </div>
+        </div>
+
         </div>
     );
 };
@@ -291,7 +308,7 @@ const InfoCardLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
             <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-12 lg:gap-20 w-full">
               {/* Personal Info Cards */}
               <div className="w-full lg:w-1/2">
-                {personalInfo.length > 0 && <InfoCardLayout infos={personalInfo} />}
+                {personalInfo.length > 0 && <InfoCardArrowLayout infos={personalInfo} />}
               </div>
 
               {/* Text Content */}
