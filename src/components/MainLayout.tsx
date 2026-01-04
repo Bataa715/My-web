@@ -6,7 +6,7 @@ import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { useFirebase } from '@/firebase';
 import { useEffect, useMemo, useState } from 'react';
-import { Loader2, ImageIcon, Save } from 'lucide-react';
+import { Loader2, ImageIcon, Save, Home, User, Wrench, Pencil } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -20,10 +20,12 @@ import { useEditMode } from '@/contexts/EditModeContext';
 import { AnimatePresence, motion, useScroll, useMotionValueEvent } from "framer-motion";
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const FloatingNav = () => {
     const { scrollYProgress } = useScroll();
     const [visible, setVisible] = useState(false);
+    const { isEditMode, setIsEditMode } = useEditMode();
 
     useMotionValueEvent(scrollYProgress, "change", (current) => {
         if (typeof current === "number") {
@@ -42,8 +44,9 @@ const FloatingNav = () => {
 
     const pathname = usePathname();
     const navItems = [
-        { name: "Нүүр", link: "/", active: pathname === '/' },
-        { name: "Тухай", link: "/about", active: pathname === '/about' },
+        { name: "Нүүр", link: "/", icon: <Home className="h-5 w-5" />, active: pathname === '/' },
+        { name: "Тухай", link: "/about", icon: <User className="h-5 w-5" />, active: pathname === '/about' },
+        { name: "Хэрэгсэл", link: "/tools", icon: <Wrench className="h-5 w-5" />, active: pathname.startsWith('/tools') },
     ];
     
     return (
@@ -63,31 +66,68 @@ const FloatingNav = () => {
                 className="fixed bottom-10 inset-x-0 max-w-xs mx-auto z-50 flex items-center justify-center space-x-4"
             >
                 <div className="flex items-center justify-center p-2 rounded-full border border-neutral-700 bg-neutral-900/80 backdrop-blur-md shadow-lg">
+                    <TooltipProvider>
                     {navItems.map((navItem) => (
-                        <Link
-                            key={navItem.link}
-                            href={navItem.link}
-                            className={cn(
-                                "relative flex items-center justify-center px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300",
-                                navItem.active
-                                    ? "text-primary"
-                                    : "text-neutral-400 hover:text-neutral-200"
-                            )}
-                        >
-                            {navItem.active && (
-                                <motion.span
-                                    className="absolute inset-0 z-0 bg-neutral-800 rounded-full"
-                                    layoutId="active-nav-item"
-                                    transition={{
-                                        type: "spring",
-                                        stiffness: 350,
-                                        damping: 30,
-                                    }}
-                                />
-                            )}
-                            <span className="relative z-10">{navItem.name}</span>
-                        </Link>
+                         <Tooltip key={navItem.link}>
+                            <TooltipTrigger asChild>
+                                <Link
+                                    href={navItem.link}
+                                    className={cn(
+                                        "relative flex items-center justify-center w-12 h-12 rounded-full text-sm font-medium transition-colors duration-300",
+                                        navItem.active
+                                            ? "text-primary"
+                                            : "text-neutral-400 hover:text-neutral-200"
+                                    )}
+                                >
+                                    {navItem.active && (
+                                        <motion.span
+                                            className="absolute inset-0 z-0 bg-neutral-800 rounded-full"
+                                            layoutId="active-nav-item"
+                                            transition={{
+                                                type: "spring",
+                                                stiffness: 350,
+                                                damping: 30,
+                                            }}
+                                        />
+                                    )}
+                                    <span className="relative z-10">{navItem.icon}</span>
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{navItem.name}</p>
+                            </TooltipContent>
+                        </Tooltip>
                     ))}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                onClick={() => setIsEditMode(!isEditMode)}
+                                className={cn(
+                                    "relative flex items-center justify-center w-12 h-12 rounded-full text-sm font-medium transition-colors duration-300",
+                                    isEditMode
+                                        ? "text-primary"
+                                        : "text-neutral-400 hover:text-neutral-200"
+                                )}
+                            >
+                                 {isEditMode && (
+                                    <motion.span
+                                        className="absolute inset-0 z-0 bg-neutral-800 rounded-full"
+                                        layoutId="active-nav-item"
+                                        transition={{
+                                            type: "spring",
+                                            stiffness: 350,
+                                            damping: 30,
+                                        }}
+                                    />
+                                )}
+                                <span className="relative z-10"><Pencil className="h-5 w-5" /></span>
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Засварлах</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    </TooltipProvider>
                 </div>
             </motion.div>
         </AnimatePresence>

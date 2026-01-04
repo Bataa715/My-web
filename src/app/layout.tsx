@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
@@ -12,7 +11,6 @@ import { EducationProvider } from "@/contexts/EducationContext";
 import { HobbyProvider } from "@/contexts/HobbyContext";
 import IntroOverlay from "@/components/IntroOverlay";
 import { JetBrains_Mono } from "next/font/google";
-import { motion, AnimatePresence } from "framer-motion";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -43,27 +41,23 @@ export default function RootLayout({
             enableSystem={false}
             disableTransitionOnChange
         >
-          <AnimatePresence mode="wait">
-            <motion.div>
-                <IntroOverlay />
-                <FirebaseClientProvider>
-                    <EditModeProvider>
-                        <EducationProvider>
-                        <ProjectProvider>
-                            <SkillsProvider>
-                            <HobbyProvider>
-                                <MainLayout>
-                                    {children}
-                                </MainLayout>
-                                <Toaster />
-                            </HobbyProvider>
-                            </SkillsProvider>
-                        </ProjectProvider>
-                        </EducationProvider>
-                    </EditModeProvider>
-                </FirebaseClientProvider>
-             </motion.div>
-          </AnimatePresence>
+          <IntroOverlay />
+          <FirebaseClientProvider>
+              <EditModeProvider>
+                  <EducationProvider>
+                  <ProjectProvider>
+                      <SkillsProvider>
+                      <HobbyProvider>
+                          <MainLayout>
+                              {children}
+                          </MainLayout>
+                          <Toaster />
+                      </HobbyProvider>
+                      </SkillsProvider>
+                  </ProjectProvider>
+                  </EducationProvider>
+              </EditModeProvider>
+          </FirebaseClientProvider>
         </ThemeProvider>
       </body>
     </html>
