@@ -182,20 +182,18 @@ export default function InteractiveParticles({
       }
       circle.x += circle.dx;
       circle.y += circle.dy;
-      circle.translateX +=
-        (mouse.current.x - (circle.x + circle.translateX)) / ease * circle.magnetism;
-      circle.translateY +=
-        (mouse.current.y - (circle.y + circle.translateY)) / ease * circle.magnetism;
       
-      const mouseDistance = Math.sqrt(
-          (mouse.current.x - (circle.x + circle.translateX))**2 +
-          (mouse.current.y - (circle.y + circle.translateY))**2
-      );
+      const distanceX = mouse.current.x - (circle.x + circle.translateX);
+      const distanceY = mouse.current.y - (circle.y + circle.translateY);
+      const mouseDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 
       if (mouseDistance < mouse.current.radius) {
-          const repelFactor = (1 - mouseDistance / mouse.current.radius) * staticity;
-          circle.translateX -= (mouse.current.x - (circle.x + circle.translateX)) / mouseDistance * repelFactor * 0.1;
-          circle.translateY -= (mouse.current.y - (circle.y + circle.translateY)) / mouseDistance * repelFactor * 0.1;
+        const repelFactor = (1 - mouseDistance / mouse.current.radius) * staticity;
+        circle.translateX -= distanceX / mouseDistance * repelFactor * 0.1;
+        circle.translateY -= distanceY / mouseDistance * repelFactor * 0.1;
+      } else {
+        circle.translateX += (0 - circle.translateX) / ease;
+        circle.translateY += (0 - circle.translateY) / ease;
       }
 
 
