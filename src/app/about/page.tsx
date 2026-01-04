@@ -122,20 +122,44 @@ export default function AboutPage() {
             const data = docSnap.data() as UserProfile;
             setName(data.name || 'Batuka');
             
-            if (data.personalInfo && data.personalInfo.length >= 5) {
-              setPersonalInfo(data.personalInfo);
-            } else {
-              const defaultInfo: PersonalInfoType[] = [
-                  { value: "21", label: "Нас", icon: 'Cake' },
-                  { value: "5-р сарын 25", label: "Төрсөн өдөр", icon: 'CalendarDays' },
-                  { value: "INTJ", label: "MBTI", icon: 'User' },
-                  { value: "Ихэр", label: "Орд", icon: 'Gemini' },
-                  { value: "178cm", label: "Өндөр", icon: 'Scaling' },
-              ];
-              await updateDoc(userDocRef, { personalInfo: defaultInfo });
-              setPersonalInfo(defaultInfo);
-            }
+            let currentInfo = data.personalInfo && data.personalInfo.length > 0 ? data.personalInfo : [];
+            const defaultInfoItems: PersonalInfoType[] = [
+                { value: "21", label: "Нас", icon: 'Cake' },
+                { value: "5-р сарын 25", label: "Төрсөн өдөр", icon: 'CalendarDays' },
+                { value: "INTJ", label: "MBTI", icon: 'User' },
+                { value: "Ихэр", label: "Орд", icon: 'Gemini' },
+                { value: "178cm", label: "Өндөр", icon: 'Scaling' },
+            ];
 
+            // Ensure all default items are present
+            let needsUpdate = false;
+            defaultInfoItems.forEach(defaultItem => {
+                if (!currentInfo.some(info => info.label === defaultItem.label)) {
+                    currentInfo.push(defaultItem);
+                    needsUpdate = true;
+                }
+            });
+            
+            // Filter out any extra items that are not in default
+             const filteredInfo = currentInfo.filter(info => defaultInfoItems.some(d => d.label === info.label));
+             if (filteredInfo.length !== currentInfo.length) {
+                 needsUpdate = true;
+             }
+             currentInfo = filteredInfo;
+            
+            if (needsUpdate) {
+                await updateDoc(userDocRef, { personalInfo: currentInfo });
+            }
+            
+            const orderedInfo = [
+                currentInfo.find(i => i.label === 'Орд'),
+                currentInfo.find(i => i.label === 'Төрсөн өдөр'),
+                currentInfo.find(i => i.label === 'Нас'),
+                currentInfo.find(i => i.label === 'Өндөр'),
+                currentInfo.find(i => i.label === 'MBTI'),
+            ].filter(Boolean) as PersonalInfoType[];
+
+            setPersonalInfo(orderedInfo);
           }
         } catch (error) {
             console.error("Error fetching user data:", error);
@@ -179,9 +203,14 @@ export default function AboutPage() {
   };
   
 const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) => {
-    const yOffset = -200 + index * 100;
-    const xOffset = index % 2 === 0 ? -60 : 60;
-
+    const layoutConfig = [
+        { y: -200, x: 0 },   // Top (index 0)
+        { y: -80, x: -110 }, // Middle left (index 1)
+        { y: -80, x: 110 },  // Middle right (index 2)
+        { y: 40, x: -110 },  // Bottom left (index 3)
+        { y: 40, x: 110 },   // Bottom right (index 4)
+    ];
+    const {y: yOffset, x: xOffset} = layoutConfig[index] || { y: 0, x: 0 };
 
     return (
         <motion.div
@@ -236,7 +265,7 @@ const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) =>
               {/* Personal Info Cards */}
               <div className="relative w-full lg:w-1/2 h-[450px] flex items-center justify-center">
                     {personalInfo.map((info, index) => (
-                        <InfoCard key={index} info={info} index={index} />
+                        <InfoCard key={info.label} info={info} index={index} />
                     ))}
               </div>
 
