@@ -254,7 +254,7 @@ const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) =>
 };
 
 const InfoCardArrowLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
-    if (infos.length < 5) return null;
+    if (!infos || infos.length < 5) return null;
     return (
         <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
         
