@@ -12,7 +12,7 @@ import { HobbyProvider } from "@/contexts/HobbyContext";
 import { ExperienceProvider } from "@/contexts/ExperienceContext";
 import IntroOverlay from "@/components/IntroOverlay";
 import { JetBrains_Mono } from "next/font/google";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -52,9 +52,7 @@ export default function RootLayout({
                       <SkillsProvider>
                       <HobbyProvider>
                           <MainLayout>
-                            <AnimatePresence mode="wait" initial={false}>
-                              {children}
-                            </AnimatePresence>
+                            {children}
                           </MainLayout>
                           <Toaster />
                       </HobbyProvider>

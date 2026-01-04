@@ -6,7 +6,7 @@ import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { useFirebase } from '@/firebase';
 import { useEffect, useMemo, useState } from 'react';
-import { Loader2, ImageIcon, Save, Home, User, Wrench, Pencil } from 'lucide-react';
+import { Loader2, ImageIcon, Save, Home, User, Wrench, Pencil, Edit } from 'lucide-react';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -127,7 +127,6 @@ export default function MainLayout({
   }, [pathname]);
 
   const userImageProp = useMemo((): keyof UserProfile | undefined => {
-    // About page doesn't use hero image anymore
     if (pathname === '/tools') return 'toolsHeroImage';
     if (pathname === '/') return 'homeHeroImage';
     return undefined;
@@ -153,12 +152,6 @@ export default function MainLayout({
     const fetchHeroImage = async () => {
       let imageUrl: string | undefined;
       let placeholderId = 'home-hero-background';
-
-      // About page doesn't use hero image
-      if (pathname === '/about') {
-        setHeroImage(null);
-        return;
-      }
       
       if (pathname === '/tools') {
         placeholderId = 'tools-hero-background';
@@ -306,16 +299,15 @@ export default function MainLayout({
                   backgroundSize: '50px 50px'
                 }}
               />
-              <div className="absolute -top-20 -right-20 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px]" />
-              <div className="absolute top-1/3 -left-40 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl" />
-              <div className="absolute -bottom-40 right-1/4 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl" />
             </div>
             
             <div className="relative z-10">
               <Header />
             </div>
             <main className="relative z-10 flex-1">
-              {children}
+              <AnimatePresence mode="wait" initial={false}>
+                {children}
+              </AnimatePresence>
             </main>
             <Footer />
              <FloatingNav />

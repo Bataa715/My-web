@@ -172,80 +172,72 @@ export default function AboutPage() {
       transition={{ duration: 0.5, ease: "easeInOut" }}
       className="relative"
     >
-      {/* Futuristic Dark Navy Background */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#0a1628] via-[#0d1b2a] to-[#1b263b]" />
-      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-10 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }} />
-        <div className="absolute top-1/2 left-1/3 w-[400px] h-[400px] bg-cyan-400/3 rounded-full blur-3xl" />
-      </div>
-
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
         <div className="max-w-7xl mx-auto w-full">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-                 {/* Personal Info Cards */}
-                <div className="flex flex-col gap-6 items-center lg:items-start">
-                    {personalInfo.map((info, index) => (
-                    <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 30, x: -20 }}
-                        animate={{ opacity: 1, y: 0, x: 0 }}
-                        transition={{ duration: 0.5, delay: 0.3 + index * 0.15, ease: 'easeOut' }}
-                        className="w-full max-w-sm"
-                    >
-                        <Card className="bg-slate-900/50 backdrop-blur-lg border-2 border-cyan-400/30 hover:border-cyan-400/60 transition-colors duration-300 group">
-                             <CardContent className="p-6 flex items-center justify-between gap-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="text-cyan-400">
-                                    {getIcon(info.icon, "h-8 w-8")}
-                                    </div>
-                                    <h3 className="text-xl font-bold uppercase tracking-wider text-gray-300">
-                                    {info.label}
-                                    </h3>
+          <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-12 lg:gap-20 w-full">
+            {/* Personal Info Cards */}
+            <div className="flex flex-col gap-6 items-center lg:items-start">
+                {personalInfo.map((info, index) => (
+                <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30, x: -20 }}
+                    animate={{ opacity: 1, y: 0, x: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 + index * 0.15, ease: 'easeOut' }}
+                    className="w-full max-w-sm"
+                >
+                    <Card className="bg-slate-900/50 backdrop-blur-lg border-2 border-cyan-400/30 hover:border-cyan-400/60 transition-colors duration-300 group">
+                          <CardContent className="p-6 flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="text-cyan-400">
+                                {getIcon(info.icon, "h-8 w-8")}
                                 </div>
-                                <span className="text-3xl font-bold text-white tracking-tight">
-                                    {info.value}
-                                </span>
-                                {isEditMode && (
-                                    <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-black/80 hover:bg-black rounded-full border border-cyan-400/50" 
-                                        onClick={() => handleEditInfoClick(info)}
-                                    >
-                                        <Edit className="h-3.5 w-3.5 text-cyan-400" />
-                                    </Button>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </motion.div>
-                    ))}
-                </div>
-
-                {/* Text Content */}
-                <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
-                    <motion.h1 
-                        className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-white mb-6"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.8 }}
-                    >
-                        Hello
-                    </motion.h1>
-                    <motion.h2 
-                        className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-gray-300"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.9 }}
-                    >
-                        Миний нэрийг <span className="text-cyan-400 font-bold relative inline-block" data-text={name}>
-                        {name}
-                        <span className="absolute -inset-2 bg-cyan-400/10 blur-xl -z-10" />
-                        </span> гэдэг
-                    </motion.h2>
-                </div>
+                                <h3 className="text-xl font-bold uppercase tracking-wider text-gray-300">
+                                {info.label}
+                                </h3>
+                            </div>
+                            <span className="text-3xl font-bold text-white tracking-tight">
+                                {info.value}
+                            </span>
+                            {isEditMode && (
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-black/80 hover:bg-black rounded-full border border-cyan-400/50" 
+                                    onClick={() => handleEditInfoClick(info)}
+                                >
+                                    <Edit className="h-3.5 w-3.5 text-cyan-400" />
+                                </Button>
+                            )}
+                        </CardContent>
+                    </Card>
+                </motion.div>
+                ))}
             </div>
+
+            {/* Text Content */}
+            <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 lg:w-1/2">
+                <motion.h1 
+                    className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-white mb-6"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.8 }}
+                >
+                    Hello
+                </motion.h1>
+                <motion.h2 
+                    className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-gray-300"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.9 }}
+                >
+                    Миний нэрийг <span className="text-cyan-400 font-bold relative inline-block" data-text={name}>
+                    {name}
+                    <span className="absolute -inset-2 bg-cyan-400/10 blur-xl -z-10" />
+                    </span> гэдэг
+                </motion.h2>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -254,7 +246,7 @@ export default function AboutPage() {
             <DialogHeader>
                 <DialogTitle>"{editingInfoItem?.label}"-г засах</DialogTitle>
             </DialogHeader>
-             <div className="grid gap-4 py-4">
+              <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="info-value" className="text-right">
                         Утга
@@ -291,7 +283,7 @@ export default function AboutPage() {
           ) : (
             <div className="relative flex items-center justify-center h-[350px]">
                 {displayItems.length === 0 && !isEditMode ? (
-                     <div className="text-center">
+                      <div className="text-center">
                         <p className="text-muted-foreground">Хобби олдсонгүй.</p>
                         {user && <p className="text-sm text-muted-foreground mt-2">Засварлах горимд шинээр нэмнэ үү.</p>}
                     </div>
@@ -299,7 +291,7 @@ export default function AboutPage() {
                 <div className="carousel-container" style={{ width: `${itemWidth}px`}}>
                     <div className="carousel" style={{ transform: `rotateY(${-activeIndex * anglePerItem}deg)` }}>
                         <AnimatePresence>
-                           {displayItems.map((hobby, index) => {
+                            {displayItems.map((hobby, index) => {
                               const angle = index * anglePerItem;
                               const isVisible = Math.abs((activeIndex - index + totalItems) % totalItems) <= 2 || Math.abs((activeIndex - index - totalItems) % totalItems) <= 2;
                               const style: CSSProperties = {
@@ -309,7 +301,7 @@ export default function AboutPage() {
                               };
                               if (hobby.id === 'add-new-hobby') {
                                 return (
-                                   <div className="carousel-item" style={style} key={hobby.id} onClick={() => setActiveIndex(index)}>
+                                    <div className="carousel-item" style={style} key={hobby.id} onClick={() => setActiveIndex(index)}>
                                       <AddHobbyDialog>
                                         <button className="flex h-full w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/50 bg-card/50 text-muted-foreground transition-colors hover:border-primary hover:bg-card/80 hover:text-primary">
                                             <PlusCircle size={48} />
@@ -321,7 +313,7 @@ export default function AboutPage() {
                               }
                               return (
                                   <div className="carousel-item group" key={hobby.id} style={style} onClick={() => setActiveIndex(index)}>
-                                       <Card className="relative bg-card border-[3px] border-primary/50 h-full w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
+                                        <Card className="relative bg-card border-[3px] border-primary/50 h-full w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
                                           {isEditMode && (
                                             <div className="absolute top-2 right-2 flex gap-1 z-20">
                                               <EditHobbyDialog hobby={hobby}>
@@ -356,12 +348,12 @@ export default function AboutPage() {
                                             data-ai-hint={`3D ${hobby.imageHint || hobby.title}`} 
                                           />
                                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                                           <div className="absolute bottom-0 left-0 p-4 text-white">
+                                            <div className="absolute bottom-0 left-0 p-4 text-white">
                                               <CardTitle className="text-base md:text-lg font-bold">{hobby.title}</CardTitle>
                                               <p className="text-xs md:text-sm text-white/80 mt-1">{hobby.description}</p>
-                                           </div>
-                                       </Card>
-                                   </div>
+                                            </div>
+                                        </Card>
+                                  </div>
                               )
                           })}
                         </AnimatePresence>
@@ -382,7 +374,7 @@ export default function AboutPage() {
                     className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-10"
                     variant="outline"
                     size="icon"
-                     disabled={displayItems.length === 0}
+                      disabled={displayItems.length === 0}
                 >
                     <ArrowRight/>
                 </Button>
@@ -391,7 +383,7 @@ export default function AboutPage() {
         </div>
       </section>
       
-       <style jsx>{`
+        <style jsx>{`
             .carousel-container {
                 perspective: 2000px;
                 height: 350px;
@@ -418,4 +410,3 @@ export default function AboutPage() {
     </motion.div>
   );
 }
-
