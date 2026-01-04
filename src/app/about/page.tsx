@@ -152,9 +152,9 @@ export default function AboutPage() {
             }
             
             const orderedInfo = [
-                currentInfo.find(i => i.label === 'Орд'),
-                currentInfo.find(i => i.label === 'Төрсөн өдөр'),
                 currentInfo.find(i => i.label === 'Нас'),
+                currentInfo.find(i => i.label === 'Төрсөн өдөр'),
+                currentInfo.find(i => i.label === 'Орд'),
                 currentInfo.find(i => i.label === 'Өндөр'),
                 currentInfo.find(i => i.label === 'MBTI'),
             ].filter(Boolean) as PersonalInfoType[];
@@ -204,26 +204,27 @@ export default function AboutPage() {
   
 const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) => {
     const layoutConfig = [
-      { y: -160, x: 0 },    // Top (Орд)
-      { y: -40, x: -120 }, // Middle Left (Төрсөн өдөр)
-      { y: -40, x: 120 },  // Middle Right (Нас)
-      { y: 80, x: -120 },  // Bottom Left (Өндөр)
-      { y: 80, x: 120 },   // Bottom Right (MBTI)
+      { y: 0, x: 0, z: 50, scale: 1.1 },       // Center (Нас)
+      { y: -60, x: -130, z: 0, scale: 1 },    // Middle Left (Төрсөн өдөр)
+      { y: -60, x: 130, z: 0, scale: 1 },     // Middle Right (Орд)
+      { y: 60, x: -200, z: -50, scale: 0.9 }, // Bottom Left (Өндөр)
+      { y: 60, x: 200, z: -50, scale: 0.9 },  // Bottom Right (MBTI)
     ];
-    const {y: yOffset, x: xOffset} = layoutConfig[index] || { y: 0, x: 0 };
+    const {y: yOffset, x: xOffset, z, scale} = layoutConfig[index] || { y: 0, x: 0, z: 0, scale: 1 };
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: yOffset + 40, x: xOffset }}
-            animate={{ opacity: 1, y: yOffset, x: xOffset }}
+            initial={{ opacity: 0, y: yOffset + 40, x: xOffset, scale: scale * 0.8 }}
+            animate={{ opacity: 1, y: yOffset, x: xOffset, scale }}
             transition={{
                 type: 'spring',
                 stiffness: 100,
                 damping: 15,
                 delay: 0.3 + index * 0.1,
             }}
-            whileHover={{ y: yOffset - 10, scale: 1.05 }}
+            whileHover={{ y: yOffset - 10, scale: scale * 1.05 }}
             className="group absolute w-56 h-24"
+            style={{ zIndex: Math.round(z) }}
         >
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" />
             <div className="relative p-4 h-full rounded-xl bg-neutral-900/60 backdrop-blur-md border border-neutral-800 transition-all duration-300 group-hover:border-primary/50 flex items-center justify-between">
@@ -263,7 +264,7 @@ const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) =>
           <div className="max-w-7xl mx-auto w-full">
             <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-12 lg:gap-20 w-full">
               {/* Personal Info Cards */}
-              <div className="relative w-full lg:w-1/2 h-[450px] flex items-center justify-center">
+              <div className="relative w-full lg:w-1/2 h-[450px] flex items-center justify-center" style={{ perspective: '1000px' }}>
                     {personalInfo.map((info, index) => (
                         <InfoCard key={info.label} info={info} index={index} />
                     ))}
