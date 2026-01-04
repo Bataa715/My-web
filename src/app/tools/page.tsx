@@ -4,9 +4,10 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import Link from "next/link";
-import { ArrowRight, Timer, Code as CodeIcon, BookOpen, HeartPulse, LayoutGrid, TrendingUp } from "lucide-react";
+import { ArrowRight, Timer, Code as CodeIcon, BookOpen, LayoutGrid, TrendingUp } from "lucide-react";
 import BackButton from "@/components/shared/BackButton";
 import { motion } from 'framer-motion';
+import InteractiveParticles from '@/components/shared/InteractiveParticles';
 
 const tools = [
   {
@@ -56,7 +57,8 @@ export default function ToolsPage() {
       transition={{ duration: 0.5, ease: "easeInOut" }}
       className="relative"
     >
-      <div className="space-y-8 px-4 md:px-6">
+       <InteractiveParticles />
+      <div className="space-y-8 px-4 md:px-6 relative z-10">
         <BackButton />
         <div className="text-center pt-8">
             <h1 className="text-3xl sm:text-4xl font-bold">Хэрэгслүүд</h1>
