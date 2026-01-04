@@ -12,7 +12,7 @@ import { EducationProvider } from "@/contexts/EducationContext";
 import { HobbyProvider } from "@/contexts/HobbyContext";
 import IntroOverlay from "@/components/IntroOverlay";
 import { JetBrains_Mono } from "next/font/google";
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from "framer-motion";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
