@@ -438,15 +438,15 @@
 
 /* Rotating border animation for layout */
 .animated-border-wrapper {
-  @apply relative overflow-hidden rounded-[1.75rem] p-1;
+  @apply relative overflow-hidden rounded-[1.75rem] p-[3px];
 }
 
 .animated-border-wrapper::before {
   content: '';
   position: absolute;
-  inset: -100%;
-  width: 300%;
-  height: 300%;
+  inset: -200%;
+  width: 500%;
+  height: 500%;
   z-index: 0;
   background: conic-gradient(
     from 90deg at 50% 50%,
