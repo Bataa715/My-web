@@ -204,11 +204,11 @@ export default function AboutPage() {
   
 const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) => {
     const layoutConfig = [
-        { y: -200, x: 0 },   // Top (index 0)
-        { y: -80, x: -110 }, // Middle left (index 1)
-        { y: -80, x: 110 },  // Middle right (index 2)
-        { y: 40, x: -110 },  // Bottom left (index 3)
-        { y: 40, x: 110 },   // Bottom right (index 4)
+      { y: -160, x: 0 },    // Top (Орд)
+      { y: -40, x: -120 }, // Middle Left (Төрсөн өдөр)
+      { y: -40, x: 120 },  // Middle Right (Нас)
+      { y: 80, x: -120 },  // Bottom Left (Өндөр)
+      { y: 80, x: 120 },   // Bottom Right (MBTI)
     ];
     const {y: yOffset, x: xOffset} = layoutConfig[index] || { y: 0, x: 0 };
 
