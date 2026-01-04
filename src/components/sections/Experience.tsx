@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import type { ExperienceItem } from "@/contexts/ExperienceContext";
 
-import type { ExperienceItem } from "@/contexts/ExperienceContext";
 
 const getIcon = (iconName: string) => {
   const LucideIcon = (require('lucide-react') as any)[iconName];
