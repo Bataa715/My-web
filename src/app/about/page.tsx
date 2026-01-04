@@ -203,12 +203,13 @@ export default function AboutPage() {
   };
   
 const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) => {
+    // 1-2-2 "arrow" layout configuration
     const layoutConfig = [
-      { y: 0, x: 0, z: 50, scale: 1.1 },       // Center (Нас)
-      { y: -60, x: -130, z: 0, scale: 1 },    // Middle Left (Төрсөн өдөр)
-      { y: -60, x: 130, z: 0, scale: 1 },     // Middle Right (Орд)
-      { y: 60, x: -200, z: -50, scale: 0.9 }, // Bottom Left (Өндөр)
-      { y: 60, x: 200, z: -50, scale: 0.9 },  // Bottom Right (MBTI)
+        { y: -80, x: 0, z: 50, scale: 1.1 },   // Center Top (Нас)
+        { y: 0, x: -130, z: 0, scale: 1 },     // Middle Left (Төрсөн өдөр)
+        { y: 0, x: 130, z: 0, scale: 1 },      // Middle Right (Орд)
+        { y: 80, x: -130, z: -50, scale: 0.9 }, // Bottom Left (Өндөр)
+        { y: 80, x: 130, z: -50, scale: 0.9 },  // Bottom Right (MBTI)
     ];
     const {y: yOffset, x: xOffset, z, scale} = layoutConfig[index] || { y: 0, x: 0, z: 0, scale: 1 };
 
