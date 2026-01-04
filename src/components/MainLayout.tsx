@@ -17,6 +17,83 @@ import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { useEditMode } from '@/contexts/EditModeContext';
+import { AnimatePresence, motion, useScroll, useMotionValueEvent } from "framer-motion";
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+
+const FloatingNav = () => {
+    const { scrollYProgress } = useScroll();
+    const [visible, setVisible] = useState(false);
+
+    useMotionValueEvent(scrollYProgress, "change", (current) => {
+        if (typeof current === "number") {
+            let direction = current! - scrollYProgress.getPrevious()!;
+            if (scrollYProgress.get() < 0.05) {
+                setVisible(false);
+            } else {
+                if (direction < 0) {
+                    setVisible(true);
+                } else {
+                    setVisible(false);
+                }
+            }
+        }
+    });
+
+    const pathname = usePathname();
+    const navItems = [
+        { name: "Нүүр", link: "/", active: pathname === '/' },
+        { name: "Тухай", link: "/about", active: pathname === '/about' },
+    ];
+    
+    return (
+        <AnimatePresence mode="wait">
+            <motion.div
+                initial={{
+                    opacity: 1,
+                    y: 100,
+                }}
+                animate={{
+                    y: visible ? 0 : 100,
+                    opacity: visible ? 1 : 0,
+                }}
+                transition={{
+                    duration: 0.2,
+                }}
+                className="fixed bottom-10 inset-x-0 max-w-xs mx-auto z-50 flex items-center justify-center space-x-4"
+            >
+                <div className="flex items-center justify-center p-2 rounded-full border border-neutral-700 bg-neutral-900/80 backdrop-blur-md shadow-lg">
+                    {navItems.map((navItem) => (
+                        <Link
+                            key={navItem.link}
+                            href={navItem.link}
+                            className={cn(
+                                "relative flex items-center justify-center px-6 py-2 rounded-full text-sm font-medium transition-colors duration-300",
+                                navItem.active
+                                    ? "text-primary"
+                                    : "text-neutral-400 hover:text-neutral-200"
+                            )}
+                        >
+                            {navItem.active && (
+                                <motion.span
+                                    className="absolute inset-0 z-0 bg-neutral-800 rounded-full"
+                                    layoutId="active-nav-item"
+                                    transition={{
+                                        type: "spring",
+                                        stiffness: 350,
+                                        damping: 30,
+                                    }}
+                                />
+                            )}
+                            <span className="relative z-10">{navItem.name}</span>
+                        </Link>
+                    ))}
+                </div>
+            </motion.div>
+        </AnimatePresence>
+    );
+};
+
 
 export default function MainLayout({
   children,
@@ -223,6 +300,7 @@ export default function MainLayout({
             {children}
           </main>
           <Footer />
+           <FloatingNav />
         </div>
       </div>
     </div>
