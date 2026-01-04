@@ -235,23 +235,23 @@ export default function AboutPage() {
                         {greetings[greetingIndex]}
                     </motion.h1>
                 </AnimatePresence>
-                <motion.h2 
-                    className="text-xl md:text-2xl text-gray-300"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.3, ease: [0.2, 0.65, 0.3, 0.9] }}
-                >
-                    Миний нэрийг
-                </motion.h2>
                 <div className="relative group" ref={nameRef}>
-                    <motion.p
+                    <motion.div
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.9, delay: 0.4, ease: [0.2, 0.65, 0.3, 0.9] }}
-                        className="spotlight-text text-5xl md:text-7xl lg:text-8xl font-extrabold"
+                        className="flex flex-wrap items-baseline justify-center lg:justify-start"
                     >
-                        {name}
-                    </motion.p>
+                        <h2 className="text-xl md:text-2xl text-gray-300 mr-3">
+                            Миний нэрийг
+                        </h2>
+                        <p className="spotlight-text text-5xl md:text-7xl lg:text-8xl font-extrabold">
+                            {name}
+                        </p>
+                        <h2 className="text-xl md:text-2xl text-gray-300 ml-3">
+                            гэдэг
+                        </h2>
+                    </motion.div>
                     <div
                         className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                     />
@@ -445,4 +445,5 @@ export default function AboutPage() {
     
 
     
+
 
