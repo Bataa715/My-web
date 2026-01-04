@@ -232,9 +232,8 @@ export default function MainLayout({
   }
 
   return (
-    <div className="min-h-screen p-3 md:p-4 lg:p-6 bg-neutral-950">
-      <div className="animated-border-wrapper">
-        <div className="relative z-10 flex min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] flex-col rounded-3xl bg-background overflow-hidden shadow-2xl shadow-primary/5">
+     <div className="min-h-screen p-3 md:p-4 lg:p-6 bg-neutral-950">
+        <div className="relative z-10 flex min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] flex-col rounded-3xl bg-background overflow-hidden shadow-2xl shadow-primary/5 border border-primary/20">
           
           {heroImage && (
             <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
@@ -312,7 +311,6 @@ export default function MainLayout({
           <Footer />
            <FloatingNav />
         </div>
-      </div>
     </div>
   );
 }
