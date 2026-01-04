@@ -21,10 +21,11 @@ import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import InteractiveParticles from '@/components/shared/InteractiveParticles';
+import * as LucideIcons from 'lucide-react';
 
 const getIcon = (iconName?: string, props = {}) => {
     if (!iconName) return null;
-    const LucideIcon = (require('lucide-react') as any)[iconName];
+    const LucideIcon = (LucideIcons as any)[iconName];
     return LucideIcon ? <LucideIcon {...props} /> : null;
 };
 
@@ -111,59 +112,45 @@ export default function AboutPage() {
   const scrollPrev = () => setActiveIndex((prev) => (prev - 1 + totalItems) % totalItems);
 
   useEffect(() => {
-    if (isUserLoading) return;
+    if (isUserLoading || !user || !firestore) return;
 
     const fetchUserData = async () => {
-      if (user && firestore) {
-        try {
-          const userDocRef = doc(firestore, 'users', user.uid);
-          const docSnap = await getDoc(userDocRef);
-          if (docSnap.exists()) {
-            const data = docSnap.data() as UserProfile;
-            setName(data.name || 'Batuka');
-            
-            let currentInfo = data.personalInfo && data.personalInfo.length > 0 ? data.personalInfo : [];
-            const defaultInfoItems: PersonalInfoType[] = [
-                { value: "21", label: "Нас", icon: 'Cake' },
-                { value: "5-р сарын 25", label: "Төрсөн өдөр", icon: 'CalendarDays' },
-                { value: "INTJ", label: "MBTI", icon: 'User' },
-                { value: "Ихэр", label: "Орд", icon: 'Gemini' },
-                { value: "178cm", label: "Өндөр", icon: 'Scaling' },
-            ];
+      try {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        const docSnap = await getDoc(userDocRef);
 
-            // Ensure all default items are present
-            let needsUpdate = false;
-            defaultInfoItems.forEach(defaultItem => {
-                if (!currentInfo.some(info => info.label === defaultItem.label)) {
-                    currentInfo.push(defaultItem);
-                    needsUpdate = true;
-                }
-            });
-            
-            // Filter out any extra items that are not in default
-             const filteredInfo = currentInfo.filter(info => defaultInfoItems.some(d => d.label === info.label));
-             if (filteredInfo.length !== currentInfo.length) {
-                 needsUpdate = true;
-             }
-             currentInfo = filteredInfo;
-            
-            if (needsUpdate) {
-                await updateDoc(userDocRef, { personalInfo: currentInfo });
-            }
-            
-            const orderedInfo = [
-                currentInfo.find(i => i.label === 'Нас'),
-                currentInfo.find(i => i.label === 'Төрсөн өдөр'),
-                currentInfo.find(i => i.label === 'Орд'),
-                currentInfo.find(i => i.label === 'Өндөр'),
-                currentInfo.find(i => i.label === 'MBTI'),
-            ].filter(Boolean) as PersonalInfoType[];
+        if (docSnap.exists()) {
+          const data = docSnap.data() as UserProfile;
+          setName(data.name || 'Batuka');
 
-            setPersonalInfo(orderedInfo);
+          const defaultInfoItems: PersonalInfoType[] = [
+              { value: "21", label: "Нас", icon: 'Cake' },
+              { value: "5-р сарын 25", label: "Төрсөн өдөр", icon: 'CalendarDays' },
+              { value: "INTJ", label: "MBTI", icon: 'User' },
+              { value: "Ихэр", label: "Орд", icon: 'Gemini' },
+              { value: "178cm", label: "Өндөр", icon: 'Scaling' },
+          ];
+
+          let currentInfo = data.personalInfo && data.personalInfo.length > 0 
+              ? data.personalInfo 
+              : defaultInfoItems;
+          
+          let needsUpdate = !data.personalInfo || data.personalInfo.length === 0;
+
+          const updatedInfo = defaultInfoItems.map(defaultItem => {
+              const existingItem = currentInfo.find(info => info.label === defaultItem.label);
+              return existingItem || defaultItem;
+          });
+
+          if (needsUpdate || JSON.stringify(updatedInfo) !== JSON.stringify(data.personalInfo)) {
+              await updateDoc(userDocRef, { personalInfo: updatedInfo });
+              setPersonalInfo(updatedInfo);
+          } else {
+              setPersonalInfo(data.personalInfo!);
           }
-        } catch (error) {
-            console.error("Error fetching user data:", error);
         }
+      } catch (error) {
+          console.error("Error fetching user data:", error);
       }
     };
 
@@ -254,42 +241,52 @@ const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) =>
 };
 
 const InfoCardArrowLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
-    if (!infos || infos.length < 5) return null;
+    if (!infos || infos.length === 0) return null;
+    const orderedInfo = [
+        infos.find(i => i.label === 'Нас'),
+        infos.find(i => i.label === 'Төрсөн өдөр'),
+        infos.find(i => i.label === 'Орд'),
+        infos.find(i => i.label === 'Өндөр'),
+        infos.find(i => i.label === 'MBTI'),
+    ].filter(Boolean) as PersonalInfoType[];
+
+    if (orderedInfo.length < 5) return null;
+
     return (
         <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
         
         {/* [1] */}
         <div className="flex justify-start">
             <div className="w-[85%]">
-            <InfoCard info={infos[0]} index={0} />
+            <InfoCard info={orderedInfo[0]} index={0} />
             </div>
         </div>
 
         {/* [2] */}
         <div className="flex justify-center -ml-12 sm:-ml-16">
             <div className="w-[75%]">
-            <InfoCard info={infos[1]} index={1} />
+            <InfoCard info={orderedInfo[1]} index={1} />
             </div>
         </div>
 
         {/* [3] */}
         <div className="flex justify-end">
             <div className="w-[85%]">
-            <InfoCard info={infos[2]} index={2} />
+            <InfoCard info={orderedInfo[2]} index={2} />
             </div>
         </div>
 
         {/* [4] */}
         <div className="flex justify-center -mr-12 sm:-mr-16">
             <div className="w-[75%]">
-            <InfoCard info={infos[3]} index={3} />
+            <InfoCard info={orderedInfo[3]} index={3} />
             </div>
         </div>
 
         {/* [5] */}
         <div className="flex justify-start">
             <div className="w-[85%]">
-            <InfoCard info={infos[4]} index={4} />
+            <InfoCard info={orderedInfo[4]} index={4} />
             </div>
         </div>
 
@@ -532,3 +529,5 @@ const InfoCardArrowLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
     </>
   );
 }
+
+    
