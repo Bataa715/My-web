@@ -123,30 +123,18 @@ export default function AboutPage() {
           const data = docSnap.data() as UserProfile;
           setName(data.name || 'Batuka');
 
-          const defaultInfoItems: PersonalInfoType[] = [
-              { value: "21", label: "Нас", icon: 'Cake' },
-              { value: "5-р сарын 25", label: "Төрсөн өдөр", icon: 'CalendarDays' },
-              { value: "INTJ", label: "MBTI", icon: 'User' },
-              { value: "Ихэр", label: "Орд", icon: 'Gemini' },
-              { value: "178cm", label: "Өндөр", icon: 'Scaling' },
-          ];
-
-          let currentInfo = data.personalInfo && data.personalInfo.length > 0 
-              ? data.personalInfo 
-              : defaultInfoItems;
-          
-          let needsUpdate = !data.personalInfo || data.personalInfo.length === 0;
-
-          const updatedInfo = defaultInfoItems.map(defaultItem => {
-              const existingItem = currentInfo.find(info => info.label === defaultItem.label);
-              return existingItem || defaultItem;
-          });
-
-          if (needsUpdate || JSON.stringify(updatedInfo) !== JSON.stringify(data.personalInfo)) {
-              await updateDoc(userDocRef, { personalInfo: updatedInfo });
-              setPersonalInfo(updatedInfo);
+          if (data.personalInfo && data.personalInfo.length > 0) {
+            setPersonalInfo(data.personalInfo);
           } else {
-              setPersonalInfo(data.personalInfo!);
+            const defaultInfoItems: PersonalInfoType[] = [
+                { value: "21", label: "Нас", icon: 'Cake' },
+                { value: "5-р сарын 25", label: "Төрсөн өдөр", icon: 'CalendarDays' },
+                { value: "INTJ", label: "MBTI", icon: 'User' },
+                { value: "Ихэр", label: "Орд", icon: 'Gemini' },
+                { value: "178cm", label: "Өндөр", icon: 'Scaling' },
+            ];
+            await updateDoc(userDocRef, { personalInfo: defaultInfoItems });
+            setPersonalInfo(defaultInfoItems);
           }
         }
       } catch (error) {
@@ -241,7 +229,15 @@ const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) =>
 };
 
 const InfoCardArrowLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
-    if (!infos || infos.length === 0) return null;
+    if (!infos || infos.length < 5) {
+        return (
+            <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
+                {infos.map((info, index) => (
+                    <InfoCard info={info} index={index} key={index} />
+                ))}
+            </div>
+        );
+    }
     const orderedInfo = [
         infos.find(i => i.label === 'Нас'),
         infos.find(i => i.label === 'Төрсөн өдөр'),
@@ -250,7 +246,12 @@ const InfoCardArrowLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
         infos.find(i => i.label === 'MBTI'),
     ].filter(Boolean) as PersonalInfoType[];
 
-    if (orderedInfo.length < 5) return null;
+    if (orderedInfo.length < 5) {
+        // Fallback for when not all items are present but there are 5 or more total
+        const remainingInfos = infos.filter(i => !orderedInfo.includes(i));
+        const finalInfos = [...orderedInfo, ...remainingInfos].slice(0, 5);
+        return <InfoCardArrowLayout infos={finalInfos} />;
+    };
 
     return (
         <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
