@@ -244,6 +244,48 @@ const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) =>
     );
 };
 
+const InfoCardLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
+    if (infos.length < 5) return null;
+    return (
+        <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
+            {/* 3 */}
+            <div className="flex justify-end">
+                <div className="w-[85%]">
+                    <InfoCard info={infos[2]} index={2} />
+                </div>
+            </div>
+
+            {/* 2 */}
+            <div className="flex justify-center -mt-12">
+                <div className="w-[85%]">
+                    <InfoCard info={infos[1]} index={1} />
+                </div>
+            </div>
+
+            {/* 1 */}
+            <div className="flex justify-start -mt-12">
+                <div className="w-[85%]">
+                    <InfoCard info={infos[0]} index={0} />
+                </div>
+            </div>
+
+            {/* 4 */}
+            <div className="flex justify-center -mt-12">
+                <div className="w-[85%]">
+                    <InfoCard info={infos[3]} index={3} />
+                </div>
+            </div>
+
+            {/* 5 */}
+            <div className="flex justify-end -mt-12">
+                <div className="w-[85%]">
+                    <InfoCard info={infos[4]} index={4} />
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
   return (
     <>
@@ -254,10 +296,8 @@ const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) =>
           <div className="max-w-7xl mx-auto w-full">
             <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-12 lg:gap-20 w-full">
               {/* Personal Info Cards */}
-              <div className="flex flex-col gap-6 items-center lg:items-start w-full lg:w-1/2">
-                    {personalInfo.map((info, index) => (
-                        <InfoCard key={info.label} info={info} index={index} />
-                    ))}
+              <div className="w-full lg:w-1/2">
+                {personalInfo.length > 0 && <InfoCardLayout infos={personalInfo} />}
               </div>
 
               {/* Text Content */}
