@@ -234,86 +234,86 @@ export default function MainLayout({
 
   return (
      <div className="min-h-screen p-3 md:p-4 lg:p-6 bg-neutral-950">
-        <div className="relative z-10 flex min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] flex-col rounded-3xl bg-background overflow-hidden shadow-2xl shadow-primary/5 border-2 border-primary/20">
-          
-          {heroImage && (
-            <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
-              <Image
-                src={heroImage}
-                alt="Background"
-                fill
-                className="object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-            </div>
-          )}
-          
-           {isEditMode && userImageProp && (
-              <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="icon" className="absolute top-28 right-4 z-50">
-                    <ImageIcon className="h-4 w-4" />
-                    <span className="sr-only">Арын зураг солих</span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Арын зургийн холбоос</DialogTitle>
-                    <DialogDescription>
-                      Шинэ зургийнхаа URL хаягийг энд буулгана уу.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="image-url" className="text-right">
-                        URL
-                      </Label>
-                      <Input
-                        id="image-url"
-                        value={editedImageUrl}
-                        onChange={(e) => setEditedImageUrl(e.target.value)}
-                        className="col-span-3"
-                        placeholder="https://example.com/image.png"
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button type="button" variant="secondary">Цуцлах</Button>
-                    </DialogClose>
-                    <Button type="button" onClick={handleSaveImage} disabled={saving}>
-                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+        <div className="animated-border-wrapper">
+          <div className="relative z-10 flex min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] flex-col rounded-3xl bg-background overflow-hidden shadow-2xl shadow-primary/5">
+            
+            {heroImage && (
+              <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
+                <Image
+                  src={heroImage}
+                  alt="Background"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+              </div>
             )}
+            
+             {isEditMode && userImageProp && (
+                <Dialog open={isImageEditingOpen} onOpenChange={setIsImageEditingOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="icon" className="absolute top-28 right-4 z-50">
+                      <ImageIcon className="h-4 w-4" />
+                      <span className="sr-only">Арын зураг солих</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Арын зургийн холбоос</DialogTitle>
+                      <DialogDescription>
+                        Шинэ зургийнхаа URL хаягийг энд буулгана уу.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="image-url" className="text-right">
+                          URL
+                        </Label>
+                        <Input
+                          id="image-url"
+                          value={editedImageUrl}
+                          onChange={(e) => setEditedImageUrl(e.target.value)}
+                          className="col-span-3"
+                          placeholder="https://example.com/image.png"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <Button type="button" variant="secondary">Цуцлах</Button>
+                      </DialogClose>
+                      <Button type="button" onClick={handleSaveImage} disabled={saving}>
+                        {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
 
-          <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
-            <div 
-              className="absolute inset-0 opacity-[0.02]"
-              style={{
-                backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-                backgroundSize: '50px 50px'
-              }}
-            />
-            <div className="absolute -top-20 -right-20 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px]" />
-            <div className="absolute top-1/3 -left-40 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl" />
-            <div className="absolute -bottom-40 right-1/4 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl" />
+            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
+              <div 
+                className="absolute inset-0 opacity-[0.02]"
+                style={{
+                  backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+                  backgroundSize: '50px 50px'
+                }}
+              />
+              <div className="absolute -top-20 -right-20 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[100px]" />
+              <div className="absolute top-1/3 -left-40 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl" />
+              <div className="absolute -bottom-40 right-1/4 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl" />
+            </div>
+            
+            <div className="relative z-10">
+              <Header />
+            </div>
+            <main className="relative z-10 flex-1">
+              {children}
+            </main>
+            <Footer />
+             <FloatingNav />
           </div>
-          
-          <div className="relative z-10">
-            <Header />
-          </div>
-          <main className="relative z-10 flex-1">
-            {children}
-          </main>
-          <Footer />
-           <FloatingNav />
         </div>
     </div>
   );
 }
-
-    
