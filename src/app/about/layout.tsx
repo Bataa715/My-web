@@ -4,7 +4,7 @@ export default function AboutLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-background">
       {children}
     </div>
   );

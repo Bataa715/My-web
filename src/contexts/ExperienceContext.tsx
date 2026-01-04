@@ -10,6 +10,7 @@ export interface ExperienceItem {
   title: string;
   description: string;
   icon: string;
+  image?: string; // Path to image like /images/exp1.png
 }
 
 interface ExperienceContextType {

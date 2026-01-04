@@ -2,6 +2,7 @@
 
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { PlusCircle, Trash2, Edit, AlertTriangle } from "lucide-react";
 import { useExperience } from "@/contexts/ExperienceContext";
 import { useEditMode } from "@/contexts/EditModeContext";
@@ -22,10 +23,13 @@ import {
 import type { ExperienceItem } from "@/contexts/ExperienceContext";
 
 
-const getIcon = (iconName: string) => {
-  const LucideIcon = (require('lucide-react') as any)[iconName];
-  return LucideIcon ? <LucideIcon className="h-10 w-10" /> : <AlertTriangle className="h-10 w-10 text-destructive" />;
-};
+// Default images for experiences
+const defaultImages = [
+  '/images/exp1.png',
+  '/images/exp2.png',
+  '/images/exp3.png',
+  '/images/exp4.png',
+];
 
 const ExperienceCard = ({ experience, index }: { experience: ExperienceItem; index: number }) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -60,15 +64,18 @@ const ExperienceCard = ({ experience, index }: { experience: ExperienceItem; ind
     y.set(0);
   };
 
+  // Use experience image or fallback to default based on index
+  const imageSrc = experience.image || defaultImages[index % defaultImages.length];
+
   return (
     <motion.div
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      transition={{ duration: 0.6, delay: index * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
       style={{
         rotateX,
         rotateY,
@@ -76,38 +83,54 @@ const ExperienceCard = ({ experience, index }: { experience: ExperienceItem; ind
       }}
       className="group relative"
     >
-      {/* Card */}
-      <div className="relative overflow-hidden rounded-2xl bg-neutral-900/80 backdrop-blur-sm border border-neutral-800 p-6 h-full transition-all duration-300 hover:border-neutral-700">
+      {/* Card with glass morphism effect */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card/90 via-card/70 to-card/50 backdrop-blur-xl border border-border/30 p-6 h-full transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10">
         
-        {/* Glowing accent line at top */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-1 bg-primary rounded-b-full blur-sm" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-0.5 bg-primary rounded-b-full" />
+        {/* Animated gradient border on hover */}
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/20 via-transparent to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        
+        {/* Top glow accent */}
+        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-32 h-2 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full blur-md opacity-60 group-hover:opacity-100 transition-opacity" />
         
         {/* Spotlight effect */}
         <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"
           style={{
-            background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, hsl(var(--primary) / 0.1), transparent 40%)`
+            background: `radial-gradient(500px circle at ${mousePosition.x}px ${mousePosition.y}px, hsl(var(--primary) / 0.15), transparent 50%)`
           }}
         />
         
         {/* Content */}
-        <div className="relative z-10 flex gap-5">
-          {/* Icon */}
-          <div className="flex items-center justify-center w-20 h-20 md:w-24 md:h-24 flex-shrink-0 rounded-xl bg-primary/10 text-primary border border-primary/20">
-            {getIcon(experience.icon)}
+        <div className="relative z-10 flex gap-5 items-start">
+          {/* Image container with glow effect */}
+          <div className="relative flex-shrink-0">
+            {/* Glow behind image */}
+            <div className="absolute inset-0 bg-primary/30 rounded-2xl blur-xl scale-90 group-hover:scale-110 transition-transform duration-500" />
+            
+            {/* Image */}
+            <div className="relative w-20 h-20 md:w-28 md:h-28 rounded-2xl overflow-hidden ring-2 ring-primary/20 group-hover:ring-primary/50 transition-all duration-300">
+              <Image
+                src={imageSrc}
+                alt={experience.title}
+                fill
+                className="object-contain p-2 group-hover:scale-110 transition-transform duration-500"
+              />
+            </div>
           </div>
           
           {/* Text content */}
-          <div className="flex-1 min-w-0">
-            <h3 className="text-lg md:text-xl font-bold text-white mb-2 group-hover:text-primary transition-colors duration-300">
+          <div className="flex-1 min-w-0 pt-1">
+            <h3 className="text-lg md:text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">
               {experience.title}
             </h3>
-            <p className="text-sm text-neutral-400 leading-relaxed line-clamp-3">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {experience.description}
             </p>
           </div>
         </div>
+        
+        {/* Bottom gradient fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-card/50 to-transparent pointer-events-none rounded-b-3xl" />
       </div>
     </motion.div>
   );

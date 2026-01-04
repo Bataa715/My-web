@@ -4,7 +4,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Link from "next/link";
-import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit, ArrowUpRight } from "lucide-react";
+import { Github, ExternalLink, Trash2, Loader2, PlusCircle, Edit, ArrowUpRight, Globe, ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -86,7 +86,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
             rotateX,
             transformStyle: "preserve-3d",
         }}
-        className="group relative h-[480px] w-full cursor-pointer"
+        className="group relative h-[420px] md:h-[450px] w-full cursor-pointer"
     >
        {/* Outer glow effect */}
        <div 
@@ -97,7 +97,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
        />
        
        {/* Main card container */}
-       <div className="relative h-full w-full rounded-2xl border border-neutral-800 bg-neutral-950 overflow-hidden transition-all duration-300 group-hover:border-neutral-700">
+       <div className="relative h-full w-full rounded-2xl border border-neutral-800 bg-neutral-950 overflow-hidden transition-all duration-300 group-hover:border-neutral-700 flex flex-col">
          
          {/* Interactive spotlight overlay */}
          <div 
@@ -118,7 +118,7 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
          {/* Image section */}
          <div 
            style={{ transform: "translateZ(50px)" }}
-           className="relative h-[55%] w-full overflow-hidden bg-neutral-900"
+           className="relative h-40 md:h-44 w-full overflow-hidden bg-neutral-900 flex-shrink-0"
          >
            <motion.div 
              className="relative h-full w-full"
@@ -146,65 +146,74 @@ const ProjectCard = ({ project, index }: { project: Project; index: number }) =>
          {/* Content section */}
          <div 
            style={{ transform: "translateZ(60px)" }}
-           className="relative h-[45%] flex flex-col justify-between p-6"
+           className="relative flex-1 flex flex-col p-4 md:p-5"
          >
-           <div>
-             <h3 className="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-neutral-400 transition-all duration-300">
+           {/* Header with title and action icons */}
+           <div className="flex items-start justify-between gap-2 mb-3">
+             <h3 className="text-lg md:text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-neutral-400 transition-all duration-300 line-clamp-1 flex-1">
                {project.name}
              </h3>
-             <div className="mt-3">
-               <p className={`text-sm text-neutral-400 leading-relaxed transition-all duration-300 ${isExpanded ? '' : 'line-clamp-2'}`}>
-                 {project.description}
-               </p>
-               {project.description && project.description.length > 100 && (
-                 <button
-                   onClick={() => setIsExpanded(!isExpanded)}
-                   className="text-xs text-primary hover:text-primary/80 mt-1 transition-colors duration-200"
+             
+             {/* Action icons in top right */}
+             <div className="flex items-center gap-1.5 flex-shrink-0">
+               {project.link && (
+                 <Link 
+                   href={project.link} 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   onClick={(e) => e.stopPropagation()}
+                   className="p-2 rounded-lg bg-neutral-800/60 hover:bg-neutral-700 text-neutral-400 hover:text-white transition-all duration-300"
                  >
-                   {isExpanded ? 'Хураах' : 'Цааш үзэх'}
-                 </button>
+                   <Github className="h-4 w-4" />
+                 </Link>
+               )}
+               {project.live && (
+                 <Link 
+                   href={project.live} 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   onClick={(e) => e.stopPropagation()}
+                   className={`p-2 rounded-lg bg-gradient-to-r ${accent.gradient} text-white transition-all duration-300 hover:shadow-lg hover:shadow-${accent.border}`}
+                 >
+                   <Globe className="h-4 w-4" />
+                 </Link>
                )}
              </div>
            </div>
            
-           {/* Tech stack & Actions */}
-           <div className="space-y-4">
-             {/* Tech icons */}
+           {/* Description with expand/collapse */}
+           <div className="flex-1 overflow-hidden">
+             <p className={`text-sm text-neutral-400 leading-relaxed transition-all duration-300 ${isExpanded ? '' : 'line-clamp-2'}`}>
+               {project.description}
+             </p>
+             {project.description && project.description.length > 80 && (
+               <button
+                 onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
+                 className="flex items-center gap-1 mt-2 text-xs text-primary hover:text-primary/80 transition-colors"
+               >
+                 {isExpanded ? (
+                   <>
+                     <ChevronUp className="h-3 w-3" />
+                     <span>Хураах</span>
+                   </>
+                 ) : (
+                   <>
+                     <ChevronDown className="h-3 w-3" />
+                     <span>Дэлгэрэнгүй</span>
+                   </>
+                 )}
+               </button>
+             )}
+           </div>
+           
+           {/* Tech stack at bottom */}
+           <div className="mt-auto pt-3 border-t border-neutral-800">
              <div className="flex items-center gap-2 flex-wrap">
                {project.technologies.slice(0, 5).map((techName) => (
                  <TechIcon key={techName} techName={techName} />
                ))}
                {project.technologies.length > 5 && (
                  <span className="text-xs text-neutral-500">+{project.technologies.length - 5}</span>
-               )}
-             </div>
-             
-             {/* Action buttons */}
-             <div className="flex items-center justify-between pt-3 border-t border-neutral-800">
-               <div className="flex items-center gap-2">
-                 {project.link && (
-                   <Link 
-                     href={project.link} 
-                     target="_blank" 
-                     rel="noopener noreferrer"
-                     className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors duration-300"
-                   >
-                     <Github className="h-4 w-4" />
-                     <span className="hidden sm:inline">Код</span>
-                   </Link>
-                 )}
-               </div>
-               
-               {project.live && (
-                 <Link 
-                   href={project.live} 
-                   target="_blank" 
-                   rel="noopener noreferrer"
-                   className={`group/btn flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r ${accent.gradient} text-white text-sm font-medium transition-all duration-300 hover:shadow-lg hover:shadow-${accent.border}`}
-                 >
-                   Лайв
-                   <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
-                 </Link>
                )}
              </div>
            </div>
@@ -285,7 +294,7 @@ export default function Projects() {
                  {isEditMode && (
                    <motion.div layout initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3 }}>
                     <AddProjectDialog>
-                      <button className="flex h-[480px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-800 bg-neutral-950/50 text-neutral-500 transition-all duration-300 hover:border-primary hover:bg-neutral-900/50 hover:text-primary hover:shadow-lg hover:shadow-primary/10">
+                      <button className="flex h-full min-h-[380px] md:min-h-[420px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-800 bg-neutral-950/50 text-neutral-500 transition-all duration-300 hover:border-primary hover:bg-neutral-900/50 hover:text-primary hover:shadow-lg hover:shadow-primary/10">
                         <PlusCircle size={48} />
                         <span className="mt-4 font-semibold">Шинэ төсөл нэмэх</span>
                       </button>

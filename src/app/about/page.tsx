@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight } from 'lucide-react';
+import { Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight, Calendar, Cake, Star, Ruler, Brain, User, Heart, MapPin, Mail, Phone, Briefcase, GraduationCap, Home } from 'lucide-react';
 import { useState, useEffect, useCallback, type CSSProperties, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -20,14 +20,174 @@ import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import InteractiveParticles from '@/components/shared/InteractiveParticles';
-import * as LucideIcons from 'lucide-react';
 
-const getIcon = (iconName?: string, props = {}) => {
-    if (!iconName) return null;
-    const LucideIcon = (LucideIcons as any)[iconName];
-    return LucideIcon ? <LucideIcon {...props} /> : null;
+// Icon map for personal info icons
+const iconMap: Record<string, React.ReactNode> = {
+  Calendar: <Calendar className="h-5 w-5" />,
+  Cake: <Cake className="h-5 w-5" />,
+  Star: <Star className="h-5 w-5" />,
+  Ruler: <Ruler className="h-5 w-5" />,
+  Brain: <Brain className="h-5 w-5" />,
+  User: <User className="h-5 w-5" />,
+  Heart: <Heart className="h-5 w-5" />,
+  MapPin: <MapPin className="h-5 w-5" />,
+  Mail: <Mail className="h-5 w-5" />,
+  Phone: <Phone className="h-5 w-5" />,
+  Briefcase: <Briefcase className="h-5 w-5" />,
+  GraduationCap: <GraduationCap className="h-5 w-5" />,
+  Home: <Home className="h-5 w-5" />,
 };
 
+const getIcon = (iconName?: string) => {
+  if (!iconName) return <User className="h-5 w-5" />;
+  return iconMap[iconName] || <User className="h-5 w-5" />;
+};
+
+// Display label mapping (Firebase label -> Display label)
+const displayLabelMap: Record<string, string> = {
+  'Төрсөн өдөр': 'Bday',
+};
+
+const getDisplayLabel = (label: string) => displayLabelMap[label] || label;
+
+// InfoCard component - clean minimal design without icons
+const InfoCard = ({ 
+  info, 
+  index, 
+  isEditMode, 
+  onEditClick,
+  size = 'normal'
+}: { 
+  info: PersonalInfoType; 
+  index: number;
+  isEditMode: boolean;
+  onEditClick: (info: PersonalInfoType) => void;
+  size?: 'small' | 'normal' | 'large';
+}) => {
+  const sizeClasses = {
+    small: 'py-4 px-5',
+    normal: 'py-5 px-6',
+    large: 'py-6 px-7'
+  };
+  
+  const textSizeClasses = {
+    small: 'text-2xl md:text-3xl',
+    normal: 'text-3xl md:text-4xl',
+    large: 'text-4xl md:text-5xl'
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -30 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{
+        type: 'spring',
+        stiffness: 100,
+        damping: 15,
+        delay: 0.1 + index * 0.1,
+      }}
+      whileHover={{ scale: 1.03, x: 8 }}
+      className="group w-full"
+    >
+      <div className={cn(
+        "relative rounded-2xl overflow-hidden transition-all duration-500",
+        "bg-gradient-to-r from-card/90 via-card/70 to-transparent backdrop-blur-xl",
+        "border-l-4 border-primary/60 group-hover:border-primary",
+        "group-hover:shadow-xl group-hover:shadow-primary/20",
+        sizeClasses[size]
+      )}>
+        {/* Animated background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        
+        {/* Glow effect on left border */}
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Content */}
+        <div className="relative z-10 flex items-center justify-between gap-4">
+          {/* Label */}
+          <span className="text-xs md:text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary transition-colors duration-300">
+            {getDisplayLabel(info.label)}
+          </span>
+          
+          {/* Value */}
+          <span className={cn(
+            "font-black text-foreground tracking-tight",
+            "bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text",
+            "group-hover:from-primary group-hover:to-foreground group-hover:text-transparent",
+            "transition-all duration-300",
+            textSizeClasses[size]
+          )}>
+            {info.value}
+          </span>
+        </div>
+        
+        {isEditMode && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-1/2 -translate-y-1/2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-background/80 hover:bg-primary/20 rounded-full border border-primary/50"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEditClick(info);
+            }}
+          >
+            <Edit className="h-3.5 w-3.5 text-primary" />
+          </Button>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
+// InfoCardArrowLayout - Diagonal staircase pattern (top-right to bottom-left)
+const InfoCardArrowLayout = ({ 
+  infos, 
+  isEditMode, 
+  onEditClick 
+}: { 
+  infos: PersonalInfoType[];
+  isEditMode: boolean;
+  onEditClick: (info: PersonalInfoType) => void;
+}) => {
+  const orderedInfo = useMemo(() => {
+    if (!infos || infos.length === 0) return [];
+    const infoMap = new Map(infos.map(i => [i.label, i]));
+    // Order: Орд (top) -> Төрсөн өдөр -> Нас (center) -> Өндөр -> MBTI (bottom)
+    const order = ['Орд', 'Төрсөн өдөр', 'Нас', 'Өндөр', 'MBTI'];
+    
+    const mainItems = order.map(label => infoMap.get(label)).filter(Boolean) as PersonalInfoType[];
+    if (mainItems.length >= 5) {
+      return mainItems.slice(0, 5);
+    }
+    
+    const remaining = infos.filter(i => !order.includes(i.label));
+    return [...mainItems, ...remaining].slice(0, 5);
+  }, [infos]);
+
+  if (!orderedInfo || orderedInfo.length < 5) {
+    return (
+      <div className="flex flex-col gap-3 w-full max-w-md">
+        {orderedInfo.map((info, index) => (
+          <InfoCard key={index} info={info} index={index} isEditMode={isEditMode} onEditClick={onEditClick} />
+        ))}
+      </div>
+    );
+  }
+
+  // Diagonal staircase: top-right to bottom-left
+  // Each card has same width, just different margin-left
+  const offsets = ['ml-[0%]', 'ml-[15%]', 'ml-[30%]', 'ml-[15%]', 'ml-0'];
+
+  return (
+    <div className="flex flex-col gap-2.5 w-full">
+      {orderedInfo.map((info, index) => (
+        <div key={index} className={`w-[45%] min-w-[280px] ${offsets[index]}`}>
+          <InfoCard info={info} index={index} isEditMode={isEditMode} onEditClick={onEditClick} />
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default function AboutPage() {
   const { firestore, user, isUserLoading } = useFirebase();
@@ -162,169 +322,72 @@ export default function AboutPage() {
         toast({ title: "Алдаа", description: "Мэдээлэл хадгалахад алдаа гарлаа.", variant: "destructive" });
     }
   };
-  
-const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -60 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: 90,
-        damping: 18,
-        delay: 0.15 + index * 0.1,
-      }}
-      whileHover={{ x: 12, scale: 1.03 }}
-      className="group w-full"
-    >
-      <div className="relative p-4 h-20 rounded-3xl bg-black/95 backdrop-blur-sm border border-neutral-800/60 transition-all duration-300 group-hover:border-primary/40 flex items-center justify-between overflow-hidden shadow-lg">
-        
-        {/* hover glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-        <div className="flex items-center gap-4 relative z-10">
-          <div className="p-3 rounded-full bg-neutral-800/90 text-neutral-400 border border-neutral-700/60">
-            {getIcon(info.icon, { className: "h-5 w-5" })}
-          </div>
-
-          <h3 className="text-base md:text-lg font-medium uppercase tracking-wide text-neutral-300">
-            {info.label}
-          </h3>
-        </div>
-
-        <span className="text-2xl md:text-3xl font-bold text-white tracking-tight relative z-10">
-          {info.value}
-        </span>
-
-        {isEditMode && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-black/80 hover:bg-black rounded-full border border-cyan-400/50"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleEditInfoClick(info);
-            }}
-          >
-            <Edit className="h-3.5 w-3.5 text-cyan-400" />
-          </Button>
-        )}
-      </div>
-    </motion.div>
-  );
-};
-
-const InfoCardArrowLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
-    const orderedInfo = useMemo(() => {
-        if (!infos || infos.length === 0) return [];
-        const infoMap = new Map(infos.map(i => [i.label, i]));
-        const order = ['Нас', 'Төрсөн өдөр', 'Орд', 'Өндөр', 'MBTI'];
-        
-        const mainItems = order.map(label => infoMap.get(label)).filter(Boolean) as PersonalInfoType[];
-        if (mainItems.length >= 5) {
-            return mainItems.slice(0, 5);
-        }
-        
-        const remaining = infos.filter(i => !order.includes(i.label));
-        return [...mainItems, ...remaining].slice(0, 5);
-
-    }, [infos]);
-
-    if (!orderedInfo || orderedInfo.length < 5) {
-        // Not enough data to render the arrow layout, render a simple list instead
-        return (
-            <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
-                {orderedInfo.map((info, index) => (
-                    <InfoCard info={info} index={index} key={index} />
-                ))}
-            </div>
-        );
-    }
-
-    return (
-        <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
-        
-        {/* [1] */}
-        <div className="flex justify-start">
-            <div className="w-[85%]">
-            <InfoCard info={orderedInfo[0]} index={0} />
-            </div>
-        </div>
-
-        {/* [2] */}
-        <div className="flex justify-center -ml-12 sm:-ml-16">
-            <div className="w-[75%]">
-            <InfoCard info={orderedInfo[1]} index={1} />
-            </div>
-        </div>
-
-        {/* [3] */}
-        <div className="flex justify-end">
-            <div className="w-[85%]">
-            <InfoCard info={orderedInfo[2]} index={2} />
-            </div>
-        </div>
-
-        {/* [4] */}
-        <div className="flex justify-center -mr-12 sm:-mr-16">
-            <div className="w-[75%]">
-            <InfoCard info={orderedInfo[3]} index={3} />
-            </div>
-        </div>
-
-        {/* [5] */}
-        <div className="flex justify-start">
-            <div className="w-[85%]">
-            <InfoCard info={orderedInfo[4]} index={4} />
-            </div>
-        </div>
-
-        </div>
-    );
-};
-
 
   return (
     <>
-      <InteractiveParticles />
-      <div className="relative z-10">
+      <InteractiveParticles className="fixed inset-0 z-0 pointer-events-none" />
+      <div className="relative z-10 min-h-screen">
         {/* Hero Section */}
-        <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
+        <section className="relative min-h-[calc(100vh-100px)] flex items-start justify-center px-4 pt-24 md:pt-28">
           <div className="max-w-7xl mx-auto w-full">
-            <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-12 lg:gap-20 w-full">
+            <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-8 lg:gap-16 w-full">
               {/* Personal Info Cards */}
               <div className="w-full lg:w-1/2">
-                {personalInfo.length > 0 && <InfoCardArrowLayout infos={personalInfo} />}
+                {personalInfo.length > 0 && <InfoCardArrowLayout infos={personalInfo} isEditMode={isEditMode} onEditClick={handleEditInfoClick} />}
               </div>
 
-              {/* Text Content */}
-              <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 lg:w-1/2">
-                  <AnimatePresence mode="wait">
-                      <motion.h1
-                          key={greetingIndex}
-                          className="text-4xl md:text-5xl font-bold tracking-tighter text-white/50"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          transition={{ duration: 0.5, ease: 'easeInOut' }}
-                      >
-                          {greetings[greetingIndex]}
-                      </motion.h1>
-                  </AnimatePresence>
+              {/* Text Content - Enhanced Design */}
+              <div className="flex flex-col items-center lg:items-start text-center lg:text-left lg:w-1/2">
+                  {/* Greeting with glowing effect */}
+                  <div className="relative mb-6">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={greetingIndex}
+                            className="relative"
+                            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                            transition={{ duration: 0.5, ease: 'easeInOut' }}
+                        >
+                            {/* Glowing background */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent blur-2xl rounded-full transform scale-150" />
+                            <h1 className="relative text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-foreground bg-clip-text text-transparent">
+                                {greetings[greetingIndex]}
+                            </h1>
+                        </motion.div>
+                    </AnimatePresence>
+                    {/* Animated underline */}
+                    <motion.div 
+                      className="h-1 bg-gradient-to-r from-primary via-primary/50 to-transparent rounded-full mt-2"
+                      initial={{ width: 0 }}
+                      animate={{ width: '80%' }}
+                      transition={{ duration: 0.8, delay: 0.3 }}
+                    />
+                  </div>
+
+                  {/* Name section with enhanced styling */}
                   <div className="relative group" ref={nameRef}>
                       <motion.div
                           initial={{ opacity: 0, y: 40 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.9, delay: 0.4, ease: [0.2, 0.65, 0.3, 0.9] }}
-                          className="flex flex-wrap items-baseline justify-center lg:justify-start"
+                          className="flex flex-col items-center lg:items-start gap-2"
                       >
-                          <h2 className="text-xl md:text-2xl text-gray-300 mr-3">
-                              Миний нэрийг
-                          </h2>
-                          <p className="spotlight-text text-5xl md:text-6xl font-extrabold">
-                              {name}
-                          </p>
-                          <h2 className="text-xl md:text-2xl text-gray-300 ml-3">
+                          <div className="flex items-baseline gap-3 flex-wrap justify-center lg:justify-start">
+                            <h2 className="text-xl md:text-2xl text-muted-foreground font-light">
+                                Миний нэрийг
+                            </h2>
+                          </div>
+                          
+                          {/* Name with spotlight effect */}
+                          <div className="relative py-2">
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/10 to-transparent blur-3xl" />
+                            <p className="spotlight-text text-6xl md:text-8xl font-black tracking-tighter relative">
+                                {name}
+                            </p>
+                          </div>
+                          
+                          <h2 className="text-xl md:text-2xl text-muted-foreground font-light">
                               гэдэг
                           </h2>
                       </motion.div>

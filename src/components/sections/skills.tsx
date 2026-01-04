@@ -41,6 +41,23 @@ const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["8deg", "-8deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-8deg", "8deg"]);
 
+  // Check if this is a Language category
+  const isLanguageCategory = skillGroup.name.toLowerCase().includes('language') || 
+                              skillGroup.name.toLowerCase().includes('хэл');
+
+  // Country flag mapping for languages
+  const languageFlags: Record<string, string> = {
+    'english': '🇺🇸',
+    'japanese': '🇯🇵',
+    'korean': '🇰🇷',
+    'chinese': '🇨🇳',
+    'german': '🇩🇪',
+    'french': '🇫🇷',
+    'spanish': '🇪🇸',
+    'russian': '🇷🇺',
+    'mongolian': '🇲🇳',
+  };
+
   const getIcon = (iconName: string) => {
     const LucideIcon = (require('lucide-react') as any)[iconName];
     return LucideIcon ? <LucideIcon className="h-8 w-8" /> : <AlertTriangle className="h-8 w-8 text-destructive" />;
@@ -82,57 +99,71 @@ const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
       }}
       className="group relative h-full"
     >
-      {/* Card */}
-      <div className="relative overflow-hidden rounded-2xl bg-neutral-900/80 backdrop-blur-sm border border-neutral-800 p-6 h-full transition-all duration-300 hover:border-neutral-700">
+      {/* Card with glass morphism */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card/95 via-card/80 to-card/60 backdrop-blur-xl border border-border/30 p-6 h-full transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10">
         
-        {/* Glowing accent line at top */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-primary rounded-b-full blur-sm" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-0.5 bg-primary rounded-b-full" />
+        {/* Animated gradient border */}
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/10 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        
+        {/* Top glow accent */}
+        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-24 h-2 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full blur-md opacity-60 group-hover:opacity-100 transition-opacity" />
         
         {/* Spotlight effect */}
         <div 
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"
           style={{
-            background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, hsl(var(--primary) / 0.1), transparent 40%)`
+            background: `radial-gradient(500px circle at ${mousePosition.x}px ${mousePosition.y}px, hsl(var(--primary) / 0.12), transparent 50%)`
           }}
         />
         
         {/* Content */}
         <div className="relative z-10">
           {/* Icon and Title */}
-          <div className="flex items-center gap-4 mb-5">
-            <div className="flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 text-primary border border-primary/20">
-              {getIcon(skillGroup.icon)}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="relative">
+              {/* Glow behind icon */}
+              <div className="absolute inset-0 bg-primary/30 rounded-2xl blur-xl scale-75 group-hover:scale-100 transition-transform duration-500" />
+              <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary border border-primary/30 group-hover:border-primary/50 transition-all">
+                {getIcon(skillGroup.icon)}
+              </div>
             </div>
-            <h3 className="text-xl font-bold text-white group-hover:text-primary transition-colors duration-300">
+            <h3 className="text-xl md:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
               {skillGroup.name}
             </h3>
           </div>
           
-          {/* Skills tags */}
+          {/* Skills tags - larger and more prominent */}
           <div className="flex flex-wrap gap-3">
-            {skillGroup.items.map((item, idx) => (
-              <div 
-                key={idx} 
-                className="group/item relative overflow-hidden"
-              >
-                {/* Glow effect */}
-                <div className="absolute inset-0 rounded-full bg-primary/20 blur-md opacity-0 group-hover/item:opacity-100 transition-opacity duration-300" />
-                
-                {/* Skill badge */}
-                <div className="relative flex items-center gap-2 px-3 py-2 rounded-full bg-neutral-800/80 border border-neutral-700 group-hover/item:border-primary/50 backdrop-blur-sm transition-all duration-300 group-hover/item:scale-105 group-hover/item:bg-neutral-800">
-                  {/* Icon */}
-                  <div className="w-5 h-5 flex-shrink-0">
-                    <TechIcon techName={item} className="w-5 h-5" />
-                  </div>
+            {skillGroup.items.map((item, idx) => {
+              const flag = languageFlags[item.toLowerCase()];
+              
+              return (
+                <div 
+                  key={idx} 
+                  className="group/item relative overflow-hidden"
+                >
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 rounded-full bg-primary/20 blur-md opacity-0 group-hover/item:opacity-100 transition-opacity duration-300" />
                   
-                  {/* Name */}
-                  <span className="text-sm font-medium text-neutral-300 group-hover/item:text-primary transition-colors duration-300 whitespace-nowrap">
-                    {item}
-                  </span>
+                  {/* Skill badge - larger size */}
+                  <div className="relative flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-card/80 border border-border/50 group-hover/item:border-primary/50 backdrop-blur-sm transition-all duration-300 group-hover/item:scale-105 group-hover/item:bg-card">
+                    {/* Flag for languages or Icon */}
+                    {isLanguageCategory && flag ? (
+                      <span className="text-xl">{flag}</span>
+                    ) : (
+                      <div className="w-6 h-6 flex-shrink-0">
+                        <TechIcon techName={item} className="w-6 h-6" />
+                      </div>
+                    )}
+                    
+                    {/* Name */}
+                    <span className="text-sm md:text-base font-medium text-foreground/80 group-hover/item:text-primary transition-colors duration-300 whitespace-nowrap">
+                      {item}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

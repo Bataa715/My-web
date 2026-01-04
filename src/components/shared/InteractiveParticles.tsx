@@ -41,8 +41,48 @@ export default function InteractiveParticles({
     animate();
     window.addEventListener('resize', initCanvas);
 
+    // Listen to document-level mouse events for particle interaction
+    const handleDocumentMouseMove = (e: MouseEvent) => {
+      if (canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const { w, h } = canvasSize.current;
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        mouse.current.x = x;
+        mouse.current.y = y;
+        mouse.current.sentX = (x / w) * 2 - 1;
+        mouse.current.sentY = (y / h) * 2 - 1;
+      }
+    };
+
+    // Listen to document-level click events for creating new particles
+    const handleDocumentClick = () => {
+      if (canvasRef.current) {
+        for(let i = 0; i < 5; i++) {
+          const newCircle = {
+            x: mouse.current.x,
+            y: mouse.current.y,
+            translateX: 0,
+            translateY: 0,
+            size: Math.random() * 2 + 1,
+            alpha: 0,
+            targetAlpha: parseFloat((Math.random() * 0.6 + 0.1).toFixed(1)),
+            dx: (Math.random() - 0.5) * 2,
+            dy: (Math.random() - 0.5) * 2,
+            magnetism: 0.1 + Math.random() * 4,
+          };
+          circles.current.push(newCircle);
+        }
+      }
+    };
+
+    document.addEventListener('mousemove', handleDocumentMouseMove);
+    document.addEventListener('click', handleDocumentClick);
+
     return () => {
       window.removeEventListener('resize', initCanvas);
+      document.removeEventListener('mousemove', handleDocumentMouseMove);
+      document.removeEventListener('click', handleDocumentClick);
     };
   }, []);
 
@@ -255,15 +295,13 @@ export default function InteractiveParticles({
 
   return (
     <div
-      className={cn("absolute inset-0 -z-10", className)}
+      className={cn("absolute inset-0 -z-10 pointer-events-none", className)}
       ref={canvasContainerRef}
       aria-hidden="true"
     >
       <canvas
         ref={canvasRef}
         className="h-full w-full"
-        onMouseMove={onMouseMove}
-        onClick={onMouseClick}
       ></canvas>
     </div>
   );
