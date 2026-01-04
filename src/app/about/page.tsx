@@ -265,7 +265,7 @@ export default function AboutPage() {
                               }
                               return (
                                   <div className="carousel-item group" key={hobby.id} style={style} onClick={() => setActiveIndex(index)}>
-                                       <Card className="relative bg-card border-border/20 h-full w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
+                                       <Card className="relative bg-card border-[3px] border-primary/50 h-full w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
                                           {isEditMode && (
                                             <div className="absolute top-2 right-2 flex gap-1 z-20">
                                               <EditHobbyDialog hobby={hobby}>
