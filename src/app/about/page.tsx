@@ -242,13 +242,13 @@ export default function AboutPage() {
                         transition={{ duration: 0.9, delay: 0.4, ease: [0.2, 0.65, 0.3, 0.9] }}
                         className="flex flex-wrap items-baseline justify-center lg:justify-start"
                     >
-                        <h2 className="text-xl md:text-2xl text-gray-300 mr-3">
+                        <h2 className="text-lg md:text-xl text-gray-300 mr-3">
                             Миний нэрийг
                         </h2>
-                        <p className="spotlight-text text-5xl md:text-7xl lg:text-8xl font-extrabold">
+                        <p className="spotlight-text text-4xl md:text-5xl lg:text-6xl font-extrabold">
                             {name}
                         </p>
-                        <h2 className="text-xl md:text-2xl text-gray-300 ml-3">
+                        <h2 className="text-lg md:text-xl text-gray-300 ml-3">
                             гэдэг
                         </h2>
                     </motion.div>
@@ -445,5 +445,6 @@ export default function AboutPage() {
     
 
     
+
 
 
