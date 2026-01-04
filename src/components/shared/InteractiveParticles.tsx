@@ -23,7 +23,6 @@ export default function InteractiveParticles({
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const context = useRef<CanvasRenderingContext2D | null>(null);
   const circles = useRef<any[]>([]);
-  const mousePosition = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const mouse = useRef<{ x: number; y: number; sentX: number; sentY: number; radius: number }>({
     x: 0,
     y: 0,
@@ -63,30 +62,30 @@ export default function InteractiveParticles({
       const { w, h } = canvasSize.current;
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      const sentX = (x / w) * 2 - 1;
-      const sentY = (y / h) * 2 - 1;
       mouse.current.x = x;
       mouse.current.y = y;
-      mouse.current.sentX = sentX;
-      mouse.current.sentY = sentY;
+      mouse.current.sentX = (x / w) * 2 - 1;
+      mouse.current.sentY = (y / h) * 2 - 1;
     }
   };
   
   const onMouseClick = () => {
     if (canvasRef.current) {
-        const newCircle = {
-            x: mouse.current.x,
-            y: mouse.current.y,
-            translateX: 0,
-            translateY: 0,
-            size: Math.random() * 2 + 1,
-            alpha: 0,
-            targetAlpha: parseFloat((Math.random() * 0.6 + 0.1).toFixed(1)),
-            dx: (Math.random() - 0.5) * 0.2,
-            dy: (Math.random() - 0.5) * 0.2,
-            magnetism: 0.1 + Math.random() * 4,
-        };
-        circles.current.push(newCircle);
+        for(let i = 0; i < 5; i++) {
+            const newCircle = {
+                x: mouse.current.x,
+                y: mouse.current.y,
+                translateX: 0,
+                translateY: 0,
+                size: Math.random() * 2 + 1,
+                alpha: 0,
+                targetAlpha: parseFloat((Math.random() * 0.6 + 0.1).toFixed(1)),
+                dx: (Math.random() - 0.5) * 2,
+                dy: (Math.random() - 0.5) * 2,
+                magnetism: 0.1 + Math.random() * 4,
+            };
+            circles.current.push(newCircle);
+        }
     }
   };
 
@@ -184,17 +183,29 @@ export default function InteractiveParticles({
       circle.x += circle.dx;
       circle.y += circle.dy;
       circle.translateX +=
-        (mouse.current.sentX * staticity * circle.magnetism - circle.translateX) /
-        ease;
+        (mouse.current.x - (circle.x + circle.translateX)) / ease * circle.magnetism;
       circle.translateY +=
-        (mouse.current.sentY * staticity * circle.magnetism - circle.translateY) /
-        ease;
+        (mouse.current.y - (circle.y + circle.translateY)) / ease * circle.magnetism;
+      
+      const mouseDistance = Math.sqrt(
+          (mouse.current.x - (circle.x + circle.translateX))**2 +
+          (mouse.current.y - (circle.y + circle.translateY))**2
+      );
+
+      if (mouseDistance < mouse.current.radius) {
+          const repelFactor = (1 - mouseDistance / mouse.current.radius) * staticity;
+          circle.translateX -= (mouse.current.x - (circle.x + circle.translateX)) / mouseDistance * repelFactor * 0.1;
+          circle.translateY -= (mouse.current.y - (circle.y + circle.translateY)) / mouseDistance * repelFactor * 0.1;
+      }
+
+
       // circle gets out of the canvas
       if (
         circle.x < -circle.size ||
         circle.x > canvasSize.current.w + circle.size ||
         circle.y < -circle.size ||
-        circle.y > canvasSize.current.h + circle.size
+        circle.y > canvasSize.current.h + circle.size ||
+        circle.alpha <= 0
       ) {
         // remove the circle from the array
         circles.current.splice(i, 1);
