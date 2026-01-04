@@ -28,7 +28,8 @@
             "type": "object",
             "properties": {
               "label": { "type": "string" },
-              "value": { "type": "string" }
+              "value": { "type": "string" },
+              "icon": { "type": "string" }
             },
             "required": ["label", "value"]
           }
@@ -431,7 +432,7 @@
     "/users/{userId}/englishReading/{materialId}": {
       "schema": { "$ref": "#/entities/ReadingMaterial" }
     },
-    "/users/{userId}/englishReading/{materialId}/notes/{noteId}": {
+    "/users/{userId}/readingNotes/{noteId}": {
       "schema": { "$ref": "#/entities/ReadingNote" }
     },
     "/users/{userId}/englishListening/{materialId}": {
@@ -465,3 +466,5 @@
     "/katakana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } }
   }
 }
+
+    

@@ -113,7 +113,7 @@ export default function AboutPage() {
             } else {
               const defaultInfo: PersonalInfoType[] = [
                   { value: "21", label: "Нас", icon: 'Cake' },
-                  { value: "Мэлхий", label: "Орд", icon: 'Sun' },
+                  { value: "Ихэр", label: "Орд", icon: 'Gemini' },
                   { value: "INTJ", label: "MBTI", icon: 'User' },
               ];
               await updateDoc(userDocRef, { personalInfo: defaultInfo });
@@ -218,24 +218,34 @@ export default function AboutPage() {
             {/* Text Content */}
             <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 lg:w-1/2">
                 <motion.h1 
-                    className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-white mb-6"
-                    initial={{ opacity: 0, y: 20 }}
+                    className="text-5xl md:text-6xl font-bold tracking-tighter text-white/50"
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.8 }}
+                    transition={{ duration: 0.8, delay: 0.2, ease: [0.2, 0.65, 0.3, 0.9] }}
                 >
                     Hello
                 </motion.h1>
                 <motion.h2 
-                    className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-gray-300"
-                    initial={{ opacity: 0, y: 20 }}
+                    className="text-2xl md:text-3xl text-gray-300"
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.9 }}
+                    transition={{ duration: 0.8, delay: 0.3, ease: [0.2, 0.65, 0.3, 0.9] }}
                 >
-                    Миний нэрийг <span className="text-cyan-400 font-bold relative inline-block" data-text={name}>
-                    {name}
-                    <span className="absolute -inset-2 bg-cyan-400/10 blur-xl -z-10" />
-                    </span> гэдэг
+                    Миний нэрийг
                 </motion.h2>
+                <div className="relative group" ref={nameRef}>
+                    <motion.p
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.9, delay: 0.4, ease: [0.2, 0.65, 0.3, 0.9] }}
+                        className="spotlight-text text-6xl md:text-8xl lg:text-9xl font-extrabold"
+                    >
+                        {name}
+                    </motion.p>
+                    <div
+                        className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                    />
+                </div>
             </div>
           </div>
         </div>
@@ -406,7 +416,20 @@ export default function AboutPage() {
                 transition: opacity 0.6s, transform 0.6s;
                 cursor: pointer;
             }
+            .spotlight-text {
+                color: transparent;
+                background-clip: text;
+                -webkit-background-clip: text;
+                background-image: radial-gradient(
+                    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                    hsl(var(--primary)) 20%,
+                    white 80%
+                );
+                transition: background-image 0.3s;
+            }
       `}</style>
     </motion.div>
   );
 }
+
+    
