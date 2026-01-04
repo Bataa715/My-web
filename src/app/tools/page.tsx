@@ -56,7 +56,7 @@ export default function ToolsPage() {
       transition={{ duration: 0.5, ease: "easeInOut" }}
       className="relative"
     >
-      <div className="space-y-8">
+      <div className="space-y-8 px-4 md:px-6">
         <BackButton />
         <div className="text-center pt-8">
             <h1 className="text-3xl sm:text-4xl font-bold">Хэрэгслүүд</h1>
