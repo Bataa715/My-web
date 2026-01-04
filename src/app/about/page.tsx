@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -122,20 +121,7 @@ export default function AboutPage() {
         if (docSnap.exists()) {
           const data = docSnap.data() as UserProfile;
           setName(data.name || 'Batuka');
-
-          if (data.personalInfo && data.personalInfo.length > 0) {
-            setPersonalInfo(data.personalInfo);
-          } else {
-            const defaultInfoItems: PersonalInfoType[] = [
-                { value: "21", label: "Нас", icon: 'Cake' },
-                { value: "5-р сарын 25", label: "Төрсөн өдөр", icon: 'CalendarDays' },
-                { value: "INTJ", label: "MBTI", icon: 'User' },
-                { value: "Ихэр", label: "Орд", icon: 'Gemini' },
-                { value: "178cm", label: "Өндөр", icon: 'Scaling' },
-            ];
-            await updateDoc(userDocRef, { personalInfo: defaultInfoItems });
-            setPersonalInfo(defaultInfoItems);
-          }
+          setPersonalInfo(data.personalInfo || []);
         }
       } catch (error) {
           console.error("Error fetching user data:", error);
@@ -229,29 +215,31 @@ const InfoCard = ({ info, index }: { info: PersonalInfoType; index: number }) =>
 };
 
 const InfoCardArrowLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
-    if (!infos || infos.length < 5) {
+    const orderedInfo = useMemo(() => {
+        if (!infos || infos.length === 0) return [];
+        const infoMap = new Map(infos.map(i => [i.label, i]));
+        const order = ['Нас', 'Төрсөн өдөр', 'Орд', 'Өндөр', 'MBTI'];
+        
+        const mainItems = order.map(label => infoMap.get(label)).filter(Boolean) as PersonalInfoType[];
+        if (mainItems.length >= 5) {
+            return mainItems.slice(0, 5);
+        }
+        
+        const remaining = infos.filter(i => !order.includes(i.label));
+        return [...mainItems, ...remaining].slice(0, 5);
+
+    }, [infos]);
+
+    if (orderedInfo.length < 5) {
+        // Not enough data to render the arrow layout, render a simple list instead
         return (
             <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
-                {infos.map((info, index) => (
+                {orderedInfo.map((info, index) => (
                     <InfoCard info={info} index={index} key={index} />
                 ))}
             </div>
         );
     }
-    const orderedInfo = [
-        infos.find(i => i.label === 'Нас'),
-        infos.find(i => i.label === 'Төрсөн өдөр'),
-        infos.find(i => i.label === 'Орд'),
-        infos.find(i => i.label === 'Өндөр'),
-        infos.find(i => i.label === 'MBTI'),
-    ].filter(Boolean) as PersonalInfoType[];
-
-    if (orderedInfo.length < 5) {
-        // Fallback for when not all items are present but there are 5 or more total
-        const remainingInfos = infos.filter(i => !orderedInfo.includes(i));
-        const finalInfos = [...orderedInfo, ...remainingInfos].slice(0, 5);
-        return <InfoCardArrowLayout infos={finalInfos} />;
-    };
 
     return (
         <div className="flex flex-col gap-6 w-full max-w-xl mx-auto">
@@ -530,5 +518,3 @@ const InfoCardArrowLayout = ({ infos }: { infos: PersonalInfoType[] }) => {
     </>
   );
 }
-
-    

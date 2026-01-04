@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
@@ -44,7 +43,7 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
     'typescript': { slug: 'typescript', color: '3178C6' },
     'javascript': { slug: 'javascript', color: 'F7DF1E' },
     'python': { slug: 'python', color: '3776AB' },
-    'java': { slug: 'oracle', color: 'F80000' },
+    'java': { slug: 'openjdk', color: 'FFFFFF' },
     'kotlin': { slug: 'kotlin', color: '7F52FF' },
     'swift': { slug: 'swift', color: 'F05138' },
     'go': { slug: 'go', color: '00ADD8' },
@@ -130,9 +129,9 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
     'gcp': { slug: 'googlecloud', color: '4285F4' },
     'google cloud': { slug: 'googlecloud', color: '4285F4' },
     'azure': { slug: 'microsoftazure', color: '0078D4' },
-    'microsoft': { slug: 'microsoft', color: '5E5E5E' },
-    'microsoft 365': { slug: 'microsoft', color: '5E5E5E' },
-    'microsoft365': { slug: 'microsoft', color: '5E5E5E' },
+    'microsoft': { slug: 'microsoft', color: 'FFFFFF' },
+    'microsoft 365': { slug: 'microsoft365', color: 'FFFFFF' },
+    'microsoft365': { slug: 'microsoft365', color: 'FFFFFF' },
     'power bi': { slug: 'powerbi', color: 'F2C811' },
     'powerbi': { slug: 'powerbi', color: 'F2C811' },
     'microsoft excel': { slug: 'microsoftexcel', color: '217346' },
