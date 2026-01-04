@@ -122,11 +122,11 @@ export default function AboutPage() {
             const data = docSnap.data() as UserProfile;
             setName(data.name || 'Batuka');
             
-            if (data.personalInfo && data.personalInfo.length > 0) {
+            if (data.personalInfo && data.personalInfo.length >= 5) {
               setPersonalInfo(data.personalInfo);
             } else {
               const defaultInfo: PersonalInfoType[] = [
-                  { value: "20", label: "Нас", icon: 'Cake' },
+                  { value: "21", label: "Нас", icon: 'Cake' },
                   { value: "5-р сарын 25", label: "Төрсөн өдөр", icon: 'CalendarDays' },
                   { value: "INTJ", label: "MBTI", icon: 'User' },
                   { value: "Ихэр", label: "Орд", icon: 'Gemini' },
