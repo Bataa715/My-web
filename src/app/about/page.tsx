@@ -41,6 +41,18 @@ export default function AboutPage() {
   const nameRef = useRef<HTMLDivElement>(null);
   const [name, setName] = useState("Batuka");
 
+  const greetings = ["Сайн уу", "こんにちは", "Hello", "안녕하세요", "Привет", "Hallo"];
+  const [greetingIndex, setGreetingIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+        setGreetingIndex((prevIndex) => (prevIndex + 1) % greetings.length);
+    }, 2000); // Change every 2 seconds
+
+    return () => clearInterval(interval);
+  }, [greetings.length]);
+
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!nameRef.current) return;
@@ -165,13 +177,7 @@ export default function AboutPage() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, ease: "easeInOut" }}
-      className="relative"
-    >
+    <div className="relative min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-4 py-20">
         <div className="max-w-7xl mx-auto w-full">
@@ -216,15 +222,19 @@ export default function AboutPage() {
             </div>
 
             {/* Text Content */}
-            <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 lg:w-1/2">
-                <motion.h1 
-                    className="text-4xl md:text-5xl font-bold tracking-tighter text-white/50"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2, ease: [0.2, 0.65, 0.3, 0.9] }}
-                >
-                    Hello
-                </motion.h1>
+            <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-4 lg:w-1/2">
+                <AnimatePresence mode="wait">
+                    <motion.h1
+                        key={greetingIndex}
+                        className="text-4xl md:text-5xl font-bold tracking-tighter text-white/50"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.5, ease: 'easeInOut' }}
+                    >
+                        {greetings[greetingIndex]}
+                    </motion.h1>
+                </AnimatePresence>
                 <motion.h2 
                     className="text-xl md:text-2xl text-gray-300"
                     initial={{ opacity: 0, y: 30 }}
@@ -428,7 +438,7 @@ export default function AboutPage() {
                 transition: background-image 0.3s;
             }
       `}</style>
-    </motion.div>
+    </div>
   );
 }
 
