@@ -114,6 +114,7 @@ export type Hobby = {
   description: string;
   image: string;
   imageHint: string;
+  emoji?: string;
   createdAt?: Date | Timestamp;
 };
 
@@ -162,6 +163,7 @@ export type UserProfile = {
   homeHeroImage?: string;
   aboutHeroImage?: string;
   toolsHeroImage?: string;
+  backgroundImage?: string;
   orbitInfo: OrbitInfo[];
   github?: string;
   instagram?: string;

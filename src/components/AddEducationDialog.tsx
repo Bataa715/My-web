@@ -32,16 +32,12 @@ interface AddEducationDialogProps {
 const educationSchema = z.object({
   degree: z.string().min(2, 'Мэргэжлийн нэр дор хаяж 2 тэмдэгттэй байх ёстой.'),
   school: z.string().min(2, 'Сургуулийн нэр дор хаяж 2 тэмдэгттэй байх ёстой.'),
-  startDate: z
-    .string()
-    .refine(val => !isNaN(Date.parse(val)), {
-      message: 'Эхлэх огноо буруу байна.',
-    }),
-  endDate: z
-    .string()
-    .refine(val => !isNaN(Date.parse(val)), {
-      message: 'Дуусах огноо буруу байна.',
-    }),
+  startDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+    message: 'Эхлэх огноо буруу байна.',
+  }),
+  endDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+    message: 'Дуусах огноо буруу байна.',
+  }),
   score: z.string().optional(),
 });
 

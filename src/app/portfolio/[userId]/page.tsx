@@ -5,10 +5,11 @@ import { notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Hero from '@/components/sections/hero';
 import type { UserProfile } from '@/lib/types';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, use } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useFirebase } from '@/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
+import InteractiveParticles from '@/components/shared/InteractiveParticles';
 
 const Education = dynamic(() => import('@/components/sections/Education'), {
   loading: () => <Skeleton className="w-full h-96" />,
@@ -23,10 +24,14 @@ const Experience = dynamic(() => import('@/components/sections/Experience'), {
   loading: () => <Skeleton className="w-full h-96" />,
 });
 
-function PortfolioContent() {
+function PortfolioContent({ userId }: { userId: string }) {
   return (
-    <div className="flex flex-col">
-      <Hero />
+    <div className="relative flex flex-col">
+      <InteractiveParticles
+        className="fixed inset-0 z-0 pointer-events-none"
+        quantity={50}
+      />
+      <Hero portfolioUserId={userId} />
       <Suspense fallback={<Skeleton className="w-full h-96" />}>
         <Education />
       </Suspense>
@@ -49,9 +54,9 @@ export const dynamicParams = true;
 export default function PortfolioPage({
   params,
 }: {
-  params: { userId: string };
+  params: Promise<{ userId: string }>;
 }) {
-  const { userId } = params;
+  const { userId } = use(params);
   const { firestore } = useFirebase();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -107,7 +112,7 @@ export default function PortfolioPage({
         </div>
       }
     >
-      <PortfolioContent />
+      <PortfolioContent userId={userId} />
     </Suspense>
   );
 }

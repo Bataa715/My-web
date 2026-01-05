@@ -12,7 +12,6 @@ import { HobbyProvider } from '@/contexts/HobbyContext';
 import { ExperienceProvider } from '@/contexts/ExperienceContext';
 import IntroOverlay from '@/components/IntroOverlay';
 import { JetBrains_Mono } from 'next/font/google';
-import { usePathname } from 'next/navigation';
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -35,11 +34,12 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
-  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -66,7 +66,7 @@ export default function RootLayout({
                   <ProjectProvider>
                     <SkillsProvider>
                       <HobbyProvider>
-                        {children}
+                        <MainLayout>{children}</MainLayout>
                         <Toaster />
                       </HobbyProvider>
                     </SkillsProvider>

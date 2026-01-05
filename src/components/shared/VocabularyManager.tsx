@@ -55,6 +55,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Link as LinkIcon,
+  Sparkles,
+  GraduationCap,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
@@ -82,6 +84,9 @@ import { generateVocabulary } from '@/ai/flows/generate-vocabulary-flow';
 import FlashcardGame from './FlashcardGame';
 import TestGame from './TestGame';
 import MatchingGame from './MatchingGame';
+import { motion } from 'framer-motion';
+import InteractiveParticles from './InteractiveParticles';
+import BackButton from './BackButton';
 
 type Word = EnglishWord | JapaneseWord;
 
@@ -535,27 +540,74 @@ export default function VocabularyManager<T extends Word>({
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 },
+  };
+
+  // Determine gradient colors based on wordType
+  const gradientColors =
+    wordType === 'english'
+      ? { from: 'violet', to: 'purple', mid: 'fuchsia' }
+      : { from: 'rose', to: 'pink', mid: 'fuchsia' };
+
   if (loading) {
     return (
-      <div className="space-y-4 pt-8">
-        <div className="flex justify-between items-center">
-          <Skeleton className="h-10 w-48" />
-          <Skeleton className="h-10 w-24" />
+      <div className="min-h-screen relative">
+        <div className="fixed inset-0 -z-10">
+          <InteractiveParticles quantity={30} />
         </div>
-        <Skeleton className="h-[400px] w-full" />
+        <div className="space-y-6 pt-8">
+          <BackButton />
+          <div className="flex justify-center">
+            <Skeleton className="h-16 w-64 rounded-2xl" />
+          </div>
+          <div className="flex justify-between items-center gap-4">
+            <Skeleton className="h-10 w-48 rounded-xl" />
+            <Skeleton className="h-10 w-32 rounded-xl" />
+          </div>
+          <Skeleton className="h-[500px] w-full rounded-2xl" />
+        </div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <Card className="text-center p-8">
-        <CardContent>
-          <p className="text-muted-foreground">
-            Үгсийн санг харахын тулд нэвтэрнэ үү.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="min-h-screen relative">
+        <div className="fixed inset-0 -z-10">
+          <InteractiveParticles quantity={30} />
+        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="pt-8"
+        >
+          <BackButton />
+          <Card className="text-center p-12 mt-8 bg-card/50 backdrop-blur-xl border-0 rounded-2xl max-w-md mx-auto">
+            <CardContent className="flex flex-col items-center gap-4">
+              <div
+                className={`p-4 rounded-full bg-gradient-to-br from-${gradientColors.from}-500/20 to-${gradientColors.to}-500/20`}
+              >
+                <Sparkles
+                  className={`h-10 w-10 text-${gradientColors.from}-400`}
+                />
+              </div>
+              <p className="text-muted-foreground text-lg">
+                Үгсийн санг харахын тулд нэвтэрнэ үү.
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
     );
   }
 
@@ -591,370 +643,535 @@ export default function VocabularyManager<T extends Word>({
   }
 
   return (
-    <>
-      <Card>
-        <CardHeader className="space-y-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex-1">
-              <CardTitle>{title}</CardTitle>
-            </div>
-            <div className="flex w-full sm:w-auto items-center gap-2">
-              <Input
-                placeholder="Үг хайх..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="flex-1 sm:w-48"
-              />
-              {wordType === 'english' && (
-                <AiAssistantDialog onAddWords={handleAddWordsBatch} />
-              )}
-              <Dialog
-                open={isDialogOpen}
-                onOpenChange={isOpen => {
-                  if (!isOpen) setCurrentWord(null);
-                  setIsDialogOpen(isOpen);
-                }}
-              >
-                <DialogTrigger asChild>
-                  <Button
-                    onClick={() => openDialog()}
-                    disabled={!user}
-                    size="sm"
-                    className="whitespace-nowrap"
-                  >
-                    <PlusCircle className="mr-2 h-4 w-4" /> Шинэ үг
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      {currentWord ? 'Үг засах' : 'Шинэ үг нэмэх'}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleSave} className="space-y-4">
-                    {columns.map(col => (
-                      <div key={col.key as string}>
-                        <Label htmlFor={col.key as string}>{col.header}</Label>
-                        <Input
-                          id={col.key as string}
-                          name={col.key as string}
-                          defaultValue={
-                            currentWord
-                              ? (currentWord[col.key as keyof Word] as string)
-                              : ''
-                          }
-                          required
-                        />
-                      </div>
-                    ))}
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button type="button" variant="secondary">
-                          Цуцлах
-                        </Button>
-                      </DialogClose>
-                      <Button type="submit">Хадгалах</Button>
-                    </DialogFooter>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
+    <div className="min-h-screen relative">
+      {/* Background Particles */}
+      <div className="fixed inset-0 -z-10">
+        <InteractiveParticles quantity={30} />
+      </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-            <ToggleGroup
-              type="single"
-              defaultValue="all"
-              variant="outline"
-              size="sm"
-              onValueChange={value => setFilter((value as any) || 'all')}
+      <motion.div
+        className="space-y-8 relative z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <BackButton />
+
+        {/* Hero Section */}
+        <div className="text-center pt-4 flex flex-col items-center justify-center gap-6">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            className="relative"
+          >
+            <div
+              className={`absolute inset-0 bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500/30 via-purple-500/30 to-fuchsia-500/30' : 'from-rose-500/30 via-pink-500/30 to-fuchsia-500/30'} blur-3xl rounded-full scale-150`}
+            />
+            <div
+              className={`relative p-5 rounded-2xl bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'} backdrop-blur-sm border ${wordType === 'english' ? 'border-violet-500/20' : 'border-rose-500/20'}`}
             >
-              <ToggleGroupItem value="all">Бүгд</ToggleGroupItem>
-              <ToggleGroupItem value="memorized">Цээжилсэн</ToggleGroupItem>
-              <ToggleGroupItem value="not-memorized">
-                Цээжлээгүй
-              </ToggleGroupItem>
-              <ToggleGroupItem value="favorite">Онцолсон</ToggleGroupItem>
-            </ToggleGroup>
-            <div className="flex items-center gap-2">
-              <Dialog
-                open={isAlphabetModalOpen}
-                onOpenChange={setIsAlphabetModalOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    Үсгээр шүүх
-                    {alphabetFilter !== 'all' && (
-                      <span className="ml-2 font-bold text-primary">
-                        {alphabetFilter}
-                      </span>
-                    )}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Үсгээр шүүх</DialogTitle>
-                  </DialogHeader>
-                  <ScrollArea className="h-72">
-                    <div className="grid grid-cols-6 gap-2 pr-4">
-                      <Button
-                        variant={
-                          alphabetFilter === 'all' ? 'default' : 'outline'
-                        }
-                        onClick={() => handleAlphabetSelect('all')}
-                      >
-                        All
-                      </Button>
-                      {ALPHABET.map(letter => (
-                        <Button
-                          key={letter}
-                          variant={
-                            alphabetFilter === letter ? 'default' : 'outline'
-                          }
-                          onClick={() => handleAlphabetSelect(letter)}
-                        >
-                          {letter}
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </DialogContent>
-              </Dialog>
-              {alphabetFilter !== 'all' && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9"
-                  onClick={() => setAlphabetFilter('all')}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
+              <GraduationCap
+                className={`h-12 w-12 ${wordType === 'english' ? 'text-violet-400' : 'text-rose-400'}`}
+              />
             </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="border rounded-md overflow-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {columns.map(col => (
-                    <TableHead key={col.key as string}>{col.header}</TableHead>
-                  ))}
-                  <TableHead>Цээжилсэн</TableHead>
-                  <TableHead className="text-right">Үйлдэл</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentWords.map(word => (
-                  <TableRow
-                    key={word.id}
-                    className={cn(
-                      word.memorized && 'bg-primary/10 hover:bg-primary/20'
-                    )}
-                  >
-                    {columns.map(col => (
-                      <TableCell key={`${word.id}-${col.key as string}`}>
-                        {word[col.key as keyof Word] as string}
-                      </TableCell>
-                    ))}
-                    <TableCell>
-                      <Checkbox
-                        checked={word.memorized}
-                        onCheckedChange={() =>
-                          toggleBooleanValue(word.id!, 'memorized')
-                        }
-                        disabled={!user}
+          </motion.div>
+
+          <motion.h1
+            className={`text-4xl md:text-5xl font-bold font-headline bg-gradient-to-r ${wordType === 'english' ? 'from-violet-400 via-purple-400 to-fuchsia-400' : 'from-rose-400 via-pink-400 to-fuchsia-400'} bg-clip-text text-transparent`}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            {title}
+          </motion.h1>
+          <motion.p
+            className="text-muted-foreground max-w-2xl text-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            Үгсийн санг цэгцлэх, шинэ үг нэмэх, цээжлэх
+          </motion.p>
+        </div>
+
+        <motion.div variants={itemVariants}>
+          <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden shadow-lg">
+            <CardHeader className="space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex-1">
+                  <CardTitle className="flex items-center gap-3">
+                    <div
+                      className={`p-2 rounded-lg bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
+                    >
+                      <BookOpen
+                        className={`h-5 w-5 ${wordType === 'english' ? 'text-violet-400' : 'text-rose-400'}`}
                       />
-                    </TableCell>
-                    <TableCell className="text-right space-x-1">
+                    </div>
+                    Үгсийн сан
+                  </CardTitle>
+                </div>
+                <div className="flex w-full sm:w-auto items-center gap-2">
+                  <Input
+                    placeholder="Үг хайх..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="flex-1 sm:w-48 bg-background/50 border-0 rounded-xl"
+                  />
+                  {wordType === 'english' && (
+                    <AiAssistantDialog onAddWords={handleAddWordsBatch} />
+                  )}
+                  <Dialog
+                    open={isDialogOpen}
+                    onOpenChange={isOpen => {
+                      if (!isOpen) setCurrentWord(null);
+                      setIsDialogOpen(isOpen);
+                    }}
+                  >
+                    <DialogTrigger asChild>
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => toggleBooleanValue(word.id!, 'favorite')}
+                        onClick={() => openDialog()}
                         disabled={!user}
+                        size="sm"
+                        className={`whitespace-nowrap bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0`}
                       >
-                        <Heart
-                          className={cn(
-                            'h-4 w-4',
-                            word.favorite
-                              ? 'fill-red-500 text-red-500'
-                              : 'text-muted-foreground'
-                          )}
-                        />
+                        <PlusCircle className="mr-2 h-4 w-4" /> Шинэ үг
                       </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>
+                          {currentWord ? 'Үг засах' : 'Шинэ үг нэмэх'}
+                        </DialogTitle>
+                      </DialogHeader>
+                      <form onSubmit={handleSave} className="space-y-4">
+                        {columns.map(col => (
+                          <div key={col.key as string}>
+                            <Label htmlFor={col.key as string}>
+                              {col.header}
+                            </Label>
+                            <Input
+                              id={col.key as string}
+                              name={col.key as string}
+                              defaultValue={
+                                currentWord
+                                  ? (currentWord[
+                                      col.key as keyof Word
+                                    ] as string)
+                                  : ''
+                              }
+                              required
+                            />
+                          </div>
+                        ))}
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button type="button" variant="secondary">
+                              Цуцлах
+                            </Button>
+                          </DialogClose>
+                          <Button
+                            type="submit"
+                            className={`bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500' : 'from-rose-500 to-pink-500'} text-white border-0`}
+                          >
+                            Хадгалах
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                <ToggleGroup
+                  type="single"
+                  defaultValue="all"
+                  variant="outline"
+                  size="sm"
+                  className="bg-background/30 rounded-xl p-1"
+                  onValueChange={value => setFilter((value as any) || 'all')}
+                >
+                  <ToggleGroupItem value="all" className="rounded-lg">
+                    Бүгд
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="memorized" className="rounded-lg">
+                    Цээжилсэн
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="not-memorized" className="rounded-lg">
+                    Цээжлээгүй
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="favorite" className="rounded-lg">
+                    Онцолсон
+                  </ToggleGroupItem>
+                </ToggleGroup>
+                <div className="flex items-center gap-2">
+                  <Dialog
+                    open={isAlphabetModalOpen}
+                    onOpenChange={setIsAlphabetModalOpen}
+                  >
+                    <DialogTrigger asChild>
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => openDialog(word)}
-                        disabled={!user}
+                        variant="outline"
+                        size="sm"
+                        className="rounded-xl bg-background/30 border-0"
                       >
-                        <Edit className="h-4 w-4" />
+                        Үсгээр шүүх
+                        {alphabetFilter !== 'all' && (
+                          <span
+                            className={`ml-2 font-bold ${wordType === 'english' ? 'text-violet-400' : 'text-rose-400'}`}
+                          >
+                            {alphabetFilter}
+                          </span>
+                        )}
                       </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Үсгээр шүүх</DialogTitle>
+                      </DialogHeader>
+                      <ScrollArea className="h-72">
+                        <div className="grid grid-cols-6 gap-2 pr-4">
+                          <Button
+                            variant={
+                              alphabetFilter === 'all' ? 'default' : 'outline'
+                            }
+                            onClick={() => handleAlphabetSelect('all')}
+                          >
+                            All
+                          </Button>
+                          {ALPHABET.map(letter => (
+                            <Button
+                              key={letter}
+                              variant={
+                                alphabetFilter === letter
+                                  ? 'default'
+                                  : 'outline'
+                              }
+                              onClick={() => handleAlphabetSelect(letter)}
+                            >
+                              {letter}
+                            </Button>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </DialogContent>
+                  </Dialog>
+                  {alphabetFilter !== 'all' && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-9 w-9 rounded-xl"
+                      onClick={() => setAlphabetFilter('all')}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="border-0 rounded-xl overflow-auto bg-background/30">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-b border-border/30 hover:bg-transparent">
+                      {columns.map(col => (
+                        <TableHead
+                          key={col.key as string}
+                          className="font-semibold"
+                        >
+                          {col.header}
+                        </TableHead>
+                      ))}
+                      <TableHead className="font-semibold">Цээжилсэн</TableHead>
+                      <TableHead className="text-right font-semibold">
+                        Үйлдэл
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {currentWords.map(word => (
+                      <TableRow
+                        key={word.id}
+                        className={cn(
+                          'border-b border-border/20 transition-colors',
+                          word.memorized &&
+                            `${wordType === 'english' ? 'bg-violet-500/10 hover:bg-violet-500/20' : 'bg-rose-500/10 hover:bg-rose-500/20'}`
+                        )}
+                      >
+                        {columns.map(col => (
+                          <TableCell key={`${word.id}-${col.key as string}`}>
+                            {word[col.key as keyof Word] as string}
+                          </TableCell>
+                        ))}
+                        <TableCell>
+                          <Checkbox
+                            checked={word.memorized}
+                            onCheckedChange={() =>
+                              toggleBooleanValue(word.id!, 'memorized')
+                            }
+                            disabled={!user}
+                            className={
+                              wordType === 'english'
+                                ? 'data-[state=checked]:bg-violet-500 data-[state=checked]:border-violet-500'
+                                : 'data-[state=checked]:bg-rose-500 data-[state=checked]:border-rose-500'
+                            }
+                          />
+                        </TableCell>
+                        <TableCell className="text-right space-x-1">
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-destructive hover:text-destructive"
+                            onClick={() =>
+                              toggleBooleanValue(word.id!, 'favorite')
+                            }
                             disabled={!user}
+                            className="rounded-lg"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Heart
+                              className={cn(
+                                'h-4 w-4',
+                                word.favorite
+                                  ? 'fill-red-500 text-red-500'
+                                  : 'text-muted-foreground'
+                              )}
+                            />
                           </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Та итгэлтэй байна уу?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Энэ үйлдлийг буцаах боломжгүй. Энэ үг таны сангаас
-                              бүрмөсөн устгагдах болно.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDelete(word.id!)}
-                            >
-                              Устгах
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            {filteredWords.length === 0 && (
-              <div className="text-center p-8 text-muted-foreground">
-                Шүүлтүүрт тохирох үг олдсонгүй.
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openDialog(word)}
+                            disabled={!user}
+                            className="rounded-lg"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:text-destructive rounded-lg"
+                                disabled={!user}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Та итгэлтэй байна уу?
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Энэ үйлдлийг буцаах боломжгүй. Энэ үг таны
+                                  сангаас бүрмөсөн устгагдах болно.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(word.id!)}
+                                >
+                                  Устгах
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                {filteredWords.length === 0 && (
+                  <div className="text-center p-8 text-muted-foreground">
+                    Шүүлтүүрт тохирох үг олдсонгүй.
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-4">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => paginate(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                number => (
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-4">
                   <Button
-                    key={number}
-                    variant={currentPage === number ? 'default' : 'outline'}
+                    variant="outline"
                     size="icon"
-                    onClick={() => paginate(number)}
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="rounded-lg bg-background/30 border-0"
                   >
-                    {number}
+                    <ChevronLeft className="h-4 w-4" />
                   </Button>
-                )
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    number => (
+                      <Button
+                        key={number}
+                        variant={currentPage === number ? 'default' : 'outline'}
+                        size="icon"
+                        onClick={() => paginate(number)}
+                        className={cn(
+                          'rounded-lg',
+                          currentPage === number
+                            ? `${wordType === 'english' ? 'bg-gradient-to-r from-violet-500 to-purple-500' : 'bg-gradient-to-r from-rose-500 to-pink-500'} border-0`
+                            : 'bg-background/30 border-0'
+                        )}
+                      >
+                        {number}
+                      </Button>
+                    )
+                  )}
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="rounded-lg bg-background/30 border-0"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
               )}
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => paginate(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold text-center mb-4">
-          Сонирхолтой аргууд
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="hover:shadow-primary/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex-row items-center gap-4">
-              <BookOpen className="w-8 h-8 text-primary" />
-              <CardTitle>Flashcard (Anki)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Картаар эргүүлж цээжилсэн үгээ бататгах.
-              </CardDescription>
-              <Button
-                className="mt-4 w-full"
-                onClick={() => setGameMode('flashcard')}
-                disabled={filteredWords.length === 0}
-              >
-                {filter === 'all'
-                  ? 'Бүх үгсээр'
-                  : filter === 'memorized'
-                    ? 'Цээжилсэн үгсээр'
-                    : filter === 'not-memorized'
-                      ? 'Цээжлээгүй үгсээр'
-                      : filter === 'favorite'
-                        ? 'Онцолсон үгсээр'
-                        : ''}{' '}
-                эхлэх
-              </Button>
             </CardContent>
           </Card>
-          <Card className="hover:shadow-primary/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex-row items-center gap-4">
-              <Brain className="w-8 h-8 text-primary" />
-              <CardTitle>Тест</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Орчуулга, утга зэргийг сонголтот тестээр шалгуулах.
-              </CardDescription>
-              <Button
-                className="mt-4 w-full"
-                onClick={() => setGameMode('test')}
-                disabled={filteredWords.length < 4}
+        </motion.div>
+
+        {/* Game Methods Section */}
+        <motion.div
+          className="mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <h2
+            className={`text-3xl font-bold text-center mb-8 bg-gradient-to-r ${wordType === 'english' ? 'from-violet-400 via-purple-400 to-fuchsia-400' : 'from-rose-400 via-pink-400 to-fuchsia-400'} bg-clip-text text-transparent`}
+          >
+            Сонирхолтой аргууд
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <motion.div variants={itemVariants}>
+              <Card
+                className={`bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden hover:shadow-lg ${wordType === 'english' ? 'hover:shadow-violet-500/20' : 'hover:shadow-rose-500/20'} transition-all duration-500 group`}
               >
-                {filter === 'all'
-                  ? 'Бүх үгсээр'
-                  : filter === 'memorized'
-                    ? 'Цээжилсэн үгсээр'
-                    : filter === 'not-memorized'
-                      ? 'Цээжлээгүй үгсээр'
-                      : filter === 'favorite'
-                        ? 'Онцолсон үгсээр'
-                        : ''}{' '}
-                тестлэх
-              </Button>
-            </CardContent>
-          </Card>
-          <Card className="hover:shadow-primary/20 hover:shadow-lg transition-shadow">
-            <CardHeader className="flex-row items-center gap-4">
-              <LinkIcon className="w-8 h-8 text-primary" />
-              <CardTitle>Холбох Арга</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Англи болон Монгол үгсийг зөв хооронд нь холбох.
-              </CardDescription>
-              <Button
-                className="mt-4 w-full"
-                onClick={() => setGameMode('matching')}
-                disabled={filteredWords.length < 5}
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/10 to-purple-500/10' : 'from-rose-500/10 to-pink-500/10'} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                />
+                <CardHeader className="flex-row items-center gap-4 relative">
+                  <div
+                    className={`p-3 rounded-xl bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
+                  >
+                    <BookOpen
+                      className={`w-6 h-6 ${wordType === 'english' ? 'text-violet-400' : 'text-rose-400'}`}
+                    />
+                  </div>
+                  <CardTitle>Flashcard (Anki)</CardTitle>
+                </CardHeader>
+                <CardContent className="relative">
+                  <CardDescription className="text-base">
+                    Картаар эргүүлж цээжилсэн үгээ бататгах.
+                  </CardDescription>
+                  <Button
+                    className={`mt-4 w-full bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0 rounded-xl`}
+                    onClick={() => setGameMode('flashcard')}
+                    disabled={filteredWords.length === 0}
+                  >
+                    {filter === 'all'
+                      ? 'Бүх үгсээр'
+                      : filter === 'memorized'
+                        ? 'Цээжилсэн үгсээр'
+                        : filter === 'not-memorized'
+                          ? 'Цээжлээгүй үгсээр'
+                          : filter === 'favorite'
+                            ? 'Онцолсон үгсээр'
+                            : ''}{' '}
+                    эхлэх
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Card
+                className={`bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden hover:shadow-lg ${wordType === 'english' ? 'hover:shadow-violet-500/20' : 'hover:shadow-rose-500/20'} transition-all duration-500 group`}
               >
-                {filter === 'all'
-                  ? 'Бүх үгсээр'
-                  : filter === 'memorized'
-                    ? 'Цээжилсэн үгсээр'
-                    : filter === 'not-memorized'
-                      ? 'Цээжлээгүй үгсээр'
-                      : filter === 'favorite'
-                        ? 'Онцолсон үгсээр'
-                        : ''}{' '}
-                тоглох
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </>
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/10 to-purple-500/10' : 'from-rose-500/10 to-pink-500/10'} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                />
+                <CardHeader className="flex-row items-center gap-4 relative">
+                  <div
+                    className={`p-3 rounded-xl bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
+                  >
+                    <Brain
+                      className={`w-6 h-6 ${wordType === 'english' ? 'text-violet-400' : 'text-rose-400'}`}
+                    />
+                  </div>
+                  <CardTitle>Тест</CardTitle>
+                </CardHeader>
+                <CardContent className="relative">
+                  <CardDescription className="text-base">
+                    Орчуулга, утга зэргийг сонголтот тестээр шалгуулах.
+                  </CardDescription>
+                  <Button
+                    className={`mt-4 w-full bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0 rounded-xl`}
+                    onClick={() => setGameMode('test')}
+                    disabled={filteredWords.length < 4}
+                  >
+                    {filter === 'all'
+                      ? 'Бүх үгсээр'
+                      : filter === 'memorized'
+                        ? 'Цээжилсэн үгсээр'
+                        : filter === 'not-memorized'
+                          ? 'Цээжлээгүй үгсээр'
+                          : filter === 'favorite'
+                            ? 'Онцолсон үгсээр'
+                            : ''}{' '}
+                    тестлэх
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Card
+                className={`bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden hover:shadow-lg ${wordType === 'english' ? 'hover:shadow-violet-500/20' : 'hover:shadow-rose-500/20'} transition-all duration-500 group`}
+              >
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/10 to-purple-500/10' : 'from-rose-500/10 to-pink-500/10'} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                />
+                <CardHeader className="flex-row items-center gap-4 relative">
+                  <div
+                    className={`p-3 rounded-xl bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
+                  >
+                    <LinkIcon
+                      className={`w-6 h-6 ${wordType === 'english' ? 'text-violet-400' : 'text-rose-400'}`}
+                    />
+                  </div>
+                  <CardTitle>Холбох Арга</CardTitle>
+                </CardHeader>
+                <CardContent className="relative">
+                  <CardDescription className="text-base">
+                    {wordType === 'english'
+                      ? 'Англи болон Монгол үгсийг зөв хооронд нь холбох.'
+                      : 'Япон болон Монгол үгсийг зөв хооронд нь холбох.'}
+                  </CardDescription>
+                  <Button
+                    className={`mt-4 w-full bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0 rounded-xl`}
+                    onClick={() => setGameMode('matching')}
+                    disabled={filteredWords.length < 5}
+                  >
+                    {filter === 'all'
+                      ? 'Бүх үгсээр'
+                      : filter === 'memorized'
+                        ? 'Цээжилсэн үгсээр'
+                        : filter === 'not-memorized'
+                          ? 'Цээжлээгүй үгсээр'
+                          : filter === 'favorite'
+                            ? 'Онцолсон үгсээр'
+                            : ''}{' '}
+                    тоглох
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </div>
   );
 }

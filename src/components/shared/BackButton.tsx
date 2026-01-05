@@ -3,19 +3,27 @@
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function BackButton() {
   const router = useRouter();
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => router.back()}
-      className="mb-8 hover:bg-primary/10 hover:text-primary"
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.3 }}
+      className="sticky top-24 z-50 w-fit mt-8"
     >
-      <ArrowLeft className="h-4 w-4" />
-      <span className="sr-only">Буцах</span>
-    </Button>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => router.back()}
+        className="group flex items-center gap-2 px-4 py-2 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg hover:bg-primary/10 hover:border-primary/30 hover:shadow-primary/10 transition-all duration-300"
+      >
+        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-300" />
+        <span className="text-sm font-medium">Буцах</span>
+      </Button>
+    </motion.div>
   );
 }

@@ -19,8 +19,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { AddGrammarRuleDialog } from '@/components/shared/AddGrammarRuleDialog';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, BookText, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { motion } from 'framer-motion';
+import InteractiveParticles from '@/components/shared/InteractiveParticles';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function JapaneseGrammarPage() {
   const { firestore, user } = useFirebase();
@@ -138,60 +141,143 @@ export default function JapaneseGrammarPage() {
   };
 
   return (
-    <div className="space-y-8">
-      <BackButton />
-      <div className="text-center pt-8 flex items-center justify-center gap-4">
-        <h1 className="text-4xl font-bold">Япон хэлний дүрэм</h1>
-        {isEditMode && (
-          <AddGrammarRuleDialog onAddRule={handleAddRule} ruleType="japanese">
-            <Button variant="outline" size="icon">
-              <PlusCircle className="h-5 w-5" />
-              <span className="sr-only">Шинэ дүрэм нэмэх</span>
-            </Button>
-          </AddGrammarRuleDialog>
-        )}
+    <div className="min-h-screen relative">
+      {/* Background Particles */}
+      <div className="fixed inset-0 -z-10">
+        <InteractiveParticles quantity={30} />
       </div>
-      {loading ? (
-        <div className="space-y-4 pt-8">
-          <div className="flex justify-center flex-wrap gap-2 py-8">
-            <Skeleton className="h-10 w-20" />
-            <Skeleton className="h-10 w-24" />
-            <Skeleton className="h-10 w-28" />
-          </div>
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-        </div>
-      ) : !user ? (
-        <div className="text-center py-10">
-          <p className="text-muted-foreground">
-            Дүрмийн жагсаалтыг харахын тулд нэвтэрнэ үү.
-          </p>
-        </div>
-      ) : (
-        <>
-          <div className="flex justify-center flex-wrap gap-2 py-8">
-            {categories.map(category => (
-              <Button
-                key={category}
-                variant={selectedCategory === category ? 'default' : 'outline'}
-                onClick={() => setSelectedCategory(category)}
-                className="rounded-full transition-colors duration-300"
+
+      <motion.div
+        className="space-y-8 relative z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <BackButton />
+
+        {/* Hero Section */}
+        <div className="text-center pt-8 flex flex-col items-center justify-center gap-6">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-rose-500/30 via-pink-500/30 to-fuchsia-500/30 blur-3xl rounded-full scale-150" />
+            <div className="relative p-5 rounded-2xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 backdrop-blur-sm border border-rose-500/20">
+              <BookText className="h-12 w-12 text-rose-400" />
+            </div>
+          </motion.div>
+
+          <div className="flex items-center gap-4">
+            <motion.h1
+              className="text-4xl md:text-5xl font-bold font-headline bg-gradient-to-r from-rose-400 via-pink-400 to-fuchsia-400 bg-clip-text text-transparent"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              Япон хэлний дүрэм
+            </motion.h1>
+            {isEditMode && (
+              <AddGrammarRuleDialog
+                onAddRule={handleAddRule}
+                ruleType="japanese"
               >
-                {category}
-              </Button>
-            ))}
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="bg-rose-500/10 border-rose-500/30 hover:bg-rose-500/20 hover:border-rose-500/50 transition-all duration-300 rounded-xl"
+                >
+                  <PlusCircle className="h-5 w-5 text-rose-400" />
+                  <span className="sr-only">Шинэ дүрэм нэмэх</span>
+                </Button>
+              </AddGrammarRuleDialog>
+            )}
           </div>
-          <div className="pt-2">
-            <GrammarList
-              rules={filteredRules}
-              onDeleteRule={handleDeleteRule}
-              onUpdateRule={handleUpdateRule}
-              collectionPath="japaneseGrammar"
-            />
+          <motion.p
+            className="text-muted-foreground max-w-2xl text-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            Япон хэлний дүрмүүдийг судлаж, тэмдэглэл хийгээрэй
+          </motion.p>
+        </div>
+
+        {loading ? (
+          <div className="space-y-4 pt-8">
+            <div className="flex justify-center flex-wrap gap-2 py-8">
+              <Skeleton className="h-10 w-20 rounded-full" />
+              <Skeleton className="h-10 w-24 rounded-full" />
+              <Skeleton className="h-10 w-28 rounded-full" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Skeleton className="h-32 w-full rounded-2xl" />
+              <Skeleton className="h-32 w-full rounded-2xl" />
+              <Skeleton className="h-32 w-full rounded-2xl" />
+            </div>
           </div>
-        </>
-      )}
+        ) : !user ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-16"
+          >
+            <Card className="max-w-md mx-auto bg-card/50 backdrop-blur-xl border-0 rounded-2xl p-8 shadow-lg shadow-rose-500/5">
+              <CardContent className="flex flex-col items-center gap-4">
+                <div className="p-4 rounded-full bg-rose-500/10">
+                  <Sparkles className="h-8 w-8 text-rose-400" />
+                </div>
+                <p className="text-muted-foreground text-lg">
+                  Дүрмийн жагсаалтыг харахын тулд нэвтэрнэ үү.
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : (
+          <>
+            {/* Category Filter */}
+            <motion.div
+              className="flex justify-center flex-wrap gap-2 py-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              {categories.map(category => (
+                <Button
+                  key={category}
+                  variant={
+                    selectedCategory === category ? 'default' : 'outline'
+                  }
+                  onClick={() => setSelectedCategory(category)}
+                  className={`rounded-full transition-all duration-300 ${
+                    selectedCategory === category
+                      ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white border-0 shadow-lg shadow-rose-500/25'
+                      : 'bg-card/50 backdrop-blur-xl border-0 hover:bg-rose-500/10'
+                  }`}
+                >
+                  {category}
+                </Button>
+              ))}
+            </motion.div>
+
+            {/* Grammar List */}
+            <motion.div
+              className="pt-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <GrammarList
+                rules={filteredRules}
+                onDeleteRule={handleDeleteRule}
+                onUpdateRule={handleUpdateRule}
+                collectionPath="japaneseGrammar"
+              />
+            </motion.div>
+          </>
+        )}
+      </motion.div>
     </div>
   );
 }

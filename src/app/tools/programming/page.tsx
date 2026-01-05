@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import {
   collection,
   getDocs,
@@ -19,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import LanguageCard from './components/LanguageCard';
 import { AddLanguageDialog } from './components/AddLanguageDialog';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Code, Sparkles } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,6 +32,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import InteractiveParticles from '@/components/shared/InteractiveParticles';
 
 export default function ProgrammingPage() {
   const { firestore, user } = useFirebase();
@@ -115,55 +117,94 @@ export default function ProgrammingPage() {
   };
 
   return (
-    <div className="space-y-8 p-4 md:p-8">
-      <div className="flex justify-between items-center">
-        <BackButton />
-        <AddLanguageDialog onAddLanguage={handleAddLanguage}>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Шинэ хэл нэмэх
-          </Button>
-        </AddLanguageDialog>
-      </div>
-      <div className="text-center">
-        <h1 className="text-4xl font-bold tracking-tighter text-primary">
-          The Language Library
-        </h1>
-        <p className="mt-2 text-muted-foreground max-w-2xl mx-auto">
-          Өөрийн суралцах програмчлалын хэлнүүдээ удирдаарай.
-        </p>
-      </div>
-
-      {loading ? (
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-48 rounded-2xl" />
-          ))}
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
+      className="relative min-h-screen"
+    >
+      <InteractiveParticles quantity={50} />
+      <div className="space-y-8 p-4 md:p-8 relative z-10">
+        <div className="flex justify-between items-center">
+          <BackButton />
+          <AddLanguageDialog onAddLanguage={handleAddLanguage}>
+            <Button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white border-0 shadow-lg shadow-orange-500/25">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Шинэ хэл нэмэх
+            </Button>
+          </AddLanguageDialog>
         </div>
-      ) : !user ? (
-        <div className="text-center py-20 mt-4 glassmorphism-card">
-          <p className="text-lg text-muted-foreground">
-            Хэлнүүдийг харахын тулд нэвтэрнэ үү.
+
+        {/* Hero Section */}
+        <div className="text-center pt-4 pb-6">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 mb-6"
+          >
+            <Code className="h-4 w-4" />
+            <span className="text-sm font-medium">Код бичиж сур</span>
+          </motion.div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 bg-clip-text text-transparent">
+            The Language Library
+          </h1>
+          <p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
+            Өөрийн суралцах програмчлалын хэлнүүдээ удирдаарай
           </p>
         </div>
-      ) : (
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {languages.map(lang => (
-            <LanguageCard
-              key={lang.id}
-              language={lang}
-              onDelete={handleDeleteLanguage}
-            />
-          ))}
-          {languages.length === 0 && (
-            <div className="col-span-full text-center py-20">
-              <p className="text-muted-foreground">
-                Та одоогоор ямар ч хэл нэмээгүй байна.
-              </p>
+
+        {loading ? (
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-48 rounded-2xl bg-card/50" />
+            ))}
+          </div>
+        ) : !user ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-center py-20 mt-4 bg-card/50 backdrop-blur-xl rounded-2xl border-0"
+          >
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-500/10 mb-4">
+              <Code className="h-8 w-8 text-orange-500" />
             </div>
-          )}
-        </div>
-      )}
-    </div>
+            <p className="text-lg text-muted-foreground">
+              Хэлнүүдийг харахын тулд нэвтэрнэ үү.
+            </p>
+          </motion.div>
+        ) : (
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {languages.map((lang, index) => (
+              <motion.div
+                key={lang.id}
+                initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{
+                  duration: 0.4,
+                  delay: index * 0.05,
+                  type: 'spring',
+                  stiffness: 100,
+                }}
+              >
+                <LanguageCard language={lang} onDelete={handleDeleteLanguage} />
+              </motion.div>
+            ))}
+            {languages.length === 0 && (
+              <div className="col-span-full text-center py-20">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-4">
+                  <Code className="h-8 w-8 text-muted-foreground" />
+                </div>
+                <p className="text-muted-foreground">
+                  Та одоогоор ямар ч хэл нэмээгүй байна.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 }

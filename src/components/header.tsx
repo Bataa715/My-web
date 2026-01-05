@@ -21,7 +21,6 @@ import {
   Home,
   User,
   Wrench,
-  QrCode,
   Copy,
 } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
@@ -216,48 +215,7 @@ const Header = () => {
                     )}
                     <span>{isEditMode ? 'Харах' : 'Засварлах'}</span>
                   </DropdownMenuItem>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <DropdownMenuItem onSelect={e => e.preventDefault()}>
-                        <QrCode className="mr-2 h-4 w-4" />
-                        <span>Портфолио QR</span>
-                      </DropdownMenuItem>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Портфолиогоо хуваалцах</DialogTitle>
-                        <DialogDescription>
-                          Энэхүү QR кодыг уншуулж эсвэл холбоосыг хуулж бусадтай
-                          хуваалцаарай.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="flex flex-col items-center justify-center space-y-4 p-4">
-                        <div className="p-2 bg-white rounded-lg">
-                          <Image
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${portfolioUrl}`}
-                            alt="Portfolio QR Code"
-                            width={200}
-                            height={200}
-                          />
-                        </div>
-                        <div className="flex w-full items-center space-x-2">
-                          <Input
-                            id="portfolio-link"
-                            value={portfolioUrl}
-                            readOnly
-                          />
-                          <Button
-                            type="button"
-                            size="sm"
-                            onClick={copyToClipboard}
-                          >
-                            <span className="sr-only">Хуулах</span>
-                            <Copy className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                  <DropdownMenuSeparator />
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger>
                       <Palette className="mr-2 h-4 w-4" />

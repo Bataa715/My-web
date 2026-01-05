@@ -112,7 +112,7 @@ const OrbitItem: FC<OrbitItemProps> = ({
   return (
     <motion.div
       key={item.id}
-      className="absolute h-14 w-14 md:h-16 md:w-16"
+      className="absolute h-12 w-12 md:h-14 md:w-14"
       style={{
         top: '50%',
         left: '50%',
@@ -136,13 +136,13 @@ const OrbitItem: FC<OrbitItemProps> = ({
         variant="outline"
         size="icon"
         className={cn(
-          'rounded-full h-14 w-14 md:h-16 md:w-16 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-110',
+          'rounded-full h-12 w-12 md:h-14 md:w-14 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-110',
           selectedOrbit?.id === item.id &&
             'bg-primary text-primary-foreground scale-110'
         )}
         onClick={() => onItemClick(item)}
       >
-        {getIcon(item.icon, { className: 'h-6 w-6 md:h-8 md:w-8' })}
+        {getIcon(item.icon, { className: 'h-4 w-4 md:h-5 md:w-5' })}
         <span className="sr-only">{item.title}</span>
       </Button>
     </motion.div>
@@ -170,7 +170,9 @@ interface SocialInfo {
   name: string;
 }
 
-export default function Hero() {
+export default function Hero({
+  portfolioUserId,
+}: { portfolioUserId?: string } = {}) {
   const { isEditMode } = useEditMode();
   const { firestore, user, isUserLoading } = useFirebase();
   const [profileImage, setProfileImage] = useState<string>('');
@@ -220,17 +222,20 @@ export default function Hero() {
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      if (isUserLoading) {
+      if (isUserLoading && !portfolioUserId) {
         setLoading(true);
         return;
       }
 
-      if (!user || !firestore) {
+      // Use portfolioUserId if provided, otherwise use logged-in user
+      const targetUserId = portfolioUserId || user?.uid;
+
+      if (!targetUserId || !firestore) {
         setLoading(false);
         return;
       }
 
-      const userInfoDocRef = doc(firestore, 'users', user.uid);
+      const userInfoDocRef = doc(firestore, 'users', targetUserId);
       setLoading(true);
       try {
         const docSnap = await getDoc(userInfoDocRef);
@@ -443,7 +448,8 @@ export default function Hero() {
       }
     };
     fetchUserInfo();
-  }, [user, isUserLoading, firestore, toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isUserLoading, firestore, portfolioUserId]);
 
   const handleSaveLinks = async () => {
     if (!user || !firestore) return;

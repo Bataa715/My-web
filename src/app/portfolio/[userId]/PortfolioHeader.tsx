@@ -1,75 +1,61 @@
 'use client';
 
 import Link from 'next/link';
-import { Home, User } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useParams } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { useState, useEffect } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { useFirebase } from '@/firebase';
-import type { UserProfile } from '@/lib/types';
-
-const mainLinks = [
-  { href: '/', label: 'Нүүр' },
-  { href: '/about', label: 'Тухай' },
-];
+import { Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const PortfolioHeader = () => {
   const pathname = usePathname();
-  const { user, firestore, isUserLoading } = useFirebase();
-  const [appName, setAppName] = useState('');
+  const params = useParams();
+  const userId = params.userId as string;
 
-  useEffect(() => {
-    const fetchAppName = async () => {
-      if (user && firestore) {
-        const userDocRef = doc(firestore, 'users', user.uid);
-        const docSnap = await getDoc(userDocRef);
-        if (docSnap.exists()) {
-          const data = docSnap.data() as UserProfile;
-          setAppName(data.name || 'Portfolio');
-        }
-      } else if (!isUserLoading) {
-        setAppName('Portfolio');
-      }
-    };
-    fetchAppName();
-  }, [user, firestore, isUserLoading]);
+  const navLinks = [
+    { href: `/portfolio/${userId}`, label: 'Маргэжлийн Профайл' },
+    { href: `/portfolio/${userId}/about`, label: 'Хувийн Амьдрал' },
+    { href: `/portfolio/${userId}/contact`, label: 'Холбоо Барих' },
+  ];
 
   return (
     <header className="sticky top-0 left-0 w-full z-50">
       <div className="relative">
-        <div className="mx-3 md:mx-4 mt-3 md:mt-4 grid grid-cols-[1fr_auto_1fr] items-center p-2 px-4 bg-black/20 backdrop-blur-md rounded-2xl border border-white/10">
-          <div className="flex justify-self-start items-center gap-4">
-            <Link
-              href="/"
-              className={cn(
-                'text-sm font-medium transition-colors hover:text-primary',
-                pathname === '/' ? 'text-primary' : 'text-muted-foreground'
-              )}
-            >
-              Нүүр
-            </Link>
-            <Link
-              href="/about"
-              className={cn(
-                'text-sm font-medium transition-colors hover:text-primary',
-                pathname === '/about' ? 'text-primary' : 'text-muted-foreground'
-              )}
-            >
-              Тухай
-            </Link>
-          </div>
+        <div className="mx-3 md:mx-4 mt-3 md:mt-4 flex items-center justify-between gap-6 p-3 px-6 bg-background/80 backdrop-blur-xl rounded-full border border-primary/20 shadow-lg shadow-primary/5">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+            <span className="font-bold text-xl tracking-tight text-foreground group-hover:text-primary transition-colors">
+              Batmyagmar
+            </span>
+          </Link>
 
-          <div className="justify-self-center">
-            <Link
-              href="/"
-              className="font-bold text-2xl tracking-tighter text-foreground hover:text-primary transition-colors"
-            >
-              {appName}
-            </Link>
-          </div>
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1">
+            {navLinks.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  'px-4 py-2 text-sm font-medium rounded-full transition-all duration-300',
+                  pathname === link.href
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-primary/10'
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
 
-          <div className="justify-self-end">{/* Empty for now */}</div>
+          {/* Language Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full border-primary/30 bg-primary/5 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+          >
+            <Globe className="h-4 w-4 mr-2" />
+            Монгол
+          </Button>
         </div>
       </div>
     </header>

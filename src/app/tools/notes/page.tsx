@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import BackButton from '@/components/shared/BackButton';
 import { useFirebase, useMemoFirebase } from '@/firebase';
 import {
@@ -22,6 +23,8 @@ import {
   History,
   CalendarDays,
   Notebook,
+  Sparkles,
+  LayoutGrid,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -67,6 +70,7 @@ import {
 } from 'recharts';
 import { Timestamp } from 'firebase/firestore';
 import { Textarea } from '@/components/ui/textarea';
+import InteractiveParticles from '@/components/shared/InteractiveParticles';
 
 const AddNoteDialog = ({
   onAdd,
@@ -561,122 +565,164 @@ export default function WorkspacePage() {
 
   if (loading) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-8 px-4 md:px-6">
         <BackButton />
         <Skeleton className="h-10 w-1/2 mx-auto" />
         <div className="pt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-48 w-full rounded-2xl bg-card/50" />
+          <Skeleton className="h-48 w-full rounded-2xl bg-card/50" />
+          <Skeleton className="h-48 w-full rounded-2xl bg-card/50" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      <BackButton />
-      <div className="text-center pt-8">
-        <h1 className="text-4xl font-bold">Хувийн Workspace</h1>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      transition={{ duration: 0.5, ease: 'easeInOut' }}
+      className="relative min-h-screen"
+    >
+      <InteractiveParticles quantity={40} />
+      <div className="space-y-8 px-4 md:px-6 relative z-10 pb-16">
+        <BackButton />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        <div className="lg:col-span-1 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Notebook /> Тэмдэглэлүүд
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 max-h-[600px] overflow-y-auto">
-              <AddNoteDialog onAdd={handleAddNote} />
-              <div className="space-y-2">
-                {notes.map(note => (
-                  <Card
-                    key={note.id}
-                    className="flex justify-between items-center p-3 bg-muted/50 group"
-                  >
-                    <p className="font-semibold">{note.title}</p>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-0 group-hover:opacity-100"
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Устгахдаа итгэлтэй байна уу?
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            "{note.title}" тэмдэглэлийг устгах гэж байна. Энэ
-                            үйлдэл буцаагдахгүй.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeleteNote(note.id!)}
+        {/* Hero Section */}
+        <div className="text-center pt-8 pb-4">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 mb-6"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              Хувийн зохион байгуулалт
+            </span>
+          </motion.div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 bg-clip-text text-transparent">
+            Хувийн Workspace
+          </h1>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          <motion.div
+            className="lg:col-span-1 space-y-6"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <Card className="relative bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden">
+              <div className="absolute -top-16 -right-16 w-32 h-32 bg-gradient-to-br from-emerald-500 to-teal-400 rounded-full opacity-20 blur-3xl" />
+              <CardHeader className="relative z-10">
+                <CardTitle className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-400 text-white">
+                    <Notebook className="h-4 w-4" />
+                  </div>
+                  Тэмдэглэлүүд
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 max-h-[600px] overflow-y-auto relative z-10">
+                <AddNoteDialog onAdd={handleAddNote} />
+                <div className="space-y-2">
+                  {notes.map(note => (
+                    <Card
+                      key={note.id}
+                      className="flex justify-between items-center p-3 bg-background/50 group border-primary/10 hover:border-primary/30 transition-colors"
+                    >
+                      <p className="font-semibold">{note.title}</p>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-0 group-hover:opacity-100"
                           >
-                            Устгах
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </Card>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Устгахдаа итгэлтэй байна уу?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              "{note.title}" тэмдэглэлийг устгах гэж байна. Энэ
+                              үйлдэл буцаагдахгүй.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteNote(note.id!)}
+                            >
+                              Устгах
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </Card>
+                  ))}
+                  {notes.length === 0 && (
+                    <p className="text-muted-foreground text-center py-4">
+                      Тэмдэглэл алга байна.
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="relative bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden">
+              <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-gradient-to-br from-orange-500 to-amber-400 rounded-full opacity-20 blur-3xl" />
+              <CardHeader className="relative z-10">
+                <CardTitle className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-orange-500 to-amber-400 text-white">
+                    <Dumbbell className="h-4 w-4" />
+                  </div>
+                  Дасгалууд
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 max-h-[600px] overflow-y-auto relative z-10">
+                <AddExerciseDialog onAdd={handleAddExercise} />
+                {Object.keys(groupedExercises).map(category => (
+                  <div key={category}>
+                    <h3 className="font-bold mb-2 text-primary">{category}</h3>
+                    <div className="space-y-2">
+                      {groupedExercises[category].map(ex => (
+                        <Card
+                          key={ex.id}
+                          className="flex justify-between items-center p-3 bg-background/50 border-primary/10 hover:border-primary/30 transition-colors"
+                        >
+                          <p className="font-semibold">{ex.name}</p>
+                          <LogWorkoutDialog
+                            exercise={ex}
+                            onLog={handleLogWorkout}
+                          />
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
                 ))}
-                {notes.length === 0 && (
+                {exercises.length === 0 && (
                   <p className="text-muted-foreground text-center py-4">
-                    Тэмдэглэл алга байна.
+                    Дасгал нэмээгүй байна.
                   </p>
                 )}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Dumbbell /> Дасгалууд
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 max-h-[600px] overflow-y-auto">
-              <AddExerciseDialog onAdd={handleAddExercise} />
-              {Object.keys(groupedExercises).map(category => (
-                <div key={category}>
-                  <h3 className="font-bold mb-2 text-primary">{category}</h3>
-                  <div className="space-y-2">
-                    {groupedExercises[category].map(ex => (
-                      <Card
-                        key={ex.id}
-                        className="flex justify-between items-center p-3 bg-muted/50"
-                      >
-                        <p className="font-semibold">{ex.name}</p>
-                        <LogWorkoutDialog
-                          exercise={ex}
-                          onLog={handleLogWorkout}
-                        />
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              {exercises.length === 0 && (
-                <p className="text-muted-foreground text-center py-4">
-                  Дасгал нэмээгүй байна.
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-        <div className="lg:col-span-2 space-y-6">
-          <WorkoutChart logs={workoutLogs} />
-          <WorkoutHistory logs={workoutLogs} />
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div
+            className="lg:col-span-2 space-y-6"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <WorkoutChart logs={workoutLogs} />
+            <WorkoutHistory logs={workoutLogs} />
+          </motion.div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

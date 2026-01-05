@@ -5,6 +5,7 @@ import Hero from '@/components/sections/hero';
 import { motion } from 'framer-motion';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import InteractiveParticles from '@/components/shared/InteractiveParticles';
 
 const Education = dynamic(() => import('@/components/sections/Education'), {
   loading: () => <Skeleton className="w-full h-96" />,
@@ -26,7 +27,9 @@ export default function HomePage() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.5, ease: 'easeInOut' }}
+      className="relative"
     >
+      <InteractiveParticles quantity={50} />
       <Hero />
       <Suspense fallback={<Skeleton className="w-full h-96" />}>
         <Education />
