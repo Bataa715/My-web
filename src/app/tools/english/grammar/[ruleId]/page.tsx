@@ -9,12 +9,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import BackButton from '@/components/shared/BackButton';
 import GrammarRuleDetail from '@/components/shared/GrammarRuleDetail';
 
-export default function EnglishGrammarRulePage({ params }: { params: Promise<{ ruleId: string }> }) {
+export default function EnglishGrammarRulePage({ params }: { params: { ruleId: string } }) {
   const { firestore, user } = useFirebase();
   const [rule, setRule] = useState<GrammarRule | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { ruleId } = React.use(params);
+  const { ruleId } = params;
 
   useEffect(() => {
     if (!firestore || !ruleId || !user) {

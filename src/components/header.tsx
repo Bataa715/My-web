@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
-import { Menu, PencilRuler, Eye, Settings, LogOut, Palette, Check, Home, User, Wrench } from 'lucide-react';
+import { Menu, PencilRuler, Eye, Settings, LogOut, Palette, Check, Home, User, Wrench, QrCode, Copy } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -24,9 +24,11 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent
 } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { themes } from '@/lib/themes';
-import { Card } from './ui/card';
+import { Input } from './ui/input';
 
 
 const mainLinks = [
@@ -47,6 +49,13 @@ const Header = () => {
     const [appName, setAppName] = useState("");
     
     const { theme, setTheme } = useTheme();
+
+    const portfolioUrl = (typeof window !== 'undefined' && user) ? `${window.location.origin}/portfolio/${user.uid}` : '';
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(portfolioUrl);
+        toast({ title: 'Хуулагдлаа', description: 'Портфолио холбоосыг хууллаа.' });
+    };
 
     useEffect(() => {
         const fetchAppName = async () => {
@@ -87,14 +96,11 @@ const Header = () => {
 
     return (
       <header className="sticky top-0 left-0 w-full z-50">
-        {/* Header with transparent background - background image shows through */}
         <div className="relative">
           <div 
             className="mx-3 md:mx-4 mt-3 md:mt-4 grid grid-cols-[1fr_auto_1fr] items-center p-2 px-4 bg-black/20 backdrop-blur-md rounded-2xl border border-white/10"
           >
-          {/* Left Side: Desktop Navigation & Mobile Menu */}
           <div className="flex justify-self-start items-center gap-2">
-            {/* Mobile Menu Sheet */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger asChild>
                     <Button variant="ghost" size="icon" className="md:hidden">
@@ -131,7 +137,6 @@ const Header = () => {
                 </SheetContent>
             </Sheet>
 
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-4">
               {mainLinks.map(link => {
                   const isActive = (pathname.startsWith(link.href) && link.href !== '/') || pathname === link.href;
@@ -151,14 +156,12 @@ const Header = () => {
             </nav>
           </div>
           
-          {/* Center: App Name (Desktop) */}
           <div className="justify-self-center">
              <Link href="/" className="font-bold text-2xl tracking-tighter text-foreground hover:text-primary transition-colors">
                 {appName}
             </Link>
           </div>
 
-          {/* Right Side: Settings */}
           <div className="justify-self-end flex items-center">
             {user && !isUserLoading && (
                 <DropdownMenu>
@@ -173,6 +176,39 @@ const Header = () => {
                             {isEditMode ? <Eye className="mr-2 h-4 w-4" /> : <PencilRuler className="mr-2 h-4 w-4" />}
                             <span>{isEditMode ? "Харах" : "Засварлах"}</span>
                         </DropdownMenuItem>
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                    <QrCode className="mr-2 h-4 w-4" />
+                                    <span>Портфолио QR</span>
+                                </DropdownMenuItem>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle>Портфолиогоо хуваалцах</DialogTitle>
+                                    <DialogDescription>
+                                        Энэхүү QR кодыг уншуулж эсвэл холбоосыг хуулж бусадтай хуваалцаарай.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="flex flex-col items-center justify-center space-y-4 p-4">
+                                     <div className="p-2 bg-white rounded-lg">
+                                        <Image
+                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${portfolioUrl}`}
+                                            alt="Portfolio QR Code"
+                                            width={200}
+                                            height={200}
+                                        />
+                                    </div>
+                                    <div className="flex w-full items-center space-x-2">
+                                        <Input id="portfolio-link" value={portfolioUrl} readOnly />
+                                        <Button type="button" size="sm" onClick={copyToClipboard}>
+                                            <span className="sr-only">Хуулах</span>
+                                            <Copy className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
                         <DropdownMenuSub>
                         <DropdownMenuSubTrigger>
                             <Palette className="mr-2 h-4 w-4" />
