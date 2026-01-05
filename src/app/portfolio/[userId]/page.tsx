@@ -1,30 +1,18 @@
 
-import { doc, getDoc } from 'firebase/firestore';
-import { getFirebaseAdmin } from '@/firebase/server';
-import { notFound } from 'next/navigation';
+'use client';
 
+import { doc, getDoc } from 'firebase/firestore';
+import { notFound } from 'next/navigation';
 import Hero from '@/components/sections/hero';
 import Projects from '@/components/sections/projects';
 import Skills from '@/components/sections/skills';
 import Experience from '@/components/sections/Experience';
 import Education from '@/components/sections/Education';
 import AboutPage from '@/app/about/page';
-import { FirebaseProvider } from '@/firebase/provider';
 import type { UserProfile } from '@/lib/types';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
-
-async function getUserProfile(userId: string): Promise<UserProfile | null> {
-    // Use the Admin SDK on the server to bypass security rules for public read
-    const { firestore: adminFirestore } = getFirebaseAdmin();
-    const userDocRef = doc(adminFirestore, 'users', userId);
-    const docSnap = await getDoc(userDocRef);
-
-    if (docSnap.exists()) {
-        return docSnap.data() as UserProfile;
-    }
-    return null;
-}
+import { useFirebase } from '@/firebase';
 
 function PortfolioContent() {
     return (
@@ -34,33 +22,57 @@ function PortfolioContent() {
             <Skills />
             <Projects />
             <Experience />
-            <AboutPage />
         </div>
     );
 }
 
-export default async function PortfolioPage({ params }: { params: { userId: string } }) {
+export default function PortfolioPage({ params }: { params: { userId: string } }) {
     const { userId } = params;
+    const { firestore } = useFirebase();
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    // Fetch the specific user's profile on the server
-    const userProfile = await getUserProfile(userId);
-    
-    // If no profile is found for the given userId, show a 404 page.
-    if (!userProfile) {
-        notFound();
+    useEffect(() => {
+        const getUserProfile = async () => {
+            if (!firestore) {
+                setLoading(false);
+                return;
+            }
+            try {
+                const userDocRef = doc(firestore, 'users', userId);
+                const docSnap = await getDoc(userDocRef);
+
+                if (docSnap.exists()) {
+                    setUserProfile(docSnap.data() as UserProfile);
+                } else {
+                    notFound();
+                }
+            } catch (error) {
+                console.error("Error fetching portfolio:", error);
+                // Optionally handle error state
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        getUserProfile();
+    }, [userId, firestore]);
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <Loader2 className="h-10 w-10 animate-spin" />
+            </div>
+        );
     }
     
-    // Get the admin-initialized app for the provider
-    const { firebaseApp, auth, firestore } = getFirebaseAdmin();
+    if (!userProfile) {
+        return notFound();
+    }
 
     return (
-        // The provider now receives a server-side authenticated context
-        // which allows child components (like Hero, Projects, etc.) to use
-        // Firebase hooks as if a user is logged in, but in a read-only context for this public page.
-         <FirebaseProvider firebaseApp={firebaseApp} auth={auth} firestore={firestore}>
-            <Suspense fallback={<div className="flex justify-center items-center h-screen"><Loader2 className="h-10 w-10 animate-spin" /></div>}>
-                <PortfolioContent />
-            </Suspense>
-        </FirebaseProvider>
+        <Suspense fallback={<div className="flex justify-center items-center h-screen"><Loader2 className="h-10 w-10 animate-spin" /></div>}>
+            <PortfolioContent />
+        </Suspense>
     );
 }

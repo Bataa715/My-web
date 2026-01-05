@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import { EditModeProvider } from "@/contexts/EditModeContext";
 import { ProjectProvider } from "@/contexts/ProjectContext";
 import { SkillsProvider } from "@/contexts/SkillsContext";
 import { EducationProvider } from "@/contexts/EducationContext";
@@ -11,6 +10,7 @@ import { ExperienceProvider } from "@/contexts/ExperienceContext";
 import { JetBrains_Mono } from "next/font/google";
 import PortfolioHeader from "./PortfolioHeader";
 import PortfolioFooter from "./PortfolioFooter";
+import { FirebaseClientProvider } from "@/firebase";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -31,17 +31,13 @@ export default function PortfolioLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="mn" suppressHydrationWarning>
-      <head>
-      </head>
-      <body className={`${jetbrainsMono.variable} min-h-screen bg-background font-body antialiased`}>
+    <div className={`${jetbrainsMono.variable} min-h-screen bg-background font-body antialiased`}>
         <ThemeProvider
             attribute="class"
             defaultTheme="default"
             enableSystem={false}
             disableTransitionOnChange
         >
-          <EditModeProvider>
             <EducationProvider>
             <ExperienceProvider>
             <ProjectProvider>
@@ -66,9 +62,7 @@ export default function PortfolioLayout({
             </ProjectProvider>
             </ExperienceProvider>
             </EducationProvider>
-          </EditModeProvider>
         </ThemeProvider>
-      </body>
-    </html>
+    </div>
   );
 }

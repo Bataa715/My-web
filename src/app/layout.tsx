@@ -12,7 +12,8 @@ import { HobbyProvider } from "@/contexts/HobbyContext";
 import { ExperienceProvider } from "@/contexts/ExperienceContext";
 import IntroOverlay from "@/components/IntroOverlay";
 import { JetBrains_Mono } from "next/font/google";
-import { AnimatePresence, motion } from "framer-motion";
+import { usePathname } from "next/navigation";
+
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -32,37 +33,17 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   return (
     <html lang="mn" suppressHydrationWarning>
       <head>
       </head>
       <body className={`${jetbrainsMono.variable} min-h-screen bg-background font-body antialiased`}>
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="default"
-            enableSystem={false}
-            disableTransitionOnChange
-        >
-          <IntroOverlay />
-          <FirebaseClientProvider>
-              <EditModeProvider>
-                  <EducationProvider>
-                  <ExperienceProvider>
-                  <ProjectProvider>
-                      <SkillsProvider>
-                      <HobbyProvider>
-                          <MainLayout>
-                            {children}
-                          </MainLayout>
-                          <Toaster />
-                      </HobbyProvider>
-                      </SkillsProvider>
-                  </ProjectProvider>
-                  </ExperienceProvider>
-                  </EducationProvider>
-              </EditModeProvider>
-          </FirebaseClientProvider>
-        </ThemeProvider>
+        <FirebaseClientProvider>
+          <EditModeProvider>
+            {children}
+          </EditModeProvider>
+        </FirebaseClientProvider>
       </body>
     </html>
   );
