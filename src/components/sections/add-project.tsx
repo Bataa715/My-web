@@ -1,16 +1,22 @@
-
-"use client";
+'use client';
 
 import { useState } from 'react';
-import { PlusCircle, X, Search, Upload } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { useProjects } from "@/contexts/ProjectContext";
+import { PlusCircle, X, Search, Upload } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { useProjects } from '@/contexts/ProjectContext';
 import { ScrollArea } from '../ui/scroll-area';
 import { cn } from '@/lib/utils';
 import TechIcon from '../shared/TechIcon';
@@ -19,22 +25,69 @@ import Image from 'next/image';
 
 // Popular technologies list for quick selection
 const popularTechnologies = [
-  "React", "Next.js", "TypeScript", "JavaScript", "Python", "Node.js",
-  "Firebase", "PostgreSQL", "MongoDB", "Tailwind CSS", "Vue", "Angular",
-  "React Native", "Flutter", "Docker", "AWS", "Supabase", "GraphQL",
-  "Express", "NestJS", "Django", "FastAPI", "Prisma", "Redis",
-  "Vercel", "Netlify", "GitHub", "Git", "Figma", "Framer",
-  "Vite", "Jest", "Cypress", "Stripe", "Electron", "Tauri",
-  "Kubernetes", "Terraform", "MySQL", "SQLite", "MinIO", "Expo"
+  'React',
+  'Next.js',
+  'TypeScript',
+  'JavaScript',
+  'Python',
+  'Node.js',
+  'Firebase',
+  'PostgreSQL',
+  'MongoDB',
+  'Tailwind CSS',
+  'Vue',
+  'Angular',
+  'React Native',
+  'Flutter',
+  'Docker',
+  'AWS',
+  'Supabase',
+  'GraphQL',
+  'Express',
+  'NestJS',
+  'Django',
+  'FastAPI',
+  'Prisma',
+  'Redis',
+  'Vercel',
+  'Netlify',
+  'GitHub',
+  'Git',
+  'Figma',
+  'Framer',
+  'Vite',
+  'Jest',
+  'Cypress',
+  'Stripe',
+  'Electron',
+  'Tauri',
+  'Kubernetes',
+  'Terraform',
+  'MySQL',
+  'SQLite',
+  'MinIO',
+  'Expo',
 ];
 
 const projectSchema = z.object({
-  name: z.string().min(2, "Төслийн нэр дор хаяж 2 тэмдэгттэй байх ёстой."),
-  description: z.string().min(10, "Төслийн тайлбар дор хаяж 10 тэмдэгттэй байх ёстой."),
-  technologies: z.array(z.string()).min(1, "Дор хаяж нэг технологи сонгох ёстой."),
-  link: z.string().url("Github холбоос буруу байна.").optional().or(z.literal('')),
-  live: z.string().url("Live хувилбарын холбоос буруу байна.").optional().or(z.literal('')),
-  category: z.string().min(1, "Төслийн ангилал заавал байх ёстой."),
+  name: z.string().min(2, 'Төслийн нэр дор хаяж 2 тэмдэгттэй байх ёстой.'),
+  description: z
+    .string()
+    .min(10, 'Төслийн тайлбар дор хаяж 10 тэмдэгттэй байх ёстой.'),
+  technologies: z
+    .array(z.string())
+    .min(1, 'Дор хаяж нэг технологи сонгох ёстой.'),
+  link: z
+    .string()
+    .url('Github холбоос буруу байна.')
+    .optional()
+    .or(z.literal('')),
+  live: z
+    .string()
+    .url('Live хувилбарын холбоос буруу байна.')
+    .optional()
+    .or(z.literal('')),
+  category: z.string().min(1, 'Төслийн ангилал заавал байх ёстой.'),
   image: z.string().optional().or(z.literal('')),
 });
 
@@ -44,19 +97,19 @@ interface AddProjectProps {
 
 export default function AddProject({ setDialogOpen }: AddProjectProps) {
   const { addProject } = useProjects();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [customTech, setCustomTech] = useState("");
-  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [customTech, setCustomTech] = useState('');
+
   const form = useForm<z.infer<typeof projectSchema>>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      name: '',
+      description: '',
       technologies: [],
-      link: "",
-      live: "",
-      category: "",
-      image: "",
+      link: '',
+      live: '',
+      category: '',
+      image: '',
     },
   });
 
@@ -93,7 +146,7 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
     if (customTech.trim() && !selectedTechs.includes(customTech.trim())) {
       const newTechs = [...selectedTechs, customTech.trim()];
       form.setValue('technologies', newTechs, { shouldValidate: true });
-      setCustomTech("");
+      setCustomTech('');
     }
   };
 
@@ -105,7 +158,6 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
   const filteredTechnologies = popularTechnologies.filter(tech =>
     tech.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
 
   return (
     <Form {...form}>
@@ -149,47 +201,58 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
               <div className="flex items-center gap-4">
                 <div className="w-24 h-24 rounded-md border bg-muted flex items-center justify-center shrink-0">
                   {imageValue ? (
-                    <Image src={imageValue} alt="Project preview" width={96} height={96} className="w-full h-full object-cover rounded-md" />
+                    <Image
+                      src={imageValue}
+                      alt="Project preview"
+                      width={96}
+                      height={96}
+                      className="w-full h-full object-cover rounded-md"
+                    />
                   ) : (
                     <Upload className="w-8 h-8 text-muted-foreground" />
                   )}
                 </div>
                 <div className="w-full space-y-2">
-                   <Input 
-                      placeholder="Зургийн холбоос..." 
-                      value={field.value || ''}
-                      onChange={field.onChange}
-                   />
-                   <div className="relative">
-                     <Button type="button" variant="outline" size="sm" className="w-full">
-                       Компьютерээс сонгох
-                     </Button>
-                     <Input 
-                      type="file" 
+                  <Input
+                    placeholder="Зургийн холбоос..."
+                    value={field.value || ''}
+                    onChange={field.onChange}
+                  />
+                  <div className="relative">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                    >
+                      Компьютерээс сонгох
+                    </Button>
+                    <Input
+                      type="file"
                       accept="image/*"
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       onChange={handleImageUpload}
                     />
-                   </div>
+                  </div>
                 </div>
               </div>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="technologies"
           render={() => (
             <FormItem>
               <FormLabel>Ашигласан технологиуд</FormLabel>
-              
+
               {selectedTechs.length > 0 && (
                 <div className="flex flex-wrap gap-2 pb-2">
                   {selectedTechs.map(tech => (
-                    <Badge 
-                      key={tech} 
+                    <Badge
+                      key={tech}
                       variant="secondary"
                       className="flex items-center gap-1.5 pr-1 bg-primary/20 text-primary border border-primary/30"
                     >
@@ -211,8 +274,8 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
                 <Input
                   placeholder="Өөр технологи нэмэх..."
                   value={customTech}
-                  onChange={(e) => setCustomTech(e.target.value)}
-                  onKeyDown={(e) => {
+                  onChange={e => setCustomTech(e.target.value)}
+                  onKeyDown={e => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
                       handleAddCustomTech();
@@ -236,7 +299,7 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
                 <Input
                   placeholder="Технологи хайх..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={e => setSearchQuery(e.target.value)}
                   className="pl-9 h-9"
                 />
               </div>
@@ -249,14 +312,16 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
                       type="button"
                       onClick={() => handleTechToggle(tech)}
                       className={cn(
-                        "flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all duration-200",
+                        'flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all duration-200',
                         selectedTechs.includes(tech)
-                          ? "bg-primary/20 border-primary shadow-md shadow-primary/20 scale-105"
-                          : "bg-muted/30 border-transparent hover:bg-muted hover:border-muted-foreground/30"
+                          ? 'bg-primary/20 border-primary shadow-md shadow-primary/20 scale-105'
+                          : 'bg-muted/30 border-transparent hover:bg-muted hover:border-muted-foreground/30'
                       )}
                     >
                       <TechIcon techName={tech} className="h-8 w-8" />
-                      <span className="text-[10px] text-center font-medium truncate w-full">{tech}</span>
+                      <span className="text-[10px] text-center font-medium truncate w-full">
+                        {tech}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -279,7 +344,7 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
             </FormItem>
           )}
         />
-          <FormField
+        <FormField
           control={form.control}
           name="link"
           render={({ field }) => (
@@ -292,7 +357,7 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
             </FormItem>
           )}
         />
-          <FormField
+        <FormField
           control={form.control}
           name="live"
           render={({ field }) => (
@@ -305,8 +370,19 @@ export default function AddProject({ setDialogOpen }: AddProjectProps) {
             </FormItem>
           )}
         />
-        <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? 'Нэмж байна...' : <><PlusCircle className="mr-2 h-4 w-4" /> Төсөл нэмэх</>}
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? (
+            'Нэмж байна...'
+          ) : (
+            <>
+              <PlusCircle className="mr-2 h-4 w-4" /> Төсөл нэмэх
+            </>
+          )}
         </Button>
       </form>
     </Form>

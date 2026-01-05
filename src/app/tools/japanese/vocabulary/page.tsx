@@ -1,6 +1,6 @@
 'use client';
 
-import VocabularyManager from "@/components/shared/VocabularyManager";
+import VocabularyManager from '@/components/shared/VocabularyManager';
 
 const columns = [
   { key: 'word' as const, header: 'Япон үг' },

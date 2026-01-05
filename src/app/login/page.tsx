@@ -8,8 +8,22 @@ import { useAuth } from '@/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 
@@ -34,9 +48,13 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     if (!auth) {
-        toast({ title: 'Алдаа', description: 'Firebase-д холбогдож чадсангүй.', variant: 'destructive' });
-        setIsLoading(false);
-        return;
+      toast({
+        title: 'Алдаа',
+        description: 'Firebase-д холбогдож чадсангүй.',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
     }
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
@@ -47,18 +65,18 @@ export default function LoginPage() {
       });
       // MainLayout will handle the redirect automatically
     } catch (error: any) {
-       let errorMessage = 'Нэвтрэхэд тодорхойгүй алдаа гарлаа.';
-        if (error?.code === 'auth/user-not-found') {
-            errorMessage = 'Хэрэглэгч олдсонгүй. Бүртгүүлнэ үү.';
-        } else if (error?.code === 'auth/wrong-password') {
-            errorMessage = 'Нууц үг буруу байна.';
-        } else if (error?.code === 'auth/invalid-credential') {
-            errorMessage = 'И-мэйл эсвэл нууц үг буруу байна.';
-        } else if (error?.code === 'auth/too-many-requests') {
-            errorMessage = 'Хэт олон оролдлого хийсэн байна. Хэсэг хүлээнэ үү.';
-        } else if (error?.code === 'auth/network-request-failed') {
-            errorMessage = 'Интернэт холболтыг шалгана үү.';
-        }
+      let errorMessage = 'Нэвтрэхэд тодорхойгүй алдаа гарлаа.';
+      if (error?.code === 'auth/user-not-found') {
+        errorMessage = 'Хэрэглэгч олдсонгүй. Бүртгүүлнэ үү.';
+      } else if (error?.code === 'auth/wrong-password') {
+        errorMessage = 'Нууц үг буруу байна.';
+      } else if (error?.code === 'auth/invalid-credential') {
+        errorMessage = 'И-мэйл эсвэл нууц үг буруу байна.';
+      } else if (error?.code === 'auth/too-many-requests') {
+        errorMessage = 'Хэт олон оролдлого хийсэн байна. Хэсэг хүлээнэ үү.';
+      } else if (error?.code === 'auth/network-request-failed') {
+        errorMessage = 'Интернэт холболтыг шалгана үү.';
+      }
 
       toast({
         title: 'Нэвтрэхэд алдаа гарлаа',
@@ -102,7 +120,11 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Нууц үг</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -114,13 +136,13 @@ export default function LoginPage() {
             </form>
           </Form>
         </CardContent>
-         <CardFooter className="flex-col items-center text-sm">
-            <p className="text-muted-foreground">
-                Шинэ хэрэглэгч үү?{' '}
-                <Link href="/signup" className="underline text-primary">
-                Бүртгүүлэх
-                </Link>
-            </p>
+        <CardFooter className="flex-col items-center text-sm">
+          <p className="text-muted-foreground">
+            Шинэ хэрэглэгч үү?{' '}
+            <Link href="/signup" className="underline text-primary">
+              Бүртгүүлэх
+            </Link>
+          </p>
         </CardFooter>
       </Card>
     </div>

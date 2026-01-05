@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -11,7 +10,11 @@ import ReadingView from '@/components/shared/ReadingView';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-export default function ReadingMaterialPage({ params }: { params: { readingId: string } }) {
+export default function ReadingMaterialPage({
+  params,
+}: {
+  params: { readingId: string };
+}) {
   const { firestore, user, isUserLoading } = useFirebase();
   const [material, setMaterial] = useState<ReadingMaterial | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,34 +32,42 @@ export default function ReadingMaterialPage({ params }: { params: { readingId: s
       setLoading(true);
       setError(null);
       try {
-        const materialDocRef = doc(firestore, `users/${user.uid}/englishReading`, readingId);
+        const materialDocRef = doc(
+          firestore,
+          `users/${user.uid}/englishReading`,
+          readingId
+        );
         const userDocRef = doc(firestore, 'users', user.uid);
-        
+
         const [materialSnap, userSnap] = await Promise.all([
-            getDoc(materialDocRef),
-            getDoc(userDocRef)
+          getDoc(materialDocRef),
+          getDoc(userDocRef),
         ]);
 
         if (materialSnap.exists()) {
-          setMaterial({ id: materialSnap.id, ...materialSnap.data() } as ReadingMaterial);
+          setMaterial({
+            id: materialSnap.id,
+            ...materialSnap.data(),
+          } as ReadingMaterial);
         } else {
           setError('Унших материал олдсонгүй.');
         }
 
         let imageUrl;
         if (userSnap.exists()) {
-            const data = userSnap.data() as UserProfile;
-            imageUrl = data.homeHeroImage;
+          const data = userSnap.data() as UserProfile;
+          imageUrl = data.homeHeroImage;
         }
 
         if (!imageUrl) {
-            const placeholder = PlaceHolderImages.find(p => p.id === 'home-hero-background');
-            imageUrl = placeholder?.imageUrl;
+          const placeholder = PlaceHolderImages.find(
+            p => p.id === 'home-hero-background'
+          );
+          imageUrl = placeholder?.imageUrl;
         }
         setHeroImage(imageUrl);
-
       } catch (err) {
-        console.error("Error fetching reading material or hero image:", err);
+        console.error('Error fetching reading material or hero image:', err);
         setError('Унших материал татахад алдаа гарлаа.');
       } finally {
         setLoading(false);
@@ -68,20 +79,20 @@ export default function ReadingMaterialPage({ params }: { params: { readingId: s
 
   return (
     <div className="relative space-y-8">
-        {heroImage && (
-            <div className="absolute top-0 left-0 w-full h-full -z-10">
-              <Image
-                src={heroImage}
-                alt="Abstract background"
-                fill
-                className="object-cover"
-                data-ai-hint="abstract library"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
-            </div>
-        )}
+      {heroImage && (
+        <div className="absolute top-0 left-0 w-full h-full -z-10">
+          <Image
+            src={heroImage}
+            alt="Abstract background"
+            fill
+            className="object-cover"
+            data-ai-hint="abstract library"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
+        </div>
+      )}
       <BackButton />
-      
+
       {loading && (
         <div className="space-y-4 pt-8">
           <Skeleton className="h-10 w-3/4" />
@@ -100,9 +111,7 @@ export default function ReadingMaterialPage({ params }: { params: { readingId: s
         </div>
       )}
 
-      {!loading && !error && material && (
-        <ReadingView material={material} />
-      )}
+      {!loading && !error && material && <ReadingView material={material} />}
     </div>
   );
 }

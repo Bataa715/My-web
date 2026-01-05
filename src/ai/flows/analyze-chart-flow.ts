@@ -1,4 +1,3 @@
-
 'use server';
 
 import { ai } from '@/ai/genkit';
@@ -14,20 +13,33 @@ const ChartAnalysisInputSchema = z.object({
 export type ChartAnalysisInput = z.infer<typeof ChartAnalysisInputSchema>;
 
 const ChartAnalysisOutputSchema = z.object({
-  analysis: z.string().describe("Графикийн техник шинжилгээний дэлгэрэнгүй тайлбар. Ямар патерн, индикатор ашигласан, дэмжих болон эсэргүүцэх гол түвшнүүд, мөн яагаад ийм дохио гарсныг болон stop-loss/take-profit цэгүүдийг яагаад тэнд тавих нь зүйтэйг тайлбарлана."),
-  signal: z.enum(['BUY', 'SELL', 'HOLD']).describe("Шинжилгээнээс гарсан арилжааны дохио (АВАХ, ЗАРАХ, ХҮЛЭЭХ)."),
-  confidence: z.number().min(0).max(100).describe("Дохионы итгэлцлийн хувь (0-100)."),
-  suggestedStopLoss: z.number().describe("Санал болгож буй алдагдлыг зогсоох (stop-loss) цэгийн ханш."),
-  suggestedTakeProfit: z.number().describe("Санал болгож буй ашгийг авах (take-profit) цэгийн ханш."),
+  analysis: z
+    .string()
+    .describe(
+      'Графикийн техник шинжилгээний дэлгэрэнгүй тайлбар. Ямар патерн, индикатор ашигласан, дэмжих болон эсэргүүцэх гол түвшнүүд, мөн яагаад ийм дохио гарсныг болон stop-loss/take-profit цэгүүдийг яагаад тэнд тавих нь зүйтэйг тайлбарлана.'
+    ),
+  signal: z
+    .enum(['BUY', 'SELL', 'HOLD'])
+    .describe('Шинжилгээнээс гарсан арилжааны дохио (АВАХ, ЗАРАХ, ХҮЛЭЭХ).'),
+  confidence: z
+    .number()
+    .min(0)
+    .max(100)
+    .describe('Дохионы итгэлцлийн хувь (0-100).'),
+  suggestedStopLoss: z
+    .number()
+    .describe('Санал болгож буй алдагдлыг зогсоох (stop-loss) цэгийн ханш.'),
+  suggestedTakeProfit: z
+    .number()
+    .describe('Санал болгож буй ашгийг авах (take-profit) цэгийн ханш.'),
 });
 export type ChartAnalysisOutput = z.infer<typeof ChartAnalysisOutputSchema>;
 
-
 const analyzeChartPrompt = ai.definePrompt({
-    name: 'analyzeChartPrompt',
-    input: { schema: ChartAnalysisInputSchema },
-    output: { schema: ChartAnalysisOutputSchema },
-    prompt: `Та бол зөвхөн Алтны (XAU/USD) ханшийн техник шинжилгээгээр мэргэшсэн, олон жилийн туршлагатай мэргэжлийн арилжаачин. Таны үүрэг бол оруулсан зургийг шинжлээд, МОНГОЛ хэл дээр, маш дэлгэрэнгүй, ойлгомжтой зөвлөгөө өгөх.
+  name: 'analyzeChartPrompt',
+  input: { schema: ChartAnalysisInputSchema },
+  output: { schema: ChartAnalysisOutputSchema },
+  prompt: `Та бол зөвхөн Алтны (XAU/USD) ханшийн техник шинжилгээгээр мэргэшсэн, олон жилийн туршлагатай мэргэжлийн арилжаачин. Таны үүрэг бол оруулсан зургийг шинжлээд, МОНГОЛ хэл дээр, маш дэлгэрэнгүй, ойлгомжтой зөвлөгөө өгөх.
 
 Дараах зургийг шинжилнэ үү:
 
@@ -48,7 +60,7 @@ const analyzeChartFlow = ai.defineFlow(
     inputSchema: ChartAnalysisInputSchema,
     outputSchema: ChartAnalysisOutputSchema,
   },
-  async (input) => {
+  async input => {
     const { output } = await analyzeChartPrompt(input);
     if (!output) {
       throw new Error('Failed to get a chart analysis from the AI model.');
@@ -57,6 +69,8 @@ const analyzeChartFlow = ai.defineFlow(
   }
 );
 
-export async function analyzeChart(input: ChartAnalysisInput): Promise<ChartAnalysisOutput> {
+export async function analyzeChart(
+  input: ChartAnalysisInput
+): Promise<ChartAnalysisOutput> {
   return analyzeChartFlow(input);
 }

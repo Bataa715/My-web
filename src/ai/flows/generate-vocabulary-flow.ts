@@ -1,4 +1,3 @@
-
 'use server';
 
 import { ai } from '@/ai/genkit';
@@ -7,23 +6,32 @@ import { z } from 'zod';
 const GeneratedWordSchema = z.object({
   word: z.string().describe('The English word.'),
   translation: z.string().describe('The Mongolian translation of the word.'),
-  definition: z.string().optional().describe('A simple English definition of the word.'),
+  definition: z
+    .string()
+    .optional()
+    .describe('A simple English definition of the word.'),
 });
 export type GeneratedWord = z.infer<typeof GeneratedWordSchema>;
 
-
 // Define the schema for the flow's input
 const GenerateVocabularyInputSchema = z.object({
-  text: z.string().describe('A block of raw text containing English words, their Mongolian translations, and possibly definitions. The format can be messy, like copied from a PDF or website.'),
+  text: z
+    .string()
+    .describe(
+      'A block of raw text containing English words, their Mongolian translations, and possibly definitions. The format can be messy, like copied from a PDF or website.'
+    ),
 });
-export type GenerateVocabularyInput = z.infer<typeof GenerateVocabularyInputSchema>;
+export type GenerateVocabularyInput = z.infer<
+  typeof GenerateVocabularyInputSchema
+>;
 
 // Define the schema for the flow's output
 const GenerateVocabularyOutputSchema = z.object({
   words: z.array(GeneratedWordSchema),
 });
-export type GenerateVocabularyOutput = z.infer<typeof GenerateVocabularyOutputSchema>;
-
+export type GenerateVocabularyOutput = z.infer<
+  typeof GenerateVocabularyOutputSchema
+>;
 
 const generateVocabularyPrompt = ai.definePrompt({
   name: 'generateVocabularyPrompt',
@@ -56,16 +64,20 @@ const generateVocabularyFlow = ai.defineFlow(
     inputSchema: GenerateVocabularyInputSchema,
     outputSchema: GenerateVocabularyOutputSchema,
   },
-  async (input) => {
+  async input => {
     const { output } = await generateVocabularyPrompt(input);
     if (!output) {
-      throw new Error('Failed to generate vocabulary. The AI model did not return a valid output.');
+      throw new Error(
+        'Failed to generate vocabulary. The AI model did not return a valid output.'
+      );
     }
     return output;
   }
 );
 
 // Export a wrapper function to be used as a server action
-export async function generateVocabulary(input: GenerateVocabularyInput): Promise<GenerateVocabularyOutput> {
+export async function generateVocabulary(
+  input: GenerateVocabularyInput
+): Promise<GenerateVocabularyOutput> {
   return generateVocabularyFlow(input);
 }

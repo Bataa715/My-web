@@ -1,4 +1,3 @@
-
 export default function NotesLayout({
   children,
 }: Readonly<{

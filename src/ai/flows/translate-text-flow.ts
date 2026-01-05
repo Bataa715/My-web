@@ -1,4 +1,3 @@
-
 'use server';
 
 import { ai } from '@/ai/genkit';
@@ -6,7 +5,10 @@ import { z } from 'zod';
 
 const TranslateTextInputSchema = z.object({
   text: z.string().describe('The text to be translated.'),
-  targetLanguage: z.string().default('Mongolian').describe('The language to translate the text into.'),
+  targetLanguage: z
+    .string()
+    .default('Mongolian')
+    .describe('The language to translate the text into.'),
 });
 export type TranslateTextInput = z.infer<typeof TranslateTextInputSchema>;
 
@@ -35,7 +37,7 @@ const translateTextFlow = ai.defineFlow(
     inputSchema: TranslateTextInputSchema,
     outputSchema: TranslateTextOutputSchema,
   },
-  async (input) => {
+  async input => {
     const { output } = await translateTextPrompt(input);
     if (!output) {
       throw new Error('Failed to get a translation from the AI model.');
@@ -44,6 +46,8 @@ const translateTextFlow = ai.defineFlow(
   }
 );
 
-export async function translateText(input: TranslateTextInput): Promise<TranslateTextOutput> {
+export async function translateText(
+  input: TranslateTextInput
+): Promise<TranslateTextOutput> {
   return translateTextFlow(input);
 }

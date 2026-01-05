@@ -1,7 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -18,7 +24,11 @@ const experienceImages = [
   { id: 'exp4', src: '/images/exp4.png', label: 'DevOps' },
 ];
 
-export const AddExperienceDialog = ({ children }: { children: React.ReactNode }) => {
+export const AddExperienceDialog = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -47,7 +57,7 @@ export const AddExperienceDialog = ({ children }: { children: React.ReactNode })
             <Input
               id="title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={e => setTitle(e.target.value)}
               placeholder="Жишээ: Фронтенд инженер"
               required
             />
@@ -57,7 +67,7 @@ export const AddExperienceDialog = ({ children }: { children: React.ReactNode })
             <Textarea
               id="description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               placeholder="Туршлагын дэлгэрэнгүй..."
               rows={4}
               required
@@ -66,17 +76,17 @@ export const AddExperienceDialog = ({ children }: { children: React.ReactNode })
           <div className="space-y-2">
             <Label>Зураг сонгох</Label>
             <div className="grid grid-cols-4 gap-3">
-              {experienceImages.map((img) => (
+              {experienceImages.map(img => (
                 <button
                   key={img.id}
                   type="button"
                   onClick={() => setImage(img.src)}
                   className={cn(
-                    "relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-200",
-                    "hover:border-primary/50 hover:scale-105",
-                    image === img.src 
-                      ? "border-primary ring-2 ring-primary/30" 
-                      : "border-border/50"
+                    'relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-200',
+                    'hover:border-primary/50 hover:scale-105',
+                    image === img.src
+                      ? 'border-primary ring-2 ring-primary/30'
+                      : 'border-border/50'
                   )}
                 >
                   <Image
@@ -95,7 +105,11 @@ export const AddExperienceDialog = ({ children }: { children: React.ReactNode })
             </div>
           </div>
           <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
               Цуцлах
             </Button>
             <Button type="submit">Нэмэх</Button>

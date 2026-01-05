@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -9,7 +8,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import BackButton from '@/components/shared/BackButton';
 import GrammarRuleDetail from '@/components/shared/GrammarRuleDetail';
 
-export default function JapaneseGrammarRulePage({ params }: { params: { ruleId: string } }) {
+export default function JapaneseGrammarRulePage({
+  params,
+}: {
+  params: { ruleId: string };
+}) {
   const { firestore, user } = useFirebase();
   const [rule, setRule] = useState<GrammarRule | null>(null);
   const [loading, setLoading] = useState(true);
@@ -18,15 +21,19 @@ export default function JapaneseGrammarRulePage({ params }: { params: { ruleId: 
 
   useEffect(() => {
     if (!firestore || !ruleId || !user) {
-        setLoading(false);
-        return;
-    };
+      setLoading(false);
+      return;
+    }
 
     const fetchRule = async () => {
       setLoading(true);
       setError(null);
       try {
-        const ruleDocRef = doc(firestore, `users/${user.uid}/japaneseGrammar`, ruleId);
+        const ruleDocRef = doc(
+          firestore,
+          `users/${user.uid}/japaneseGrammar`,
+          ruleId
+        );
         const docSnap = await getDoc(ruleDocRef);
 
         if (docSnap.exists()) {
@@ -35,7 +42,7 @@ export default function JapaneseGrammarRulePage({ params }: { params: { ruleId: 
           setError('Дүрэм олдсонгүй.');
         }
       } catch (err) {
-        console.error("Error fetching grammar rule:", err);
+        console.error('Error fetching grammar rule:', err);
         setError('Дүрэм татахад алдаа гарлаа.');
       } finally {
         setLoading(false);
@@ -44,20 +51,20 @@ export default function JapaneseGrammarRulePage({ params }: { params: { ruleId: 
 
     fetchRule();
   }, [firestore, ruleId, user]);
-  
+
   const handleUpdateRule = (updatedRule: GrammarRule) => {
     setRule(updatedRule);
   };
 
   const handleDeleteRule = () => {
     setRule(null);
-    setError("Энэ дүрэм устгагдсан.");
+    setError('Энэ дүрэм устгагдсан.');
   };
 
   return (
     <div className="space-y-8">
       <BackButton />
-      
+
       {loading && (
         <div className="space-y-4 pt-8">
           <Skeleton className="h-12 w-3/4 mx-auto" />
@@ -71,17 +78,17 @@ export default function JapaneseGrammarRulePage({ params }: { params: { ruleId: 
       )}
 
       {error && (
-         <div className="text-center py-10">
-            <p className="text-destructive">{error}</p>
-         </div>
+        <div className="text-center py-10">
+          <p className="text-destructive">{error}</p>
+        </div>
       )}
 
       {!loading && !error && rule && (
-        <GrammarRuleDetail 
-            rule={rule} 
-            onUpdateRule={handleUpdateRule}
-            onDeleteRule={handleDeleteRule}
-            collectionPath="japaneseGrammar" 
+        <GrammarRuleDetail
+          rule={rule}
+          onUpdateRule={handleUpdateRule}
+          onDeleteRule={handleDeleteRule}
+          collectionPath="japaneseGrammar"
         />
       )}
     </div>

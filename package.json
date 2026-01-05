@@ -9,6 +9,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css}\"",
     "typecheck": "tsc --noEmit",
     "deploy": "vercel --prod"
   },
@@ -69,6 +71,7 @@
     "@types/react-dom": "^19.2.1",
     "genkit-cli": "^1.20.0",
     "postcss": "^8",
+    "prettier": "^3.7.4",
     "tailwindcss": "^3.4.1",
     "typescript": "5.9.3",
     "vercel": "^35.2.0"

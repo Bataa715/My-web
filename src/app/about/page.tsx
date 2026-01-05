@@ -1,23 +1,80 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, ArrowLeft, PlusCircle, Edit, Trash2, ArrowRight, Calendar, Cake, Star, Ruler, Brain, User, Heart, MapPin, Mail, Phone, Briefcase, GraduationCap, Home } from 'lucide-react';
-import { useState, useEffect, useCallback, type CSSProperties, useMemo, useRef } from 'react';
+import {
+  Loader2,
+  Save,
+  ArrowLeft,
+  PlusCircle,
+  Edit,
+  Trash2,
+  ArrowRight,
+  Calendar,
+  Cake,
+  Star,
+  Ruler,
+  Brain,
+  User,
+  Heart,
+  MapPin,
+  Mail,
+  Phone,
+  Briefcase,
+  GraduationCap,
+  Home,
+} from 'lucide-react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  type CSSProperties,
+  useMemo,
+  useRef,
+} from 'react';
 import Image from 'next/image';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
-import type { UserProfile, Hobby, PersonalInfoItem as PersonalInfoType } from '@/lib/types';
+import type {
+  UserProfile,
+  Hobby,
+  PersonalInfoItem as PersonalInfoType,
+} from '@/lib/types';
 import { useEditMode } from '@/contexts/EditModeContext';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useHobbies } from '@/contexts/HobbyContext';
 import { AddHobbyDialog } from '@/components/AddHobbyDialog';
 import { EditHobbyDialog } from '@/components/EditHobbyDialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import InteractiveParticles from '@/components/shared/InteractiveParticles';
 
@@ -51,14 +108,14 @@ const displayLabelMap: Record<string, string> = {
 const getDisplayLabel = (label: string) => displayLabelMap[label] || label;
 
 // InfoCard component - clean minimal design without icons
-const InfoCard = ({ 
-  info, 
-  index, 
-  isEditMode, 
+const InfoCard = ({
+  info,
+  index,
+  isEditMode,
   onEditClick,
-  size = 'normal'
-}: { 
-  info: PersonalInfoType; 
+  size = 'normal',
+}: {
+  info: PersonalInfoType;
   index: number;
   isEditMode: boolean;
   onEditClick: (info: PersonalInfoType) => void;
@@ -67,13 +124,13 @@ const InfoCard = ({
   const sizeClasses = {
     small: 'py-4 px-5',
     normal: 'py-5 px-6',
-    large: 'py-6 px-7'
+    large: 'py-6 px-7',
   };
-  
+
   const textSizeClasses = {
     small: 'text-2xl md:text-3xl',
     normal: 'text-3xl md:text-4xl',
-    large: 'text-4xl md:text-5xl'
+    large: 'text-4xl md:text-5xl',
   };
 
   return (
@@ -89,44 +146,48 @@ const InfoCard = ({
       whileHover={{ scale: 1.03, x: 8 }}
       className="group w-full"
     >
-      <div className={cn(
-        "relative rounded-2xl overflow-hidden transition-all duration-500",
-        "bg-gradient-to-r from-card/90 via-card/70 to-transparent backdrop-blur-xl",
-        "border-l-4 border-primary/60 group-hover:border-primary",
-        "group-hover:shadow-xl group-hover:shadow-primary/20",
-        sizeClasses[size]
-      )}>
+      <div
+        className={cn(
+          'relative rounded-2xl overflow-hidden transition-all duration-500',
+          'bg-gradient-to-r from-card/90 via-card/70 to-transparent backdrop-blur-xl',
+          'border-l-4 border-primary/60 group-hover:border-primary',
+          'group-hover:shadow-xl group-hover:shadow-primary/20',
+          sizeClasses[size]
+        )}
+      >
         {/* Animated background gradient */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-        
+
         {/* Glow effect on left border */}
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        
+
         {/* Content */}
         <div className="relative z-10 flex items-center justify-between gap-4">
           {/* Label */}
           <span className="text-xs md:text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary transition-colors duration-300">
             {getDisplayLabel(info.label)}
           </span>
-          
+
           {/* Value */}
-          <span className={cn(
-            "font-black text-foreground tracking-tight",
-            "bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text",
-            "group-hover:from-primary group-hover:to-foreground group-hover:text-transparent",
-            "transition-all duration-300",
-            textSizeClasses[size]
-          )}>
+          <span
+            className={cn(
+              'font-black text-foreground tracking-tight',
+              'bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text',
+              'group-hover:from-primary group-hover:to-foreground group-hover:text-transparent',
+              'transition-all duration-300',
+              textSizeClasses[size]
+            )}
+          >
             {info.value}
           </span>
         </div>
-        
+
         {isEditMode && (
           <Button
             variant="ghost"
             size="icon"
             className="absolute top-1/2 -translate-y-1/2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-background/80 hover:bg-primary/20 rounded-full border border-primary/50"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               onEditClick(info);
             }}
@@ -140,11 +201,11 @@ const InfoCard = ({
 };
 
 // InfoCardArrowLayout - Diagonal staircase pattern (top-right to bottom-left)
-const InfoCardArrowLayout = ({ 
-  infos, 
-  isEditMode, 
-  onEditClick 
-}: { 
+const InfoCardArrowLayout = ({
+  infos,
+  isEditMode,
+  onEditClick,
+}: {
   infos: PersonalInfoType[];
   isEditMode: boolean;
   onEditClick: (info: PersonalInfoType) => void;
@@ -154,12 +215,14 @@ const InfoCardArrowLayout = ({
     const infoMap = new Map(infos.map(i => [i.label, i]));
     // Order: Орд (top) -> Төрсөн өдөр -> Нас (center) -> Өндөр -> MBTI (bottom)
     const order = ['Орд', 'Төрсөн өдөр', 'Нас', 'Өндөр', 'MBTI'];
-    
-    const mainItems = order.map(label => infoMap.get(label)).filter(Boolean) as PersonalInfoType[];
+
+    const mainItems = order
+      .map(label => infoMap.get(label))
+      .filter(Boolean) as PersonalInfoType[];
     if (mainItems.length >= 5) {
       return mainItems.slice(0, 5);
     }
-    
+
     const remaining = infos.filter(i => !order.includes(i.label));
     return [...mainItems, ...remaining].slice(0, 5);
   }, [infos]);
@@ -168,7 +231,13 @@ const InfoCardArrowLayout = ({
     return (
       <div className="flex flex-col gap-3 w-full max-w-md">
         {orderedInfo.map((info, index) => (
-          <InfoCard key={index} info={info} index={index} isEditMode={isEditMode} onEditClick={onEditClick} />
+          <InfoCard
+            key={index}
+            info={info}
+            index={index}
+            isEditMode={isEditMode}
+            onEditClick={onEditClick}
+          />
         ))}
       </div>
     );
@@ -182,7 +251,12 @@ const InfoCardArrowLayout = ({
     <div className="flex flex-col gap-2.5 w-full">
       {orderedInfo.map((info, index) => (
         <div key={index} className={`w-[45%] min-w-[280px] ${offsets[index]}`}>
-          <InfoCard info={info} index={index} isEditMode={isEditMode} onEditClick={onEditClick} />
+          <InfoCard
+            info={info}
+            index={index}
+            isEditMode={isEditMode}
+            onEditClick={onEditClick}
+          />
         </div>
       ))}
     </div>
@@ -196,24 +270,27 @@ export default function AboutPage() {
   const { toast } = useToast();
   const [personalInfo, setPersonalInfo] = useState<PersonalInfoType[]>([]);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
-  const [editingInfoItem, setEditingInfoItem] = useState<PersonalInfoType | null>(null);
+  const [editingInfoItem, setEditingInfoItem] =
+    useState<PersonalInfoType | null>(null);
   const [editingInfoValue, setEditingInfoValue] = useState('');
   const [saving, setSaving] = useState(false);
 
   const nameRef = useRef<HTMLDivElement>(null);
-  const [name, setName] = useState("Batuka");
+  const [name, setName] = useState('Batuka');
 
-  const greetings = useMemo(() => ["Сайн уу", "こんにちは", "Hello", "안녕하세요", "Привет", "Hallo"], []);
+  const greetings = useMemo(
+    () => ['Сайн уу', 'こんにちは', 'Hello', '안녕하세요', 'Привет', 'Hallo'],
+    []
+  );
   const [greetingIndex, setGreetingIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-        setGreetingIndex((prevIndex) => (prevIndex + 1) % greetings.length);
+      setGreetingIndex(prevIndex => (prevIndex + 1) % greetings.length);
     }, 2000); // Change every 2 seconds
 
     return () => clearInterval(interval);
   }, [greetings.length]);
-
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -221,21 +298,31 @@ export default function AboutPage() {
       const rect = nameRef.current.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      nameRef.current.style.setProperty("--mouse-x", `${x}px`);
-      nameRef.current.style.setProperty("--mouse-y", `${y}px`);
+      nameRef.current.style.setProperty('--mouse-x', `${x}px`);
+      nameRef.current.style.setProperty('--mouse-y', `${y}px`);
     };
 
     const currentRef = nameRef.current;
-    currentRef?.addEventListener("mousemove", handleMouseMove);
+    currentRef?.addEventListener('mousemove', handleMouseMove);
 
     return () => {
-      currentRef?.removeEventListener("mousemove", handleMouseMove);
+      currentRef?.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
 
   const displayItems = useMemo(() => {
-     if (isEditMode) {
-      return [...hobbies, { id: 'add-new-hobby', title: '', description: '', image: '', imageHint: '', createdAt: new Date() }];
+    if (isEditMode) {
+      return [
+        ...hobbies,
+        {
+          id: 'add-new-hobby',
+          title: '',
+          description: '',
+          image: '',
+          imageHint: '',
+          createdAt: new Date(),
+        },
+      ];
     }
     return hobbies;
   }, [hobbies, isEditMode]);
@@ -246,7 +333,7 @@ export default function AboutPage() {
   const anglePerItem = 360 / totalItems;
   const CIRCLE_RADIUS_DESKTOP = 400; // Controls the circle's radius
   const ITEM_WIDTH_DESKTOP = 250; // Width of a card
-  const CIRCLE_RADIUS_MOBILE = 220; 
+  const CIRCLE_RADIUS_MOBILE = 220;
   const ITEM_WIDTH_MOBILE = 180;
 
   const [carouselRadius, setCarouselRadius] = useState(CIRCLE_RADIUS_DESKTOP);
@@ -267,8 +354,9 @@ export default function AboutPage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const scrollNext = () => setActiveIndex((prev) => (prev + 1) % totalItems);
-  const scrollPrev = () => setActiveIndex((prev) => (prev - 1 + totalItems) % totalItems);
+  const scrollNext = () => setActiveIndex(prev => (prev + 1) % totalItems);
+  const scrollPrev = () =>
+    setActiveIndex(prev => (prev - 1 + totalItems) % totalItems);
 
   useEffect(() => {
     if (isUserLoading || !user || !firestore) return;
@@ -284,7 +372,7 @@ export default function AboutPage() {
           setPersonalInfo(data.personalInfo || []);
         }
       } catch (error) {
-          console.error("Error fetching user data:", error);
+        console.error('Error fetching user data:', error);
       }
     };
 
@@ -296,30 +384,39 @@ export default function AboutPage() {
     setEditingInfoValue(info.value);
     setIsEditingInfo(true);
   };
-  
+
   const handleSavePersonalInfo = async () => {
     if (!user || !firestore || !editingInfoItem) {
-        toast({ title: "Алдаа", description: "Нэвтэрч орно уу.", variant: "destructive" });
-        return;
+      toast({
+        title: 'Алдаа',
+        description: 'Нэвтэрч орно уу.',
+        variant: 'destructive',
+      });
+      return;
     }
     setSaving(true);
     try {
-        const updatedInfo = personalInfo.map(info => 
-            info.label === editingInfoItem.label ? { ...info, value: editingInfoValue } : info
-        );
-        const userDocRef = doc(firestore, 'users', user.uid);
-        await updateDoc(userDocRef, { personalInfo: updatedInfo });
-        
-        setPersonalInfo(updatedInfo);
-        setSaving(false);
-        setIsEditingInfo(false);
-        setEditingInfoItem(null);
-        toast({ title: "Амжилттай", description: "Мэдээлэл шинэчлэгдлээ." });
+      const updatedInfo = personalInfo.map(info =>
+        info.label === editingInfoItem.label
+          ? { ...info, value: editingInfoValue }
+          : info
+      );
+      const userDocRef = doc(firestore, 'users', user.uid);
+      await updateDoc(userDocRef, { personalInfo: updatedInfo });
 
+      setPersonalInfo(updatedInfo);
+      setSaving(false);
+      setIsEditingInfo(false);
+      setEditingInfoItem(null);
+      toast({ title: 'Амжилттай', description: 'Мэдээлэл шинэчлэгдлээ.' });
     } catch (error) {
-        console.error("Error saving personal info:", error);
-        setSaving(false);
-        toast({ title: "Алдаа", description: "Мэдээлэл хадгалахад алдаа гарлаа.", variant: "destructive" });
+      console.error('Error saving personal info:', error);
+      setSaving(false);
+      toast({
+        title: 'Алдаа',
+        description: 'Мэдээлэл хадгалахад алдаа гарлаа.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -333,68 +430,76 @@ export default function AboutPage() {
             <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-8 lg:gap-16 w-full">
               {/* Personal Info Cards */}
               <div className="w-full lg:w-1/2">
-                {personalInfo.length > 0 && <InfoCardArrowLayout infos={personalInfo} isEditMode={isEditMode} onEditClick={handleEditInfoClick} />}
+                {personalInfo.length > 0 && (
+                  <InfoCardArrowLayout
+                    infos={personalInfo}
+                    isEditMode={isEditMode}
+                    onEditClick={handleEditInfoClick}
+                  />
+                )}
               </div>
 
               {/* Text Content - Enhanced Design */}
               <div className="flex flex-col items-center lg:items-start text-center lg:text-left lg:w-1/2">
-                  {/* Greeting with glowing effect */}
-                  <div className="relative mb-6">
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={greetingIndex}
-                            className="relative"
-                            initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -20, scale: 0.9 }}
-                            transition={{ duration: 0.5, ease: 'easeInOut' }}
-                        >
-                            {/* Glowing background */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent blur-2xl rounded-full transform scale-150" />
-                            <h1 className="relative text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-foreground bg-clip-text text-transparent">
-                                {greetings[greetingIndex]}
-                            </h1>
-                        </motion.div>
-                    </AnimatePresence>
-                    {/* Animated underline */}
-                    <motion.div 
-                      className="h-1 bg-gradient-to-r from-primary via-primary/50 to-transparent rounded-full mt-2"
-                      initial={{ width: 0 }}
-                      animate={{ width: '80%' }}
-                      transition={{ duration: 0.8, delay: 0.3 }}
-                    />
-                  </div>
+                {/* Greeting with glowing effect */}
+                <div className="relative mb-6">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={greetingIndex}
+                      className="relative"
+                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                      transition={{ duration: 0.5, ease: 'easeInOut' }}
+                    >
+                      {/* Glowing background */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent blur-2xl rounded-full transform scale-150" />
+                      <h1 className="relative text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-foreground bg-clip-text text-transparent">
+                        {greetings[greetingIndex]}
+                      </h1>
+                    </motion.div>
+                  </AnimatePresence>
+                  {/* Animated underline */}
+                  <motion.div
+                    className="h-1 bg-gradient-to-r from-primary via-primary/50 to-transparent rounded-full mt-2"
+                    initial={{ width: 0 }}
+                    animate={{ width: '80%' }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                  />
+                </div>
 
-                  {/* Name section with enhanced styling */}
-                  <div className="relative group" ref={nameRef}>
-                      <motion.div
-                          initial={{ opacity: 0, y: 40 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.9, delay: 0.4, ease: [0.2, 0.65, 0.3, 0.9] }}
-                          className="flex flex-col items-center lg:items-start gap-2"
-                      >
-                          <div className="flex items-baseline gap-3 flex-wrap justify-center lg:justify-start">
-                            <h2 className="text-xl md:text-2xl text-muted-foreground font-light">
-                                Миний нэрийг
-                            </h2>
-                          </div>
-                          
-                          {/* Name with spotlight effect */}
-                          <div className="relative py-2">
-                            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/10 to-transparent blur-3xl" />
-                            <p className="spotlight-text text-6xl md:text-8xl font-black tracking-tighter relative">
-                                {name}
-                            </p>
-                          </div>
-                          
-                          <h2 className="text-xl md:text-2xl text-muted-foreground font-light">
-                              гэдэг
-                          </h2>
-                      </motion.div>
-                      <div
-                          className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      />
-                  </div>
+                {/* Name section with enhanced styling */}
+                <div className="relative group" ref={nameRef}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.9,
+                      delay: 0.4,
+                      ease: [0.2, 0.65, 0.3, 0.9],
+                    }}
+                    className="flex flex-col items-center lg:items-start gap-2"
+                  >
+                    <div className="flex items-baseline gap-3 flex-wrap justify-center lg:justify-start">
+                      <h2 className="text-xl md:text-2xl text-muted-foreground font-light">
+                        Миний нэрийг
+                      </h2>
+                    </div>
+
+                    {/* Name with spotlight effect */}
+                    <div className="relative py-2">
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/10 to-transparent blur-3xl" />
+                      <p className="spotlight-text text-6xl md:text-8xl font-black tracking-tighter relative">
+                        {name}
+                      </p>
+                    </div>
+
+                    <h2 className="text-xl md:text-2xl text-muted-foreground font-light">
+                      гэдэг
+                    </h2>
+                  </motion.div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                </div>
               </div>
             </div>
           </div>
@@ -402,37 +507,60 @@ export default function AboutPage() {
 
         <Dialog open={isEditingInfo} onOpenChange={setIsEditingInfo}>
           <DialogContent>
-              <DialogHeader>
-                  <DialogTitle>"{editingInfoItem?.label}"-г засах</DialogTitle>
-              </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="info-value" className="text-right">
-                          Утга
-                      </Label>
-                      <Input
-                          id="info-value"
-                          value={editingInfoValue}
-                          onChange={(e) => setEditingInfoValue(e.target.value)}
-                          className="col-span-3"
-                      />
-                  </div>
+            <DialogHeader>
+              <DialogTitle>"{editingInfoItem?.label}"-г засах</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="info-value" className="text-right">
+                  Утга
+                </Label>
+                <Input
+                  id="info-value"
+                  value={editingInfoValue}
+                  onChange={e => setEditingInfoValue(e.target.value)}
+                  className="col-span-3"
+                />
               </div>
-              <DialogFooter>
-                  <DialogClose asChild>
-                      <Button type="button" variant="secondary" onClick={() => { setIsEditingInfo(false); setEditingInfoItem(null); }}>Цуцлах</Button>
-                  </DialogClose>
-                  <Button type="button" onClick={handleSavePersonalInfo} disabled={saving}>
-                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />} Хадгалах
-                  </Button>
-              </DialogFooter>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setIsEditingInfo(false);
+                    setEditingInfoItem(null);
+                  }}
+                >
+                  Цуцлах
+                </Button>
+              </DialogClose>
+              <Button
+                type="button"
+                onClick={handleSavePersonalInfo}
+                disabled={saving}
+              >
+                {saving ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 h-4 w-4" />
+                )}{' '}
+                Хадгалах
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
-        
-        <section id="hobbies" className="relative py-24 md:py-32 mt-16 md:mt-24 reveal z-10">
+
+        <section
+          id="hobbies"
+          className="relative py-24 md:py-32 mt-16 md:mt-24 reveal z-10"
+        >
           <div className="container px-4 md:px-6">
             <div className="text-center mb-12 sm:mb-24">
-              <h2 className="text-3xl md:text-5xl font-bold">Миний хоббинууд</h2>
+              <h2 className="text-3xl md:text-5xl font-bold">
+                Миний хоббинууд
+              </h2>
             </div>
 
             {hobbiesLoading ? (
@@ -441,141 +569,198 @@ export default function AboutPage() {
               </div>
             ) : (
               <div className="relative flex items-center justify-center h-[350px]">
-                  {displayItems.length === 0 && !isEditMode ? (
-                        <div className="text-center">
-                          <p className="text-muted-foreground">Хобби олдсонгүй.</p>
-                          {user && <p className="text-sm text-muted-foreground mt-2">Засварлах горимд шинээр нэмнэ үү.</p>}
-                      </div>
-                  ) : (
-                  <div className="carousel-container" style={{ width: `${itemWidth}px`}}>
-                      <div className="carousel" style={{ transform: `rotateY(${-activeIndex * anglePerItem}deg)` }}>
-                          <AnimatePresence>
-                              {displayItems.map((hobby, index) => {
-                                const angle = index * anglePerItem;
-                                const isVisible = Math.abs((activeIndex - index + totalItems) % totalItems) <= 2 || Math.abs((activeIndex - index - totalItems) % totalItems) <= 2;
-                                const style: CSSProperties = {
-                                    transform: `rotateY(${angle}deg) translateZ(${carouselRadius}px)`,
-                                    opacity: isVisible ? 1 : 0.2,
-                                    pointerEvents: isVisible ? 'auto' : 'none',
-                                };
-                                if (hobby.id === 'add-new-hobby') {
-                                  return (
-                                      <div className="carousel-item" style={style} key={hobby.id} onClick={() => setActiveIndex(index)}>
-                                        <AddHobbyDialog>
-                                          <button className="flex h-full w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/50 bg-card/50 text-muted-foreground transition-colors hover:border-primary hover:bg-card/80 hover:text-primary">
-                                              <PlusCircle size={48} />
-                                              <span className="mt-4 font-semibold">Хобби нэмэх</span>
-                                          </button>
-                                      </AddHobbyDialog>
-                                    </div>
-                                  )
-                                }
-                                return (
-                                    <div className="carousel-item group" key={hobby.id} style={style} onClick={() => setActiveIndex(index)}>
-                                          <Card className="relative bg-card border-[3px] border-primary/50 h-full w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
-                                            {isEditMode && (
-                                              <div className="absolute top-2 right-2 flex gap-1 z-20">
-                                                <EditHobbyDialog hobby={hobby}>
-                                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-white bg-black/30 hover:bg-black/50 hover:text-white">
-                                                    <Edit className="h-4 w-4" />
-                                                  </Button>
-                                                </EditHobbyDialog>
-                                                <AlertDialog>
-                                                  <AlertDialogTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white bg-black/30 hover:bg-destructive/80 hover:text-white">
-                                                      <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                  </AlertDialogTrigger>
-                                                  <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                      <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
-                                                      <AlertDialogDescription>"{hobby.title}" хоббиг устгах гэж байна. Энэ үйлдэл буцаагдахгүй.</AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                      <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                                                      <AlertDialogAction onClick={() => hobby.id && deleteHobby(hobby.id)}>Устгах</AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                  </AlertDialogContent>
-                                                </AlertDialog>
-                                              </div>
-                                            )}
-                                            <Image 
-                                              src={hobby.image} 
-                                              alt={hobby.title} 
-                                              fill 
-                                              className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                              data-ai-hint={`3D ${hobby.imageHint || hobby.title}`} 
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                                              <div className="absolute bottom-0 left-0 p-4 text-white">
-                                                <CardTitle className="text-base md:text-lg font-bold">{hobby.title}</CardTitle>
-                                                <p className="text-xs md:text-sm text-white/80 mt-1">{hobby.description}</p>
-                                              </div>
-                                          </Card>
-                                    </div>
-                                )
-                            })}
-                          </AnimatePresence>
-                      </div>
+                {displayItems.length === 0 && !isEditMode ? (
+                  <div className="text-center">
+                    <p className="text-muted-foreground">Хобби олдсонгүй.</p>
+                    {user && (
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Засварлах горимд шинээр нэмнэ үү.
+                      </p>
+                    )}
                   </div>
-                  )}
-                  <Button
-                      onClick={scrollPrev}
-                      className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-10"
-                      variant="outline"
-                      size="icon"
-                      disabled={displayItems.length === 0}
+                ) : (
+                  <div
+                    className="carousel-container"
+                    style={{ width: `${itemWidth}px` }}
                   >
-                      <ArrowLeft/>
-                  </Button>
-                  <Button
-                      onClick={scrollNext}
-                      className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-10"
-                      variant="outline"
-                      size="icon"
-                        disabled={displayItems.length === 0}
-                  >
-                      <ArrowRight/>
-                  </Button>
+                    <div
+                      className="carousel"
+                      style={{
+                        transform: `rotateY(${-activeIndex * anglePerItem}deg)`,
+                      }}
+                    >
+                      <AnimatePresence>
+                        {displayItems.map((hobby, index) => {
+                          const angle = index * anglePerItem;
+                          const isVisible =
+                            Math.abs(
+                              (activeIndex - index + totalItems) % totalItems
+                            ) <= 2 ||
+                            Math.abs(
+                              (activeIndex - index - totalItems) % totalItems
+                            ) <= 2;
+                          const style: CSSProperties = {
+                            transform: `rotateY(${angle}deg) translateZ(${carouselRadius}px)`,
+                            opacity: isVisible ? 1 : 0.2,
+                            pointerEvents: isVisible ? 'auto' : 'none',
+                          };
+                          if (hobby.id === 'add-new-hobby') {
+                            return (
+                              <div
+                                className="carousel-item"
+                                style={style}
+                                key={hobby.id}
+                                onClick={() => setActiveIndex(index)}
+                              >
+                                <AddHobbyDialog>
+                                  <button className="flex h-full w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/50 bg-card/50 text-muted-foreground transition-colors hover:border-primary hover:bg-card/80 hover:text-primary">
+                                    <PlusCircle size={48} />
+                                    <span className="mt-4 font-semibold">
+                                      Хобби нэмэх
+                                    </span>
+                                  </button>
+                                </AddHobbyDialog>
+                              </div>
+                            );
+                          }
+                          return (
+                            <div
+                              className="carousel-item group"
+                              key={hobby.id}
+                              style={style}
+                              onClick={() => setActiveIndex(index)}
+                            >
+                              <Card className="relative bg-card border-[3px] border-primary/50 h-full w-full overflow-hidden rounded-xl shadow-lg transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-2xl">
+                                {isEditMode && (
+                                  <div className="absolute top-2 right-2 flex gap-1 z-20">
+                                    <EditHobbyDialog hobby={hobby}>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-white bg-black/30 hover:bg-black/50 hover:text-white"
+                                      >
+                                        <Edit className="h-4 w-4" />
+                                      </Button>
+                                    </EditHobbyDialog>
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          className="h-8 w-8 text-white bg-black/30 hover:bg-destructive/80 hover:text-white"
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>
+                                            Устгахдаа итгэлтэй байна уу?
+                                          </AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            "{hobby.title}" хоббиг устгах гэж
+                                            байна. Энэ үйлдэл буцаагдахгүй.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>
+                                            Цуцлах
+                                          </AlertDialogCancel>
+                                          <AlertDialogAction
+                                            onClick={() =>
+                                              hobby.id && deleteHobby(hobby.id)
+                                            }
+                                          >
+                                            Устгах
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </div>
+                                )}
+                                <Image
+                                  src={hobby.image}
+                                  alt={hobby.title}
+                                  fill
+                                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                  data-ai-hint={`3D ${hobby.imageHint || hobby.title}`}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                                <div className="absolute bottom-0 left-0 p-4 text-white">
+                                  <CardTitle className="text-base md:text-lg font-bold">
+                                    {hobby.title}
+                                  </CardTitle>
+                                  <p className="text-xs md:text-sm text-white/80 mt-1">
+                                    {hobby.description}
+                                  </p>
+                                </div>
+                              </Card>
+                            </div>
+                          );
+                        })}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                )}
+                <Button
+                  onClick={scrollPrev}
+                  className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-10"
+                  variant="outline"
+                  size="icon"
+                  disabled={displayItems.length === 0}
+                >
+                  <ArrowLeft />
+                </Button>
+                <Button
+                  onClick={scrollNext}
+                  className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-10"
+                  variant="outline"
+                  size="icon"
+                  disabled={displayItems.length === 0}
+                >
+                  <ArrowRight />
+                </Button>
               </div>
-             )}
+            )}
           </div>
         </section>
-        
-          <style jsx>{`
-              .carousel-container {
-                  perspective: 2000px;
-                  height: 350px;
-                  position: relative;
-              }
-              .carousel {
-                  width: 100%;
-                  height: 100%;
-                  position: absolute;
-                  transform-style: preserve-3d;
-                  transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
-              }
-              .carousel-item {
-                  position: absolute;
-                  width: ${itemWidth}px;
-                  height: 320px;
-                  top: 15px;
-                  left: 0;
-                  background: transparent;
-                  transition: opacity 0.6s, transform 0.6s;
-                  cursor: pointer;
-              }
-              .spotlight-text {
-                  color: transparent;
-                  background-clip: text;
-                  -webkit-background-clip: text;
-                  background-image: radial-gradient(
-                      circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-                      hsl(var(--primary)) 20%,
-                      white 80%
-                  );
-                  transition: background-image 0.3s;
-              }
+
+        <style jsx>{`
+          .carousel-container {
+            perspective: 2000px;
+            height: 350px;
+            position: relative;
+          }
+          .carousel {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+          }
+          .carousel-item {
+            position: absolute;
+            width: ${itemWidth}px;
+            height: 320px;
+            top: 15px;
+            left: 0;
+            background: transparent;
+            transition:
+              opacity 0.6s,
+              transform 0.6s;
+            cursor: pointer;
+          }
+          .spotlight-text {
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            background-image: radial-gradient(
+              circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+              hsl(var(--primary)) 20%,
+              white 80%
+            );
+            transition: background-image 0.3s;
+          }
         `}</style>
       </div>
     </>

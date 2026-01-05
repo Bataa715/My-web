@@ -1,16 +1,21 @@
-
 'use server';
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 const GenerateSkillsInputSchema = z.object({
-  category: z.string().describe('The category of skills to generate, e.g., "frontend frameworks", "programming languages", "database technologies".'),
+  category: z
+    .string()
+    .describe(
+      'The category of skills to generate, e.g., "frontend frameworks", "programming languages", "database technologies".'
+    ),
 });
 export type GenerateSkillsInput = z.infer<typeof GenerateSkillsInputSchema>;
 
 const GenerateSkillsOutputSchema = z.object({
-  skills: z.array(z.string()).describe('A list of skills related to the category.'),
+  skills: z
+    .array(z.string())
+    .describe('A list of skills related to the category.'),
 });
 export type GenerateSkillsOutput = z.infer<typeof GenerateSkillsOutputSchema>;
 
@@ -33,7 +38,7 @@ const generateSkillsFlow = ai.defineFlow(
     inputSchema: GenerateSkillsInputSchema,
     outputSchema: GenerateSkillsOutputSchema,
   },
-  async (input) => {
+  async input => {
     const { output } = await generateSkillsPrompt(input);
     if (!output) {
       throw new Error('Failed to generate skills from the AI model.');
@@ -42,6 +47,8 @@ const generateSkillsFlow = ai.defineFlow(
   }
 );
 
-export async function generateSkills(input: GenerateSkillsInput): Promise<GenerateSkillsOutput> {
+export async function generateSkills(
+  input: GenerateSkillsInput
+): Promise<GenerateSkillsOutput> {
   return generateSkillsFlow(input);
 }

@@ -22,7 +22,13 @@ export default function InteractiveParticles({
   const canvasContainerRef = useRef<HTMLDivElement | null>(null);
   const context = useRef<CanvasRenderingContext2D | null>(null);
   const circles = useRef<any[]>([]);
-  const mouse = useRef<{ x: number; y: number; sentX: number; sentY: number; radius: number }>({
+  const mouse = useRef<{
+    x: number;
+    y: number;
+    sentX: number;
+    sentY: number;
+    radius: number;
+  }>({
     x: 0,
     y: 0,
     sentX: 0,
@@ -58,7 +64,7 @@ export default function InteractiveParticles({
     // Listen to document-level click events for creating new particles
     const handleDocumentClick = () => {
       if (canvasRef.current) {
-        for(let i = 0; i < 5; i++) {
+        for (let i = 0; i < 5; i++) {
           const newCircle = {
             x: mouse.current.x,
             y: mouse.current.y,
@@ -107,27 +113,26 @@ export default function InteractiveParticles({
       mouse.current.sentY = (y / h) * 2 - 1;
     }
   };
-  
+
   const onMouseClick = () => {
     if (canvasRef.current) {
-        for(let i = 0; i < 5; i++) {
-            const newCircle = {
-                x: mouse.current.x,
-                y: mouse.current.y,
-                translateX: 0,
-                translateY: 0,
-                size: Math.random() * 2 + 1,
-                alpha: 0,
-                targetAlpha: parseFloat((Math.random() * 0.6 + 0.1).toFixed(1)),
-                dx: (Math.random() - 0.5) * 2,
-                dy: (Math.random() - 0.5) * 2,
-                magnetism: 0.1 + Math.random() * 4,
-            };
-            circles.current.push(newCircle);
-        }
+      for (let i = 0; i < 5; i++) {
+        const newCircle = {
+          x: mouse.current.x,
+          y: mouse.current.y,
+          translateX: 0,
+          translateY: 0,
+          size: Math.random() * 2 + 1,
+          alpha: 0,
+          targetAlpha: parseFloat((Math.random() * 0.6 + 0.1).toFixed(1)),
+          dx: (Math.random() - 0.5) * 2,
+          dy: (Math.random() - 0.5) * 2,
+          magnetism: 0.1 + Math.random() * 4,
+        };
+        circles.current.push(newCircle);
+      }
     }
   };
-
 
   const resizeCanvas = () => {
     if (canvasContainerRef.current && canvasRef.current && context.current) {
@@ -153,7 +158,18 @@ export default function InteractiveParticles({
     const dx = (Math.random() - 0.5) * 0.2;
     const dy = (Math.random() - 0.5) * 0.2;
     const magnetism = 0.1 + Math.random() * 4;
-    return { x, y, translateX, translateY, size, alpha, targetAlpha, dx, dy, magnetism };
+    return {
+      x,
+      y,
+      translateX,
+      translateY,
+      size,
+      alpha,
+      targetAlpha,
+      dx,
+      dy,
+      magnetism,
+    };
   };
 
   const drawCircle = (circle: any, update = false) => {
@@ -174,7 +190,12 @@ export default function InteractiveParticles({
 
   const clearContext = () => {
     if (context.current) {
-      context.current.clearRect(0, 0, canvasSize.current.w, canvasSize.current.h);
+      context.current.clearRect(
+        0,
+        0,
+        canvasSize.current.w,
+        canvasSize.current.h
+      );
     }
   };
 
@@ -194,7 +215,8 @@ export default function InteractiveParticles({
     start2: number,
     end2: number
   ): number => {
-    const remapped = ((value - start1) * (end2 - start2)) / (end1 - start1) + start2;
+    const remapped =
+      ((value - start1) * (end2 - start2)) / (end1 - start1) + start2;
     return remapped > 0 ? remapped : 0;
   };
 
@@ -221,20 +243,22 @@ export default function InteractiveParticles({
       }
       circle.x += circle.dx;
       circle.y += circle.dy;
-      
+
       const distanceX = mouse.current.x - (circle.x + circle.translateX);
       const distanceY = mouse.current.y - (circle.y + circle.translateY);
-      const mouseDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+      const mouseDistance = Math.sqrt(
+        distanceX * distanceX + distanceY * distanceY
+      );
 
       if (mouseDistance < mouse.current.radius) {
-        const repelFactor = (1 - mouseDistance / mouse.current.radius) * staticity;
-        circle.translateX -= distanceX / mouseDistance * repelFactor * 0.1;
-        circle.translateY -= distanceY / mouseDistance * repelFactor * 0.1;
+        const repelFactor =
+          (1 - mouseDistance / mouse.current.radius) * staticity;
+        circle.translateX -= (distanceX / mouseDistance) * repelFactor * 0.1;
+        circle.translateY -= (distanceY / mouseDistance) * repelFactor * 0.1;
       } else {
         circle.translateX += (0 - circle.translateX) / ease;
         circle.translateY += (0 - circle.translateY) / ease;
       }
-
 
       // circle gets out of the canvas
       if (
@@ -264,30 +288,30 @@ export default function InteractiveParticles({
         );
       }
     });
-    
+
     // Draw lines between nearby particles
     for (let i = 0; i < circles.current.length; i++) {
-        for (let j = i + 1; j < circles.current.length; j++) {
-            const A = circles.current[i];
-            const B = circles.current[j];
+      for (let j = i + 1; j < circles.current.length; j++) {
+        const A = circles.current[i];
+        const B = circles.current[j];
 
-            const d = Math.sqrt(
-                (A.x + A.translateX - (B.x + B.translateX)) ** 2 +
-                (A.y + A.translateY - (B.y + B.translateY)) ** 2
-            );
+        const d = Math.sqrt(
+          (A.x + A.translateX - (B.x + B.translateX)) ** 2 +
+            (A.y + A.translateY - (B.y + B.translateY)) ** 2
+        );
 
-            if (d < 100) {
-                 if (context.current) {
-                    const alpha = 1 - (d/100);
-                    context.current.beginPath();
-                    context.current.moveTo(A.x + A.translateX, A.y + A.translateY);
-                    context.current.lineTo(B.x + B.translateX, B.y + B.translateY);
-                    context.current.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
-                    context.current.lineWidth = 0.5;
-                    context.current.stroke();
-                }
-            }
+        if (d < 100) {
+          if (context.current) {
+            const alpha = 1 - d / 100;
+            context.current.beginPath();
+            context.current.moveTo(A.x + A.translateX, A.y + A.translateY);
+            context.current.lineTo(B.x + B.translateX, B.y + B.translateY);
+            context.current.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
+            context.current.lineWidth = 0.5;
+            context.current.stroke();
+          }
         }
+      }
     }
 
     window.requestAnimationFrame(animate);
@@ -295,14 +319,11 @@ export default function InteractiveParticles({
 
   return (
     <div
-      className={cn("absolute inset-0 -z-10 pointer-events-none", className)}
+      className={cn('absolute inset-0 -z-10 pointer-events-none', className)}
       ref={canvasContainerRef}
       aria-hidden="true"
     >
-      <canvas
-        ref={canvasRef}
-        className="h-full w-full"
-      ></canvas>
+      <canvas ref={canvasRef} className="h-full w-full"></canvas>
     </div>
   );
 }

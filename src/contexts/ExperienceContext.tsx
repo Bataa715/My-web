@@ -1,8 +1,21 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 import { useFirebase } from '@/firebase';
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 
 export interface ExperienceItem {
@@ -17,11 +30,16 @@ interface ExperienceContextType {
   experiences: ExperienceItem[];
   loading: boolean;
   addExperience: (experience: Omit<ExperienceItem, 'id'>) => Promise<void>;
-  updateExperience: (id: string, experience: Omit<ExperienceItem, 'id'>) => Promise<void>;
+  updateExperience: (
+    id: string,
+    experience: Omit<ExperienceItem, 'id'>
+  ) => Promise<void>;
   deleteExperience: (id: string) => Promise<void>;
 }
 
-const ExperienceContext = createContext<ExperienceContextType | undefined>(undefined);
+const ExperienceContext = createContext<ExperienceContextType | undefined>(
+  undefined
+);
 
 export const ExperienceProvider = ({ children }: { children: ReactNode }) => {
   const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
@@ -37,19 +55,24 @@ export const ExperienceProvider = ({ children }: { children: ReactNode }) => {
       }
 
       try {
-        const experiencesRef = collection(firestore, 'users', user.uid, 'experiences');
+        const experiencesRef = collection(
+          firestore,
+          'users',
+          user.uid,
+          'experiences'
+        );
         const snapshot = await getDocs(experiencesRef);
         const experiencesData = snapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         })) as ExperienceItem[];
         setExperiences(experiencesData);
       } catch (error) {
         console.error('Error fetching experiences:', error);
-        toast({ 
-          title: 'Алдаа', 
-          description: 'Туршлагын мэдээллийг татахад алдаа гарлаа.', 
-          variant: 'destructive' 
+        toast({
+          title: 'Алдаа',
+          description: 'Туршлагын мэдээллийг татахад алдаа гарлаа.',
+          variant: 'destructive',
         });
       } finally {
         setLoading(false);
@@ -63,34 +86,50 @@ export const ExperienceProvider = ({ children }: { children: ReactNode }) => {
     if (!firestore || !user) return;
 
     try {
-      const experiencesRef = collection(firestore, 'users', user.uid, 'experiences');
+      const experiencesRef = collection(
+        firestore,
+        'users',
+        user.uid,
+        'experiences'
+      );
       const docRef = await addDoc(experiencesRef, experience);
       setExperiences(prev => [...prev, { id: docRef.id, ...experience }]);
       toast({ title: 'Амжилттай', description: 'Туршлага нэмэгдлээ.' });
     } catch (error) {
       console.error('Error adding experience:', error);
-      toast({ 
-        title: 'Алдаа', 
-        description: 'Туршлага нэмэхэд алдаа гарлаа.', 
-        variant: 'destructive' 
+      toast({
+        title: 'Алдаа',
+        description: 'Туршлага нэмэхэд алдаа гарлаа.',
+        variant: 'destructive',
       });
     }
   };
 
-  const updateExperience = async (id: string, experience: Omit<ExperienceItem, 'id'>) => {
+  const updateExperience = async (
+    id: string,
+    experience: Omit<ExperienceItem, 'id'>
+  ) => {
     if (!firestore || !user) return;
 
     try {
-      const experienceRef = doc(firestore, 'users', user.uid, 'experiences', id);
+      const experienceRef = doc(
+        firestore,
+        'users',
+        user.uid,
+        'experiences',
+        id
+      );
       await updateDoc(experienceRef, experience);
-      setExperiences(prev => prev.map(exp => exp.id === id ? { id, ...experience } : exp));
+      setExperiences(prev =>
+        prev.map(exp => (exp.id === id ? { id, ...experience } : exp))
+      );
       toast({ title: 'Амжилттай', description: 'Туршлага шинэчлэгдлээ.' });
     } catch (error) {
       console.error('Error updating experience:', error);
-      toast({ 
-        title: 'Алдаа', 
-        description: 'Туршлага шинэчлэхэд алдаа гарлаа.', 
-        variant: 'destructive' 
+      toast({
+        title: 'Алдаа',
+        description: 'Туршлага шинэчлэхэд алдаа гарлаа.',
+        variant: 'destructive',
       });
     }
   };
@@ -99,22 +138,36 @@ export const ExperienceProvider = ({ children }: { children: ReactNode }) => {
     if (!firestore || !user) return;
 
     try {
-      const experienceRef = doc(firestore, 'users', user.uid, 'experiences', id);
+      const experienceRef = doc(
+        firestore,
+        'users',
+        user.uid,
+        'experiences',
+        id
+      );
       await deleteDoc(experienceRef);
       setExperiences(prev => prev.filter(exp => exp.id !== id));
       toast({ title: 'Амжилттай', description: 'Туршлага устгагдлаа.' });
     } catch (error) {
       console.error('Error deleting experience:', error);
-      toast({ 
-        title: 'Алдаа', 
-        description: 'Туршлага устгахад алдаа гарлаа.', 
-        variant: 'destructive' 
+      toast({
+        title: 'Алдаа',
+        description: 'Туршлага устгахад алдаа гарлаа.',
+        variant: 'destructive',
       });
     }
   };
 
   return (
-    <ExperienceContext.Provider value={{ experiences, loading, addExperience, updateExperience, deleteExperience }}>
+    <ExperienceContext.Provider
+      value={{
+        experiences,
+        loading,
+        addExperience,
+        updateExperience,
+        deleteExperience,
+      }}
+    >
       {children}
     </ExperienceContext.Provider>
   );

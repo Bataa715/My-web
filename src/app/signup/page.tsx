@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -10,8 +9,22 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import type { UserProfile } from '@/lib/types';
 import Link from 'next/link';
@@ -19,7 +32,9 @@ import Link from 'next/link';
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Нэр дор хаяж 2 тэмдэгттэй байх ёстой.' }),
   email: z.string().email({ message: 'И-мэйл хаяг буруу байна.' }),
-  password: z.string().min(6, { message: 'Нууц үг дор хаяж 6 тэмдэгттэй байх ёстой.' }),
+  password: z
+    .string()
+    .min(6, { message: 'Нууц үг дор хаяж 6 тэмдэгттэй байх ёстой.' }),
 });
 
 export default function SignupPage() {
@@ -40,42 +55,95 @@ export default function SignupPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     if (!firestore || !auth) {
-        toast({ title: 'Алдаа', description: 'Firebase-д холбогдож чадсангүй.', variant: 'destructive' });
-        setIsLoading(false);
-        return;
+      toast({
+        title: 'Алдаа',
+        description: 'Firebase-д холбогдож чадсангүй.',
+        variant: 'destructive',
+      });
+      setIsLoading(false);
+      return;
     }
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        values.email,
+        values.password
+      );
       const user = userCredential.user;
 
-      const defaultImage = "https://api.dicebear.com/7.x/avataaars/svg?seed=default";
-      
+      const defaultImage =
+        'https://api.dicebear.com/7.x/avataaars/svg?seed=default';
+
       const defaultOrbitInfo: OrbitInfo[] = [
-        { id: 'location', icon: 'MapPin', title: 'Байршил', content: '', type: 'info' },
-        { id: 'hobbies', icon: 'Gamepad2', title: 'Хобби', content: '', type: 'info' },
-        { id: 'goals', icon: 'Target', title: 'Зорилго', content: '', type: 'info' },
+        {
+          id: 'location',
+          icon: 'MapPin',
+          title: 'Байршил',
+          content: '',
+          type: 'info',
+        },
+        {
+          id: 'hobbies',
+          icon: 'Gamepad2',
+          title: 'Хобби',
+          content: '',
+          type: 'info',
+        },
+        {
+          id: 'goals',
+          icon: 'Target',
+          title: 'Зорилго',
+          content: '',
+          type: 'info',
+        },
         { id: 'user', icon: 'User', title: 'Тухай', content: '', type: 'info' },
-        { id: 'song', icon: 'Music', title: 'Дуртай дуу', content: '', type: 'audio', youtubeVideoId: '' },
-        { id: 'movie', icon: 'Film', title: 'Кино', content: '', type: 'info', backgroundImage: '' },
-        { id: 'quote', icon: 'MessageSquareQuote', title: 'Ишлэл', content: '', type: 'info' },
-        { id: 'likes', icon: 'Heart', title: 'Дуртай зүйлс', content: '', type: 'info' },
+        {
+          id: 'song',
+          icon: 'Music',
+          title: 'Дуртай дуу',
+          content: '',
+          type: 'audio',
+          youtubeVideoId: '',
+        },
+        {
+          id: 'movie',
+          icon: 'Film',
+          title: 'Кино',
+          content: '',
+          type: 'info',
+          backgroundImage: '',
+        },
+        {
+          id: 'quote',
+          icon: 'MessageSquareQuote',
+          title: 'Ишлэл',
+          content: '',
+          type: 'info',
+        },
+        {
+          id: 'likes',
+          icon: 'Heart',
+          title: 'Дуртай зүйлс',
+          content: '',
+          type: 'info',
+        },
       ];
-      
+
       const userProfile: UserProfile = {
-        appName: "Kaizen",
+        appName: 'Kaizen',
         name: values.name,
         email: values.email,
-        bio: "",
+        bio: '',
         profileImage: defaultImage,
         personalInfo: [],
         homeHeroImage: defaultImage,
         aboutHeroImage: defaultImage,
         toolsHeroImage: defaultImage,
         orbitInfo: defaultOrbitInfo,
-        github: "",
-        instagram: "",
-        cvUrl: "",
-        facebook: "",
+        github: '',
+        instagram: '',
+        cvUrl: '',
+        facebook: '',
       };
 
       await setDoc(doc(firestore, 'users', user.uid), userProfile);
@@ -88,7 +156,7 @@ export default function SignupPage() {
     } catch (error: any) {
       const errorCode = error?.code;
       let errorMessage = error?.message || 'Бүртгүүлэхэд алдаа гарлаа.';
-      
+
       if (errorCode === 'auth/email-already-in-use') {
         errorMessage = 'Энэ и-мэйл хаяг бүртгэлтэй байна.';
       } else if (errorCode === 'auth/invalid-email') {
@@ -98,7 +166,7 @@ export default function SignupPage() {
       } else if (errorCode === 'auth/network-request-failed') {
         errorMessage = 'Интернэт холболтыг шалгана үү.';
       }
-      
+
       toast({
         title: 'Бүртгүүлэхэд алдаа гарлаа',
         description: errorMessage,
@@ -154,7 +222,11 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Нууц үг</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="••••••••" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -166,13 +238,13 @@ export default function SignupPage() {
             </form>
           </Form>
         </CardContent>
-         <CardFooter className="flex-col items-center text-sm">
-            <p className="text-muted-foreground">
-                Бүртгэлтэй юу?{' '}
-                <Link href="/login" className="underline text-primary">
-                Нэвтрэх
-                </Link>
-            </p>
+        <CardFooter className="flex-col items-center text-sm">
+          <p className="text-muted-foreground">
+            Бүртгэлтэй юу?{' '}
+            <Link href="/login" className="underline text-primary">
+              Нэвтрэх
+            </Link>
+          </p>
         </CardFooter>
       </Card>
     </div>

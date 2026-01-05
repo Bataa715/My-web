@@ -20,7 +20,11 @@ export function useUser(auth: Auth | null): UseUserResult {
     // If no Auth service instance, we can't determine user state.
     // Set loading to false and return.
     if (!auth) {
-      setUserState({ user: null, isLoading: false, error: new Error("Auth service not provided.") });
+      setUserState({
+        user: null,
+        isLoading: false,
+        error: new Error('Auth service not provided.'),
+      });
       return;
     }
 
@@ -30,14 +34,14 @@ export function useUser(auth: Auth | null): UseUserResult {
 
     const unsubscribe = onAuthStateChanged(
       auth,
-      (firebaseUser) => {
+      firebaseUser => {
         // Auth state is now definitively determined.
         // Set the user and stop loading.
         setUserState({ user: firebaseUser, isLoading: false, error: null });
       },
-      (error) => {
+      error => {
         // Auth listener encountered an error.
-        console.error("useUser: onAuthStateChanged error:", error);
+        console.error('useUser: onAuthStateChanged error:', error);
         setUserState({ user: null, isLoading: false, error: error });
       }
     );

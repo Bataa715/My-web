@@ -1,4 +1,3 @@
-
 'use server';
 
 import { ai } from '@/ai/genkit';
@@ -11,7 +10,9 @@ export type CorrectTextInput = z.infer<typeof CorrectTextInputSchema>;
 
 const CorrectTextOutputSchema = z.object({
   correction: z.string().describe('The corrected version of the text.'),
-  explanation: z.string().describe('A brief explanation of the corrections made.'),
+  explanation: z
+    .string()
+    .describe('A brief explanation of the corrections made.'),
 });
 export type CorrectTextOutput = z.infer<typeof CorrectTextOutputSchema>;
 
@@ -37,7 +38,7 @@ const correctTextFlow = ai.defineFlow(
     inputSchema: CorrectTextInputSchema,
     outputSchema: CorrectTextOutputSchema,
   },
-  async (input) => {
+  async input => {
     const { output } = await correctTextPrompt(input);
     if (!output) {
       throw new Error('Failed to get a correction from the AI model.');
@@ -46,6 +47,8 @@ const correctTextFlow = ai.defineFlow(
   }
 );
 
-export async function correctText(input: CorrectTextInput): Promise<CorrectTextOutput> {
+export async function correctText(
+  input: CorrectTextInput
+): Promise<CorrectTextOutput> {
   return correctTextFlow(input);
 }

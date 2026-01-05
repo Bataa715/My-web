@@ -1,5 +1,3 @@
-
-
 import type { Timestamp } from 'firebase/firestore';
 
 export interface EnglishWord {
@@ -84,20 +82,20 @@ export interface Kana {
 }
 
 export interface Language {
-    id?: string;
-    name: string;
-    iconUrl: string;
-    primaryColor: string;
-    progress: number;
-    createdAt?: Date | Timestamp;
+  id?: string;
+  name: string;
+  iconUrl: string;
+  primaryColor: string;
+  progress: number;
+  createdAt?: Date | Timestamp;
 }
 
 export interface Chapter {
-    id?: string;
-    title: string;
-    languageId: string;
-    order: number;
-    createdAt?: Date | Timestamp;
+  id?: string;
+  title: string;
+  languageId: string;
+  order: number;
+  createdAt?: Date | Timestamp;
 }
 
 export type Education = {
@@ -132,11 +130,11 @@ export type Project = {
 };
 
 export type Skill = {
-    id: string;
-    name:string;
-    icon: string; // Icon name as string
-    items: string[];
-    createdAt?: Date | Timestamp;
+  id: string;
+  name: string;
+  icon: string; // Icon name as string
+  items: string[];
+  createdAt?: Date | Timestamp;
 };
 
 export type OrbitInfo = {
@@ -150,26 +148,26 @@ export type OrbitInfo = {
 };
 
 export type PersonalInfoItem = {
-    label: string;
-    value: string;
-    icon?: string;
+  label: string;
+  value: string;
+  icon?: string;
 };
 
 export type UserProfile = {
-    appName?: string;
-    name: string;
-    bio: string;
-    profileImage: string;
-    personalInfo?: PersonalInfoItem[];
-    homeHeroImage?: string;
-    aboutHeroImage?: string;
-    toolsHeroImage?: string;
-    orbitInfo: OrbitInfo[];
-    github?: string;
-    instagram?: string;
-    facebook?: string;
-    email?: string;
-    cvUrl?: string;
+  appName?: string;
+  name: string;
+  bio: string;
+  profileImage: string;
+  personalInfo?: PersonalInfoItem[];
+  homeHeroImage?: string;
+  aboutHeroImage?: string;
+  toolsHeroImage?: string;
+  orbitInfo: OrbitInfo[];
+  github?: string;
+  instagram?: string;
+  facebook?: string;
+  email?: string;
+  cvUrl?: string;
 };
 
 export type Note = {
@@ -180,22 +178,21 @@ export type Note = {
   updatedAt?: Date | Timestamp;
 };
 
-
 export type Exercise = {
-    id?: string;
-    name: string;
-    category: string;
-    createdAt?: Date | Timestamp;
-}
+  id?: string;
+  name: string;
+  category: string;
+  createdAt?: Date | Timestamp;
+};
 
 export type WorkoutLog = {
-    id?: string;
-    exerciseId: string;
-    exerciseName: string;
-    duration: number; // in minutes
-    repetitions: number;
-    date: Date | Timestamp;
-}
+  id?: string;
+  exerciseId: string;
+  exerciseName: string;
+  duration: number; // in minutes
+  repetitions: number;
+  date: Date | Timestamp;
+};
 
 export interface GeneratedMCQ {
   question: string;
@@ -223,7 +220,7 @@ export interface GeneratedWord {
 export type AIAction = 'translate' | 'correct' | null;
 
 export interface AIResponse {
-    correction?: string;
-    explanation?: string;
-    translation?: string;
+  correction?: string;
+  explanation?: string;
+  translation?: string;
 }

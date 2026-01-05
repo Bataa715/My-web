@@ -1,12 +1,21 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
-import { useExperience, type ExperienceItem } from '@/contexts/ExperienceContext';
+import {
+  useExperience,
+  type ExperienceItem,
+} from '@/contexts/ExperienceContext';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
@@ -18,11 +27,11 @@ const experienceImages = [
   { id: 'exp4', src: '/images/exp4.png', label: 'DevOps' },
 ];
 
-export const EditExperienceDialog = ({ 
-  experience, 
-  children 
-}: { 
-  experience: ExperienceItem; 
+export const EditExperienceDialog = ({
+  experience,
+  children,
+}: {
+  experience: ExperienceItem;
   children: React.ReactNode;
 }) => {
   const [open, setOpen] = useState(false);
@@ -39,7 +48,12 @@ export const EditExperienceDialog = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await updateExperience(experience.id, { title, description, icon: '', image });
+    await updateExperience(experience.id, {
+      title,
+      description,
+      icon: '',
+      image,
+    });
     setOpen(false);
   };
 
@@ -56,7 +70,7 @@ export const EditExperienceDialog = ({
             <Input
               id="title"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={e => setTitle(e.target.value)}
               placeholder="Жишээ: Фронтенд инженер"
               required
             />
@@ -66,7 +80,7 @@ export const EditExperienceDialog = ({
             <Textarea
               id="description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               placeholder="Туршлагын дэлгэрэнгүй..."
               rows={4}
               required
@@ -75,17 +89,17 @@ export const EditExperienceDialog = ({
           <div className="space-y-2">
             <Label>Зураг сонгох</Label>
             <div className="grid grid-cols-4 gap-3">
-              {experienceImages.map((img) => (
+              {experienceImages.map(img => (
                 <button
                   key={img.id}
                   type="button"
                   onClick={() => setImage(img.src)}
                   className={cn(
-                    "relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-200",
-                    "hover:border-primary/50 hover:scale-105",
-                    image === img.src 
-                      ? "border-primary ring-2 ring-primary/30" 
-                      : "border-border/50"
+                    'relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-200',
+                    'hover:border-primary/50 hover:scale-105',
+                    image === img.src
+                      ? 'border-primary ring-2 ring-primary/30'
+                      : 'border-border/50'
                   )}
                 >
                   <Image
@@ -104,7 +118,11 @@ export const EditExperienceDialog = ({
             </div>
           </div>
           <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
               Цуцлах
             </Button>
             <Button type="submit">Хадгалах</Button>

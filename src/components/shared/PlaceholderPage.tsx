@@ -1,16 +1,24 @@
-
 'use client';
 
-import BackButton from "@/components/shared/BackButton";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Construction } from "lucide-react";
+import BackButton from '@/components/shared/BackButton';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import { Construction } from 'lucide-react';
 
 interface PlaceholderPageProps {
   title: string;
   description: string;
 }
 
-export default function PlaceholderPage({ title, description }: PlaceholderPageProps) {
+export default function PlaceholderPage({
+  title,
+  description,
+}: PlaceholderPageProps) {
   return (
     <div className="space-y-8">
       <BackButton />
@@ -24,7 +32,9 @@ export default function PlaceholderPage({ title, description }: PlaceholderPageP
             <CardDescription>{description}</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground">Энэ хуудас одоогоор хийгдэж байна. Удахгүй ашиглалтад орно.</p>
+            <p className="text-muted-foreground">
+              Энэ хуудас одоогоор хийгдэж байна. Удахгүй ашиглалтад орно.
+            </p>
           </CardContent>
         </Card>
       </div>

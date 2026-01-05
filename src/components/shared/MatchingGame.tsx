@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -28,13 +27,21 @@ interface WordItem {
   matchId: string;
 }
 
-export default function MatchingGame({ words, wordType, onExit }: MatchingGameProps) {
+export default function MatchingGame({
+  words,
+  wordType,
+  onExit,
+}: MatchingGameProps) {
   const [roundWords, setRoundWords] = useState<Word[]>([]);
   const [englishItems, setEnglishItems] = useState<WordItem[]>([]);
   const [mongolianItems, setMongolianItems] = useState<WordItem[]>([]);
-  const [selectedEnglishId, setSelectedEnglishId] = useState<string | null>(null);
+  const [selectedEnglishId, setSelectedEnglishId] = useState<string | null>(
+    null
+  );
   const [matchedPairs, setMatchedPairs] = useState<string[]>([]);
-  const [incorrectPair, setIncorrectPair] = useState<[string, string] | null>(null);
+  const [incorrectPair, setIncorrectPair] = useState<[string, string] | null>(
+    null
+  );
   const [isFinished, setIsFinished] = useState(false);
 
   const startNewRound = () => {
@@ -63,15 +70,19 @@ export default function MatchingGame({ words, wordType, onExit }: MatchingGamePr
     setIncorrectPair(null);
     setIsFinished(false);
   };
-  
+
   useEffect(startNewRound, [words]);
-  
+
   if (words.length < 5) {
-     return (
-        <div className="flex flex-col items-center justify-center h-[50vh]">
-            <p className="text-muted-foreground mb-4">Энэ тоглоомыг тоглохын тулд дор хаяж 5 үг байх шаардлагатай.</p>
-            <Button onClick={onExit}><ArrowLeft className="mr-2" /> Буцах</Button>
-        </div>
+    return (
+      <div className="flex flex-col items-center justify-center h-[50vh]">
+        <p className="text-muted-foreground mb-4">
+          Энэ тоглоомыг тоглохын тулд дор хаяж 5 үг байх шаардлагатай.
+        </p>
+        <Button onClick={onExit}>
+          <ArrowLeft className="mr-2" /> Буцах
+        </Button>
+      </div>
     );
   }
 
@@ -83,7 +94,9 @@ export default function MatchingGame({ words, wordType, onExit }: MatchingGamePr
   const handleMongolianSelect = (id: string) => {
     if (!selectedEnglishId || matchedPairs.includes(id)) return;
 
-    const englishWord = englishItems.find(item => item.id === selectedEnglishId);
+    const englishWord = englishItems.find(
+      item => item.id === selectedEnglishId
+    );
     const mongolianWord = mongolianItems.find(item => item.id === id);
 
     if (englishWord?.matchId === mongolianWord?.matchId) {
@@ -102,75 +115,100 @@ export default function MatchingGame({ words, wordType, onExit }: MatchingGamePr
   };
 
   if (isFinished) {
-      return (
-          <Card className="w-full max-w-2xl mx-auto p-8 text-center bg-card/80 backdrop-blur-sm border-primary/20">
-            <CardContent className="p-0">
-                <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold mb-4">Баяр хүргэе!</h2>
-                <p className="text-lg text-muted-foreground mb-6">Та бүх үгийг зөв холболоо.</p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button onClick={startNewRound}><Repeat className="mr-2"/> Шинэ үгсээр оролдох</Button>
-                    <Button variant="secondary" onClick={onExit}><ArrowLeft className="mr-2" /> Дуусгах</Button>
-                </div>
-            </CardContent>
-          </Card>
-      )
+    return (
+      <Card className="w-full max-w-2xl mx-auto p-8 text-center bg-card/80 backdrop-blur-sm border-primary/20">
+        <CardContent className="p-0">
+          <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
+          <h2 className="text-3xl font-bold mb-4">Баяр хүргэе!</h2>
+          <p className="text-lg text-muted-foreground mb-6">
+            Та бүх үгийг зөв холболоо.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button onClick={startNewRound}>
+              <Repeat className="mr-2" /> Шинэ үгсээр оролдох
+            </Button>
+            <Button variant="secondary" onClick={onExit}>
+              <ArrowLeft className="mr-2" /> Дуусгах
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
     <div className="w-full max-w-3xl mx-auto">
-        <div className="flex items-center gap-4 mb-6">
-             <Button variant="ghost" size="icon" onClick={onExit}><ArrowLeft/></Button>
-             <h2 className="text-2xl font-bold">Үгсийг холбоно уу</h2>
+      <div className="flex items-center gap-4 mb-6">
+        <Button variant="ghost" size="icon" onClick={onExit}>
+          <ArrowLeft />
+        </Button>
+        <h2 className="text-2xl font-bold">Үгсийг холбоно уу</h2>
+      </div>
+
+      <div className="grid grid-cols-2 gap-8">
+        <div className="space-y-3">
+          {englishItems.map(item => (
+            <Button
+              key={item.id}
+              variant="outline"
+              className={cn(
+                'w-full h-16 text-lg justify-center',
+                selectedEnglishId === item.id && 'ring-2 ring-primary',
+                matchedPairs.includes(item.id) &&
+                  'bg-green-500/20 text-foreground border-green-500/50',
+                incorrectPair?.[0] === item.id &&
+                  'bg-red-500/20 border-red-500/50 animate-shake'
+              )}
+              onClick={() => handleEnglishSelect(item.id)}
+            >
+              {item.text}
+            </Button>
+          ))}
         </div>
-        
-        <div className="grid grid-cols-2 gap-8">
-            <div className="space-y-3">
-                {englishItems.map(item => (
-                    <Button
-                        key={item.id}
-                        variant="outline"
-                        className={cn("w-full h-16 text-lg justify-center", 
-                            selectedEnglishId === item.id && "ring-2 ring-primary",
-                            matchedPairs.includes(item.id) && "bg-green-500/20 text-foreground border-green-500/50",
-                            incorrectPair?.[0] === item.id && "bg-red-500/20 border-red-500/50 animate-shake"
-                        )}
-                        onClick={() => handleEnglishSelect(item.id)}
-                    >
-                        {item.text}
-                    </Button>
-                ))}
-            </div>
-            <div className="space-y-3">
-                 {mongolianItems.map(item => (
-                    <Button
-                        key={item.id}
-                        variant="outline"
-                        className={cn("w-full h-16 text-lg justify-center",
-                            matchedPairs.includes(item.id) && "bg-green-500/20 text-foreground border-green-500/50",
-                            incorrectPair?.[1] === item.id && "bg-red-500/20 border-red-500/50 animate-shake"
-                        )}
-                        onClick={() => handleMongolianSelect(item.id)}
-                        disabled={!selectedEnglishId || matchedPairs.includes(item.id)}
-                    >
-                        {item.text}
-                    </Button>
-                ))}
-            </div>
+        <div className="space-y-3">
+          {mongolianItems.map(item => (
+            <Button
+              key={item.id}
+              variant="outline"
+              className={cn(
+                'w-full h-16 text-lg justify-center',
+                matchedPairs.includes(item.id) &&
+                  'bg-green-500/20 text-foreground border-green-500/50',
+                incorrectPair?.[1] === item.id &&
+                  'bg-red-500/20 border-red-500/50 animate-shake'
+              )}
+              onClick={() => handleMongolianSelect(item.id)}
+              disabled={!selectedEnglishId || matchedPairs.includes(item.id)}
+            >
+              {item.text}
+            </Button>
+          ))}
         </div>
-        <style jsx>{`
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
-            }
-            .animate-shake {
-                animation: shake 0.5s ease-in-out;
-            }
-        `}</style>
+      </div>
+      <style jsx>{`
+        @keyframes shake {
+          0%,
+          100% {
+            transform: translateX(0);
+          }
+          10%,
+          30%,
+          50%,
+          70%,
+          90% {
+            transform: translateX(-5px);
+          }
+          20%,
+          40%,
+          60%,
+          80% {
+            transform: translateX(5px);
+          }
+        }
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }
-
-
-    
