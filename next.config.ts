@@ -3,7 +3,6 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
-  outputFileTracingRoot: __dirname,
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -31,7 +30,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'https',
+        protocol: 'https,
         hostname: 'i.pinimg.com',
         port: '',
         pathname: '/**',
