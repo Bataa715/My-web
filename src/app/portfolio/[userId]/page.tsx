@@ -1,4 +1,3 @@
-
 'use client';
 
 import { doc, getDoc } from 'firebase/firestore';
@@ -8,7 +7,6 @@ import Projects from '@/components/sections/projects';
 import Skills from '@/components/sections/skills';
 import Experience from '@/components/sections/Experience';
 import Education from '@/components/sections/Education';
-import AboutPage from '@/app/about/page';
 import type { UserProfile } from '@/lib/types';
 import { Suspense, useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
@@ -55,7 +53,12 @@ export default function PortfolioPage({ params }: { params: { userId: string } }
             }
         };
 
-        getUserProfile();
+        if (userId) {
+            getUserProfile();
+        } else {
+            setLoading(false);
+            notFound();
+        }
     }, [userId, firestore]);
 
     if (loading) {
