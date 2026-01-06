@@ -22,6 +22,7 @@ import {
   User,
   Wrench,
   Copy,
+  Globe,
 } from 'lucide-react';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { useState, useEffect } from 'react';
@@ -197,7 +198,21 @@ const Header = () => {
             </Link>
           </div>
 
-          <div className="justify-self-end flex items-center">
+          <div className="justify-self-end flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Globe className="h-5 w-5" />
+                  <span className="sr-only">Хэл солих</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>Монгол</DropdownMenuItem>
+                <DropdownMenuItem>English</DropdownMenuItem>
+                <DropdownMenuItem>日本語</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {user && !isUserLoading && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
