@@ -5,7 +5,7 @@ import Image from 'next/image';
 import type { Language } from '@/lib/types';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { Trash2, AlertTriangle } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,14 +18,17 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useEditMode } from '@/contexts/EditModeContext';
+import * as LucideIcons from 'lucide-react';
 
 interface LanguageCardProps {
   language: Language;
+  index: number;
   onDelete: (id: string, name: string) => void;
 }
 
 export default function LanguageCard({
   language,
+  index,
   onDelete,
 }: LanguageCardProps) {
   const { isEditMode } = useEditMode();
@@ -40,21 +43,44 @@ export default function LanguageCard({
     backgroundColor: `rgb(var(--glow-color))`,
   } as React.CSSProperties;
 
+  const getIcon = (iconName: string) => {
+    const LucideIcon = (LucideIcons as any)[iconName];
+    return LucideIcon ? (
+      <LucideIcon className="h-8 w-8" />
+    ) : (
+      <AlertTriangle className="h-8 w-8 text-destructive" />
+    );
+  };
+
   return (
-    <div className="group relative">
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 30, scale: 0.9 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -30, scale: 0.9 }}
+      transition={{
+        duration: 0.4,
+        delay: index * 0.05,
+        type: 'spring',
+        stiffness: 100,
+      }}
+      className="group relative"
+    >
       <Link href={`/tools/programming/${language.id}`}>
         <div
           className="bg-gray-900/50 backdrop-blur-sm border p-6 rounded-2xl h-full flex flex-col justify-between hover:scale-105 transition-all cursor-pointer"
           style={cardStyle}
         >
           <div>
-            <div className="w-16 h-16 mb-4 mx-auto relative">
-              <Image
-                src={language.iconUrl}
-                alt={language.name}
-                fill
-                className="object-contain"
-              />
+            <div
+              className="w-16 h-16 mb-4 mx-auto relative flex items-center justify-center rounded-xl"
+              style={{
+                color: `rgb(var(--glow-color))`,
+                backgroundColor: `rgba(var(--glow-color), 0.1)`,
+                boxShadow: `0 0 10px 2px rgba(var(--glow-color), 0.2)`,
+              }}
+            >
+              {getIcon(language.iconUrl)}
             </div>
             <h3 className="text-white text-xl font-bold text-center mb-2">
               {language.name}
@@ -103,6 +129,6 @@ export default function LanguageCard({
           </AlertDialogContent>
         </AlertDialog>
       )}
-    </div>
+    </motion.div>
   );
 }

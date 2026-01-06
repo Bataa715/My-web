@@ -15,6 +15,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Language } from '@/lib/types';
+import IconPicker from '@/components/shared/IconPicker';
+import * as LucideIcons from 'lucide-react';
 
 interface AddLanguageDialogProps {
   children: ReactNode;
@@ -29,18 +31,23 @@ export function AddLanguageDialog({
 }: AddLanguageDialogProps) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
-  const [iconUrl, setIconUrl] = useState('');
+  const [icon, setIcon] = useState('Code');
   const [primaryColor, setPrimaryColor] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name && iconUrl && primaryColor) {
-      onAddLanguage({ name, iconUrl, primaryColor });
+    if (name && icon && primaryColor) {
+      onAddLanguage({ name, iconUrl: icon, primaryColor });
       setOpen(false);
       setName('');
-      setIconUrl('');
+      setIcon('Code');
       setPrimaryColor('');
     }
+  };
+
+  const getIcon = (iconName: string) => {
+    const LucideIcon = (LucideIcons as any)[iconName];
+    return LucideIcon ? <LucideIcon className="h-5 w-5" /> : null;
   };
 
   return (
@@ -64,15 +71,18 @@ export function AddLanguageDialog({
               required
             />
           </div>
-          <div>
-            <Label htmlFor="lang-icon">Icon URL</Label>
-            <Input
-              id="lang-icon"
-              value={iconUrl}
-              onChange={e => setIconUrl(e.target.value)}
-              placeholder="https://example.com/icon.svg"
-              required
-            />
+          <div className="space-y-2">
+            <Label>Icon</Label>
+            <IconPicker selectedIcon={icon} onIconSelect={setIcon}>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-start gap-2"
+              >
+                {getIcon(icon)}
+                <span>{icon}</span>
+              </Button>
+            </IconPicker>
           </div>
           <div>
             <Label htmlFor="lang-color">Үндсэн өнгө (RGB)</Label>

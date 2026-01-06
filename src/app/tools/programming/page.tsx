@@ -21,18 +21,8 @@ import LanguageCard from './components/LanguageCard';
 import { AddLanguageDialog } from './components/AddLanguageDialog';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Code, Sparkles } from 'lucide-react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import InteractiveParticles from '@/components/shared/InteractiveParticles';
+import { AnimatePresence } from 'framer-motion';
 
 export default function ProgrammingPage() {
   const { firestore, user } = useFirebase();
@@ -101,13 +91,19 @@ export default function ProgrammingPage() {
   const handleDeleteLanguage = async (id: string, name: string) => {
     if (!user || !firestore) return;
     const originalLanguages = [...languages];
-    setLanguages(prev => prev.filter(l => l.id !== id));
+    const skillToDelete = languages.find(s => s.id === id);
+    if (!skillToDelete) return;
+    setLanguages(prev => prev.filter(s => s.id !== id));
     try {
-      const docRef = doc(firestore, `users/${user.uid}/languages`, id);
-      await deleteDoc(docRef);
-      toast({ title: `"${name}" устгагдлаа` });
+      const skillDoc = doc(firestore, `users/${user.uid}/languages`, id);
+      await deleteDoc(skillDoc);
+      toast({
+        title: 'Амжилттай',
+        description: `"${name}" хэл устгагдлаа.`,
+      });
     } catch (error) {
       setLanguages(originalLanguages);
+      console.error('Error deleting language: ', error);
       toast({
         title: 'Алдаа',
         description: 'Хэл устгахад алдаа гарлаа.',
@@ -176,22 +172,20 @@ export default function ProgrammingPage() {
             </p>
           </motion.div>
         ) : (
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {languages.map((lang, index) => (
-              <motion.div
-                key={lang.id}
-                initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{
-                  duration: 0.4,
-                  delay: index * 0.05,
-                  type: 'spring',
-                  stiffness: 100,
-                }}
-              >
-                <LanguageCard language={lang} onDelete={handleDeleteLanguage} />
-              </motion.div>
-            ))}
+          <motion.div
+            layout
+            className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+          >
+            <AnimatePresence>
+              {languages.map((lang, index) => (
+                <LanguageCard
+                  key={lang.id}
+                  language={lang}
+                  index={index}
+                  onDelete={handleDeleteLanguage}
+                />
+              ))}
+            </AnimatePresence>
             {languages.length === 0 && (
               <div className="col-span-full text-center py-20">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-4">
@@ -202,7 +196,7 @@ export default function ProgrammingPage() {
                 </p>
               </div>
             )}
-          </div>
+          </motion.div>
         )}
       </div>
     </motion.div>
