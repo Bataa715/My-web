@@ -19,6 +19,7 @@ import {
   TrendingUp,
   User,
   Sparkles,
+  ListTodo,
 } from 'lucide-react';
 import InteractiveParticles from '@/components/shared/InteractiveParticles';
 import BackButton from '@/components/shared/BackButton';
@@ -47,6 +48,14 @@ const tools = [
     icon: <User className="h-7 w-7" />,
     gradient: 'from-violet-500 to-purple-400',
     shadowColor: 'rgba(139, 92, 246, 0.5)',
+  },
+  {
+    title: 'Todo List',
+    description: 'Хийх зүйлсийн жагсаалт',
+    href: '/tools/todo',
+    icon: <ListTodo className="h-7 w-7" />,
+    gradient: 'from-green-500 to-emerald-400',
+    shadowColor: 'rgba(16, 185, 129, 0.5)',
   },
   {
     title: 'Workspace',
@@ -132,7 +141,7 @@ export default function ToolsPage() {
                 <div
                   className="relative h-full rounded-2xl p-[1px] transition-all duration-500 group-hover:scale-[1.02]"
                   style={{
-                    background: `linear-gradient(135deg, ${tool.gradient.includes('blue') ? '#3b82f6' : tool.gradient.includes('rose') ? '#f43f5e' : tool.gradient.includes('violet') ? '#8b5cf6' : tool.gradient.includes('emerald') ? '#10b981' : tool.gradient.includes('orange') ? '#f97316' : tool.gradient.includes('yellow') ? '#eab308' : '#ef4444'}40, transparent)`,
+                    background: `linear-gradient(135deg, ${tool.gradient.includes('blue') ? '#3b82f6' : tool.gradient.includes('rose') ? '#f43f5e' : tool.gradient.includes('violet') ? '#8b5cf6' : tool.gradient.includes('emerald') ? '#10b981' : tool.gradient.includes('orange') ? '#f97316' : tool.gradient.includes('yellow') ? '#eab308' : tool.gradient.includes('green') ? '#22c55e' : '#ef4444'}40, transparent)`,
                   }}
                 >
                   <Card

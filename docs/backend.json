@@ -162,6 +162,26 @@
       },
       "required": ["title", "createdAt", "updatedAt"]
     },
+    "Todo": {
+      "title": "Todo",
+      "description": "Represents a single todo item.",
+      "type": "object",
+      "properties": {
+        "task": {
+          "type": "string",
+          "description": "The content of the todo task."
+        },
+        "completed": {
+          "type": "boolean",
+          "description": "Whether the todo task is completed."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["task", "completed", "createdAt"]
+    },
     "Exercise": {
       "title": "Exercise",
       "description": "Represents a fitness exercise.",
@@ -388,6 +408,10 @@
      "/users/{userId}/notes/{noteId}": {
       "schema": { "$ref": "#/entities/Note" },
       "description": "Stores user notes."
+    },
+    "/users/{userId}/todos/{todoId}": {
+      "schema": { "$ref": "#/entities/Todo" },
+      "description": "Stores user's todo items."
     },
     "/users/{userId}/fitnessExercises/{exerciseId}": {
       "schema": { "$ref": "#/entities/Exercise" },

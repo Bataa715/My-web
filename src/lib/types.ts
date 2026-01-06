@@ -180,6 +180,13 @@ export type Note = {
   updatedAt?: Date | Timestamp;
 };
 
+export type Todo = {
+  id?: string;
+  task: string;
+  completed: boolean;
+  createdAt?: Date | Timestamp;
+};
+
 export type Exercise = {
   id?: string;
   name: string;
