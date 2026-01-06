@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
 
 interface IconPickerProps {
   selectedIcon: string;
@@ -52,12 +53,15 @@ const IconPicker = ({
           <DialogTitle>Icon сонгох</DialogTitle>
         </DialogHeader>
         <div className="p-1">
-          <Input
-            placeholder="Icon хайх..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="mb-4"
-          />
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Icon хайх..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
           <ScrollArea className="h-72">
             <div className="grid grid-cols-8 gap-4 pr-4">
               {filteredIcons.map(iconName => (
