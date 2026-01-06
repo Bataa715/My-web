@@ -169,6 +169,13 @@ export type UserProfile = {
   facebook?: string;
   email?: string;
   cvUrl?: string;
+  learningGoals?: {
+    english: boolean;
+    japanese: boolean;
+    programming: boolean;
+    fitness: boolean;
+  };
+  onboardingCompleted?: boolean;
 };
 
 export type Note = {
