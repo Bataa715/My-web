@@ -71,17 +71,7 @@ export function HobbyProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       try {
         const snapshot = await getDocs(hobbiesCollectionRef);
-
-        if (snapshot.empty) {
-          const batch = writeBatch(firestore);
-          initialHobbies.forEach(hobby => {
-            const docRef = doc(hobbiesCollectionRef);
-            batch.set(docRef, { ...hobby, createdAt: serverTimestamp() });
-          });
-          await batch.commit();
-
-          const newSnapshot = await getDocs(hobbiesCollectionRef);
-          const hobbiesList = newSnapshot.docs.map(doc => {
+        const hobbiesList = snapshot.docs.map(doc => {
             const data = doc.data();
             return {
               id: doc.id,
@@ -89,30 +79,14 @@ export function HobbyProvider({ children }: { children: ReactNode }) {
               createdAt: toDateSafe(data.createdAt),
             } as Hobby;
           });
-          setHobbies(
-            hobbiesList.sort(
-              (a, b) =>
-                (a.createdAt as Date).getTime() -
-                (b.createdAt as Date).getTime()
-            )
-          );
-        } else {
-          const hobbiesList = snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              createdAt: toDateSafe(data.createdAt),
-            } as Hobby;
-          });
-          setHobbies(
-            hobbiesList.sort(
-              (a, b) =>
-                (a.createdAt as Date).getTime() -
-                (b.createdAt as Date).getTime()
-            )
-          );
-        }
+        setHobbies(
+          hobbiesList.sort(
+            (a, b) =>
+              (a.createdAt as Date).getTime() -
+              (b.createdAt as Date).getTime()
+          )
+        );
+
       } catch (error) {
         console.error('Error fetching hobbies: ', error);
         toast({

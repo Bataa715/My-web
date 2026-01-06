@@ -62,36 +62,16 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'));
         const projectSnapshot = await getDocs(q);
 
-        if (projectSnapshot.empty) {
-          const batch = writeBatch(firestore);
-          initialProjects.forEach(project => {
-            const docRef = doc(projectsCollectionRef);
-            batch.set(docRef, { ...project, createdAt: serverTimestamp() });
-          });
-          await batch.commit();
+        const projectList = projectSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: (data.createdAt as Timestamp)?.toDate(),
+          } as Project;
+        });
+        setProjects(projectList);
 
-          // Re-fetch after seeding
-          const newSnapshot = await getDocs(q);
-          const projectList = newSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              createdAt: (data.createdAt as Timestamp)?.toDate(),
-            } as Project;
-          });
-          setProjects(projectList);
-        } else {
-          const projectList = projectSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              createdAt: (data.createdAt as Timestamp)?.toDate(),
-            } as Project;
-          });
-          setProjects(projectList);
-        }
       } catch (error) {
         console.error('Error fetching projects: ', error);
         toast({

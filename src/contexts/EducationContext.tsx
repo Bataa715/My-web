@@ -76,17 +76,7 @@ export function EducationProvider({ children }: { children: ReactNode }) {
       try {
         const q = query(educationCollectionRef, orderBy('startDate', 'asc'));
         const educationSnapshot = await getDocs(q);
-
-        if (educationSnapshot.empty) {
-          const batch = writeBatch(firestore);
-          initialEducation.forEach(edu => {
-            const docRef = doc(educationCollectionRef);
-            batch.set(docRef, { ...edu, createdAt: serverTimestamp() });
-          });
-          await batch.commit();
-
-          const newSnapshot = await getDocs(q);
-          const educationList = newSnapshot.docs.map(doc => {
+        const educationList = educationSnapshot.docs.map(doc => {
             const data = doc.data();
             return {
               id: doc.id,
@@ -96,20 +86,8 @@ export function EducationProvider({ children }: { children: ReactNode }) {
               createdAt: toDate(data.createdAt),
             } as Education;
           });
-          setEducation(educationList);
-        } else {
-          const educationList = educationSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              startDate: toDate(data.startDate),
-              endDate: toDate(data.endDate),
-              createdAt: toDate(data.createdAt),
-            } as Education;
-          });
-          setEducation(educationList);
-        }
+        setEducation(educationList);
+        
       } catch (error) {
         console.error('Error fetching education: ', error);
         toast({

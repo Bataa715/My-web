@@ -64,35 +64,16 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
         const q = query(skillsCollectionRef, orderBy('createdAt', 'asc'));
         const skillsSnapshot = await getDocs(q);
 
-        if (skillsSnapshot.empty) {
-          const batch = writeBatch(firestore);
-          initialSkillsData.forEach(skill => {
-            const docRef = doc(skillsCollectionRef);
-            batch.set(docRef, { ...skill, createdAt: serverTimestamp() });
-          });
-          await batch.commit();
+        const skillsList = skillsSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: (data.createdAt as Timestamp)?.toDate(),
+          } as Skill;
+        });
+        setSkills(skillsList);
 
-          const newSnapshot = await getDocs(q);
-          const skillsList = newSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              createdAt: (data.createdAt as Timestamp)?.toDate(),
-            } as Skill;
-          });
-          setSkills(skillsList);
-        } else {
-          const skillsList = skillsSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              createdAt: (data.createdAt as Timestamp)?.toDate(),
-            } as Skill;
-          });
-          setSkills(skillsList);
-        }
       } catch (error) {
         toast({
           title: 'Алдаа',

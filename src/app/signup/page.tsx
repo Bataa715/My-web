@@ -26,8 +26,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import type { UserProfile } from '@/lib/types';
+import type { UserProfile, OrbitInfo } from '@/lib/types';
 import Link from 'next/link';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Нэр дор хаяж 2 тэмдэгттэй байх ёстой.' }),
@@ -71,37 +72,51 @@ export default function SignupPage() {
       );
       const user = userCredential.user;
 
-      const defaultImage =
-        'https://api.dicebear.com/7.x/avataaars/svg?seed=default';
+      const profileImage = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`;
+      const homeHeroImage =
+        PlaceHolderImages.find(p => p.id === 'home-hero-background')
+          ?.imageUrl || 'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17';
+      const aboutHeroImage =
+        PlaceHolderImages.find(p => p.id === 'about-hero-background')
+          ?.imageUrl || 'https://images.unsplash.com/photo-1581533676255-4f26a768fc4a';
+      const toolsHeroImage =
+        PlaceHolderImages.find(p => p.id === 'tools-hero-background')
+          ?.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726a';
 
       const defaultOrbitInfo: OrbitInfo[] = [
         {
           id: 'location',
           icon: 'MapPin',
           title: 'Байршил',
-          content: '',
+          content: 'Таны одоогийн байршил...',
           type: 'info',
         },
         {
           id: 'hobbies',
           icon: 'Gamepad2',
           title: 'Хобби',
-          content: '',
+          content: 'Сонирхдог зүйлсээ энд бичнэ үү.',
           type: 'info',
         },
         {
           id: 'goals',
           icon: 'Target',
           title: 'Зорилго',
-          content: '',
+          content: 'Таны ирээдүйн зорилго...',
           type: 'info',
         },
-        { id: 'user', icon: 'User', title: 'Тухай', content: '', type: 'info' },
+        {
+          id: 'user',
+          icon: 'User',
+          title: 'Тухай',
+          content: 'Өөрийнхөө тухай сонирхолтой баримт.',
+          type: 'info',
+        },
         {
           id: 'song',
           icon: 'Music',
           title: 'Дуртай дуу',
-          content: '',
+          content: 'Сонсох дуртай дуугаа нэмээрэй.',
           type: 'audio',
           youtubeVideoId: '',
         },
@@ -109,7 +124,7 @@ export default function SignupPage() {
           id: 'movie',
           icon: 'Film',
           title: 'Кино',
-          content: '',
+          content: 'Сэтгэлд хоногшсон киногоо хуваалцаарай.',
           type: 'info',
           backgroundImage: '',
         },
@@ -117,14 +132,14 @@ export default function SignupPage() {
           id: 'quote',
           icon: 'MessageSquareQuote',
           title: 'Ишлэл',
-          content: '',
+          content: 'Урам зориг өгдөг ишлэлээ бичнэ үү.',
           type: 'info',
         },
         {
           id: 'likes',
           icon: 'Heart',
           title: 'Дуртай зүйлс',
-          content: '',
+          content: 'Таны дуртай бүх зүйлс...',
           type: 'info',
         },
       ];
@@ -133,12 +148,12 @@ export default function SignupPage() {
         appName: 'Kaizen',
         name: values.name,
         email: values.email,
-        bio: '',
-        profileImage: defaultImage,
+        bio: 'Өөрийнхөө тухай товч танилцуулга энд бичнэ үү.',
+        profileImage: profileImage,
         personalInfo: [],
-        homeHeroImage: defaultImage,
-        aboutHeroImage: defaultImage,
-        toolsHeroImage: defaultImage,
+        homeHeroImage: homeHeroImage,
+        aboutHeroImage: aboutHeroImage,
+        toolsHeroImage: toolsHeroImage,
         orbitInfo: defaultOrbitInfo,
         github: '',
         instagram: '',
