@@ -75,13 +75,16 @@ export default function SignupPage() {
       const profileImage = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`;
       const homeHeroImage =
         PlaceHolderImages.find(p => p.id === 'home-hero-background')
-          ?.imageUrl || 'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17';
+          ?.imageUrl ||
+        'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17';
       const aboutHeroImage =
         PlaceHolderImages.find(p => p.id === 'about-hero-background')
-          ?.imageUrl || 'https://images.unsplash.com/photo-1581533676255-4f26a768fc4a';
+          ?.imageUrl ||
+        'https://images.unsplash.com/photo-1581533676255-4f26a768fc4a';
       const toolsHeroImage =
         PlaceHolderImages.find(p => p.id === 'tools-hero-background')
-          ?.imageUrl || 'https://images.unsplash.com/photo-1550745165-9bc0b252726a';
+          ?.imageUrl ||
+        'https://images.unsplash.com/photo-1550745165-9bc0b252726a';
 
       const defaultOrbitInfo: OrbitInfo[] = [
         {

@@ -77,17 +77,16 @@ export function EducationProvider({ children }: { children: ReactNode }) {
         const q = query(educationCollectionRef, orderBy('startDate', 'asc'));
         const educationSnapshot = await getDocs(q);
         const educationList = educationSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              startDate: toDate(data.startDate),
-              endDate: toDate(data.endDate),
-              createdAt: toDate(data.createdAt),
-            } as Education;
-          });
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            startDate: toDate(data.startDate),
+            endDate: toDate(data.endDate),
+            createdAt: toDate(data.createdAt),
+          } as Education;
+        });
         setEducation(educationList);
-        
       } catch (error) {
         console.error('Error fetching education: ', error);
         toast({

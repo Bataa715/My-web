@@ -55,12 +55,8 @@ import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { themes } from '@/lib/themes';
 import { Input } from './ui/input';
-
-const mainLinks = [
-  { href: '/', label: 'Нүүр', icon: Home },
-  { href: '/about', label: 'Тухай', icon: User },
-  { href: '/tools', label: 'Хэрэгсэл', icon: Wrench },
-];
+import { useLanguage } from '@/contexts/I18nContext';
+import { useTranslation } from 'react-i18next';
 
 const Header = () => {
   const { isEditMode, setIsEditMode } = useEditMode();
@@ -68,6 +64,14 @@ const Header = () => {
   const { toast } = useToast();
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useTranslation();
+  const { language, setLanguage, languages } = useLanguage();
+
+  const mainLinks = [
+    { href: '/', label: t('common.home'), icon: Home },
+    { href: '/about', label: t('common.about'), icon: User },
+    { href: '/tools', label: t('common.tools'), icon: Wrench },
+  ];
 
   const { user, isUserLoading, auth, firestore } = useFirebase();
   const [appName, setAppName] = useState('');
@@ -201,15 +205,32 @@ const Header = () => {
           <div className="justify-self-end flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="relative">
                   <Globe className="h-5 w-5" />
                   <span className="sr-only">Хэл солих</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Монгол</DropdownMenuItem>
-                <DropdownMenuItem>English</DropdownMenuItem>
-                <DropdownMenuItem>Japan</DropdownMenuItem>
+              <DropdownMenuContent align="end" className="p-2 min-w-[160px]">
+                <div className="grid gap-1">
+                  {languages.map(lang => (
+                    <DropdownMenuItem
+                      key={lang.code}
+                      onClick={() => setLanguage(lang.code)}
+                      className={cn(
+                        'flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200',
+                        language === lang.code
+                          ? 'bg-primary/15 border border-primary/30'
+                          : 'hover:bg-white/5'
+                      )}
+                    >
+                      <span className="text-lg">{lang.flag}</span>
+                      <span className="flex-1 font-medium">{lang.name}</span>
+                      {language === lang.code && (
+                        <Check className="h-4 w-4 text-primary" />
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -218,7 +239,7 @@ const Header = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon">
                     <Settings className="h-5 w-5" />
-                    <span className="sr-only">Тохиргоо</span>
+                    <span className="sr-only">{t('common.settings')}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -228,41 +249,52 @@ const Header = () => {
                     ) : (
                       <PencilRuler className="mr-2 h-4 w-4" />
                     )}
-                    <span>{isEditMode ? 'Харах' : 'Засварлах'}</span>
+                    <span>
+                      {isEditMode ? t('common.view') : t('common.edit')}
+                    </span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger>
                       <Palette className="mr-2 h-4 w-4" />
-                      <span>Theme</span>
+                      <span>{t('common.theme')}</span>
                     </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent>
-                      {themes.map(themeOption => (
-                        <DropdownMenuItem
-                          key={themeOption.name}
-                          onClick={() => handleThemeChange(themeOption.name)}
-                        >
-                          <span
-                            className="mr-2 h-4 w-4 rounded-full"
-                            style={{
-                              backgroundColor: `hsl(${themeOption.primary})`,
-                            }}
-                          />
-                          <span>
-                            {themeOption.name.charAt(0).toUpperCase() +
-                              themeOption.name.slice(1)}
-                          </span>
-                          {theme === themeOption.name && (
-                            <Check className="ml-auto h-4 w-4" />
-                          )}
-                        </DropdownMenuItem>
-                      ))}
+                    <DropdownMenuSubContent className="p-2 min-w-[180px]">
+                      <div className="grid gap-1">
+                        {themes.map(themeOption => (
+                          <DropdownMenuItem
+                            key={themeOption.name}
+                            onClick={() => handleThemeChange(themeOption.name)}
+                            className={cn(
+                              'flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200',
+                              theme === themeOption.name
+                                ? 'bg-primary/15 border border-primary/30'
+                                : 'hover:bg-white/5'
+                            )}
+                          >
+                            <div
+                              className="w-4 h-4 rounded-full ring-2 ring-white/20 shadow-lg"
+                              style={{
+                                backgroundColor: `hsl(${themeOption.primary})`,
+                                boxShadow: `0 0 12px hsl(${themeOption.primary} / 0.5)`,
+                              }}
+                            />
+                            <span className="flex-1 font-medium">
+                              {themeOption.name.charAt(0).toUpperCase() +
+                                themeOption.name.slice(1).replace('-', ' ')}
+                            </span>
+                            {theme === themeOption.name && (
+                              <Check className="h-4 w-4 text-primary" />
+                            )}
+                          </DropdownMenuItem>
+                        ))}
+                      </div>
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Гарах</span>
+                    <span>{t('common.logout')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

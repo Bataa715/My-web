@@ -1,0 +1,50 @@
+{
+  "common": {
+    "home": "Нүүр",
+    "about": "Тухай",
+    "tools": "Хэрэгсэл",
+    "settings": "Тохиргоо",
+    "logout": "Гарах",
+    "login": "Нэвтрэх",
+    "signup": "Бүртгүүлэх",
+    "edit": "Засварлах",
+    "view": "Харах",
+    "theme": "Загвар",
+    "language": "Хэл",
+    "save": "Хадгалах",
+    "cancel": "Цуцлах",
+    "delete": "Устгах",
+    "add": "Нэмэх",
+    "search": "Хайх",
+    "loading": "Уншиж байна...",
+    "error": "Алдаа гарлаа",
+    "success": "Амжилттай"
+  },
+  "header": {
+    "editMode": "Засварлах горим",
+    "viewMode": "Харах горим"
+  },
+  "hero": {
+    "greeting": "Сайн байна уу, Би",
+    "role": "Програмист",
+    "description": "Вэб хөгжүүлэгч, UI/UX дизайнер"
+  },
+  "tools": {
+    "title": "Хэрэгсэл",
+    "subtitle": "Миний үүсгэсэн хэрэгслүүд",
+    "english": "Англи хэл",
+    "japanese": "Япон хэл",
+    "programming": "Програмчлал",
+    "fitness": "Фитнесс",
+    "notes": "Тэмдэглэл",
+    "pomodoro": "Помодоро",
+    "todo": "Хийх зүйлс",
+    "chartAnalyzer": "График шинжилгээ",
+    "traderAI": "Трейдер AI"
+  },
+  "languages": {
+    "mongolian": "Монгол",
+    "english": "English",
+    "japanese": "日本語"
+  }
+}

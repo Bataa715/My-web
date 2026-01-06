@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { GrammarRule } from '@/lib/types';
@@ -11,13 +11,13 @@ import GrammarRuleDetail from '@/components/shared/GrammarRuleDetail';
 export default function JapaneseGrammarRulePage({
   params,
 }: {
-  params: { ruleId: string };
+  params: Promise<{ ruleId: string }>;
 }) {
+  const { ruleId } = use(params);
   const { firestore, user } = useFirebase();
   const [rule, setRule] = useState<GrammarRule | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { ruleId } = params;
 
   useEffect(() => {
     if (!firestore || !ruleId || !user) {

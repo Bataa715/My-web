@@ -86,7 +86,11 @@ export function EditEducationDialog({
 
   const onSubmit = async (values: z.infer<typeof educationSchema>) => {
     if (education.id) {
-      await updateEducation(education.id, values);
+      await updateEducation(education.id, {
+        ...values,
+        startDate: new Date(values.startDate),
+        endDate: new Date(values.endDate),
+      });
     }
     setOpen(false);
   };

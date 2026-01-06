@@ -58,9 +58,9 @@ const tools = [
     shadowColor: 'rgba(16, 185, 129, 0.5)',
   },
   {
-    title: 'Workspace',
-    description: 'Хувийн ажлын самбар, төлөвлөгч',
-    href: '/tools/notes',
+    title: 'Fitness Tracker',
+    description: 'Биеийн тамирын дасгал хянах хэрэгсэл',
+    href: '/tools/fitness',
     icon: <LayoutGrid className="h-7 w-7" />,
     gradient: 'from-emerald-500 to-teal-400',
     shadowColor: 'rgba(16, 185, 129, 0.5)',

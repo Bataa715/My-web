@@ -120,7 +120,10 @@ export default function ReadingView({ material }: ReadingViewProps) {
 
     try {
       if (action === 'translate') {
-        const result = await translateText({ text });
+        const result = await translateText({
+          text,
+          targetLanguage: 'Mongolian',
+        });
         setAiResponse({ translation: result.translation });
       } else if (action === 'correct') {
         const result = await correctText({ text });

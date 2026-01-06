@@ -175,6 +175,7 @@ export type Note = {
   id?: string;
   title: string;
   content: string;
+  chapterId?: string; // Optional: belongs to a chapter
   createdAt?: Date | Timestamp;
   updatedAt?: Date | Timestamp;
 };
@@ -199,7 +200,17 @@ export type WorkoutLog = {
   exerciseName: string;
   duration: number; // in minutes
   repetitions: number;
+  sets?: number;
+  weight?: number; // weight used in kg
   date: Date | Timestamp;
+};
+
+export type BodyStats = {
+  id?: string;
+  weight: number; // kg
+  height: number; // cm
+  date: Date | Timestamp;
+  notes?: string;
 };
 
 export interface GeneratedMCQ {

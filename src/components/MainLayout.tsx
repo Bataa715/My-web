@@ -391,7 +391,7 @@ export default function MainLayout({
                         />
                       </div>
 
-                      <div className="relative z-10">
+                      <div className="relative z-50">
                         <Header />
                       </div>
                       <main className="relative z-10 flex-1">

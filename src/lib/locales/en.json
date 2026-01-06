@@ -1,0 +1,50 @@
+{
+  "common": {
+    "home": "Home",
+    "about": "About",
+    "tools": "Tools",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "signup": "Sign Up",
+    "edit": "Edit",
+    "view": "View",
+    "theme": "Theme",
+    "language": "Language",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "add": "Add",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error occurred",
+    "success": "Success"
+  },
+  "header": {
+    "editMode": "Edit Mode",
+    "viewMode": "View Mode"
+  },
+  "hero": {
+    "greeting": "Hello, I'm",
+    "role": "Developer",
+    "description": "Web Developer, UI/UX Designer"
+  },
+  "tools": {
+    "title": "Tools",
+    "subtitle": "My created tools",
+    "english": "English",
+    "japanese": "Japanese",
+    "programming": "Programming",
+    "fitness": "Fitness",
+    "notes": "Notes",
+    "pomodoro": "Pomodoro",
+    "todo": "Todo",
+    "chartAnalyzer": "Chart Analyzer",
+    "traderAI": "Trader AI"
+  },
+  "languages": {
+    "mongolian": "Монгол",
+    "english": "English",
+    "japanese": "日本語"
+  }
+}

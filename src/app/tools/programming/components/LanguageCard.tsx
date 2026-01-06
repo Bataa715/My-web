@@ -1,11 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import type { Language } from '@/lib/types';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Trash2, AlertTriangle } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,16 +32,6 @@ export default function LanguageCard({
 }: LanguageCardProps) {
   const { isEditMode } = useEditMode();
 
-  const cardStyle = {
-    '--glow-color': language.primaryColor,
-    boxShadow: `0 0 15px 1px rgba(var(--glow-color), 0.2), 0 0 20px 2px rgba(var(--glow-color), 0.1)`,
-    borderColor: `rgba(var(--glow-color), 0.3)`,
-  } as React.CSSProperties;
-
-  const progressStyle = {
-    backgroundColor: `rgb(var(--glow-color))`,
-  } as React.CSSProperties;
-
   return (
     <motion.div
       layout
@@ -60,33 +48,47 @@ export default function LanguageCard({
     >
       <Link href={`/tools/programming/${language.id}`}>
         <div
-          className="bg-gray-900/50 backdrop-blur-sm border p-6 rounded-2xl h-full flex flex-col justify-between hover:scale-105 transition-all cursor-pointer"
-          style={cardStyle}
+          className="bg-card/50 backdrop-blur-xl border-0 p-6 rounded-2xl h-full flex flex-col justify-between hover:scale-105 transition-all cursor-pointer overflow-hidden relative"
+          style={{
+            boxShadow: `0 0 30px rgba(${language.primaryColor}, 0.15), 0 0 60px rgba(${language.primaryColor}, 0.05)`,
+          }}
         >
-          <div>
+          {/* Gradient overlay */}
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              background: `linear-gradient(135deg, rgba(${language.primaryColor}, 0.3), transparent)`,
+            }}
+          />
+
+          <div className="relative z-10">
             <div
-              className="w-16 h-16 mb-4 mx-auto relative flex items-center justify-center rounded-xl"
+              className="w-16 h-16 mb-4 mx-auto relative flex items-center justify-center rounded-2xl"
               style={{
-                color: `rgb(var(--glow-color))`,
-                backgroundColor: `rgba(var(--glow-color), 0.1)`,
-                boxShadow: `0 0 10px 2px rgba(var(--glow-color), 0.2)`,
+                color: `rgb(${language.primaryColor})`,
+                backgroundColor: `rgba(${language.primaryColor}, 0.1)`,
+                boxShadow: `0 0 20px rgba(${language.primaryColor}, 0.2)`,
               }}
             >
               <TechIcon techName={language.iconUrl} className="w-8 h-8" />
             </div>
-            <h3 className="text-white text-xl font-bold text-center mb-2">
+            <h3 className="text-xl font-bold text-center mb-2">
               {language.name}
             </h3>
           </div>
-          <div className="mt-4">
-            <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
-              <div
-                className="h-full transition-all duration-500"
-                style={{ ...progressStyle, width: `${language.progress}%` }}
-              ></div>
+
+          <div className="mt-4 relative z-10">
+            <div className="w-full bg-muted/50 h-2 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${language.progress}%` }}
+                transition={{ duration: 1, delay: index * 0.1 }}
+                className="h-full rounded-full"
+                style={{ backgroundColor: `rgb(${language.primaryColor})` }}
+              />
             </div>
-            <p className="text-gray-400 text-xs mt-2 text-right">
-              {language.progress}% completed
+            <p className="text-muted-foreground text-xs mt-2 text-right">
+              {language.progress}% дууссан
             </p>
           </div>
         </div>

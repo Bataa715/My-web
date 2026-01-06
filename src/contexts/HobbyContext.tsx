@@ -72,21 +72,19 @@ export function HobbyProvider({ children }: { children: ReactNode }) {
       try {
         const snapshot = await getDocs(hobbiesCollectionRef);
         const hobbiesList = snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              createdAt: toDateSafe(data.createdAt),
-            } as Hobby;
-          });
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: toDateSafe(data.createdAt),
+          } as Hobby;
+        });
         setHobbies(
           hobbiesList.sort(
             (a, b) =>
-              (a.createdAt as Date).getTime() -
-              (b.createdAt as Date).getTime()
+              (a.createdAt as Date).getTime() - (b.createdAt as Date).getTime()
           )
         );
-
       } catch (error) {
         console.error('Error fetching hobbies: ', error);
         toast({

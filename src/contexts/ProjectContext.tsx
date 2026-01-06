@@ -71,7 +71,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
           } as Project;
         });
         setProjects(projectList);
-
       } catch (error) {
         console.error('Error fetching projects: ', error);
         toast({

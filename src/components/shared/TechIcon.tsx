@@ -360,8 +360,6 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
   jupyter: { slug: 'jupyter', color: 'F37626' },
   pandas: { slug: 'pandas', color: '150458' },
   numpy: { slug: 'numpy', color: '013243' },
-  'data analysis': { slug: 'googleanalytics', color: 'E37400' },
-  dataanalysis: { slug: 'googleanalytics', color: 'E37400' },
 
   // Storage & CDN
   minio: { slug: 'minio', color: 'C72E49' },

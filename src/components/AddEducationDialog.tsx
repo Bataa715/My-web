@@ -57,7 +57,11 @@ export function AddEducationDialog({ children }: AddEducationDialogProps) {
   });
 
   const onSubmit = async (values: z.infer<typeof educationSchema>) => {
-    await addEducation(values);
+    await addEducation({
+      ...values,
+      startDate: new Date(values.startDate),
+      endDate: new Date(values.endDate),
+    });
     form.reset();
     setOpen(false);
   };

@@ -58,6 +58,8 @@ interface MaterialManagerProps {
   pageDescription: string;
   dialogTitle: string;
   dialogDescription: string;
+  showBackButton?: boolean;
+  showAddButton?: boolean;
 }
 
 export default function MaterialManager({
@@ -66,6 +68,8 @@ export default function MaterialManager({
   pageDescription,
   dialogTitle,
   dialogDescription,
+  showBackButton = true,
+  showAddButton = true,
 }: MaterialManagerProps) {
   const { firestore, user } = useFirebase();
   const { isEditMode } = useEditMode();

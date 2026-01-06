@@ -73,7 +73,6 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
           } as Skill;
         });
         setSkills(skillsList);
-
       } catch (error) {
         toast({
           title: 'Алдаа',

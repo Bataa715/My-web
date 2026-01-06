@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type { ReadingMaterial, UserProfile } from '@/lib/types';
@@ -13,13 +13,13 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 export default function ReadingMaterialPage({
   params,
 }: {
-  params: { readingId: string };
+  params: Promise<{ readingId: string }>;
 }) {
+  const { readingId } = use(params);
   const { firestore, user, isUserLoading } = useFirebase();
   const [material, setMaterial] = useState<ReadingMaterial | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { readingId } = params;
   const [heroImage, setHeroImage] = useState<string | undefined>(undefined);
 
   useEffect(() => {

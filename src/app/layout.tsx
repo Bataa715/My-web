@@ -11,6 +11,7 @@ import { EducationProvider } from '@/contexts/EducationContext';
 import { HobbyProvider } from '@/contexts/HobbyContext';
 import { ExperienceProvider } from '@/contexts/ExperienceContext';
 import IntroOverlay from '@/components/IntroOverlay';
+import { I18nProvider } from '@/contexts/I18nContext';
 import { JetBrains_Mono } from 'next/font/google';
 
 const jetbrainsMono = JetBrains_Mono({
@@ -61,18 +62,20 @@ export default function RootLayout({
               enableSystem={false}
               disableTransitionOnChange
             >
-              <EducationProvider>
-                <ExperienceProvider>
-                  <ProjectProvider>
-                    <SkillsProvider>
-                      <HobbyProvider>
-                        <MainLayout>{children}</MainLayout>
-                        <Toaster />
-                      </HobbyProvider>
-                    </SkillsProvider>
-                  </ProjectProvider>
-                </ExperienceProvider>
-              </EducationProvider>
+              <I18nProvider>
+                <EducationProvider>
+                  <ExperienceProvider>
+                    <ProjectProvider>
+                      <SkillsProvider>
+                        <HobbyProvider>
+                          <MainLayout>{children}</MainLayout>
+                          <Toaster />
+                        </HobbyProvider>
+                      </SkillsProvider>
+                    </ProjectProvider>
+                  </ExperienceProvider>
+                </EducationProvider>
+              </I18nProvider>
             </ThemeProvider>
           </EditModeProvider>
         </FirebaseClientProvider>

@@ -87,6 +87,15 @@ import MatchingGame from './MatchingGame';
 import { motion } from 'framer-motion';
 import InteractiveParticles from './InteractiveParticles';
 import BackButton from './BackButton';
+import { autoGenerateVocabulary } from '@/ai/flows/auto-generate-vocabulary-flow';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type Word = EnglishWord | JapaneseWord;
 
@@ -109,6 +118,13 @@ const AiAssistantDialog = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
+
+  // Auto generate states
+  const [autoTopic, setAutoTopic] = useState('');
+  const [autoCount, setAutoCount] = useState(10);
+  const [autoLevel, setAutoLevel] = useState<
+    'beginner' | 'intermediate' | 'advanced'
+  >('intermediate');
 
   const handleGenerate = async () => {
     if (!text.trim()) {
@@ -149,6 +165,62 @@ const AiAssistantDialog = ({
     }
   };
 
+  const handleAutoGenerate = async () => {
+    if (!autoTopic.trim()) {
+      toast({
+        title: 'Сэдэв хоосон байна',
+        description: 'Ямар сэдвээр үг үүсгэхээ оруулна уу.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const result = await autoGenerateVocabulary({
+        topic: autoTopic,
+        count: autoCount,
+        level: autoLevel,
+      });
+      if (result.words && result.words.length > 0) {
+        await onAddWords(result.words);
+        toast({
+          title: 'Амжилттай',
+          description: `${result.words.length} үг автоматаар үүсгэгдлээ.`,
+        });
+        setIsOpen(false);
+        setAutoTopic('');
+      } else {
+        toast({
+          title: 'Үг үүсгэж чадсангүй',
+          description: 'AI үг үүсгэхэд алдаа гарлаа.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: 'Алдаа гарлаа',
+        description: 'AI автомат үг үүсгэхэд алдаа гарлаа.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const topicSuggestions = [
+    'Business & Work',
+    'Travel & Tourism',
+    'Technology & IT',
+    'Food & Cooking',
+    'Health & Medicine',
+    'Sports & Fitness',
+    'Education & School',
+    'Environment & Nature',
+    'Entertainment & Movies',
+    'Science & Research',
+  ];
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -156,37 +228,146 @@ const AiAssistantDialog = ({
           <Wand2 className="mr-2 h-4 w-4" /> AI Туслах
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>AI Туслахаар үгс нэмэх</DialogTitle>
-          <DialogDescription>
-            Англи, монгол үгс, тайлбар агуулсан текстээ хуулж тавина уу. AI
-            автоматаар ялгаж, хүснэгтэд нэмэх болно.
-          </DialogDescription>
         </DialogHeader>
-        <div className="py-4 space-y-4">
-          <Label htmlFor="ai-text-input">Текст</Label>
-          <Textarea
-            id="ai-text-input"
-            value={text}
-            onChange={e => setText(e.target.value)}
-            placeholder="e.g. apple - алим
+
+        <Tabs defaultValue="manual" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="manual" className="gap-2">
+              <BookOpen className="h-4 w-4" />
+              Текстээс
+            </TabsTrigger>
+            <TabsTrigger value="auto" className="gap-2">
+              <Sparkles className="h-4 w-4" />
+              Автомат
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="manual" className="space-y-4 mt-4">
+            <p className="text-sm text-muted-foreground">
+              Англи, монгол үгс, тайлбар агуулсан текстээ хуулж тавина уу. AI
+              автоматаар ялгаж, хүснэгтэд нэмэх болно.
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="ai-text-input">Текст</Label>
+              <Textarea
+                id="ai-text-input"
+                value={text}
+                onChange={e => setText(e.target.value)}
+                placeholder="e.g. apple - алим
 banana: гадил
 car: машин (A vehicle with four wheels)"
-            rows={10}
-          />
-        </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="secondary" type="button">
-              Цуцлах
-            </Button>
-          </DialogClose>
-          <Button onClick={handleGenerate} disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLoading ? 'Нэмж байна...' : 'Үгс нэмэх'}
-          </Button>
-        </DialogFooter>
+                rows={8}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <DialogClose asChild>
+                <Button variant="secondary" type="button">
+                  Цуцлах
+                </Button>
+              </DialogClose>
+              <Button onClick={handleGenerate} disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? 'Нэмж байна...' : 'Үгс нэмэх'}
+              </Button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="auto" className="space-y-4 mt-4">
+            <p className="text-sm text-muted-foreground">
+              Сэдэв болон хэдэн үг үүсгэхээ сонгоно уу. AI автоматаар үг
+              үүсгэнэ.
+            </p>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="auto-topic">Сэдэв / Агуулгын хүрээ</Label>
+                <Input
+                  id="auto-topic"
+                  value={autoTopic}
+                  onChange={e => setAutoTopic(e.target.value)}
+                  placeholder="e.g. Business English, Medical terms, Daily conversation..."
+                />
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {topicSuggestions.map(topic => (
+                    <Button
+                      key={topic}
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => setAutoTopic(topic)}
+                    >
+                      {topic}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="auto-count">Үгийн тоо</Label>
+                  <Select
+                    value={autoCount.toString()}
+                    onValueChange={v => setAutoCount(parseInt(v))}
+                  >
+                    <SelectTrigger id="auto-count">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">5 үг</SelectItem>
+                      <SelectItem value="10">10 үг</SelectItem>
+                      <SelectItem value="15">15 үг</SelectItem>
+                      <SelectItem value="20">20 үг</SelectItem>
+                      <SelectItem value="30">30 үг</SelectItem>
+                      <SelectItem value="50">50 үг</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="auto-level">Түвшин</Label>
+                  <Select
+                    value={autoLevel}
+                    onValueChange={v => setAutoLevel(v as typeof autoLevel)}
+                  >
+                    <SelectTrigger id="auto-level">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">🟢 Beginner</SelectItem>
+                      <SelectItem value="intermediate">
+                        🟡 Intermediate
+                      </SelectItem>
+                      <SelectItem value="advanced">🔴 Advanced</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <DialogClose asChild>
+                <Button variant="secondary" type="button">
+                  Цуцлах
+                </Button>
+              </DialogClose>
+              <Button
+                onClick={handleAutoGenerate}
+                disabled={isLoading}
+                className="gap-2"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
+                {isLoading ? 'Үүсгэж байна...' : 'Үг үүсгэх'}
+              </Button>
+            </div>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

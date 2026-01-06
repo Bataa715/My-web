@@ -23,15 +23,19 @@ interface EditSkillDialogProps {
   skillGroup: Skill;
 }
 
+interface EditingGroupState {
+  name: string;
+  icon: string;
+  items: string;
+}
+
 export function EditSkillDialog({
   children,
   skillGroup,
 }: EditSkillDialogProps) {
   const { updateSkillGroup } = useSkills();
   const [open, setOpen] = useState(false);
-  const [editingGroup, setEditingGroup] = useState<
-    Partial<Skill> & { items: string }
-  >({
+  const [editingGroup, setEditingGroup] = useState<EditingGroupState>({
     name: skillGroup.name,
     icon: skillGroup.icon,
     items: skillGroup.items.join(', '),

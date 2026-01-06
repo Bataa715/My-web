@@ -13,7 +13,7 @@ export default function BackButton() {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
-      className="sticky top-24 z-50 w-fit mt-8"
+      className="sticky top-24 z-40 w-fit mt-8 ml-4 md:ml-6"
     >
       <Button
         variant="ghost"
