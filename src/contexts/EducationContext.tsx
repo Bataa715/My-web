@@ -91,9 +91,9 @@ export function EducationProvider({ children }: { children: ReactNode }) {
             return {
               id: doc.id,
               ...data,
-              startDate: (data.startDate as Timestamp)?.toDate(),
-              endDate: (data.endDate as Timestamp)?.toDate(),
-              createdAt: (data.createdAt as Timestamp)?.toDate(),
+              startDate: toDate(data.startDate),
+              endDate: toDate(data.endDate),
+              createdAt: toDate(data.createdAt),
             } as Education;
           });
           setEducation(educationList);
@@ -103,9 +103,9 @@ export function EducationProvider({ children }: { children: ReactNode }) {
             return {
               id: doc.id,
               ...data,
-              startDate: (data.startDate as Timestamp)?.toDate(),
-              endDate: (data.endDate as Timestamp)?.toDate(),
-              createdAt: (data.createdAt as Timestamp)?.toDate(),
+              startDate: toDate(data.startDate),
+              endDate: toDate(data.endDate),
+              createdAt: toDate(data.createdAt),
             } as Education;
           });
           setEducation(educationList);
