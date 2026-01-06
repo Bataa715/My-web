@@ -21,7 +21,7 @@ import * as LucideIcons from 'lucide-react';
 interface AddLanguageDialogProps {
   children: ReactNode;
   onAddLanguage: (
-    language: Omit<Language, 'id' | 'createdAt' | 'progress'>
+    language: Omit<Language, 'id' | 'createdAt' | 'progress' | 'primaryColor'>
   ) => void;
 }
 
@@ -32,16 +32,14 @@ export function AddLanguageDialog({
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [icon, setIcon] = useState('Code');
-  const [primaryColor, setPrimaryColor] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name && icon && primaryColor) {
-      onAddLanguage({ name, iconUrl: icon, primaryColor });
+    if (name && icon) {
+      onAddLanguage({ name, iconUrl: icon });
       setOpen(false);
       setName('');
       setIcon('Code');
-      setPrimaryColor('');
     }
   };
 
@@ -83,16 +81,6 @@ export function AddLanguageDialog({
                 <span>{icon}</span>
               </Button>
             </IconPicker>
-          </div>
-          <div>
-            <Label htmlFor="lang-color">Үндсэн өнгө (RGB)</Label>
-            <Input
-              id="lang-color"
-              value={primaryColor}
-              onChange={e => setPrimaryColor(e.target.value)}
-              placeholder="Жишээ: 168, 85, 247"
-              required
-            />
           </div>
           <DialogFooter>
             <DialogClose asChild>

@@ -24,6 +24,14 @@ import { PlusCircle, Code, Sparkles } from 'lucide-react';
 import InteractiveParticles from '@/components/shared/InteractiveParticles';
 import { AnimatePresence } from 'framer-motion';
 
+const colorCycle = [
+  '168, 85, 247', // Primary (purple)
+  '59, 130, 246', // Blue
+  '16, 185, 129', // Green
+  '249, 115, 22', // Orange
+  '244, 63, 94', // Rose
+];
+
 export default function ProgrammingPage() {
   const { firestore, user } = useFirebase();
   const { toast } = useToast();
@@ -66,7 +74,7 @@ export default function ProgrammingPage() {
   }, [user, firestore, fetchData]);
 
   const handleAddLanguage = async (
-    language: Omit<Language, 'id' | 'createdAt' | 'progress'>
+    language: Omit<Language, 'id' | 'createdAt' | 'progress' | 'primaryColor'>
   ) => {
     if (!user || !firestore) return;
     const langRef = collection(firestore, `users/${user.uid}/languages`);
@@ -75,11 +83,18 @@ export default function ProgrammingPage() {
         ...language,
         progress: 0,
         createdAt: serverTimestamp(),
+        primaryColor: colorCycle[languages.length % colorCycle.length],
       };
       const docRef = await addDoc(langRef, newLang);
       setLanguages(prev => [
         ...prev,
-        { ...language, id: docRef.id, progress: 0, createdAt: new Date() },
+        {
+          ...language,
+          id: docRef.id,
+          progress: 0,
+          primaryColor: newLang.primaryColor,
+          createdAt: new Date(),
+        } as Language,
       ]);
       toast({ title: 'Амжилттай нэмэгдлээ.' });
     } catch (error) {
