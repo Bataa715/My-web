@@ -209,7 +209,7 @@ const Header = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>Монгол</DropdownMenuItem>
                 <DropdownMenuItem>English</DropdownMenuItem>
-                <DropdownMenuItem>日本語</DropdownMenuItem>
+                <DropdownMenuItem>Japan</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
