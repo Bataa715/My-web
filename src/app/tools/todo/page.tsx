@@ -21,6 +21,7 @@ import { Loader2, Trash2, ListTodo, Sparkles } from 'lucide-react';
 import BackButton from '@/components/shared/BackButton';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 interface Todo {
   id: string;
@@ -34,6 +35,7 @@ export default function TodoPage() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTask, setNewTask] = useState('');
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const todosRef = useMemoFirebase(
     () =>
@@ -50,39 +52,78 @@ export default function TodoPage() {
     }
 
     const q = query(todosRef, orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, snapshot => {
-      const todosData = snapshot.docs.map(
-        doc => ({ id: doc.id, ...doc.data() }) as Todo
-      );
-      setTodos(todosData);
-      setLoading(false);
-    });
+    const unsubscribe = onSnapshot(
+      q,
+      snapshot => {
+        const todosData = snapshot.docs.map(
+          doc => ({ id: doc.id, ...doc.data() }) as Todo
+        );
+        setTodos(todosData);
+        setLoading(false);
+      },
+      error => {
+        console.error('Error fetching todos:', error);
+        toast({
+          title: 'Алдаа',
+          description: 'Хийх зүйлсийн жагсаалтыг татахад алдаа гарлаа.',
+          variant: 'destructive',
+        });
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
-  }, [todosRef]);
+  }, [todosRef, toast]);
 
   const addTodo = async (e: FormEvent) => {
     e.preventDefault();
     if (newTask.trim() === '' || !todosRef) return;
 
-    await addDoc(todosRef, {
-      task: newTask,
-      completed: false,
-      createdAt: serverTimestamp(),
-    });
-    setNewTask('');
+    try {
+      await addDoc(todosRef, {
+        task: newTask,
+        completed: false,
+        createdAt: serverTimestamp(),
+      });
+      setNewTask('');
+    } catch (error) {
+      console.error('Error adding todo:', error);
+      toast({
+        title: 'Алдаа гарлаа',
+        description: 'Нэмэхэд алдаа гарлаа. Та дахин оролдоно уу.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const toggleTodo = async (id: string, completed: boolean) => {
     if (!firestore || !user) return;
     const todoDoc = doc(firestore, `users/${user.uid}/todos`, id);
-    await updateDoc(todoDoc, { completed: !completed });
+    try {
+      await updateDoc(todoDoc, { completed: !completed });
+    } catch (error) {
+      console.error('Error toggling todo:', error);
+      toast({
+        title: 'Алдаа гарлаа',
+        description: 'Төлөв өөрчлөхөд алдаа гарлаа.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const deleteTodo = async (id: string) => {
     if (!firestore || !user) return;
     const todoDoc = doc(firestore, `users/${user.uid}/todos`, id);
-    await deleteDoc(todoDoc);
+    try {
+      await deleteDoc(todoDoc);
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+      toast({
+        title: 'Алдаа гарлаа',
+        description: 'Устгахад алдаа гарлаа.',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (loading) {
@@ -113,7 +154,10 @@ export default function TodoPage() {
           </p>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
           <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl shadow-lg shadow-green-500/5">
             <CardHeader>
               <CardTitle>Миний жагсаалт</CardTitle>
@@ -142,12 +186,18 @@ export default function TodoPage() {
                       initial={{ opacity: 0, y: -10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, x: -50, height: 0 }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 30,
+                      }}
                       className="flex items-center gap-3 p-3 bg-background/30 rounded-xl"
                     >
                       <Checkbox
                         checked={todo.completed}
-                        onCheckedChange={() => toggleTodo(todo.id, todo.completed)}
+                        onCheckedChange={() =>
+                          toggleTodo(todo.id, todo.completed)
+                        }
                         className="h-5 w-5 rounded-md border-green-500 data-[state=checked]:bg-green-500"
                         id={`todo-${todo.id}`}
                       />
@@ -174,8 +224,8 @@ export default function TodoPage() {
                   ))}
                 </AnimatePresence>
                 {!loading && todos.length === 0 && (
-                   <div className="text-center p-8 text-muted-foreground">
-                    <Sparkles className="mx-auto h-8 w-8 mb-2 text-green-500"/>
+                  <div className="text-center p-8 text-muted-foreground">
+                    <Sparkles className="mx-auto h-8 w-8 mb-2 text-green-500" />
                     Хийх ажил алга, сайхан амар!
                   </div>
                 )}
