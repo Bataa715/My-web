@@ -19,7 +19,7 @@ export default function BackButton() {
         variant="ghost"
         size="sm"
         onClick={() => router.back()}
-        className="group flex items-center gap-2 px-4 py-2 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg hover:bg-primary/10 hover:border-primary/30 hover:shadow-primary/10 transition-all duration-300"
+        className="group flex items-center gap-2 px-4 py-2 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg hover:bg-primary hover:text-primary-foreground hover:border-primary/30 hover:shadow-primary/10 transition-all duration-300"
       >
         <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-300" />
         <span className="text-sm font-medium">Буцах</span>
