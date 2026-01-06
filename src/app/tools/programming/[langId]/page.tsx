@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, use } from 'react';
 import {
   doc,
   getDoc,
@@ -20,15 +20,15 @@ import { Button } from '@/components/ui/button';
 export default function LanguageDojoPage({
   params,
 }: {
-  params: { langId: string };
+  params: Promise<{ langId: string }>;
 }) {
+  const { langId } = use(params);
   const { firestore, user } = useFirebase();
   const { toast } = useToast();
   const [language, setLanguage] = useState<Language | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
-  const { langId } = params;
 
   const fetchData = useCallback(async () => {
     if (!user || !firestore || !langId) {
