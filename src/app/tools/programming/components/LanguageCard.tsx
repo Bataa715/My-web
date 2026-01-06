@@ -18,7 +18,8 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useEditMode } from '@/contexts/EditModeContext';
-import * as LucideIcons from 'lucide-react';
+import { motion } from 'framer-motion';
+import TechIcon from '@/components/shared/TechIcon';
 
 interface LanguageCardProps {
   language: Language;
@@ -42,15 +43,6 @@ export default function LanguageCard({
   const progressStyle = {
     backgroundColor: `rgb(var(--glow-color))`,
   } as React.CSSProperties;
-
-  const getIcon = (iconName: string) => {
-    const LucideIcon = (LucideIcons as any)[iconName];
-    return LucideIcon ? (
-      <LucideIcon className="h-8 w-8" />
-    ) : (
-      <AlertTriangle className="h-8 w-8 text-destructive" />
-    );
-  };
 
   return (
     <motion.div
@@ -80,7 +72,7 @@ export default function LanguageCard({
                 boxShadow: `0 0 10px 2px rgba(var(--glow-color), 0.2)`,
               }}
             >
-              {getIcon(language.iconUrl)}
+              <TechIcon techName={language.iconUrl} className="w-8 h-8" />
             </div>
             <h3 className="text-white text-xl font-bold text-center mb-2">
               {language.name}
