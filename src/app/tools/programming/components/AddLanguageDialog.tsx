@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Language } from '@/lib/types';
 import IconPicker from '@/components/shared/IconPicker';
-import * as LucideIcons from 'lucide-react';
+import TechIcon from '@/components/shared/TechIcon';
 
 interface AddLanguageDialogProps {
   children: ReactNode;
@@ -41,11 +41,6 @@ export function AddLanguageDialog({
       setName('');
       setIcon('Code');
     }
-  };
-
-  const getIcon = (iconName: string) => {
-    const LucideIcon = (LucideIcons as any)[iconName];
-    return LucideIcon ? <LucideIcon className="h-5 w-5" /> : null;
   };
 
   return (
@@ -77,7 +72,7 @@ export function AddLanguageDialog({
                 variant="outline"
                 className="w-full justify-start gap-2"
               >
-                {getIcon(icon)}
+                <TechIcon techName={icon} className="h-5 w-5" />
                 <span>{icon}</span>
               </Button>
             </IconPicker>
