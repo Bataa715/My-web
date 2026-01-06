@@ -25,12 +25,14 @@ import {
 } from 'firebase/firestore';
 
 // Helper function to convert Timestamp or Date to Date
-const toDate = (value: Date | Timestamp | undefined): Date => {
+const toDate = (value: any): Date => {
   if (!value) return new Date();
-  if (value instanceof Timestamp) {
-    return value.toDate();
-  }
-  return value;
+  if (value instanceof Date) return value;
+  if (value instanceof Timestamp) return value.toDate();
+  if (typeof value === 'string') return new Date(value);
+  if (typeof value === 'object' && value.seconds)
+    return new Timestamp(value.seconds, value.nanoseconds).toDate();
+  return new Date();
 };
 
 interface EducationContextType {

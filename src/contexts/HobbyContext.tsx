@@ -23,6 +23,17 @@ import {
   updateDoc,
 } from 'firebase/firestore';
 
+const toDateSafe = (value: any): Date => {
+  if (!value) return new Date();
+  if (value instanceof Date) return value;
+  if (value instanceof Timestamp) return value.toDate();
+  if (typeof value === 'string') return new Date(value);
+  if (typeof value === 'object' && value.seconds) {
+    return new Timestamp(value.seconds, value.nanoseconds).toDate();
+  }
+  return new Date();
+};
+
 interface HobbyContextType {
   hobbies: Hobby[];
   addHobby: (hobby: Omit<Hobby, 'id' | 'createdAt'>) => Promise<void>;
@@ -75,7 +86,7 @@ export function HobbyProvider({ children }: { children: ReactNode }) {
             return {
               id: doc.id,
               ...data,
-              createdAt: (data.createdAt as Timestamp)?.toDate(),
+              createdAt: toDateSafe(data.createdAt),
             } as Hobby;
           });
           setHobbies(
@@ -91,7 +102,7 @@ export function HobbyProvider({ children }: { children: ReactNode }) {
             return {
               id: doc.id,
               ...data,
-              createdAt: (data.createdAt as Timestamp)?.toDate(),
+              createdAt: toDateSafe(data.createdAt),
             } as Hobby;
           });
           setHobbies(
