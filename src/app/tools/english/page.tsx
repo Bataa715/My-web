@@ -162,11 +162,6 @@ const SkillCard = ({
               {icon}
             </div>
           </CardHeader>
-
-          {/* Arrow indicator */}
-          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <ArrowRight className="h-5 w-5 text-primary" />
-          </div>
         </Card>
       </div>
     </Link>

@@ -164,9 +164,6 @@ export default function ToolsPage() {
                         >
                           {tool.icon}
                         </div>
-                        <div className="h-10 w-10 rounded-full bg-muted/50 flex items-center justify-center group-hover:bg-primary/20 transition-all duration-300">
-                          <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all duration-300" />
-                        </div>
                       </div>
                     </CardHeader>
 
@@ -188,13 +185,6 @@ export default function ToolsPage() {
                         </span>
                       </div>
                     </CardContent>
-
-                    {/* Corner decoration */}
-                    <div className="absolute bottom-0 right-0 w-20 h-20 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                      <div
-                        className={`absolute bottom-3 right-3 w-8 h-8 border-b-2 border-r-2 rounded-br-lg bg-gradient-to-br ${tool.gradient} opacity-30`}
-                      />
-                    </div>
                   </Card>
                 </div>
               </Link>
