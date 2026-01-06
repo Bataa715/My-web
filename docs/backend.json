@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "UserProfile": {
@@ -343,18 +342,31 @@
       "properties": {
         "title": { "type": "string" },
         "emoji": { "type": "string" },
-        "explanation": { "type": "string" }
+        "explanation": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["title", "emoji", "explanation"]
+      "required": ["title", "emoji", "explanation", "createdAt"]
     },
     "CheatSheetItem": {
       "title": "Cheat Sheet Item",
       "type": "object",
       "properties": {
         "title": { "type": "string" },
-        "snippet": { "type": "string" }
+        "snippet": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["title", "snippet"]
+      "required": ["title", "snippet", "createdAt"]
+    },
+     "Chapter": {
+      "title": "Chapter",
+      "description": "A chapter within a programming language workspace.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "order": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "order", "createdAt"]
     },
     "ProgressItem": {
       "title": "Progress Item",
@@ -409,10 +421,6 @@
       "schema": { "$ref": "#/entities/Note" },
       "description": "Stores user notes."
     },
-    "/users/{userId}/todos/{todoId}": {
-      "schema": { "$ref": "#/entities/Todo" },
-      "description": "Stores user's todo items."
-    },
     "/users/{userId}/fitnessExercises/{exerciseId}": {
       "schema": { "$ref": "#/entities/Exercise" },
       "description": "Stores user's custom fitness exercises."
@@ -463,14 +471,17 @@
     "/users/{userId}/japaneseSpeaking/{materialId}": {
       "schema": { "$ref": "#/entities/ReadingMaterial" }
     },
-    "/users/{userId}/programmingConcepts/{conceptId}": {
+    "/users/{userId}/languages/{langId}/chapters/{chapterId}": {
+      "schema": { "$ref": "#/entities/Chapter" }
+    },
+     "/users/{userId}/languages/{langId}/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/Note" }
+    },
+     "/users/{userId}/languages/{langId}/concepts/{conceptId}": {
       "schema": { "$ref": "#/entities/ProgrammingConcept" }
     },
-    "/users/{userId}/cheatSheetItems/{itemId}": {
+    "/users/userId/languages/{langId}/snippets/{snippetId}": {
       "schema": { "$ref": "#/entities/CheatSheetItem" }
-    },
-    "/users/{userId}/progressItems/{itemId}": {
-      "schema": { "$ref": "#/entities/ProgressItem" }
     },
     "/hiragana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } },
     "/katakana/{kanaId}": { "schema": { "$ref": "#/entities/Kana" } }

@@ -93,7 +93,6 @@ export interface Language {
 export interface Chapter {
   id?: string;
   title: string;
-  languageId: string;
   order: number;
   createdAt?: Date | Timestamp;
 }
@@ -232,4 +231,19 @@ export interface AIResponse {
   correction?: string;
   explanation?: string;
   translation?: string;
+}
+
+export interface ProgrammingConcept {
+  id?: string;
+  title: string;
+  emoji: string;
+  explanation: string;
+  createdAt?: Date | Timestamp;
+}
+
+export interface CheatSheetItem {
+  id?: string;
+  title: string;
+  snippet: string;
+  createdAt?: Date | Timestamp;
 }
