@@ -1099,140 +1099,139 @@ export default function Hero({
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                       <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
                     </span>
+                    Мэдээллийн технологийн инженер
                   </span>
                 </span>
               </motion.div>
 
               {/* Greeting and Name */}
               <div className="relative">
-                {isEditingName ? (
-                  <div className="flex items-center gap-2">
-                    <Input
-                      value={editedName}
-                      onChange={e => setEditedName(e.target.value)}
-                      className="text-3xl sm:text-4xl font-bold tracking-tighter xl:text-6xl/none h-auto p-0 border-0 focus-visible:ring-0 bg-transparent"
-                    />
-                    <Button
-                      onClick={handleSaveName}
-                      size="icon"
-                      className="h-8 w-8"
-                      disabled={saving}
-                    >
-                      {saving ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Save className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
-                      onClick={handleCancelEditName}
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8"
-                    >
-                      <XCircle className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ) : (
-                  <motion.div
-                    className="flex items-center gap-3"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2, type: 'spring' }}
-                  >
-                    <motion.h1
-                      className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{
-                        delay: 0.4,
-                        type: 'spring',
-                        stiffness: 100,
-                      }}
-                    >
-                      <span className="bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
-                        {name}
-                      </span>
-                    </motion.h1>
-                    {isEditMode && (
+                <div className="flex items-center gap-3">
+                  {isEditingName ? (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={editedName}
+                        onChange={e => setEditedName(e.target.value)}
+                        className="text-3xl sm:text-4xl font-bold tracking-tighter xl:text-6xl/none h-auto p-0 border-0 focus-visible:ring-0 bg-transparent"
+                      />
                       <Button
-                        variant="ghost"
+                        onClick={handleSaveName}
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => setIsEditingName(true)}
+                        disabled={saving}
                       >
-                        <Edit className="h-4 w-4" />
+                        {saving ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Save className="h-4 w-4" />
+                        )}
                       </Button>
-                    )}
-                  </motion.div>
-                )}
+                      <Button
+                        onClick={handleCancelEditName}
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8"
+                      >
+                        <XCircle className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <motion.div
+                      className="flex items-center gap-3"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.6,
+                        delay: 0.2,
+                        type: 'spring',
+                      }}
+                    >
+                      <motion.h1
+                        className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{
+                          delay: 0.4,
+                          type: 'spring',
+                          stiffness: 100,
+                        }}
+                      >
+                        <span className="bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
+                          {name}
+                        </span>
+                      </motion.h1>
+                      {isEditMode && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => setIsEditingName(true)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </motion.div>
+                  )}
+                </div>
               </div>
 
               {/* Bio with pipe separators */}
               <div className="relative">
-                {isEditingBio ? (
-                  <div className="space-y-2">
-                    <Textarea
-                      value={editedBio}
-                      onChange={e => setEditedBio(e.target.value)}
-                      className="max-w-[600px] text-lg md:text-xl bg-muted/50"
-                      rows={4}
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={handleSaveBio}
-                        size="sm"
-                        disabled={saving}
-                      >
-                        {saving ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        ) : (
-                          <Save className="mr-2 h-4 w-4" />
-                        )}{' '}
-                        Хадгалах
-                      </Button>
-                      <Button
-                        onClick={handleCancelEditBio}
-                        size="sm"
-                        variant="ghost"
-                      >
-                        <XCircle className="mr-2 h-4 w-4" /> Цуцлах
-                      </Button>
+                <div className="flex items-start gap-2">
+                  {isEditingBio ? (
+                    <div className="space-y-2">
+                      <Textarea
+                        value={editedBio}
+                        onChange={e => setEditedBio(e.target.value)}
+                        className="max-w-[600px] text-lg md:text-xl bg-muted/50"
+                        rows={4}
+                      />
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={handleSaveBio}
+                          size="sm"
+                          disabled={saving}
+                        >
+                          {saving ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Save className="mr-2 h-4 w-4" />
+                          )}{' '}
+                          Хадгалах
+                        </Button>
+                        <Button
+                          onClick={handleCancelEditBio}
+                          size="sm"
+                          variant="ghost"
+                        >
+                          <XCircle className="mr-2 h-4 w-4" /> Цуцлах
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <motion.div
-                    className="flex items-start gap-2"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
-                  >
-                    <div className="max-w-[650px] text-muted-foreground text-base md:text-lg leading-relaxed flex flex-wrap items-center gap-x-1">
-                      <motion.span
-                        className="text-foreground font-semibold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text"
-                        whileHover={{ scale: 1.02 }}
-                      >
-                        Fullstack хөгжүүлэгч
-                      </motion.span>
-                      <span className="mx-2 text-primary font-bold text-xl relative">
-                        <span className="absolute inset-0 blur-sm bg-primary/50" />
-                        <span className="relative">|</span>
-                      </span>
-                      <span className="text-muted-foreground/90">{bio}</span>
-                    </div>
-                    {isEditMode && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 shrink-0"
-                        onClick={() => setIsEditingBio(true)}
-                      >
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">Танилцуулга засах</span>
-                      </Button>
-                    )}
-                  </motion.div>
-                )}
+                  ) : (
+                    <motion.div
+                      className="flex items-start gap-2"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.5 }}
+                    >
+                      <p className="max-w-[650px] text-muted-foreground text-base md:text-lg leading-relaxed">
+                        {bio}
+                      </p>
+                      {isEditMode && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0"
+                          onClick={() => setIsEditingBio(true)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                          <span className="sr-only">Танилцуулга засах</span>
+                        </Button>
+                      )}
+                    </motion.div>
+                  )}
+                </div>
               </div>
             </div>
 
