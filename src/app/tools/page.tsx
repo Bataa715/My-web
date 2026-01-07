@@ -106,15 +106,6 @@ export default function ToolsPage() {
 
         {/* Hero Section */}
         <div className="text-center pt-8 pb-4">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary mb-6"
-          >
-            <Sparkles className="h-4 w-4" />
-            <span className="text-sm font-medium">Бүтээмжээ нэмэгдүүл</span>
-          </motion.div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent">
             Хэрэгслүүд
           </h1>
