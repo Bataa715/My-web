@@ -25,14 +25,6 @@ export default function PomodoroPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center pt-6 pb-8"
           >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', delay: 0.2 }}
-              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-rose-500 to-red-600 shadow-lg shadow-rose-500/30 mb-6"
-            >
-              <TimerIcon className="h-10 w-10 text-white" />
-            </motion.div>
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-rose-400 via-red-500 to-orange-500 bg-clip-text text-transparent">
               Pomodoro Timer
             </h1>
