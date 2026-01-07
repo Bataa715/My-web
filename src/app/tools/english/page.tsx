@@ -197,9 +197,6 @@ export default function EnglishDashboardPage() {
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 bg-clip-text text-transparent">
             English Dashboard
           </h1>
-          <p className="text-muted-foreground mt-4 text-lg max-w-2xl mx-auto">
-            Таны сурлагын явц болон өдөр тутмын зорилго
-          </p>
         </div>
 
         {loading ? (
