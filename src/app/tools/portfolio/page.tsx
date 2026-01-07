@@ -172,15 +172,6 @@ export default function PortfolioToolPage() {
 
         {/* Hero Header */}
         <div className="text-center pt-4 pb-6">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-500 mb-6"
-          >
-            <Sparkles className="h-4 w-4" />
-            <span className="text-sm font-medium">Portfolio удирдлага</span>
-          </motion.div>
           <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-violet-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
             Portfolio тохиргоо
           </h1>
