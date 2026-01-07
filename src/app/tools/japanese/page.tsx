@@ -178,9 +178,6 @@ export default function JapaneseToolsPage() {
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-rose-500 via-pink-500 to-red-500 bg-clip-text text-transparent">
             Япон хэл
           </h1>
-          <p className="text-muted-foreground mt-4 text-lg max-w-2xl mx-auto">
-            Чадваруудаа сонгож хичээллээрэй
-          </p>
         </div>
 
         {/* Skills Grid */}
