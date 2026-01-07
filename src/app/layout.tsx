@@ -56,27 +56,10 @@ export default function RootLayout({
       >
         <FirebaseClientProvider>
           <EditModeProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="default"
-              enableSystem={false}
-              disableTransitionOnChange
-            >
-              <I18nProvider>
-                <EducationProvider>
-                  <ExperienceProvider>
-                    <ProjectProvider>
-                      <SkillsProvider>
-                        <HobbyProvider>
-                          <MainLayout>{children}</MainLayout>
-                          <Toaster />
-                        </HobbyProvider>
-                      </SkillsProvider>
-                    </ProjectProvider>
-                  </ExperienceProvider>
-                </EducationProvider>
-              </I18nProvider>
-            </ThemeProvider>
+            <I18nProvider>
+              <MainLayout>{children}</MainLayout>
+              <Toaster />
+            </I18nProvider>
           </EditModeProvider>
         </FirebaseClientProvider>
       </body>

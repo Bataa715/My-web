@@ -1106,8 +1106,6 @@ export default function Hero({
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                       <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
                     </span>
-
-                    Мэдээллийн технологийн инженер
                   </span>
                 </span>
               </motion.div>
@@ -1155,7 +1153,6 @@ export default function Hero({
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.3 }}
                     >
-                      Сайн уу, Би
                     </motion.span>
                     <div className="flex items-center gap-3">
                       <motion.h1
