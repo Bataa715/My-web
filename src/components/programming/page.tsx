@@ -159,11 +159,8 @@ export default function ProgrammingPage() {
             <span className="text-sm font-medium">Код бичиж сур</span>
           </motion.div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 bg-clip-text text-transparent">
-            The Language Library
+            Programm language
           </h1>
-          <p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-            Өөрийн суралцах програмчлалын хэлнүүдээ удирдаарай
-          </p>
         </div>
 
         {loading ? (
