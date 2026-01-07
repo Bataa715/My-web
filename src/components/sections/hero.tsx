@@ -950,7 +950,7 @@ export default function Hero({
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
-                            className="absolute inset-0 z-30 p-6 flex flex-col items-center justify-center text-center pointer-events-none"
+                            className="absolute inset-0 z-30 p-6 flex flex-col items-center justify-center text-center"
                           >
                             {/* Decorative line above title */}
                             <motion.div 
