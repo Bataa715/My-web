@@ -26,7 +26,6 @@ import {
   Facebook,
   Sparkles,
   Code2,
-  Zap,
 } from 'lucide-react';
 import { useState, useEffect, type FC } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -131,9 +130,24 @@ const OrbitItem: FC<OrbitItemProps> = ({
       }}
       transition={{
         opacity: { duration: 0.5, delay: 0.5 + index * 0.1 },
-        scale: { duration: 0.5, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 120 },
-        x: { duration: 0.5, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 120 },
-        y: { duration: 0.5, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 120 },
+        scale: {
+          duration: 0.5,
+          delay: 0.5 + index * 0.1,
+          type: 'spring',
+          stiffness: 120,
+        },
+        x: {
+          duration: 0.5,
+          delay: 0.5 + index * 0.1,
+          type: 'spring',
+          stiffness: 120,
+        },
+        y: {
+          duration: 0.5,
+          delay: 0.5 + index * 0.1,
+          type: 'spring',
+          stiffness: 120,
+        },
         rotate: { duration: 60, repeat: Infinity, ease: 'linear' },
       }}
       whileHover={{ scale: 1.15 }}
@@ -141,12 +155,15 @@ const OrbitItem: FC<OrbitItemProps> = ({
     >
       <div className="relative group">
         {/* Glowing ring on hover */}
-        <div className={cn(
-          'absolute -inset-1 rounded-full bg-gradient-to-r from-primary via-purple-500 to-primary opacity-0 blur-sm transition-opacity duration-300',
-          'group-hover:opacity-70',
-          selectedOrbit?.id === item.id && 'opacity-70 animate-[spin_3s_linear_infinite]'
-        )} />
-        
+        <div
+          className={cn(
+            'absolute -inset-1 rounded-full bg-gradient-to-r from-primary via-purple-500 to-primary opacity-0 blur-sm transition-opacity duration-300',
+            'group-hover:opacity-70',
+            selectedOrbit?.id === item.id &&
+              'opacity-70 animate-[spin_3s_linear_infinite]'
+          )}
+        />
+
         <Button
           variant="outline"
           size="icon"
@@ -233,7 +250,9 @@ export default function Hero({
   });
 
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
-  const [selectedSocial, setSelectedSocial] = useState<SocialInfo | null>(null);
+  const [selectedSocial, setSelectedSocial] = useState<SocialInfo | null>(
+    null
+  );
   const [isQrLoading, setIsQrLoading] = useState(true);
 
   const { toast } = useToast();
@@ -682,12 +701,6 @@ export default function Hero({
     }
   };
 
-  const handleCloseContent = () => {
-    if (!isEditingOrbit) {
-      setSelectedOrbit(null);
-    }
-  };
-
   const socialButtons: SocialInfo[] = (
     [
       {
@@ -729,43 +742,59 @@ export default function Hero({
               {/* Animated background rings - faster rotation */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 {/* Inner ring - fastest, dotted */}
-                <motion.div 
+                <motion.div
                   className="absolute w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] md:w-[450px] md:h-[450px] rounded-full"
                   style={{
                     border: '2px dotted',
                     borderColor: 'hsl(var(--primary) / 0.3)',
                   }}
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+                  transition={{
+                    duration: 15,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
                 />
-                
+
                 {/* Middle ring - simple border */}
-                <motion.div 
+                <motion.div
                   className="absolute w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] md:w-[500px] md:h-[500px] rounded-full border border-primary/15"
                   animate={{ rotate: -360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                  transition={{
+                    duration: 20,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
                 />
-                
+
                 {/* Glowing accent dots on rings */}
-                <motion.div 
+                <motion.div
                   className="absolute w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] md:w-[500px] md:h-[500px]"
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+                  transition={{
+                    duration: 12,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
                 >
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary shadow-lg shadow-primary/50" />
                   <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-purple-500 shadow-lg shadow-purple-500/50" />
                 </motion.div>
-                
-                <motion.div 
+
+                <motion.div
                   className="absolute w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] md:w-[450px] md:h-[450px]"
                   animate={{ rotate: -360 }}
-                  transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+                  transition={{
+                    duration: 10,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
                 >
                   <div className="absolute top-1/2 left-0 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary/70" />
                   <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-purple-400/70" />
                 </motion.div>
               </div>
-              
+
               {/* Floating particles */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
                 {[...Array(8)].map((_, i) => (
@@ -777,7 +806,10 @@ export default function Hero({
                       height: 4 + Math.random() * 4,
                       left: `${15 + Math.random() * 70}%`,
                       top: `${15 + Math.random() * 70}%`,
-                      background: i % 2 === 0 ? 'hsl(var(--primary) / 0.5)' : 'rgb(168, 85, 247, 0.5)',
+                      background:
+                        i % 2 === 0
+                          ? 'hsl(var(--primary) / 0.5)'
+                          : 'rgb(168, 85, 247, 0.5)',
                     }}
                     animate={{
                       y: [0, -30, 0],
@@ -793,7 +825,7 @@ export default function Hero({
                   />
                 ))}
               </div>
-              
+
               <div
                 className={cn(
                   'relative transition-all duration-500 [transform-style:preserve-3d]',
@@ -812,220 +844,186 @@ export default function Hero({
                       transition={{ duration: 0.6, ease: 'easeInOut' }}
                       className="absolute inset-0 flex flex-col items-center justify-center rounded-full text-center overflow-visible [transform-style:preserve-3d]"
                     >
-                      {/* Glowing ring - same as avatar */}
-                      <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary via-purple-500 to-primary opacity-50 blur-md animate-[spin_8s_linear_infinite]" />
-                      <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-primary/50 via-purple-500/50 to-primary/50 opacity-75" />
-                      
                       {/* Inner content container */}
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-card via-card/98 to-muted backdrop-blur-sm overflow-hidden border-4 border-background/80 shadow-2xl shadow-primary/20">
-                      {selectedOrbit.backgroundImage && !isEditingOrbit && (
-                        <>
-                          <Image
-                            src={selectedOrbit.backgroundImage}
-                            alt={selectedOrbit.title}
-                            fill
-                            className="object-cover rounded-full z-0 opacity-30"
-                          />
-                          {/* Dark overlay for better text visibility */}
-                          <div className="absolute inset-0 z-10 bg-gradient-to-b from-background/70 via-background/50 to-background/70" />
-                        </>
-                      )}
+                      <div
+                        className="absolute inset-0 rounded-full bg-gradient-to-br from-card via-card/98 to-muted backdrop-blur-sm overflow-hidden border-4 border-background/80 shadow-2xl shadow-primary/20"
+                        onClick={handleContentClick}
+                      >
+                        {selectedOrbit.backgroundImage && !isEditingOrbit && (
+                          <>
+                            <Image
+                              src={selectedOrbit.backgroundImage}
+                              alt={selectedOrbit.title}
+                              fill
+                              className="object-cover rounded-full z-0 opacity-30"
+                            />
+                            {/* Dark overlay for better text visibility */}
+                            <div className="absolute inset-0 z-10 bg-gradient-to-b from-background/70 via-background/50 to-background/70" />
+                          </>
+                        )}
 
-                      <AnimatePresence mode="wait">
-                        {isEditingOrbit ? (
-                          <motion.div
-                            key="edit"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            className="w-full h-full flex flex-col justify-center items-center"
-                            onClick={e => e.stopPropagation()}
-                          >
-                            <div className="w-full max-w-xs mx-auto p-6 space-y-2">
-                              <div>
-                                <Label className="text-center text-xs mb-1 block text-foreground">
-                                  Нэр
-                                </Label>
-                                <Input
-                                  value={editedOrbitTitle}
-                                  onChange={e =>
-                                    setEditedOrbitTitle(e.target.value)
-                                  }
-                                  className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
-                                  placeholder="Нэр..."
-                                />
-                              </div>
-                              {selectedOrbit.type !== 'audio' && (
-                                <div className="space-y-2">
-                                  <Label className="text-center text-xs mb-1 block text-foreground">
-                                    Icon
-                                  </Label>
-                                  <IconPicker
-                                    selectedIcon={editedOrbitIcon}
-                                    onIconSelect={setEditedOrbitIcon}
-                                  >
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      className="w-full h-8 text-sm justify-center gap-2 bg-transparent border-primary/50 focus:ring-primary text-foreground"
-                                    >
-                                      {getIcon(editedOrbitIcon, {
-                                        className: 'h-4 w-4',
-                                      })}
-                                      <span>{editedOrbitIcon}</span>
-                                    </Button>
-                                  </IconPicker>
-                                </div>
-                              )}
-                              <div>
-                                <Label className="text-center text-xs mb-1 block text-foreground">
-                                  Тайлбар
-                                </Label>
-                                <Textarea
-                                  value={editedOrbitContent}
-                                  onChange={e =>
-                                    setEditedOrbitContent(e.target.value)
-                                  }
-                                  className="text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
-                                  rows={2}
-                                  placeholder="Тайлбар..."
-                                />
-                              </div>
-
-                              <div>
-                                <Label className="text-center text-xs mb-1 block text-foreground">
-                                  Арын зураг URL
-                                </Label>
-                                <Input
-                                  value={editedOrbitBgImage}
-                                  onChange={e =>
-                                    setEditedOrbitBgImage(e.target.value)
-                                  }
-                                  className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
-                                  placeholder="https://example.com/image.png"
-                                />
-                              </div>
-                              {selectedOrbit.type === 'audio' && (
+                        <AnimatePresence mode="wait">
+                          {isEditingOrbit ? (
+                            <motion.div
+                              key="edit"
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.9 }}
+                              className="w-full h-full flex flex-col justify-center items-center"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              <div className="w-full max-w-xs mx-auto p-6 space-y-2">
                                 <div>
                                   <Label className="text-center text-xs mb-1 block text-foreground">
-                                    YouTube холбоос
+                                    Нэр
                                   </Label>
                                   <Input
-                                    value={editedYoutubeUrl}
+                                    value={editedOrbitTitle}
                                     onChange={e =>
-                                      setEditedYoutubeUrl(e.target.value)
+                                      setEditedOrbitTitle(e.target.value)
                                     }
-                                    className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
-                                    placeholder="https://www.youtube.com/watch?v=..."
+                                    className="h-8 text-sm w-full bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
+                                    placeholder="Нэр..."
                                   />
                                 </div>
-                              )}
-                              <div className="flex gap-2 justify-center pt-1">
-                                <Button
-                                  onClick={handleSaveOrbitInfo}
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  disabled={saving}
-                                >
-                                  {saving ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
-                                    <Save className="h-4 w-4" />
-                                  )}
-                                </Button>
-                                <Button
-                                  onClick={() => setIsEditingOrbit(false)}
-                                  size="icon"
-                                  variant="ghost"
-                                  className="h-8 w-8"
-                                >
-                                  <XCircle className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </div>
-                          </motion.div>
-                        ) : (
-                          <motion.div
-                            key="view"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            className="absolute inset-0 z-30 p-6 flex flex-col items-center justify-center text-center"
-                          >
-                            {/* Decorative line above title */}
-                            <motion.div 
-                              className="w-12 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent mb-3 cursor-pointer pointer-events-auto"
-                              initial={{ width: 0 }}
-                              animate={{ width: 48 }}
-                              transition={{ delay: 0.2, duration: 0.4 }}
-                              onClick={handleContentClick}
-                            />
-                            
-                            <motion.h3 
-                              className="text-xl md:text-2xl font-bold mb-3 bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent drop-shadow-lg cursor-pointer pointer-events-auto"
-                              initial={{ y: 10, opacity: 0 }}
-                              animate={{ y: 0, opacity: 1 }}
-                              transition={{ delay: 0.1 }}
-                              onClick={handleContentClick}
-                            >
-                              {selectedOrbit.title}
-                            </motion.h3>
-                            
-                            <motion.p 
-                              className="text-sm md:text-base text-foreground/90 max-w-[75%] leading-relaxed font-medium cursor-pointer pointer-events-auto"
-                              initial={{ y: 10, opacity: 0 }}
-                              animate={{ y: 0, opacity: 1 }}
-                              transition={{ delay: 0.2 }}
-                              onClick={handleContentClick}
-                            >
-                              <span className="relative">
-                                <span className="absolute -left-3 top-0 text-primary/50 text-lg">"</span>
-                                {selectedOrbit.content}
-                                <span className="absolute -right-3 bottom-0 text-primary/50 text-lg">"</span>
-                              </span>
-                            </motion.p>
-                            
-                            {/* Decorative line below content */}
-                            <motion.div 
-                              className="w-8 h-0.5 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent mt-3"
-                              initial={{ width: 0 }}
-                              animate={{ width: 32 }}
-                              transition={{ delay: 0.3, duration: 0.4 }}
-                            />
+                                {selectedOrbit.type !== 'audio' && (
+                                  <div className="space-y-2">
+                                    <Label className="text-center text-xs mb-1 block text-foreground">
+                                      Icon
+                                    </Label>
+                                    <IconPicker
+                                      selectedIcon={editedOrbitIcon}
+                                      onIconSelect={setEditedOrbitIcon}
+                                    >
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="w-full h-8 text-sm justify-center gap-2 bg-transparent border-primary/50 focus:ring-primary text-foreground"
+                                      >
+                                        {getIcon(editedOrbitIcon, {
+                                          className: 'h-4 w-4',
+                                        })}
+                                        <span>{editedOrbitIcon}</span>
+                                      </Button>
+                                    </IconPicker>
+                                  </div>
+                                )}
+                                <div>
+                                  <Label className="text-center text-xs mb-1 block text-foreground">
+                                    Тайлбар
+                                  </Label>
+                                  <Textarea
+                                    value={editedOrbitContent}
+                                    onChange={e =>
+                                      setEditedOrbitContent(e.target.value)
+                                    }
+                                    className="text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground"
+                                    rows={2}
+                                    placeholder="Тайлбар..."
+                                  />
+                                </div>
 
-                            {isEditMode && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="absolute top-2 right-2 h-8 w-8 z-30 text-primary hover:text-primary/80 pointer-events-auto"
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                                <div>
+                                  <Label className="text-center text-xs mb-1 block text-foreground">
+                                    Арын зураг URL
+                                  </Label>
+                                  <Input
+                                    value={editedOrbitBgImage}
+                                    onChange={e =>
+                                      setEditedOrbitBgImage(e.target.value)
+                                    }
+                                    className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
+                                    placeholder="https://example.com/image.png"
+                                  />
+                                </div>
+                                {selectedOrbit.type === 'audio' && (
+                                  <div>
+                                    <Label className="text-center text-xs mb-1 block text-foreground">
+                                      YouTube холбоос
+                                    </Label>
+                                    <Input
+                                      value={editedYoutubeUrl}
+                                      onChange={e =>
+                                        setEditedYoutubeUrl(e.target.value)
+                                      }
+                                      className="h-8 text-sm bg-transparent border-primary/50 focus-visible:ring-primary text-foreground text-center"
+                                      placeholder="https://www.youtube.com/watch?v=..."
+                                    />
+                                  </div>
+                                )}
+                                <div className="flex gap-2 justify-center pt-1">
+                                  <Button
+                                    onClick={handleSaveOrbitInfo}
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    disabled={saving}
+                                  >
+                                    {saving ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <Save className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                  <Button
+                                    onClick={() => setIsEditingOrbit(false)}
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-8 w-8"
+                                  >
+                                    <XCircle className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </motion.div>
+                          ) : (
+                            <motion.div
+                              key="view"
+                              initial={{ opacity: 0, scale: 0.9 }}
+                              animate={{ opacity: 1, scale: 1 }}
+                              exit={{ opacity: 0, scale: 0.9 }}
+                              className="absolute inset-0 z-30 p-6 flex flex-col items-center justify-center text-center"
+                            >
+                              <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent mb-3" />
+
+                              <h3 className="text-xl md:text-2xl font-bold mb-3 bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent drop-shadow-lg">
+                                {selectedOrbit.title}
+                              </h3>
+
+                              <p className="text-sm md:text-base text-foreground/90 max-w-[75%] leading-relaxed font-medium">
+                                <span className="relative">
+                                  <span className="absolute -left-3 top-0 text-primary/50 text-lg">
+                                    "
+                                  </span>
+                                  {selectedOrbit.content}
+                                  <span className="absolute -right-3 bottom-0 text-primary/50 text-lg">
+                                    "
+                                  </span>
+                                </span>
+                              </p>
+
+                              <div className="w-8 h-0.5 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent mt-3" />
+
+                              {selectedOrbit.type === 'audio' &&
+                                selectedOrbit.youtubeVideoId && (
+                                  <div className="mt-4">
+                                    <Button
+                                      variant="outline"
+                                      size="icon"
+                                      className="h-10 w-10 rounded-full border-2 border-primary bg-background/90 hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all shadow-lg shadow-primary/30"
+                                      onClick={e => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setIsPlayerOpen(true);
+                                      }}
+                                    >
+                                      <PlayCircle className="h-6 w-6" />
+                                    </Button>
+                                  </div>
+                                )}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
-                      
-                      {/* Play button - outside all containers for proper click handling */}
-                      {!isEditingOrbit && selectedOrbit?.type === 'audio' && selectedOrbit?.youtubeVideoId && (
-                        <div
-                          className="absolute inset-0 flex items-center justify-center pointer-events-auto z-[999]"
-                        >
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-12 w-12 rounded-full border-2 border-primary bg-background/90 hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all shadow-lg shadow-primary/30"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setIsPlayerOpen(true);
-                            }}
-                          >
-                            <PlayCircle className="h-8 w-8" />
-                          </Button>
-                        </div>
-                      )}
                     </motion.div>
                   ) : (
                     <motion.div
@@ -1036,13 +1034,13 @@ export default function Hero({
                       transition={{ duration: 0.6, ease: 'easeInOut' }}
                       className="relative w-full h-full group [transform-style:preserve-3d]"
                     >
-                      {/* Glowing ring around avatar */}
-                      <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary via-purple-500 to-primary opacity-50 blur-md animate-[spin_8s_linear_infinite]" />
-                      <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-primary/50 via-purple-500/50 to-primary/50 opacity-75" />
-                      
-                      <div className="relative avatar-glow-wrapper w-full h-full rounded-full overflow-hidden">
+                      <div className="avatar-glow-wrapper w-full h-full rounded-full overflow-hidden">
                         <Avatar className="w-full h-full border-4 border-background/80 shadow-2xl shadow-primary/20">
-                          <AvatarImage src={profileImage} alt={name} className="object-cover" />
+                          <AvatarImage
+                            src={profileImage}
+                            alt={name}
+                            className="object-cover"
+                          />
                           <AvatarFallback className="text-6xl font-bold bg-gradient-to-br from-primary/20 to-purple-500/20">
                             {name?.charAt(0) || 'K'}
                           </AvatarFallback>
@@ -1064,12 +1062,19 @@ export default function Hero({
                     </motion.div>
                   )}
                 </AnimatePresence>
-                
+
                 {/* Orbiting items container - rotates slowly like solar system */}
                 <motion.div
-                  className="absolute inset-0"
+                  className={cn(
+                    'absolute inset-0',
+                    selectedOrbit && 'pointer-events-none'
+                  )}
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+                  transition={{
+                    duration: 60,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
                 >
                   {orbitInfo.map((item, index) => (
                     <OrbitItem
@@ -1101,7 +1106,7 @@ export default function Hero({
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                       <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
                     </span>
-                    <Code2 className="h-4 w-4" />
+
                     Мэдээллийн технологийн инженер
                   </span>
                 </span>
@@ -1144,21 +1149,24 @@ export default function Hero({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2, type: 'spring' }}
                   >
-                    <motion.span 
+                    <motion.span
                       className="text-2xl sm:text-3xl font-medium text-muted-foreground flex items-center gap-2"
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.3 }}
                     >
-                      
                       Сайн уу, Би
                     </motion.span>
                     <div className="flex items-center gap-3">
-                      <motion.h1 
+                      <motion.h1
                         className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight"
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.4, type: 'spring', stiffness: 100 }}
+                        transition={{
+                          delay: 0.4,
+                          type: 'spring',
+                          stiffness: 100,
+                        }}
                       >
                         <span className="bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
                           {name}
@@ -1219,7 +1227,7 @@ export default function Hero({
                     transition={{ duration: 0.6, delay: 0.5 }}
                   >
                     <div className="max-w-[650px] text-muted-foreground text-base md:text-lg leading-relaxed flex flex-wrap items-center gap-x-1">
-                      <motion.span 
+                      <motion.span
                         className="text-foreground font-semibold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text"
                         whileHover={{ scale: 1.02 }}
                       >
@@ -1410,7 +1418,11 @@ export default function Hero({
                                 </div>
                               )}
                               <Image
-                                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${selectedSocial.type === 'email' ? `mailto:${selectedSocial.url}` : selectedSocial.url}`}
+                                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${
+                                  selectedSocial.type === 'email'
+                                    ? `mailto:${selectedSocial.url}`
+                                    : selectedSocial.url
+                                }`}
                                 alt={`${selectedSocial.name} QR Code`}
                                 width={200}
                                 height={200}
