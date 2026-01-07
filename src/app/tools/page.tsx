@@ -109,9 +109,6 @@ export default function ToolsPage() {
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent">
             Хэрэгслүүд
           </h1>
-          <p className="text-muted-foreground mt-4 text-lg max-w-2xl mx-auto">
-            Суралцах, ажиллах, амьдралаа зохион байгуулахад туслах хэрэгслүүд
-          </p>
         </div>
 
         {/* Tools Grid */}
