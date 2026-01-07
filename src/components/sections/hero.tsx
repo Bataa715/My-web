@@ -663,19 +663,13 @@ export default function Hero({
   }
 
   const handleOrbitItemClick = (item: OrbitInfo) => {
-    if (selectedOrbit && selectedOrbit.id !== item.id) {
-      setSelectedOrbit(null);
-      setTimeout(() => {
-        setSelectedOrbit(item);
-        setEditedOrbitData(item);
-      }, 800);
-    } else if (selectedOrbit && selectedOrbit.id === item.id) {
-      setSelectedOrbit(null);
+    if (selectedOrbit?.id === item.id) {
+      setSelectedOrbit(null); // Deselect if clicking the same item
     } else {
       setSelectedOrbit(item);
       setEditedOrbitData(item);
     }
-    setIsEditingOrbit(false);
+    setIsEditingOrbit(false); // Always exit edit mode on new selection
   };
 
   const setEditedOrbitData = (item: OrbitInfo) => {
@@ -1152,8 +1146,7 @@ export default function Hero({
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.3 }}
-                    >
-                    </motion.span>
+                    ></motion.span>
                     <div className="flex items-center gap-3">
                       <motion.h1
                         className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight"
