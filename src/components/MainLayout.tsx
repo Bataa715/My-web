@@ -48,13 +48,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './ui/tooltip';
-import { ThemeProvider } from './theme-provider';
-import { Toaster } from './ui/toaster';
-import { EducationProvider } from '@/contexts/EducationContext';
-import { ExperienceProvider } from '@/contexts/ExperienceContext';
-import { ProjectProvider } from '@/contexts/ProjectContext';
-import { SkillsProvider } from '@/contexts/SkillsContext';
-import { HobbyProvider } from '@/contexts/HobbyContext';
 import IntroOverlay from './IntroOverlay';
 
 const FloatingNav = () => {
@@ -182,6 +175,7 @@ export default function MainLayout({
   const userImageProp = useMemo((): keyof UserProfile | undefined => {
     if (pathname === '/tools') return 'toolsHeroImage';
     if (pathname === '/') return 'homeHeroImage';
+    if (pathname === '/about') return 'aboutHeroImage';
     return undefined;
   }, [pathname]);
 
@@ -204,12 +198,19 @@ export default function MainLayout({
 
     const fetchHeroImage = async () => {
       let imageUrl: string | undefined;
-      let placeholderId = 'home-hero-background';
+      let placeholderId: string;
 
-      if (pathname === '/tools') {
-        placeholderId = 'tools-hero-background';
+      switch (pathname) {
+        case '/tools':
+          placeholderId = 'tools-hero-background';
+          break;
+        case '/about':
+          placeholderId = 'about-hero-background';
+          break;
+        default:
+          placeholderId = 'home-hero-background';
       }
-
+      
       if (user && userImageProp) {
         try {
           const userDocRef = doc(firestore, 'users', user.uid);

@@ -57,8 +57,18 @@ export default function RootLayout({
         <FirebaseClientProvider>
           <EditModeProvider>
             <I18nProvider>
-              <MainLayout>{children}</MainLayout>
-              <Toaster />
+              <EducationProvider>
+                <ExperienceProvider>
+                  <ProjectProvider>
+                    <SkillsProvider>
+                      <HobbyProvider>
+                        <MainLayout>{children}</MainLayout>
+                        <Toaster />
+                      </HobbyProvider>
+                    </SkillsProvider>
+                  </ProjectProvider>
+                </ExperienceProvider>
+              </EducationProvider>
             </I18nProvider>
           </EditModeProvider>
         </FirebaseClientProvider>
