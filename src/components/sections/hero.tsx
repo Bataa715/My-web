@@ -1009,19 +1009,22 @@ export default function Hero({
                       
                       {/* Play button - outside all containers for proper click handling */}
                       {!isEditingOrbit && selectedOrbit?.type === 'audio' && selectedOrbit?.youtubeVideoId && (
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-4 h-14 w-14 rounded-full border-2 border-primary bg-background/90 hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all shadow-lg shadow-primary/30"
-                          style={{ zIndex: 9999 }}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setIsPlayerOpen(true);
-                          }}
+                        <div
+                          className="absolute inset-0 flex items-center justify-center pointer-events-auto z-[999]"
                         >
-                          <PlayCircle className="h-8 w-8" />
-                        </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-12 w-12 rounded-full border-2 border-primary bg-background/90 hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all shadow-lg shadow-primary/30"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setIsPlayerOpen(true);
+                            }}
+                          >
+                            <PlayCircle className="h-8 w-8" />
+                          </Button>
+                        </div>
                       )}
                     </motion.div>
                   ) : (
@@ -1147,7 +1150,7 @@ export default function Hero({
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.3 }}
                     >
-                      <Sparkles className="h-5 w-5 text-primary animate-pulse" />
+                      
                       Сайн уу, Би
                     </motion.span>
                     <div className="flex items-center gap-3">
