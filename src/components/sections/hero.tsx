@@ -24,6 +24,9 @@ import {
   PlayCircle,
   Download,
   Facebook,
+  Sparkles,
+  Code2,
+  Zap,
 } from 'lucide-react';
 import { useState, useEffect, type FC } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -124,27 +127,42 @@ const OrbitItem: FC<OrbitItemProps> = ({
         scale: 1,
         x: `calc(-50% + ${xPos}px)`,
         y: `calc(-50% + ${yPos}px)`,
+        rotate: -360, // Counter-rotate to keep icons upright
       }}
       transition={{
-        duration: 0.5,
-        delay: 0.5 + index * 0.1,
-        type: 'spring',
-        stiffness: 120,
+        opacity: { duration: 0.5, delay: 0.5 + index * 0.1 },
+        scale: { duration: 0.5, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 120 },
+        x: { duration: 0.5, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 120 },
+        y: { duration: 0.5, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 120 },
+        rotate: { duration: 60, repeat: Infinity, ease: 'linear' },
       }}
+      whileHover={{ scale: 1.15 }}
+      whileTap={{ scale: 0.95 }}
     >
-      <Button
-        variant="outline"
-        size="icon"
-        className={cn(
-          'rounded-full h-12 w-12 md:h-14 md:w-14 border-2 border-primary/50 bg-card/80 backdrop-blur-sm transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:scale-110',
-          selectedOrbit?.id === item.id &&
-            'bg-primary text-primary-foreground scale-110'
-        )}
-        onClick={() => onItemClick(item)}
-      >
-        {getIcon(item.icon, { className: 'h-4 w-4 md:h-5 md:w-5' })}
-        <span className="sr-only">{item.title}</span>
-      </Button>
+      <div className="relative group">
+        {/* Glowing ring on hover */}
+        <div className={cn(
+          'absolute -inset-1 rounded-full bg-gradient-to-r from-primary via-purple-500 to-primary opacity-0 blur-sm transition-opacity duration-300',
+          'group-hover:opacity-70',
+          selectedOrbit?.id === item.id && 'opacity-70 animate-[spin_3s_linear_infinite]'
+        )} />
+        
+        <Button
+          variant="outline"
+          size="icon"
+          className={cn(
+            'relative rounded-full h-12 w-12 md:h-14 md:w-14 border border-primary/30 bg-background/80 backdrop-blur-md transition-all duration-300',
+            'hover:bg-primary/20 hover:text-primary hover:border-primary/60',
+            'group-hover:shadow-lg group-hover:shadow-primary/20',
+            selectedOrbit?.id === item.id &&
+              'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/40'
+          )}
+          onClick={() => onItemClick(item)}
+        >
+          {getIcon(item.icon, { className: 'h-4 w-4 md:h-5 md:w-5' })}
+          <span className="sr-only">{item.title}</span>
+        </Button>
+      </div>
     </motion.div>
   );
 };
@@ -708,6 +726,74 @@ export default function Hero({
         <div className="grid items-center justify-center gap-10 lg:grid-cols-2 lg:gap-20">
           <div className="flex flex-col justify-center space-y-6 lg:order-2">
             <div className="relative flex items-center justify-center w-full max-w-[300px] sm:max-w-[500px] aspect-square mx-auto">
+              {/* Animated background rings - faster rotation */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                {/* Inner ring - fastest, dotted */}
+                <motion.div 
+                  className="absolute w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] md:w-[450px] md:h-[450px] rounded-full"
+                  style={{
+                    border: '2px dotted',
+                    borderColor: 'hsl(var(--primary) / 0.3)',
+                  }}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+                />
+                
+                {/* Middle ring - simple border */}
+                <motion.div 
+                  className="absolute w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] md:w-[500px] md:h-[500px] rounded-full border border-primary/15"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                />
+                
+                {/* Glowing accent dots on rings */}
+                <motion.div 
+                  className="absolute w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] md:w-[500px] md:h-[500px]"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+                >
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary shadow-lg shadow-primary/50" />
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-purple-500 shadow-lg shadow-purple-500/50" />
+                </motion.div>
+                
+                <motion.div 
+                  className="absolute w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] md:w-[450px] md:h-[450px]"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+                >
+                  <div className="absolute top-1/2 left-0 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary/70" />
+                  <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-purple-400/70" />
+                </motion.div>
+              </div>
+              
+              {/* Floating particles */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {[...Array(8)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute rounded-full"
+                    style={{
+                      width: 4 + Math.random() * 4,
+                      height: 4 + Math.random() * 4,
+                      left: `${15 + Math.random() * 70}%`,
+                      top: `${15 + Math.random() * 70}%`,
+                      background: i % 2 === 0 ? 'hsl(var(--primary) / 0.5)' : 'rgb(168, 85, 247, 0.5)',
+                    }}
+                    animate={{
+                      y: [0, -30, 0],
+                      x: [0, 15 * (i % 2 === 0 ? 1 : -1), 0],
+                      opacity: [0.3, 0.7, 0.3],
+                      scale: [1, 1.3, 1],
+                    }}
+                    transition={{
+                      duration: 2.5 + Math.random() * 2,
+                      repeat: Infinity,
+                      delay: i * 0.3,
+                    }}
+                  />
+                ))}
+              </div>
+              
               <div
                 className={cn(
                   'relative transition-all duration-500 [transform-style:preserve-3d]',
@@ -724,18 +810,24 @@ export default function Hero({
                       animate={{ rotateY: 0, opacity: 1, scale: 1 }}
                       exit={{ rotateY: 180, opacity: 0, scale: 0.8 }}
                       transition={{ duration: 0.6, ease: 'easeInOut' }}
-                      className="absolute inset-0 flex flex-col items-center justify-center bg-muted rounded-full border-4 border-primary shadow-lg text-center overflow-hidden [transform-style:preserve-3d]"
-                      onClick={handleCloseContent}
+                      className="absolute inset-0 flex flex-col items-center justify-center rounded-full text-center overflow-visible [transform-style:preserve-3d]"
                     >
+                      {/* Glowing ring - same as avatar */}
+                      <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary via-purple-500 to-primary opacity-50 blur-md animate-[spin_8s_linear_infinite]" />
+                      <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-primary/50 via-purple-500/50 to-primary/50 opacity-75" />
+                      
+                      {/* Inner content container */}
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-card via-card/98 to-muted backdrop-blur-sm overflow-hidden border-4 border-background/80 shadow-2xl shadow-primary/20">
                       {selectedOrbit.backgroundImage && !isEditingOrbit && (
                         <>
                           <Image
                             src={selectedOrbit.backgroundImage}
                             alt={selectedOrbit.title}
                             fill
-                            className="object-cover rounded-full z-0 opacity-50"
+                            className="object-cover rounded-full z-0 opacity-30"
                           />
-                          <div className="absolute inset-0 z-10" />
+                          {/* Dark overlay for better text visibility */}
+                          <div className="absolute inset-0 z-10 bg-gradient-to-b from-background/70 via-background/50 to-background/70" />
                         </>
                       )}
 
@@ -855,39 +947,57 @@ export default function Hero({
                         ) : (
                           <motion.div
                             key="view"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="relative w-full cursor-pointer z-20 p-4 flex flex-col items-center justify-center text-center"
-                            onClick={handleContentClick}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            className="absolute inset-0 z-30 p-6 flex flex-col items-center justify-center text-center pointer-events-none"
                           >
-                            <h3 className="text-xl md:text-2xl font-bold mb-2 text-primary">
+                            {/* Decorative line above title */}
+                            <motion.div 
+                              className="w-12 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent mb-3 cursor-pointer pointer-events-auto"
+                              initial={{ width: 0 }}
+                              animate={{ width: 48 }}
+                              transition={{ delay: 0.2, duration: 0.4 }}
+                              onClick={handleContentClick}
+                            />
+                            
+                            <motion.h3 
+                              className="text-xl md:text-2xl font-bold mb-3 bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent drop-shadow-lg cursor-pointer pointer-events-auto"
+                              initial={{ y: 10, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              transition={{ delay: 0.1 }}
+                              onClick={handleContentClick}
+                            >
                               {selectedOrbit.title}
-                            </h3>
-                            <p className="text-sm md:text-lg text-foreground">
-                              {selectedOrbit.content}
-                            </p>
-
-                            {selectedOrbit.type === 'audio' &&
-                              selectedOrbit.youtubeVideoId && (
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="mt-4 h-12 w-12"
-                                  onClick={e => {
-                                    e.stopPropagation();
-                                    setIsPlayerOpen(true);
-                                  }}
-                                >
-                                  <PlayCircle className="h-10 w-10 text-primary" />
-                                </Button>
-                              )}
+                            </motion.h3>
+                            
+                            <motion.p 
+                              className="text-sm md:text-base text-foreground/90 max-w-[75%] leading-relaxed font-medium cursor-pointer pointer-events-auto"
+                              initial={{ y: 10, opacity: 0 }}
+                              animate={{ y: 0, opacity: 1 }}
+                              transition={{ delay: 0.2 }}
+                              onClick={handleContentClick}
+                            >
+                              <span className="relative">
+                                <span className="absolute -left-3 top-0 text-primary/50 text-lg">"</span>
+                                {selectedOrbit.content}
+                                <span className="absolute -right-3 bottom-0 text-primary/50 text-lg">"</span>
+                              </span>
+                            </motion.p>
+                            
+                            {/* Decorative line below content */}
+                            <motion.div 
+                              className="w-8 h-0.5 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent mt-3"
+                              initial={{ width: 0 }}
+                              animate={{ width: 32 }}
+                              transition={{ delay: 0.3, duration: 0.4 }}
+                            />
 
                             {isEditMode && (
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="absolute top-2 right-2 h-8 w-8 z-30 text-primary hover:text-primary/80"
+                                className="absolute top-2 right-2 h-8 w-8 z-30 text-primary hover:text-primary/80 pointer-events-auto"
                               >
                                 <Pencil className="h-4 w-4" />
                               </Button>
@@ -895,6 +1005,24 @@ export default function Hero({
                           </motion.div>
                         )}
                       </AnimatePresence>
+                      </div>
+                      
+                      {/* Play button - outside all containers for proper click handling */}
+                      {!isEditingOrbit && selectedOrbit?.type === 'audio' && selectedOrbit?.youtubeVideoId && (
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-4 h-14 w-14 rounded-full border-2 border-primary bg-background/90 hover:bg-primary hover:text-primary-foreground hover:scale-110 transition-all shadow-lg shadow-primary/30"
+                          style={{ zIndex: 9999 }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setIsPlayerOpen(true);
+                          }}
+                        >
+                          <PlayCircle className="h-8 w-8" />
+                        </Button>
+                      )}
                     </motion.div>
                   ) : (
                     <motion.div
@@ -905,10 +1033,14 @@ export default function Hero({
                       transition={{ duration: 0.6, ease: 'easeInOut' }}
                       className="relative w-full h-full group [transform-style:preserve-3d]"
                     >
-                      <div className="avatar-glow-wrapper w-full h-full">
-                        <Avatar className="w-full h-full border-4 border-background">
-                          <AvatarImage src={profileImage} alt={name} />
-                          <AvatarFallback>
+                      {/* Glowing ring around avatar */}
+                      <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary via-purple-500 to-primary opacity-50 blur-md animate-[spin_8s_linear_infinite]" />
+                      <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-primary/50 via-purple-500/50 to-primary/50 opacity-75" />
+                      
+                      <div className="relative avatar-glow-wrapper w-full h-full rounded-full overflow-hidden">
+                        <Avatar className="w-full h-full border-4 border-background/80 shadow-2xl shadow-primary/20">
+                          <AvatarImage src={profileImage} alt={name} className="object-cover" />
+                          <AvatarFallback className="text-6xl font-bold bg-gradient-to-br from-primary/20 to-purple-500/20">
                             {name?.charAt(0) || 'K'}
                           </AvatarFallback>
                         </Avatar>
@@ -929,17 +1061,25 @@ export default function Hero({
                     </motion.div>
                   )}
                 </AnimatePresence>
-                {orbitInfo.map((item, index) => (
-                  <OrbitItem
-                    key={item.id}
-                    item={item}
-                    index={index}
-                    total={orbitInfo.length}
-                    selectedOrbit={selectedOrbit}
-                    onItemClick={handleOrbitItemClick}
-                    isEditing={!!selectedOrbit && isEditingOrbit}
-                  />
-                ))}
+                
+                {/* Orbiting items container - rotates slowly like solar system */}
+                <motion.div
+                  className="absolute inset-0"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+                >
+                  {orbitInfo.map((item, index) => (
+                    <OrbitItem
+                      key={item.id}
+                      item={item}
+                      index={index}
+                      total={orbitInfo.length}
+                      selectedOrbit={selectedOrbit}
+                      onItemClick={handleOrbitItemClick}
+                      isEditing={!!selectedOrbit && isEditingOrbit}
+                    />
+                  ))}
+                </motion.div>
               </div>
             </div>
           </div>
@@ -947,13 +1087,20 @@ export default function Hero({
             <div className="space-y-5">
               {/* Role badge */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 }}
+                initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.1, type: 'spring' }}
               >
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium">
-                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  Програм хангамжийн инженер
+                <span className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 border border-primary/30 text-primary text-sm font-semibold overflow-hidden">
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  <span className="relative flex items-center gap-2">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
+                    </span>
+                    <Code2 className="h-4 w-4" />
+                    Мэдээллийн технологийн инженер
+                  </span>
                 </span>
               </motion.div>
 
@@ -989,18 +1136,31 @@ export default function Hero({
                   </div>
                 ) : (
                   <motion.div
-                    className="flex flex-col gap-1"
+                    className="flex flex-col gap-2"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
+                    transition={{ duration: 0.6, delay: 0.2, type: 'spring' }}
                   >
-                    <span className="text-2xl sm:text-3xl font-medium text-muted-foreground">
+                    <motion.span 
+                      className="text-2xl sm:text-3xl font-medium text-muted-foreground flex items-center gap-2"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 }}
+                    >
+                      <Sparkles className="h-5 w-5 text-primary animate-pulse" />
                       Сайн уу, Би
-                    </span>
+                    </motion.span>
                     <div className="flex items-center gap-3">
-                      <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight">
-                        <span className="text-primary">{name}</span>
-                      </h1>
+                      <motion.h1 
+                        className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.4, type: 'spring', stiffness: 100 }}
+                      >
+                        <span className="bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
+                          {name}
+                        </span>
+                      </motion.h1>
                       {isEditMode && (
                         <Button
                           variant="ghost"
@@ -1053,15 +1213,21 @@ export default function Hero({
                     className="flex items-start gap-2"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
+                    transition={{ duration: 0.6, delay: 0.5 }}
                   >
-                    <p className="max-w-[650px] text-muted-foreground text-base md:text-lg leading-relaxed">
-                      <span className="text-foreground font-medium">
+                    <div className="max-w-[650px] text-muted-foreground text-base md:text-lg leading-relaxed flex flex-wrap items-center gap-x-1">
+                      <motion.span 
+                        className="text-foreground font-semibold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text"
+                        whileHover={{ scale: 1.02 }}
+                      >
                         Fullstack хөгжүүлэгч
+                      </motion.span>
+                      <span className="mx-2 text-primary font-bold text-xl relative">
+                        <span className="absolute inset-0 blur-sm bg-primary/50" />
+                        <span className="relative">|</span>
                       </span>
-                      <span className="mx-2 text-primary">|</span>
-                      <span>{bio}</span>
-                    </p>
+                      <span className="text-muted-foreground/90">{bio}</span>
+                    </div>
                     {isEditMode && (
                       <Button
                         variant="ghost"
@@ -1176,36 +1342,49 @@ export default function Hero({
               ) : (
                 <div className="flex flex-wrap items-center gap-2 lg:gap-4">
                   {socialLinks.cvUrl && (
-                    <Button
-                      asChild
-                      variant="outline"
-                      className="text-primary border-primary hover:bg-primary hover:text-primary-foreground transition-transform hover:scale-105"
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      <Link
-                        href={socialLinks.cvUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <Button
+                        asChild
+                        className="relative group bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] hover:bg-[length:100%_auto] text-primary-foreground font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300"
                       >
-                        <Download className="mr-2 h-4 w-4" />
-                        CV татах
-                      </Link>
-                    </Button>
+                        <Link
+                          href={socialLinks.cvUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Download className="mr-2 h-4 w-4 group-hover:animate-bounce" />
+                          CV татах
+                          <Zap className="ml-2 h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </Link>
+                      </Button>
+                    </motion.div>
                   )}
                   <Dialog>
                     <div className="flex items-center gap-2">
-                      {socialButtons.map(social => (
+                      {socialButtons.map((social, index) => (
                         <DialogTrigger key={social.type} asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                            onClick={() => {
-                              setSelectedSocial(social);
-                              setIsQrLoading(true);
-                            }}
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.6 + index * 0.1 }}
+                            whileHover={{ scale: 1.1, y: -2 }}
+                            whileTap={{ scale: 0.95 }}
                           >
-                            {social.icon}
-                          </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="rounded-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-lg hover:shadow-primary/25 transition-all duration-300"
+                              onClick={() => {
+                                setSelectedSocial(social);
+                                setIsQrLoading(true);
+                              }}
+                            >
+                              {social.icon}
+                            </Button>
+                          </motion.div>
                         </DialogTrigger>
                       ))}
                     </div>
