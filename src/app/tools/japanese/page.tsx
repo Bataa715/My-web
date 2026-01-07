@@ -175,15 +175,6 @@ export default function JapaneseToolsPage() {
 
         {/* Hero Section */}
         <div className="text-center pt-8 pb-4">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 mb-6"
-          >
-            <Sparkles className="h-4 w-4" />
-            <span className="text-sm font-medium">日本語を学ぶ</span>
-          </motion.div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-rose-500 via-pink-500 to-red-500 bg-clip-text text-transparent">
             Япон хэл
           </h1>
