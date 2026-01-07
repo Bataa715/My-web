@@ -28,9 +28,6 @@ export default function PomodoroPage() {
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-rose-400 via-red-500 to-orange-500 bg-clip-text text-transparent">
               Pomodoro Timer
             </h1>
-            <p className="text-muted-foreground mt-3 text-lg">
-              Төвлөрлийг сайжруулж, бүтээмжээ нэмэгдүүлээрэй
-            </p>
           </motion.div>
 
           {/* Timer */}
