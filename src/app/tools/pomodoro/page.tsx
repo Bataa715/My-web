@@ -31,27 +31,6 @@ export default function PomodoroPage() {
             <p className="text-muted-foreground mt-3 text-lg">
               Төвлөрлийг сайжруулж, бүтээмжээ нэмэгдүүлээрэй
             </p>
-
-            {/* Feature badges */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="flex flex-wrap justify-center gap-3 mt-6"
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 text-sm">
-                <Focus className="h-3.5 w-3.5" />
-                <span>Гүн төвлөрөл</span>
-              </div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-sm">
-                <Clock className="h-3.5 w-3.5" />
-                <span>Ухаалаг амралт</span>
-              </div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-sm">
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>Бүтээмж+</span>
-              </div>
-            </motion.div>
           </motion.div>
 
           {/* Timer */}
