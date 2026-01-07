@@ -114,11 +114,11 @@ const OrbitItem: FC<OrbitItemProps> = ({
   return (
     <motion.div
       key={item.id}
-      className="absolute h-12 w-12 md:h-14 md:w-14"
+      className="absolute h-12 w-12 md:h-14 md:w-14 pointer-events-auto"
       style={{
         top: '50%',
         left: '50%',
-        zIndex: 20,
+        zIndex: 30,
       }}
       initial={{ opacity: 0, scale: 0, x: '-50%', y: '-50%' }}
       animate={{
@@ -822,20 +822,20 @@ export default function Hero({
 
               <div
                 className={cn(
-                  'relative transition-all duration-500 [transform-style:preserve-3d]',
+                  'relative transition-all duration-500 [transform-style:preserve-3d] z-20',
                   isEditingOrbit
                     ? 'w-[260px] h-[260px] sm:w-[360px] sm:h-[360px] md:w-[480px] md:h-[480px]'
                     : 'w-56 h-56 sm:w-80 sm:h-80 md:w-96 md:h-96'
                 )}
               >
-                <AnimatePresence>
+                <AnimatePresence mode="wait">
                   {selectedOrbit ? (
                     <motion.div
-                      key="orbit-content"
+                      key={`orbit-content-${selectedOrbit.id}`}
                       initial={{ rotateY: -180, opacity: 0, scale: 0.8 }}
                       animate={{ rotateY: 0, opacity: 1, scale: 1 }}
                       exit={{ rotateY: 180, opacity: 0, scale: 0.8 }}
-                      transition={{ duration: 0.6, ease: 'easeInOut' }}
+                      transition={{ duration: 0.5, ease: 'easeInOut' }}
                       className="absolute inset-0 flex flex-col items-center justify-center rounded-full text-center overflow-visible [transform-style:preserve-3d]"
                     >
                       {/* Inner content container */}
@@ -977,25 +977,17 @@ export default function Hero({
                               exit={{ opacity: 0, scale: 0.9 }}
                               className="absolute inset-0 z-30 p-6 flex flex-col items-center justify-center text-center"
                             >
-                              <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent mb-3" />
+                              <div className="w-16 h-1 rounded-full bg-primary mb-4" />
 
-                              <h3 className="text-xl md:text-2xl font-bold mb-3 bg-gradient-to-r from-primary via-purple-400 to-primary bg-clip-text text-transparent drop-shadow-lg">
+                              <h3 className="text-xl md:text-2xl font-bold mb-2 text-primary">
                                 {selectedOrbit.title}
                               </h3>
 
-                              <p className="text-sm md:text-base text-foreground/90 max-w-[75%] leading-relaxed font-medium">
-                                <span className="relative">
-                                  <span className="absolute -left-3 top-0 text-primary/50 text-lg">
-                                    "
-                                  </span>
-                                  {selectedOrbit.content}
-                                  <span className="absolute -right-3 bottom-0 text-primary/50 text-lg">
-                                    "
-                                  </span>
-                                </span>
+                              <p className="text-sm md:text-base text-muted-foreground max-w-[80%] leading-relaxed">
+                                {selectedOrbit.content}
                               </p>
 
-                              <div className="w-8 h-0.5 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent mt-3" />
+                              <div className="w-10 h-1 rounded-full bg-primary/50 mt-4" />
 
                               {selectedOrbit.type === 'audio' &&
                                 selectedOrbit.youtubeVideoId && (
@@ -1023,9 +1015,16 @@ export default function Hero({
                     <motion.div
                       key="avatar"
                       initial={{ rotateY: 180, opacity: 0, scale: 0.8 }}
-                      animate={{ rotateY: 0, opacity: 1, scale: 1 }}
+                      animate={{ 
+                        rotateY: 0, 
+                        opacity: 1, 
+                        scale: 1
+                      }}
                       exit={{ rotateY: -180, opacity: 0, scale: 0.8 }}
-                      transition={{ duration: 0.6, ease: 'easeInOut' }}
+                      transition={{ 
+                        duration: 0.5, 
+                        ease: 'easeInOut'
+                      }}
                       className="relative w-full h-full group [transform-style:preserve-3d]"
                     >
                       <div className="avatar-glow-wrapper w-full h-full rounded-full overflow-hidden">
@@ -1040,27 +1039,61 @@ export default function Hero({
                           </AvatarFallback>
                         </Avatar>
                       </div>
-                      {isEditMode && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setIsEditingImage(true)}
-                            className="h-12 w-12 rounded-full z-10 bg-background/50 backdrop-blur-sm"
-                          >
-                            <Upload className="h-5 w-5" />
-                            <span className="sr-only">Зураг солих</span>
-                          </Button>
-                        </div>
-                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
 
+                {/* Edit buttons - outside AnimatePresence with high z-index */}
+                {isEditMode && (
+                  <>
+                    {/* Orbit content edit button - positioned at bottom */}
+                    {selectedOrbit && !isEditingOrbit && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[100]"
+                        style={{ pointerEvents: 'auto' }}
+                      >
+                        <Button
+                          variant="default"
+                          size="icon"
+                          className="h-10 w-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-300 hover:scale-110"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsEditingOrbit(true);
+                          }}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </motion.div>
+                    )}
+
+                    {/* Profile upload button - centered */}
+                    {!selectedOrbit && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="absolute inset-0 flex items-center justify-center z-[100]"
+                        style={{ pointerEvents: 'auto' }}
+                      >
+                        <Button
+                          variant="default"
+                          size="icon"
+                          className="h-14 w-14 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-300 hover:scale-110"
+                          onClick={() => setIsEditingImage(true)}
+                        >
+                          <Upload className="h-6 w-6" />
+                          <span className="sr-only">Зураг солих</span>
+                        </Button>
+                      </motion.div>
+                    )}
+                  </>
+                )}
+
                 {/* Orbiting items container - rotates slowly like solar system */}
                 <motion.div
                   className={cn(
-                    'absolute inset-0'
+                    'absolute inset-0 z-10 pointer-events-none'
                   )}
                   animate={{ rotate: 360 }}
                   transition={{
@@ -1092,13 +1125,14 @@ export default function Hero({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.1, type: 'spring' }}
               >
-                <span className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 border border-primary/30 text-primary text-sm font-semibold overflow-hidden">
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  <span className="relative flex items-center gap-2">
-                    <span className="relative flex h-2.5 w-2.5">
+                <span className="group relative inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/20 via-primary/5 to-primary/20 border border-primary/30 text-primary text-sm font-semibold overflow-hidden shadow-lg shadow-primary/10">
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  <span className="relative flex items-center gap-2.5">
+                    <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
                     </span>
+                    <Code2 className="h-4 w-4" />
                     Мэдээллийн технологийн инженер
                   </span>
                 </span>
@@ -1137,7 +1171,7 @@ export default function Hero({
                     </div>
                   ) : (
                     <motion.div
-                      className="flex items-center gap-3"
+                      className="flex flex-col gap-2"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{
@@ -1146,30 +1180,41 @@ export default function Hero({
                         type: 'spring',
                       }}
                     >
-                      <motion.h1
-                        className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{
-                          delay: 0.4,
-                          type: 'spring',
-                          stiffness: 100,
-                        }}
+                      <motion.span 
+                        className="text-lg sm:text-xl md:text-2xl font-medium text-muted-foreground flex items-center gap-2"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 }}
                       >
-                        <span className="bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
-                          {name}
-                        </span>
-                      </motion.h1>
-                      {isEditMode && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => setIsEditingName(true)}
+                        <Sparkles className="h-5 w-5 text-primary animate-pulse" />
+                        Сайн уу, Би
+                      </motion.span>
+                      <div className="flex items-center gap-3">
+                        <motion.h1
+                          className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight"
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{
+                            delay: 0.4,
+                            type: 'spring',
+                            stiffness: 100,
+                          }}
                         >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      )}
+                          <span className="bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent drop-shadow-lg">
+                            {name}
+                          </span>
+                        </motion.h1>
+                        {isEditMode && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => setIsEditingName(true)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                     </motion.div>
                   )}
                 </div>
@@ -1215,9 +1260,11 @@ export default function Hero({
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: 0.5 }}
                     >
-                      <p className="max-w-[650px] text-muted-foreground text-base md:text-lg leading-relaxed">
-                        {bio}
-                      </p>
+                      <div className="max-w-[650px] text-muted-foreground text-base md:text-lg leading-relaxed">
+                        <span className="text-foreground font-semibold">Fullstack хөгжүүлэгч</span>
+                        <span className="mx-2 text-primary font-bold">|</span>
+                        <span>{bio}</span>
+                      </div>
                       {isEditMode && (
                         <Button
                           variant="ghost"
