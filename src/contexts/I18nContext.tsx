@@ -23,7 +23,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(
 export const languages = [
   { code: 'mn', name: 'Монгол', flag: '🇲🇳' },
   { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'ja', name: 'Japan', flag: '🇯🇵' },
 ];
 
 export function I18nProvider({ children }: { children: ReactNode }) {
