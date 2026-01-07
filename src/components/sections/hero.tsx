@@ -664,7 +664,7 @@ export default function Hero({
 
   const handleOrbitItemClick = (item: OrbitInfo) => {
     if (selectedOrbit?.id === item.id) {
-      setSelectedOrbit(null); // Deselect if clicking the same item
+      setSelectedOrbit(null);
     } else {
       setSelectedOrbit(item);
       setEditedOrbitData(item);
@@ -1060,8 +1060,7 @@ export default function Hero({
                 {/* Orbiting items container - rotates slowly like solar system */}
                 <motion.div
                   className={cn(
-                    'absolute inset-0',
-                    selectedOrbit && 'pointer-events-none'
+                    'absolute inset-0'
                   )}
                   animate={{ rotate: 360 }}
                   transition={{
