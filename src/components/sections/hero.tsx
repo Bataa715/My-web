@@ -663,13 +663,13 @@ export default function Hero({
   }
 
   const handleOrbitItemClick = (item: OrbitInfo) => {
-    if (selectedOrbit?.id === item.id) {
+    if (selectedOrbit?.id === item.id && !isEditingOrbit) {
       setSelectedOrbit(null);
     } else {
       setSelectedOrbit(item);
       setEditedOrbitData(item);
     }
-    setIsEditingOrbit(false); // Always exit edit mode on new selection
+    setIsEditingOrbit(false);
   };
 
   const setEditedOrbitData = (item: OrbitInfo) => {
@@ -1135,43 +1135,35 @@ export default function Hero({
                   </div>
                 ) : (
                   <motion.div
-                    className="flex flex-col gap-2"
+                    className="flex items-center gap-3"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2, type: 'spring' }}
                   >
-                    <motion.span
-                      className="text-2xl sm:text-3xl font-medium text-muted-foreground flex items-center gap-2"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.3 }}
-                    ></motion.span>
-                    <div className="flex items-center gap-3">
-                      <motion.h1
-                        className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{
-                          delay: 0.4,
-                          type: 'spring',
-                          stiffness: 100,
-                        }}
+                    <motion.h1
+                      className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{
+                        delay: 0.4,
+                        type: 'spring',
+                        stiffness: 100,
+                      }}
+                    >
+                      <span className="bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
+                        {name}
+                      </span>
+                    </motion.h1>
+                    {isEditMode && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => setIsEditingName(true)}
                       >
-                        <span className="bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent">
-                          {name}
-                        </span>
-                      </motion.h1>
-                      {isEditMode && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => setIsEditingName(true)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
                   </motion.div>
                 )}
               </div>
