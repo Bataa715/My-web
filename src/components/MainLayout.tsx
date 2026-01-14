@@ -175,7 +175,7 @@ export default function MainLayout({
   const userImageProp = useMemo((): keyof UserProfile | undefined => {
     if (pathname === '/tools') return 'toolsHeroImage';
     if (pathname === '/') return 'homeHeroImage';
-    if (pathname === '/about') return 'aboutHeroImage';
+    // About page no longer uses background image
     return undefined;
   }, [pathname]);
 
@@ -204,13 +204,10 @@ export default function MainLayout({
         case '/tools':
           placeholderId = 'tools-hero-background';
           break;
-        case '/about':
-          placeholderId = 'about-hero-background';
-          break;
         default:
           placeholderId = 'home-hero-background';
       }
-      
+
       if (user && userImageProp) {
         try {
           const userDocRef = doc(firestore, 'users', user.uid);

@@ -20,6 +20,7 @@ import {
   ArrowRight,
   Sparkles,
   GraduationCap,
+  RefreshCw,
 } from 'lucide-react';
 import BackButton from '@/components/shared/BackButton';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -34,6 +35,15 @@ const englishSkillsConfig = [
     icon: <Brain className="h-7 w-7" />,
     gradient: 'from-violet-500 to-purple-400',
     shadowColor: 'rgba(139, 92, 246, 0.5)',
+  },
+  {
+    id: 'irregular-verbs',
+    title: 'Irregular Verbs',
+    description: 'Дүрмийн бус үйл үгс',
+    href: '/tools/english/irregular-verbs',
+    icon: <RefreshCw className="h-7 w-7" />,
+    gradient: 'from-orange-500 to-yellow-400',
+    shadowColor: 'rgba(249, 115, 22, 0.5)',
   },
   {
     id: 'grammar',

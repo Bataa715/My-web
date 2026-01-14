@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode, useEffect } from 'react';
+import { useState, type ReactNode, useEffect, cloneElement } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -53,7 +53,7 @@ export function EditGrammarRuleDialog({
   onUpdateRule,
   collectionPath,
 }: EditGrammarRuleDialogProps) {
-  const { firestore } = useFirebase();
+  const { firestore, user } = useFirebase();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
 
@@ -137,10 +137,10 @@ export function EditGrammarRuleDialog({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!firestore || !rule.id) {
+    if (!firestore || !rule.id || !user) {
       toast({
         title: 'Алдаа',
-        description: 'Дүрэм засах боломжгүй.',
+        description: 'Дүрэм засах боломжгүй. Нэвтэрсэн эсэхээ шалгана уу.',
         variant: 'destructive',
       });
       return;
@@ -177,7 +177,7 @@ export function EditGrammarRuleDialog({
     };
 
     try {
-      const docRef = doc(firestore, collectionPath, rule.id);
+      const docRef = doc(firestore, `users/${user.uid}/${collectionPath}`, rule.id);
       await updateDoc(docRef, updatedRuleData);
       onUpdateRule({
         ...updatedRuleData,
@@ -201,7 +201,11 @@ export function EditGrammarRuleDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger asChild>
+        {cloneElement(children as React.ReactElement, {
+          onClick: () => setOpen(true),
+        })}
+      </DialogTrigger>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>"{rule.title}" дүрмийг засах</DialogTitle>

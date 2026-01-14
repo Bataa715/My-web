@@ -158,6 +158,11 @@ export type UserProfile = {
   name: string;
   bio: string;
   profileImage: string;
+  // Customizable text fields
+  greeting?: string; // "Сайн уу, Би" - Hero section
+  role?: string; // "Fullstack хөгжүүлэгч" - Hero section
+  introText?: string; // "Миний нэрийг" - About page
+  outroText?: string; // "гэдэг" - About page
   personalInfo?: PersonalInfoItem[];
   homeHeroImage?: string;
   aboutHeroImage?: string;

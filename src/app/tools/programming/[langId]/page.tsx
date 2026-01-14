@@ -69,6 +69,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -93,7 +94,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-// Code snippet component with copy functionality
+// Code snippet component with copy functionality and collapse/expand
 const CodeSnippet = ({
   code,
   title,
@@ -106,24 +107,59 @@ const CodeSnippet = ({
   onDelete: () => void;
 }) => {
   const [copied, setCopied] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     await navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const lineCount = code.split('\n').length;
+  const shouldCollapse = lineCount > 5;
+  const previewCode = shouldCollapse ? code.split('\n').slice(0, 4).join('\n') + '\n...' : code;
+
   return (
     <motion.div
       variants={itemVariants}
-      className="group relative bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50 overflow-hidden"
+      className="group relative bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50 overflow-hidden cursor-pointer hover:border-primary/30 transition-colors"
+      onClick={() => shouldCollapse && setIsExpanded(!isExpanded)}
     >
       <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b border-border/50">
         <div className="flex items-center gap-2">
           <Terminal className="h-4 w-4 text-green-400" />
           <span className="font-medium text-sm">{title}</span>
+          {shouldCollapse && (
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+              {lineCount} мөр
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1">
+          {shouldCollapse && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsExpanded(!isExpanded);
+              }}
+            >
+              {isExpanded ? (
+                <>
+                  <Minus className="h-3 w-3 mr-1" />
+                  Хураах
+                </>
+              ) : (
+                <>
+                  <Plus className="h-3 w-3 mr-1" />
+                  Дэлгэх
+                </>
+              )}
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -140,7 +176,10 @@ const CodeSnippet = ({
             variant="ghost"
             size="icon"
             className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={onEdit}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit();
+            }}
           >
             <Edit className="h-3.5 w-3.5" />
           </Button>
@@ -150,6 +189,7 @@ const CodeSnippet = ({
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+                onClick={(e) => e.stopPropagation()}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
@@ -168,9 +208,26 @@ const CodeSnippet = ({
           </AlertDialog>
         </div>
       </div>
-      <pre className="p-4 overflow-x-auto text-sm">
-        <code className="text-green-300 font-mono">{code}</code>
-      </pre>
+      <AnimatePresence mode="wait">
+        <motion.pre
+          key={isExpanded ? 'expanded' : 'collapsed'}
+          initial={{ height: 'auto' }}
+          animate={{ height: 'auto' }}
+          className={cn(
+            'p-4 overflow-x-auto text-sm',
+            !isExpanded && shouldCollapse && 'max-h-[140px] overflow-hidden'
+          )}
+        >
+          <code className="text-green-300 font-mono">
+            {isExpanded || !shouldCollapse ? code : previewCode}
+          </code>
+        </motion.pre>
+      </AnimatePresence>
+      {!isExpanded && shouldCollapse && (
+        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card/90 to-transparent pointer-events-none flex items-end justify-center pb-2">
+          <span className="text-xs text-muted-foreground">Дарж бүтнээр харах</span>
+        </div>
+      )}
     </motion.div>
   );
 };

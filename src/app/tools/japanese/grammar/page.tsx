@@ -19,11 +19,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { AddGrammarRuleDialog } from '@/components/shared/AddGrammarRuleDialog';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, BookText, Sparkles } from 'lucide-react';
+import { PlusCircle, BookText, Sparkles, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
 import InteractiveParticles from '@/components/shared/InteractiveParticles';
 import { Card, CardContent } from '@/components/ui/card';
+import { AIGrammarRuleDialog } from '@/components/shared/AIGrammarRuleDialog';
 
 export default function JapaneseGrammarPage() {
   const { firestore, user } = useFirebase();
@@ -179,19 +180,34 @@ export default function JapaneseGrammarPage() {
               Япон хэлний дүрэм
             </motion.h1>
             {isEditMode && (
-              <AddGrammarRuleDialog
-                onAddRule={handleAddRule}
-                ruleType="japanese"
-              >
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="bg-rose-500/10 border-rose-500/30 hover:bg-rose-500/20 hover:border-rose-500/50 transition-all duration-300 rounded-xl"
+              <div className="flex items-center gap-2">
+                <AIGrammarRuleDialog
+                  onAddRule={handleAddRule}
+                  ruleType="japanese"
                 >
-                  <PlusCircle className="h-5 w-5 text-rose-400" />
-                  <span className="sr-only">Шинэ дүрэм нэмэх</span>
-                </Button>
-              </AddGrammarRuleDialog>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white rounded-xl gap-2"
+                  >
+                    <Wand2 className="h-4 w-4" />
+                    AI-ээр үүсгэх
+                  </Button>
+                </AIGrammarRuleDialog>
+                <AddGrammarRuleDialog
+                  onAddRule={handleAddRule}
+                  ruleType="japanese"
+                >
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="bg-rose-500/10 border-rose-500/30 hover:bg-rose-500/20 hover:border-rose-500/50 transition-all duration-300 rounded-xl"
+                  >
+                    <PlusCircle className="h-5 w-5 text-rose-400" />
+                    <span className="sr-only">Гараар нэмэх</span>
+                  </Button>
+                </AddGrammarRuleDialog>
+              </div>
             )}
           </div>
           <motion.p

@@ -105,7 +105,7 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
   dotnet: { slug: 'dotnet', color: '512BD4' },
   'asp.net': { slug: 'dotnet', color: '512BD4' },
   gin: { slug: 'gin', color: '00ADD8' },
-  fiber: { slug: 'gofiber', color: '00ACD7' },
+  fiber: { slug: 'go', color: '00ADD8' },
   actix: { slug: 'actix', color: 'FFFFFF' },
   phoenix: { slug: 'phoenixframework', color: 'FD4F00' },
 
@@ -125,7 +125,7 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
   dynamodb: { slug: 'amazondynamodb', color: '4053D6' },
   cockroachdb: { slug: 'cockroachlabs', color: '6933FF' },
   planetscale: { slug: 'planetscale', color: 'FFFFFF' },
-  neon: { slug: 'neon', color: '00E599' },
+  neon: { slug: 'neondatabase', color: '00E599' },
   turso: { slug: 'turso', color: '4FF8D2' },
   influxdb: { slug: 'influxdb', color: '22ADF6' },
   timescale: { slug: 'timescale', color: 'FDB515' },
@@ -139,16 +139,17 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
   'google cloud': { slug: 'googlecloud', color: '4285F4' },
   azure: { slug: 'microsoftazure', color: '0078D4' },
   microsoft: { slug: 'microsoft', color: 'FFFFFF' },
-  'microsoft 365': { slug: 'microsoft365', color: 'FFFFFF' },
-  microsoft365: { slug: 'microsoft365', color: 'FFFFFF' },
-  'power bi': { slug: 'powerbi', color: 'F2C811' },
-  powerbi: { slug: 'powerbi', color: 'F2C811' },
-  'microsoft excel': { slug: 'microsoftexcel', color: '217346' },
-  excel: { slug: 'microsoftexcel', color: '217346' },
-  'microsoft word': { slug: 'microsoftword', color: '2B579A' },
-  word: { slug: 'microsoftword', color: '2B579A' },
-  'microsoft powerpoint': { slug: 'microsoftpowerpoint', color: 'B7472A' },
-  powerpoint: { slug: 'microsoftpowerpoint', color: 'B7472A' },
+  // Microsoft Office icons removed from Simple Icons - using fallback colors only
+  'microsoft 365': { slug: '', color: 'EB3C00' },
+  microsoft365: { slug: '', color: 'EB3C00' },
+  'power bi': { slug: '', color: 'F2C811' },
+  powerbi: { slug: '', color: 'F2C811' },
+  'microsoft excel': { slug: '', color: '217346' },
+  excel: { slug: '', color: '217346' },
+  'microsoft word': { slug: '', color: '2B579A' },
+  word: { slug: '', color: '2B579A' },
+  'microsoft powerpoint': { slug: '', color: 'B7472A' },
+  powerpoint: { slug: '', color: 'B7472A' },
   digitalocean: { slug: 'digitalocean', color: '0080FF' },
   linode: { slug: 'linode', color: '00A95C' },
   heroku: { slug: 'heroku', color: '430098' },
@@ -187,14 +188,14 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
   'tailwind css': { slug: 'tailwindcss', color: '06B6D4' },
   tailwindcss: { slug: 'tailwindcss', color: '06B6D4' },
   tailwind: { slug: 'tailwindcss', color: '06B6D4' },
-  css: { slug: 'css3', color: '1572B6' },
-  css3: { slug: 'css3', color: '1572B6' },
+  css: { slug: 'css', color: '1572B6' },
+  css3: { slug: 'css', color: '1572B6' },
   sass: { slug: 'sass', color: 'CC6699' },
   scss: { slug: 'sass', color: 'CC6699' },
   less: { slug: 'less', color: '1D365D' },
   'styled-components': { slug: 'styledcomponents', color: 'DB7093' },
   styledcomponents: { slug: 'styledcomponents', color: 'DB7093' },
-  emotion: { slug: 'emotion', color: 'C43BAD' },
+  emotion: { slug: 'styledcomponents', color: 'C43BAD' },
   bootstrap: { slug: 'bootstrap', color: '7952B3' },
   'material ui': { slug: 'mui', color: '007FFF' },
   materialui: { slug: 'mui', color: '007FFF' },
@@ -280,34 +281,34 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
 
   // State Management
   redux: { slug: 'redux', color: '764ABC' },
-  zustand: { slug: 'zustand', color: '764ABC' },
+  zustand: { slug: 'react', color: '764ABC' },
   mobx: { slug: 'mobx', color: 'FF9955' },
   recoil: { slug: 'recoil', color: '3578E5' },
-  jotai: { slug: 'jotai', color: 'FFFFFF' },
+  jotai: { slug: 'react', color: 'FFFFFF' },
   xstate: { slug: 'xstate', color: '2C3E50' },
   pinia: { slug: 'pinia', color: 'FFD859' },
-  vuex: { slug: 'vuex', color: '4FC08D' },
+  vuex: { slug: 'vuedotjs', color: '4FC08D' },
 
   // Auth & Security
   auth0: { slug: 'auth0', color: 'EB5424' },
   clerk: { slug: 'clerk', color: '6C47FF' },
   nextauth: { slug: 'nextdotjs', color: 'FFFFFF' },
   passport: { slug: 'passport', color: '34E27A' },
-  oauth: { slug: 'oauth', color: 'FFFFFF' },
+  oauth: { slug: 'auth0', color: 'FFFFFF' },
   jwt: { slug: 'jsonwebtokens', color: 'FFFFFF' },
   keycloak: { slug: 'keycloak', color: '4D4D4D' },
 
   // Message Queues & Streaming
   kafka: { slug: 'apachekafka', color: '231F20' },
   rabbitmq: { slug: 'rabbitmq', color: 'FF6600' },
-  nats: { slug: 'nats', color: '27AAE1' },
+  nats: { slug: 'cncf', color: '27AAE1' },
   zeromq: { slug: 'zeromq', color: 'DF0000' },
 
   // Search & Analytics
   elasticsearch: { slug: 'elasticsearch', color: '005571' },
   algolia: { slug: 'algolia', color: '003DFF' },
   meilisearch: { slug: 'meilisearch', color: 'FF5CAA' },
-  typesense: { slug: 'typesense', color: 'D52C5E' },
+  typesense: { slug: 'elasticsearch', color: 'D52C5E' },
 
   // Monitoring & Observability
   prometheus: { slug: 'prometheus', color: 'E6522C' },
@@ -328,7 +329,7 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
   adobexd: { slug: 'adobexd', color: 'FF61F6' },
   invision: { slug: 'invision', color: 'FF3366' },
   canva: { slug: 'canva', color: '00C4CC' },
-  zeplin: { slug: 'zeplin', color: 'FDBD39' },
+  zeplin: { slug: 'figma', color: 'FDBD39' },
 
   // Payment & E-commerce
   stripe: { slug: 'stripe', color: '008CDD' },
@@ -345,7 +346,7 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
   ghost: { slug: 'ghost', color: '15171A' },
   directus: { slug: 'directus', color: '263238' },
   payload: { slug: 'payloadcms', color: 'FFFFFF' },
-  keystonejs: { slug: 'keystonejs', color: '166BFF' },
+  keystonejs: { slug: 'nodedotjs', color: '166BFF' },
 
   // AI & ML
   openai: { slug: 'openai', color: 'FFFFFF' },
@@ -366,8 +367,8 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
   s3: { slug: 'amazons3', color: '569A31' },
   'amazon s3': { slug: 'amazons3', color: '569A31' },
   cloudinary: { slug: 'cloudinary', color: '3448C5' },
-  uploadthing: { slug: 'uploadthing', color: 'F5424E' },
-  imgix: { slug: 'imgix', color: 'FF5300' },
+  uploadthing: { slug: 'vercel', color: 'F5424E' },
+  imgix: { slug: 'cloudinary', color: 'FF5300' },
 
   // Game Development
   unity: { slug: 'unity', color: 'FFFFFF' },
@@ -385,8 +386,8 @@ const techIconMap: Record<string, { slug: string; color: string }> = {
   web3: { slug: 'web3dotjs', color: 'F16822' },
   'web3.js': { slug: 'web3dotjs', color: 'F16822' },
   ethers: { slug: 'ethers', color: '2535A0' },
-  hardhat: { slug: 'hardhat', color: 'F3DF49' },
-  foundry: { slug: 'foundry', color: 'FFA500' },
+  hardhat: { slug: 'ethereum', color: 'F3DF49' },
+  foundry: { slug: 'ethereum', color: 'FFA500' },
 
   // Linux & OS
   linux: { slug: 'linux', color: 'FCC624' },
@@ -483,23 +484,29 @@ const TechIcon = ({ techName, className }: TechIconProps) => {
     );
   }
 
-  // Simple Icons CDN URL
-  const iconUrl = tech
+  // Simple Icons CDN URL - only generate if slug exists
+  const iconUrl = tech && tech.slug
     ? `https://cdn.simpleicons.org/${tech.slug}/${tech.color}`
     : null;
 
   if (!iconUrl || imageError) {
+    // Use tech color if available for better visual distinction
+    const bgStyle = tech?.color ? { backgroundColor: `#${tech.color}` } : undefined;
+    const textColor = tech?.color ? 'text-white' : 'text-neutral-300';
+    
     return (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <div
               className={cn(
-                'flex h-8 w-8 items-center justify-center rounded-full border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900',
+                'flex h-8 w-8 items-center justify-center rounded-full border border-neutral-700',
+                !tech?.color && 'bg-gradient-to-br from-neutral-800 to-neutral-900',
                 className
               )}
+              style={bgStyle}
             >
-              <span className="text-xs font-bold text-neutral-300">
+              <span className={cn('text-xs font-bold', textColor)}>
                 {techName.slice(0, 2).toUpperCase()}
               </span>
             </div>

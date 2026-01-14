@@ -116,24 +116,24 @@ export default function TestGame({ words, wordType, onExit }: TestGameProps) {
 
   if (isFinished) {
     return (
-      <Card className="w-full max-w-2xl mx-auto p-8 text-center bg-card/80 backdrop-blur-sm border-primary/20">
+      <Card className="w-full max-w-2xl mx-auto p-4 md:p-8 text-center bg-card/80 backdrop-blur-sm border-primary/20">
         <CardHeader>
           <div className="flex justify-center mb-4">
-            <CheckCircle2 className="h-16 w-16 text-green-500" />
+            <CheckCircle2 className="h-12 w-12 md:h-16 md:w-16 text-green-500" />
           </div>
-          <CardTitle className="text-3xl font-bold">Тест дууслаа!</CardTitle>
+          <CardTitle className="text-2xl md:text-3xl font-bold">Тест дууслаа!</CardTitle>
         </CardHeader>
         <CardContent>
-          <CardDescription className="text-lg mb-6">
+          <CardDescription className="text-base md:text-lg mb-6">
             Таны үр дүн: <strong className="text-primary">{score}</strong> /{' '}
             {questions.length}
           </CardDescription>
-          <div className="flex gap-4 justify-center">
-            <Button onClick={handleRestart}>
-              <Repeat className="mr-2" /> Дахин оролдох
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Button className="w-full sm:w-auto" onClick={handleRestart}>
+              <Repeat className="mr-2 h-4 w-4" /> Дахин оролдох
             </Button>
-            <Button variant="outline" onClick={onExit}>
-              <ArrowLeft className="mr-2" /> Буцах
+            <Button variant="outline" className="w-full sm:w-auto" onClick={onExit}>
+              <ArrowLeft className="mr-2 h-4 w-4" /> Буцах
             </Button>
           </div>
         </CardContent>
@@ -143,30 +143,30 @@ export default function TestGame({ words, wordType, onExit }: TestGameProps) {
 
   if (!gameMode) {
     return (
-      <Card className="w-full max-w-2xl mx-auto p-8 text-center">
+      <Card className="w-full max-w-2xl mx-auto p-4 md:p-8 text-center">
         <CardHeader>
           <div className="flex justify-center mb-4">
-            <HelpCircle className="h-16 w-16 text-primary" />
+            <HelpCircle className="h-12 w-12 md:h-16 md:w-16 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-bold">
+          <CardTitle className="text-2xl md:text-3xl font-bold">
             Тестийн төрлөө сонгоно уу
           </CardTitle>
-          <CardDescription className="text-lg text-muted-foreground">
+          <CardDescription className="text-base md:text-lg text-muted-foreground">
             Ямар чиглэлд үгээ шалгуулах вэ?
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 mt-4 md:mt-6">
           <Button
-            className="h-24 text-xl"
+            className="h-16 md:h-24 text-base md:text-xl"
             onClick={() => setGameMode('eng-to-mon')}
           >
-            <Languages className="mr-4" /> Англи {'->'} Монгол
+            <Languages className="mr-2 md:mr-4 h-5 w-5 md:h-6 md:w-6" /> Англи {'->'} Монгол
           </Button>
           <Button
-            className="h-24 text-xl"
+            className="h-16 md:h-24 text-base md:text-xl"
             onClick={() => setGameMode('mon-to-eng')}
           >
-            <Book className="mr-4" /> Монгол {'->'} Англи
+            <Book className="mr-2 md:mr-4 h-5 w-5 md:h-6 md:w-6" /> Монгол {'->'} Англи
           </Button>
         </CardContent>
       </Card>
@@ -188,13 +188,13 @@ export default function TestGame({ words, wordType, onExit }: TestGameProps) {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <div className="flex items-center gap-4 mb-6">
-        <Button variant="ghost" size="icon" onClick={onExit}>
-          <ArrowLeft />
+    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4">
+      <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+        <Button variant="ghost" size="icon" className="shrink-0" onClick={onExit}>
+          <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="w-full">
-          <p className="text-right text-sm font-mono text-muted-foreground mb-1">
+          <p className="text-right text-xs sm:text-sm font-mono text-muted-foreground mb-1">
             {currentQuestionIndex + 1} / {questions.length}
           </p>
           <Progress
@@ -205,17 +205,17 @@ export default function TestGame({ words, wordType, onExit }: TestGameProps) {
       </div>
 
       <Card>
-        <CardHeader className="text-center min-h-[120px] flex justify-center items-center">
-          <CardTitle className="text-5xl font-bold text-primary">
+        <CardHeader className="text-center min-h-[80px] sm:min-h-[120px] flex justify-center items-center p-4 sm:p-6">
+          <CardTitle className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-primary">
             {currentQuestion.questionWord}
           </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 pt-4 sm:pt-6 px-3 sm:px-6">
           {currentQuestion.options.map((option, index) => {
             const isCorrect = option === currentQuestion.correctAnswer;
             const isSelected = option === selectedAnswer;
 
-            let buttonClass = 'h-auto py-4 text-lg justify-center';
+            let buttonClass = 'h-auto py-3 sm:py-4 text-sm sm:text-base md:text-lg justify-center';
             if (selectedAnswer) {
               if (isCorrect) {
                 buttonClass = cn(
@@ -246,11 +246,11 @@ export default function TestGame({ words, wordType, onExit }: TestGameProps) {
                   <span className="mr-2">
                     {selectedAnswer &&
                       (isCorrect ? (
-                        <Check />
+                        <Check className="h-4 w-4 sm:h-5 sm:w-5" />
                       ) : isSelected ? (
-                        <X />
+                        <X className="h-4 w-4 sm:h-5 sm:w-5" />
                       ) : (
-                        <div className="w-6" />
+                        <div className="w-4 sm:w-6" />
                       ))}
                   </span>
                   {option}

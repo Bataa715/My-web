@@ -34,6 +34,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
   Dialog,
   DialogContent,
@@ -87,20 +88,27 @@ const OrbitItem: FC<OrbitItemProps> = ({
 }) => {
   const angle = (index / total) * 2 * Math.PI;
 
-  const baseRadius = 140; // Reduced for mobile
-  const mdBaseRadius = 240;
-  const editingRadius = 160; // Reduced for mobile
-  const mdEditingRadius = 270;
+  const baseRadius = 110; // Mobile radius
+  const smBaseRadius = 150; // Small tablet
+  const mdBaseRadius = 200; // Desktop
+  const editingRadius = 130; // Mobile editing
+  const smEditingRadius = 170; // Small tablet editing
+  const mdEditingRadius = 230; // Desktop editing
 
   const [currentRadius, setCurrentRadius] = useState(baseRadius);
 
   useEffect(() => {
     const updateRadius = () => {
       const isMd = window.innerWidth >= 768;
+      const isSm = window.innerWidth >= 640;
       if (isEditing) {
-        setCurrentRadius(isMd ? mdEditingRadius : editingRadius);
+        setCurrentRadius(
+          isMd ? mdEditingRadius : isSm ? smEditingRadius : editingRadius
+        );
       } else {
-        setCurrentRadius(isMd ? mdBaseRadius : baseRadius);
+        setCurrentRadius(
+          isMd ? mdBaseRadius : isSm ? smBaseRadius : baseRadius
+        );
       }
     };
     window.addEventListener('resize', updateRadius);
@@ -114,7 +122,7 @@ const OrbitItem: FC<OrbitItemProps> = ({
   return (
     <motion.div
       key={item.id}
-      className="absolute h-12 w-12 md:h-14 md:w-14 pointer-events-auto"
+      className="absolute h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 pointer-events-auto"
       style={{
         top: '50%',
         left: '50%',
@@ -168,7 +176,7 @@ const OrbitItem: FC<OrbitItemProps> = ({
           variant="outline"
           size="icon"
           className={cn(
-            'relative rounded-full h-12 w-12 md:h-14 md:w-14 border border-primary/30 bg-background/80 backdrop-blur-md transition-all duration-300',
+            'relative rounded-full h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 border border-primary/30 bg-background/80 backdrop-blur-md transition-all duration-300',
             'hover:bg-primary/20 hover:text-primary hover:border-primary/60',
             'group-hover:shadow-lg group-hover:shadow-primary/20',
             selectedOrbit?.id === item.id &&
@@ -176,7 +184,9 @@ const OrbitItem: FC<OrbitItemProps> = ({
           )}
           onClick={() => onItemClick(item)}
         >
-          {getIcon(item.icon, { className: 'h-4 w-4 md:h-5 md:w-5' })}
+          {getIcon(item.icon, {
+            className: 'h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5',
+          })}
           <span className="sr-only">{item.title}</span>
         </Button>
       </div>
@@ -209,10 +219,12 @@ export default function Hero({
   portfolioUserId,
 }: { portfolioUserId?: string } = {}) {
   const { isEditMode } = useEditMode();
-  const { firestore, user, isUserLoading } = useFirebase();
+  const { firestore, storage, user, isUserLoading } = useFirebase();
   const [profileImage, setProfileImage] = useState<string>('');
   const [bio, setBio] = useState('');
   const [name, setName] = useState('');
+  const [greeting, setGreeting] = useState('');
+  const [role, setRole] = useState('');
   const [orbitInfo, setOrbitInfo] = useState<OrbitInfo[]>([]);
   const [socialLinks, setSocialLinks] = useState({
     github: '',
@@ -226,6 +238,10 @@ export default function Hero({
   const [editedName, setEditedName] = useState('');
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [editedBio, setEditedBio] = useState('');
+  const [isEditingGreeting, setIsEditingGreeting] = useState(false);
+  const [editedGreeting, setEditedGreeting] = useState('');
+  const [isEditingRole, setIsEditingRole] = useState(false);
+  const [editedRole, setEditedRole] = useState('');
 
   const [isEditingImage, setIsEditingImage] = useState(false);
   const [editedImage, setEditedImage] = useState('');
@@ -248,11 +264,10 @@ export default function Hero({
     cvUrl: '',
     facebook: '',
   });
+  const [isUploadingCv, setIsUploadingCv] = useState(false);
 
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
-  const [selectedSocial, setSelectedSocial] = useState<SocialInfo | null>(
-    null
-  );
+  const [selectedSocial, setSelectedSocial] = useState<SocialInfo | null>(null);
   const [isQrLoading, setIsQrLoading] = useState(true);
 
   const { toast } = useToast();
@@ -282,6 +297,8 @@ export default function Hero({
           setEditedBio(data.bio ?? '');
           setName(data.name ?? '');
           setEditedName(data.name ?? '');
+          setGreeting(data.greeting ?? '');
+          setRole(data.role ?? '');
           const imageUrl = data.profileImage ?? '';
           setProfileImage(imageUrl);
           setEditedImage(imageUrl);
@@ -451,6 +468,8 @@ export default function Hero({
             cvUrl: '',
             facebook: '',
           };
+          const defaultGreeting = 'Энд мэндчилгээгээ оруулна уу';
+          const defaultRole = 'Энд мэргэжлээ оруулна уу';
           const defaultData: UserProfile = {
             name: defaultName,
             bio: defaultBio,
@@ -459,6 +478,8 @@ export default function Hero({
             aboutHeroImage: defaultAboutHeroImage,
             toolsHeroImage: defaultToolsHeroImage,
             orbitInfo: defaultOrbitInfo,
+            greeting: defaultGreeting,
+            role: defaultRole,
             ...defaultLinks,
           };
           await setDoc(userInfoDocRef, defaultData, { merge: true });
@@ -467,6 +488,8 @@ export default function Hero({
           setEditedBio(defaultBio);
           setName(defaultName);
           setEditedName(defaultName);
+          setGreeting(defaultGreeting);
+          setRole(defaultRole);
           setProfileImage(defaultProfileImage);
           setEditedImage(defaultProfileImage);
           setOrbitInfo(defaultOrbitInfo);
@@ -487,6 +510,61 @@ export default function Hero({
     fetchUserInfo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isUserLoading, firestore, portfolioUserId]);
+
+  // PDF Upload handler
+  const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user || !storage) return;
+
+    // Validate file type
+    if (file.type !== 'application/pdf') {
+      toast({
+        title: 'Алдаа',
+        description: 'Зөвхөн PDF файл байршуулах боломжтой.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: 'Алдаа',
+        description: 'Файлын хэмжээ 10MB-с бага байх ёстой.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsUploadingCv(true);
+    try {
+      // Create storage reference
+      const storageRef = ref(storage, `users/${user.uid}/cv/${file.name}`);
+      
+      // Upload file
+      await uploadBytes(storageRef, file);
+      
+      // Get download URL
+      const downloadUrl = await getDownloadURL(storageRef);
+      
+      // Update state
+      setEditedLinks(prev => ({ ...prev, cvUrl: downloadUrl }));
+      
+      toast({
+        title: 'Амжилттай',
+        description: 'CV файл амжилттай байршуулагдлаа.',
+      });
+    } catch (error) {
+      console.error('Error uploading CV:', error);
+      toast({
+        title: 'Алдаа',
+        description: 'CV файл байршуулахад алдаа гарлаа.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploadingCv(false);
+    }
+  };
 
   const handleSaveLinks = async () => {
     if (!user || !firestore) return;
@@ -639,6 +717,54 @@ export default function Hero({
     }
   };
 
+  const handleSaveGreeting = async () => {
+    if (!user || !firestore) return;
+    const userInfoDocRef = doc(firestore, 'users', user.uid);
+    setSaving(true);
+    try {
+      await updateDoc(userInfoDocRef, { greeting: editedGreeting });
+      setGreeting(editedGreeting);
+      setIsEditingGreeting(false);
+      toast({
+        title: 'Амжилттай',
+        description: 'Мэндчилгээ шинэчлэгдлээ.',
+      });
+    } catch (error) {
+      console.error('Error updating greeting:', error);
+      toast({
+        title: 'Алдаа',
+        description: 'Мэндчилгээ шинэчлэхэд алдаа гарлаа.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveRole = async () => {
+    if (!user || !firestore) return;
+    const userInfoDocRef = doc(firestore, 'users', user.uid);
+    setSaving(true);
+    try {
+      await updateDoc(userInfoDocRef, { role: editedRole });
+      setRole(editedRole);
+      setIsEditingRole(false);
+      toast({
+        title: 'Амжилттай',
+        description: 'Мэргэжил шинэчлэгдлээ.',
+      });
+    } catch (error) {
+      console.error('Error updating role:', error);
+      toast({
+        title: 'Алдаа',
+        description: 'Мэргэжил шинэчлэхэд алдаа гарлаа.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleCancelEditBio = () => {
     setEditedBio(bio);
     setIsEditingBio(false);
@@ -647,6 +773,16 @@ export default function Hero({
   const handleCancelEditName = () => {
     setEditedName(name);
     setIsEditingName(false);
+  };
+
+  const handleCancelEditGreeting = () => {
+    setEditedGreeting(greeting);
+    setIsEditingGreeting(false);
+  };
+
+  const handleCancelEditRole = () => {
+    setEditedRole(role);
+    setIsEditingRole(false);
   };
 
   if (loading) {
@@ -727,20 +863,21 @@ export default function Hero({
   return (
     <section
       id="home"
-      className="relative w-full flex items-center min-h-[calc(100vh-200px)] py-12 overflow-hidden"
+      className="relative w-full flex items-center min-h-[calc(100vh-120px)] py-6 sm:py-12 overflow-hidden"
     >
-      <div className="container relative z-10 px-4 md:px-6">
-        <div className="grid items-center justify-center gap-10 lg:grid-cols-2 lg:gap-20">
-          <div className="flex flex-col justify-center space-y-6 lg:order-2">
-            <div className="relative flex items-center justify-center w-full max-w-[300px] sm:max-w-[500px] aspect-square mx-auto">
+      <div className="container relative z-10 px-3 sm:px-4 md:px-6">
+        <div className="grid items-center justify-center gap-6 sm:gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="flex flex-col justify-center space-y-4 sm:space-y-6 lg:order-2">
+            <div className="relative flex items-center justify-center w-full max-w-[260px] sm:max-w-[400px] md:max-w-[500px] aspect-square mx-auto">
               {/* Animated background rings - faster rotation */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 {/* Inner ring - fastest, dotted */}
                 <motion.div
-                  className="absolute w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] md:w-[450px] md:h-[450px] rounded-full"
+                  className="absolute w-[220px] h-[220px] sm:w-[320px] sm:h-[320px] md:w-[400px] md:h-[400px] rounded-full transform-gpu"
                   style={{
                     border: '2px dotted',
                     borderColor: 'hsl(var(--primary) / 0.3)',
+                    willChange: 'transform',
                   }}
                   animate={{ rotate: 360 }}
                   transition={{
@@ -752,7 +889,8 @@ export default function Hero({
 
                 {/* Middle ring - simple border */}
                 <motion.div
-                  className="absolute w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] md:w-[500px] md:h-[500px] rounded-full border border-primary/15"
+                  className="absolute w-[250px] h-[250px] sm:w-[360px] sm:h-[360px] md:w-[450px] md:h-[450px] rounded-full border border-primary/15 transform-gpu"
+                  style={{ willChange: 'transform' }}
                   animate={{ rotate: -360 }}
                   transition={{
                     duration: 20,
@@ -763,7 +901,8 @@ export default function Hero({
 
                 {/* Glowing accent dots on rings */}
                 <motion.div
-                  className="absolute w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] md:w-[500px] md:h-[500px]"
+                  className="absolute w-[250px] h-[250px] sm:w-[360px] sm:h-[360px] md:w-[450px] md:h-[450px] transform-gpu"
+                  style={{ willChange: 'transform' }}
                   animate={{ rotate: 360 }}
                   transition={{
                     duration: 12,
@@ -776,7 +915,8 @@ export default function Hero({
                 </motion.div>
 
                 <motion.div
-                  className="absolute w-[280px] h-[280px] sm:w-[380px] sm:h-[380px] md:w-[450px] md:h-[450px]"
+                  className="absolute w-[220px] h-[220px] sm:w-[320px] sm:h-[320px] md:w-[400px] md:h-[400px] transform-gpu"
+                  style={{ willChange: 'transform' }}
                   animate={{ rotate: -360 }}
                   transition={{
                     duration: 10,
@@ -824,8 +964,8 @@ export default function Hero({
                 className={cn(
                   'relative transition-all duration-500 [transform-style:preserve-3d] z-20',
                   isEditingOrbit
-                    ? 'w-[260px] h-[260px] sm:w-[360px] sm:h-[360px] md:w-[480px] md:h-[480px]'
-                    : 'w-56 h-56 sm:w-80 sm:h-80 md:w-96 md:h-96'
+                    ? 'w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px]'
+                    : 'w-40 h-40 sm:w-64 sm:h-64 md:w-80 md:h-80'
                 )}
               >
                 <AnimatePresence mode="wait">
@@ -1015,15 +1155,15 @@ export default function Hero({
                     <motion.div
                       key="avatar"
                       initial={{ rotateY: 180, opacity: 0, scale: 0.8 }}
-                      animate={{ 
-                        rotateY: 0, 
-                        opacity: 1, 
-                        scale: 1
+                      animate={{
+                        rotateY: 0,
+                        opacity: 1,
+                        scale: 1,
                       }}
                       exit={{ rotateY: -180, opacity: 0, scale: 0.8 }}
-                      transition={{ 
-                        duration: 0.5, 
-                        ease: 'easeInOut'
+                      transition={{
+                        duration: 0.5,
+                        ease: 'easeInOut',
                       }}
                       className="relative w-full h-full group [transform-style:preserve-3d]"
                     >
@@ -1058,7 +1198,7 @@ export default function Hero({
                           variant="default"
                           size="icon"
                           className="h-10 w-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/30 transition-all duration-300 hover:scale-110"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             setIsEditingOrbit(true);
                           }}
@@ -1092,9 +1232,7 @@ export default function Hero({
 
                 {/* Orbiting items container - rotates slowly like solar system */}
                 <motion.div
-                  className={cn(
-                    'absolute inset-0 z-10 pointer-events-none'
-                  )}
+                  className={cn('absolute inset-0 z-10 pointer-events-none')}
                   animate={{ rotate: 360 }}
                   transition={{
                     duration: 60,
@@ -1117,25 +1255,74 @@ export default function Hero({
               </div>
             </div>
           </div>
-          <div className="flex flex-col items-center lg:items-start justify-center space-y-6 text-center lg:text-left lg:order-1">
-            <div className="space-y-5">
+          <div className="flex flex-col items-center lg:items-start justify-center space-y-4 sm:space-y-6 text-center lg:text-left lg:order-1">
+            <div className="space-y-3 sm:space-y-5">
               {/* Role badge */}
               <motion.div
-                initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.1, type: 'spring' }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="flex items-center gap-2"
               >
-                <span className="group relative inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-gradient-to-r from-primary/20 via-primary/5 to-primary/20 border border-primary/30 text-primary text-sm font-semibold overflow-hidden shadow-lg shadow-primary/10">
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                  <span className="relative flex items-center gap-2.5">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
-                    </span>
-                    <Code2 className="h-4 w-4" />
-                    Мэдээллийн технологийн инженер
+                {isEditingRole ? (
+                  <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-primary/20 via-primary/5 to-primary/20 border border-primary/30">
+                    <Input
+                      value={editedRole}
+                      onChange={e => setEditedRole(e.target.value)}
+                      className="w-40 sm:w-48 h-7 text-xs sm:text-sm bg-transparent border-0 focus-visible:ring-1 text-primary"
+                      placeholder="Мэргэжил..."
+                      autoFocus
+                    />
+                    <Button
+                      onClick={handleSaveRole}
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6 text-primary hover:text-primary"
+                      disabled={saving}
+                    >
+                      {saving ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Save className="h-3 w-3" />
+                      )}
+                    </Button>
+                    <Button
+                      onClick={handleCancelEditRole}
+                      size="icon"
+                      variant="ghost"
+                      className="h-6 w-6 text-primary hover:text-primary"
+                    >
+                      <XCircle className="h-3 w-3" />
+                    </Button>
                   </span>
-                </span>
+                ) : (
+                  <>
+                    <span className="group relative inline-flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full bg-gradient-to-r from-primary/20 via-primary/5 to-primary/20 border border-primary/30 text-primary text-xs sm:text-sm font-semibold overflow-hidden shadow-lg shadow-primary/10">
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                      <span className="relative flex items-center gap-2.5">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                        </span>
+                        <Code2 className="h-4 w-4" />
+                        {role || 'Энд мэргэжлээ оруулна уу'}
+                      </span>
+                    </span>
+                    {isEditMode && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => {
+                          setEditedRole(role);
+                          setIsEditingRole(true);
+                        }}
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </>
+                )}
               </motion.div>
 
               {/* Greeting and Name */}
@@ -1172,26 +1359,72 @@ export default function Hero({
                   ) : (
                     <motion.div
                       className="flex flex-col gap-2"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       transition={{
-                        duration: 0.6,
+                        duration: 0.4,
                         delay: 0.2,
-                        type: 'spring',
                       }}
                     >
-                      <motion.span 
-                        className="text-lg sm:text-xl md:text-2xl font-medium text-muted-foreground flex items-center gap-2"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
+                      <motion.span
+                        className="text-sm sm:text-lg md:text-xl lg:text-2xl font-medium text-muted-foreground flex items-center gap-1.5 sm:gap-2"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
                       >
-                        <Sparkles className="h-5 w-5 text-primary animate-pulse" />
-                        Сайн уу, Би
+                        <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary animate-pulse" />
+                        {isEditingGreeting ? (
+                          <div className="flex items-center gap-2">
+                            <Input
+                              value={editedGreeting}
+                              onChange={e => setEditedGreeting(e.target.value)}
+                              className="w-48 h-8 text-lg"
+                              placeholder="Мэндчилгээ..."
+                            />
+                            <Button
+                              onClick={handleSaveGreeting}
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8"
+                              disabled={saving}
+                            >
+                              {saving ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Save className="h-4 w-4" />
+                              )}
+                            </Button>
+                            <Button
+                              onClick={handleCancelEditGreeting}
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8"
+                            >
+                              <XCircle className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            {greeting}
+                            {isEditMode && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => {
+                                  setEditedGreeting(greeting);
+                                  setIsEditingGreeting(true);
+                                }}
+                              >
+                                <Pencil className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </span>
+                        )}
                       </motion.span>
                       <div className="flex items-center gap-3">
                         <motion.h1
-                          className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight"
+                          className="text-3xl sm:text-4xl md:text-5xl xl:text-7xl font-bold tracking-tight"
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{
@@ -1256,14 +1489,15 @@ export default function Hero({
                   ) : (
                     <motion.div
                       className="flex items-start gap-2"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: 0.5 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.4, delay: 0.4 }}
                     >
-                      <div className="max-w-[650px] text-muted-foreground text-base md:text-lg leading-relaxed">
-                        <span className="text-foreground font-semibold">Fullstack хөгжүүлэгч</span>
-                        <span className="mx-2 text-primary font-bold">|</span>
-                        <span>{bio}</span>
+                      <div className="max-w-[90vw] sm:max-w-[650px] text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed">
+                        <span>
+                          {bio ||
+                            'Өөрийнхөө тухай товч танилцуулга энд бичнэ үү.'}
+                        </span>
                       </div>
                       {isEditMode && (
                         <Button
@@ -1285,19 +1519,61 @@ export default function Hero({
             <div className="relative pt-2">
               {isEditingLinks ? (
                 <div className="space-y-3 max-w-sm">
-                  <div className="flex items-center gap-2">
-                    <Upload className="h-6 w-6 text-muted-foreground" />
-                    <Input
-                      value={editedLinks.cvUrl}
-                      onChange={e =>
-                        setEditedLinks({
-                          ...editedLinks,
-                          cvUrl: e.target.value,
-                        })
-                      }
-                      placeholder="CV-ний холбоос оруулах"
-                      className="h-8 text-sm"
-                    />
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">CV файл байршуулах эсвэл холбоос оруулах</Label>
+                    <div className="flex items-center gap-2">
+                      <Upload className="h-6 w-6 text-muted-foreground shrink-0" />
+                      <Input
+                        value={editedLinks.cvUrl}
+                        onChange={e =>
+                          setEditedLinks({
+                            ...editedLinks,
+                            cvUrl: e.target.value,
+                          })
+                        }
+                        placeholder="CV-ний холбоос оруулах"
+                        className="h-8 text-sm"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        accept=".pdf"
+                        onChange={handleCvUpload}
+                        className="hidden"
+                        id="cv-upload"
+                        disabled={isUploadingCv}
+                      />
+                      <label htmlFor="cv-upload" className="flex-1">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="w-full cursor-pointer"
+                          disabled={isUploadingCv}
+                          asChild
+                        >
+                          <span>
+                            {isUploadingCv ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Байршуулж байна...
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="mr-2 h-4 w-4" />
+                                PDF файл байршуулах
+                              </>
+                            )}
+                          </span>
+                        </Button>
+                      </label>
+                    </div>
+                    {editedLinks.cvUrl && (
+                      <p className="text-xs text-muted-foreground truncate">
+                        Одоогийн: {editedLinks.cvUrl.includes('firebasestorage') ? 'Байршуулсан файл' : editedLinks.cvUrl}
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <Github className="h-6 w-6 text-muted-foreground" />
@@ -1404,10 +1680,10 @@ export default function Hero({
                       {socialButtons.map((social, index) => (
                         <DialogTrigger key={social.type} asChild>
                           <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.6 + index * 0.1 }}
-                            whileHover={{ scale: 1.1, y: -2 }}
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.5 + index * 0.05 }}
+                            whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
                           >
                             <Button

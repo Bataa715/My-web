@@ -57,6 +57,7 @@ import {
   Link as LinkIcon,
   Sparkles,
   GraduationCap,
+  Volume2,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { EnglishWord, JapaneseWord } from '@/lib/types';
@@ -397,6 +398,17 @@ export default function VocabularyManager<T extends Word>({
   const [currentPage, setCurrentPage] = useState(1);
   const wordsPerPage = 15;
 
+  // Text-to-speech function
+  const speakWord = useCallback((text: string, lang: 'en-US' | 'ja-JP') => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.9;
+      window.speechSynthesis.speak(utterance);
+    }
+  }, []);
+
   const collectionPath =
     wordType === 'english' ? 'englishWords' : 'japaneseWords';
   const initialData =
@@ -453,8 +465,12 @@ export default function VocabularyManager<T extends Word>({
     fetchWords();
   }, [fetchWords]);
 
+  // Reset to page 1 only when filter criteria change, not when words data updates
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, alphabetFilter, searchQuery]);
+
   const filteredWords = useMemo(() => {
-    setCurrentPage(1); // Reset to first page whenever filters change
     return words
       .filter(word => {
         if (filter === 'memorized') return word.memorized;
@@ -719,6 +735,41 @@ export default function VocabularyManager<T extends Word>({
     }
   };
 
+  // Save progress without exiting the game
+  const handleSaveProgress = (memorizedIds: string[]) => {
+    if (memorizedIds.length > 0 && user && firestore) {
+      const batch = writeBatch(firestore);
+      memorizedIds.forEach(id => {
+        const docRef = doc(
+          firestore,
+          `users/${user.uid}/${collectionPath}`,
+          id
+        );
+        batch.update(docRef, { memorized: true });
+      });
+
+      batch
+        .commit()
+        .then(() => {
+          setWords(prevWords =>
+            prevWords.map(w =>
+              memorizedIds.includes(w.id!)
+                ? ({ ...w, memorized: true } as T)
+                : w
+            )
+          );
+          toast({
+            title: 'Хадгалагдлаа',
+            description: `${memorizedIds.length} үг цээжилсэн төлөвт орлоо.`,
+          });
+        })
+        .catch(e => {
+          console.error('Error batch updating memorized status:', e);
+          toast({ title: 'Алдаа гарлаа', variant: 'destructive' });
+        });
+    }
+  };
+
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const containerVariants = {
@@ -798,6 +849,7 @@ export default function VocabularyManager<T extends Word>({
         words={filteredWords}
         wordType={wordType}
         onComplete={handlePracticeComplete}
+        onSaveProgress={handleSaveProgress}
         onExit={() => setGameMode(null)}
       />
     );
@@ -859,7 +911,7 @@ export default function VocabularyManager<T extends Word>({
           </motion.div>
 
           <motion.h1
-            className={`text-4xl md:text-5xl font-bold font-headline bg-gradient-to-r ${wordType === 'english' ? 'from-violet-400 via-purple-400 to-fuchsia-400' : 'from-rose-400 via-pink-400 to-fuchsia-400'} bg-clip-text text-transparent`}
+            className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-headline bg-gradient-to-r ${wordType === 'english' ? 'from-violet-400 via-purple-400 to-fuchsia-400' : 'from-rose-400 via-pink-400 to-fuchsia-400'} bg-clip-text text-transparent px-4`}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -867,7 +919,7 @@ export default function VocabularyManager<T extends Word>({
             {title}
           </motion.h1>
           <motion.p
-            className="text-muted-foreground max-w-2xl text-lg"
+            className="text-muted-foreground max-w-2xl text-sm md:text-base lg:text-lg px-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -964,28 +1016,30 @@ export default function VocabularyManager<T extends Word>({
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-                <ToggleGroup
-                  type="single"
-                  defaultValue="all"
-                  variant="outline"
-                  size="sm"
-                  className="bg-background/30 rounded-xl p-1"
-                  onValueChange={value => setFilter((value as any) || 'all')}
-                >
-                  <ToggleGroupItem value="all" className="rounded-lg">
-                    Бүгд
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="memorized" className="rounded-lg">
-                    Цээжилсэн
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="not-memorized" className="rounded-lg">
-                    Цээжлээгүй
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="favorite" className="rounded-lg">
-                    Онцолсон
-                  </ToggleGroupItem>
-                </ToggleGroup>
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center">
+                <div className="overflow-x-auto -mx-2 px-2">
+                  <ToggleGroup
+                    type="single"
+                    defaultValue="all"
+                    variant="outline"
+                    size="sm"
+                    className="bg-background/30 rounded-xl p-1 flex-nowrap"
+                    onValueChange={value => setFilter((value as any) || 'all')}
+                  >
+                    <ToggleGroupItem value="all" className="rounded-lg text-xs sm:text-sm whitespace-nowrap">
+                      Бүгд
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="memorized" className="rounded-lg text-xs sm:text-sm whitespace-nowrap">
+                      Цээжилсэн
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="not-memorized" className="rounded-lg text-xs sm:text-sm whitespace-nowrap">
+                      Цээжлээгүй
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="favorite" className="rounded-lg text-xs sm:text-sm whitespace-nowrap">
+                      Онцолсон
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                </div>
                 <div className="flex items-center gap-2">
                   <Dialog
                     open={isAlphabetModalOpen}
@@ -1051,21 +1105,24 @@ export default function VocabularyManager<T extends Word>({
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="border-0 rounded-xl overflow-auto bg-background/30">
+            <CardContent className="px-2 sm:px-4 md:px-6">
+              <div className="border-0 rounded-xl overflow-x-auto bg-background/30 -mx-2 sm:mx-0">
                 <Table>
                   <TableHeader>
                     <TableRow className="border-b border-border/30 hover:bg-transparent">
-                      {columns.map(col => (
+                      {columns.map((col, idx) => (
                         <TableHead
                           key={col.key as string}
-                          className="font-semibold"
+                          className={cn(
+                            "font-semibold text-xs sm:text-sm whitespace-nowrap",
+                            idx > 1 && "hidden md:table-cell"
+                          )}
                         >
                           {col.header}
                         </TableHead>
                       ))}
-                      <TableHead className="font-semibold">Цээжилсэн</TableHead>
-                      <TableHead className="text-right font-semibold">
+                      <TableHead className="font-semibold text-xs sm:text-sm whitespace-nowrap">Цээжилсэн</TableHead>
+                      <TableHead className="text-right font-semibold text-xs sm:text-sm whitespace-nowrap">
                         Үйлдэл
                       </TableHead>
                     </TableRow>
@@ -1080,8 +1137,14 @@ export default function VocabularyManager<T extends Word>({
                             `${wordType === 'english' ? 'bg-violet-500/10 hover:bg-violet-500/20' : 'bg-rose-500/10 hover:bg-rose-500/20'}`
                         )}
                       >
-                        {columns.map(col => (
-                          <TableCell key={`${word.id}-${col.key as string}`}>
+                        {columns.map((col, idx) => (
+                          <TableCell 
+                            key={`${word.id}-${col.key as string}`}
+                            className={cn(
+                              "text-xs sm:text-sm",
+                              idx > 1 && "hidden md:table-cell"
+                            )}
+                          >
                             {word[col.key as keyof Word] as string}
                           </TableCell>
                         ))}
@@ -1100,6 +1163,20 @@ export default function VocabularyManager<T extends Word>({
                           />
                         </TableCell>
                         <TableCell className="text-right space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              const text = wordType === 'english' 
+                                ? (word as EnglishWord).word 
+                                : (word as JapaneseWord).word;
+                              speakWord(text, wordType === 'english' ? 'en-US' : 'ja-JP');
+                            }}
+                            className="rounded-lg hover:text-primary"
+                            title="Сонсох"
+                          >
+                            <Volume2 className="h-4 w-4" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="icon"

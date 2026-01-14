@@ -95,10 +95,10 @@ const Header = () => {
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
           const data = docSnap.data() as UserProfile;
-          setAppName(data.name || 'Batmyagmar');
+          setAppName(data.name || 'PersonalWeb');
         }
       } else if (!isUserLoading) {
-        setAppName('Batmyagmar');
+        setAppName('PersonalWeb');
       }
     };
     fetchAppName();
@@ -126,7 +126,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 left-0 w-full z-50">
+    <header className="sticky top-0 left-0 w-full z-50 min-h-[60px] md:min-h-[72px]">
       <div className="relative">
         <div className="mx-3 md:mx-4 mt-3 md:mt-4 grid grid-cols-[1fr_auto_1fr] items-center p-2 px-4 bg-black/20 backdrop-blur-md rounded-2xl border border-white/10">
           <div className="flex justify-self-start items-center gap-2">

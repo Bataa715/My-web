@@ -137,22 +137,22 @@ export default function MatchingGame({
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      <div className="flex items-center gap-4 mb-6">
-        <Button variant="ghost" size="icon" onClick={onExit}>
-          <ArrowLeft />
+    <div className="w-full max-w-3xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
+      <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+        <Button variant="ghost" size="icon" className="shrink-0" onClick={onExit}>
+          <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h2 className="text-2xl font-bold">Үгсийг холбоно уу</h2>
+        <h2 className="text-lg sm:text-2xl font-bold">Үгсийг холбоно уу</h2>
       </div>
 
-      <div className="grid grid-cols-2 gap-8">
-        <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 md:gap-8">
+        <div className="space-y-2 sm:space-y-4">
           {englishItems.map(item => (
             <Button
               key={item.id}
               variant="outline"
               className={cn(
-                'w-full h-16 text-lg justify-center',
+                'w-full h-12 sm:h-16 text-xs sm:text-sm md:text-lg justify-center px-2',
                 selectedEnglishId === item.id && 'ring-2 ring-primary',
                 matchedPairs.includes(item.id) &&
                   'bg-green-500/20 text-foreground border-green-500/50',
@@ -165,13 +165,13 @@ export default function MatchingGame({
             </Button>
           ))}
         </div>
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-4">
           {mongolianItems.map(item => (
             <Button
               key={item.id}
               variant="outline"
               className={cn(
-                'w-full h-16 text-lg justify-center',
+                'w-full h-12 sm:h-16 text-xs sm:text-sm md:text-lg justify-center px-2',
                 matchedPairs.includes(item.id) &&
                   'bg-green-500/20 text-foreground border-green-500/50',
                 incorrectPair?.[1] === item.id &&

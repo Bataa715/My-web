@@ -3,6 +3,8 @@
 import * as React from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme as useNextTheme } from 'next-themes';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { useFirebase } from '@/firebase';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +15,51 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export function ThemeToggle() {
-  const { setTheme } = useNextTheme();
+  const { setTheme, theme } = useNextTheme();
+  const { firestore, user } = useFirebase();
+  const [hasSynced, setHasSynced] = React.useState(false);
+
+  // Load theme from Firestore when user logs in
+  React.useEffect(() => {
+    async function loadThemeFromFirestore() {
+      if (!firestore || !user || hasSynced) return;
+
+      try {
+        const settingsRef = doc(firestore, `users/${user.uid}/settings/preferences`);
+        const settingsSnap = await getDoc(settingsRef);
+        
+        if (settingsSnap.exists()) {
+          const data = settingsSnap.data();
+          if (data.theme && ['light', 'dark', 'system'].includes(data.theme)) {
+            setTheme(data.theme);
+          }
+        }
+        setHasSynced(true);
+      } catch (error) {
+        console.error('Error loading theme from Firestore:', error);
+        setHasSynced(true);
+      }
+    }
+
+    loadThemeFromFirestore();
+  }, [firestore, user, hasSynced, setTheme]);
+
+  // Save theme to Firestore when it changes
+  const handleSetTheme = React.useCallback(
+    async (newTheme: string) => {
+      setTheme(newTheme);
+
+      if (!firestore || !user) return;
+
+      try {
+        const settingsRef = doc(firestore, `users/${user.uid}/settings/preferences`);
+        await setDoc(settingsRef, { theme: newTheme }, { merge: true });
+      } catch (error) {
+        console.error('Error saving theme to Firestore:', error);
+      }
+    },
+    [firestore, user, setTheme]
+  );
 
   return (
     <DropdownMenu>
@@ -29,13 +75,13 @@ export function ThemeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme('light')}>
+        <DropdownMenuItem onClick={() => handleSetTheme('light')}>
           Цайвар
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('dark')}>
+        <DropdownMenuItem onClick={() => handleSetTheme('dark')}>
           Бараан
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
+        <DropdownMenuItem onClick={() => handleSetTheme('system')}>
           Систем
         </DropdownMenuItem>
       </DropdownMenuContent>

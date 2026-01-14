@@ -25,7 +25,7 @@ const PortfolioHeader = () => {
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             <span className="font-bold text-xl tracking-tight text-foreground group-hover:text-primary transition-colors">
-              Batmyagmar
+              PersonalWeb
             </span>
           </Link>
 

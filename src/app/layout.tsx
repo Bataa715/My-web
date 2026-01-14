@@ -17,17 +17,19 @@ import { JetBrains_Mono } from 'next/font/google';
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-jetbrainsMono',
+  display: 'swap',
+  preload: true,
 });
 
 export const metadata: Metadata = {
-  title: 'Batmyagmar',
+  title: 'PersonalWeb',
   description: 'Англи • Япон • Программчлал сурах хувийн систем',
   icons: {
     icon: '/favicon.ico',
   },
-  metadataBase: new URL('https://batmyagmar.com'),
+  metadataBase: new URL('https://personalweb.com'),
   openGraph: {
-    title: 'Batmyagmar',
+    title: 'PersonalWeb',
     description: 'Англи • Япон • Программчлал сурах хувийн систем',
     type: 'website',
   },
@@ -50,28 +52,39 @@ export default function RootLayout({
 }) {
   return (
     <html lang="mn" suppressHydrationWarning>
-      <head></head>
+      <head>
+        {/* Preconnect to critical external resources */}
+        <link rel="dns-prefetch" href="https://cdn.simpleicons.org" />
+        <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
+      </head>
       <body
         className={`${jetbrainsMono.variable} min-h-screen bg-background font-body antialiased`}
       >
-        <FirebaseClientProvider>
-          <EditModeProvider>
-            <I18nProvider>
-              <EducationProvider>
-                <ExperienceProvider>
-                  <ProjectProvider>
-                    <SkillsProvider>
-                      <HobbyProvider>
-                        <MainLayout>{children}</MainLayout>
-                        <Toaster />
-                      </HobbyProvider>
-                    </SkillsProvider>
-                  </ProjectProvider>
-                </ExperienceProvider>
-              </EducationProvider>
-            </I18nProvider>
-          </EditModeProvider>
-        </FirebaseClientProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <FirebaseClientProvider>
+            <EditModeProvider>
+              <I18nProvider>
+                <EducationProvider>
+                  <ExperienceProvider>
+                    <ProjectProvider>
+                      <SkillsProvider>
+                        <HobbyProvider>
+                          <MainLayout>{children}</MainLayout>
+                          <Toaster />
+                        </HobbyProvider>
+                      </SkillsProvider>
+                    </ProjectProvider>
+                  </ExperienceProvider>
+                </EducationProvider>
+              </I18nProvider>
+            </EditModeProvider>
+          </FirebaseClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -27,6 +27,18 @@ interface SkillCardProps {
   index: number;
 }
 
+// Color accents based on index - matching Education style
+const cardAccents = [
+  { gradient: 'from-primary via-primary/80 to-primary/60', glow: 'primary', iconBg: 'bg-primary/20', iconBorder: 'border-primary/40', iconText: 'text-primary' },
+  { gradient: 'from-blue-500 via-blue-400 to-cyan-400', glow: 'blue-500', iconBg: 'bg-blue-500/20', iconBorder: 'border-blue-400/40', iconText: 'text-blue-400' },
+  { gradient: 'from-violet-500 via-purple-500 to-fuchsia-500', glow: 'violet-500', iconBg: 'bg-violet-500/20', iconBorder: 'border-violet-400/40', iconText: 'text-violet-400' },
+  { gradient: 'from-amber-500 via-orange-500 to-red-500', glow: 'amber-500', iconBg: 'bg-amber-500/20', iconBorder: 'border-amber-400/40', iconText: 'text-amber-400' },
+  { gradient: 'from-emerald-500 via-green-500 to-teal-500', glow: 'emerald-500', iconBg: 'bg-emerald-500/20', iconBorder: 'border-emerald-400/40', iconText: 'text-emerald-400' },
+  { gradient: 'from-rose-500 via-pink-500 to-fuchsia-500', glow: 'rose-500', iconBg: 'bg-rose-500/20', iconBorder: 'border-rose-400/40', iconText: 'text-rose-400' },
+  { gradient: 'from-cyan-500 via-teal-500 to-emerald-500', glow: 'cyan-500', iconBg: 'bg-cyan-500/20', iconBorder: 'border-cyan-400/40', iconText: 'text-cyan-400' },
+  { gradient: 'from-indigo-500 via-blue-500 to-purple-500', glow: 'indigo-500', iconBg: 'bg-indigo-500/20', iconBorder: 'border-indigo-400/40', iconText: 'text-indigo-400' },
+];
+
 const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -87,11 +99,19 @@ const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
     y.set(0);
   };
 
+  // Get accent color for this card
+  const accent = cardAccents[index % cardAccents.length];
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <motion.div
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      onMouseLeave={() => {
+        handleMouseLeave();
+        setIsHovered(false);
+      }}
+      onMouseEnter={() => setIsHovered(true)}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -101,41 +121,48 @@ const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
         rotateY,
         transformStyle: 'preserve-3d',
       }}
-      className="group relative h-full"
+      className="group relative h-full cursor-pointer"
     >
-      {/* Card with glass morphism */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card/95 via-card/80 to-card/60 backdrop-blur-xl border border-border/30 p-6 h-full transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10">
-        {/* Animated gradient border */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/10 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      {/* Glow effect behind card */}
+      <motion.div
+        className={`absolute -inset-1 rounded-2xl bg-gradient-to-r ${accent.gradient} opacity-0 blur-xl transition-opacity duration-500`}
+        animate={{ opacity: isHovered ? 0.4 : 0 }}
+      />
 
-        {/* Top glow accent */}
-        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-24 h-2 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full blur-md opacity-60 group-hover:opacity-100 transition-opacity" />
+      {/* Card */}
+      <div className="relative h-full rounded-2xl border border-neutral-800 bg-neutral-900/80 backdrop-blur-sm overflow-hidden">
+        {/* Top gradient accent line */}
+        <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${accent.gradient}`} />
 
         {/* Spotlight effect */}
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl"
+        <motion.div
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           style={{
-            background: `radial-gradient(500px circle at ${mousePosition.x}px ${mousePosition.y}px, hsl(var(--primary) / 0.12), transparent 50%)`,
+            background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.06), transparent 40%)`,
           }}
         />
 
         {/* Content */}
-        <div className="relative z-10">
+        <div className="relative z-10 p-6 pt-8">
           {/* Icon and Title */}
           <div className="flex items-center gap-4 mb-6">
             <div className="relative">
               {/* Glow behind icon */}
-              <div className="absolute inset-0 bg-primary/30 rounded-2xl blur-xl scale-75 group-hover:scale-100 transition-transform duration-500" />
-              <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 text-primary border border-primary/30 group-hover:border-primary/50 transition-all">
+              <motion.div
+                className={`absolute inset-0 bg-gradient-to-r ${accent.gradient} rounded-2xl blur-xl`}
+                animate={{ scale: isHovered ? 1.2 : 0.8, opacity: isHovered ? 0.5 : 0.3 }}
+                transition={{ duration: 0.3 }}
+              />
+              <div className={`relative flex items-center justify-center w-16 h-16 rounded-2xl ${accent.iconBg} ${accent.iconText} border ${accent.iconBorder} group-hover:scale-110 transition-all duration-300`}>
                 {getIcon(skillGroup.icon)}
               </div>
             </div>
-            <h3 className="text-xl md:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+            <h3 className={`text-xl md:text-2xl font-bold text-foreground transition-colors duration-300`}>
               {skillGroup.name}
             </h3>
           </div>
 
-          {/* Skills tags - larger and more prominent */}
+          {/* Skills tags */}
           <div className="flex flex-wrap gap-3">
             {skillGroup.items.map((item, idx) => {
               const flag = languageFlags[item.toLowerCase()];
@@ -143,10 +170,14 @@ const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
               return (
                 <div key={idx} className="group/item relative overflow-hidden">
                   {/* Glow effect */}
-                  <div className="absolute inset-0 rounded-full bg-primary/20 blur-md opacity-0 group-hover/item:opacity-100 transition-opacity duration-300" />
+                  <motion.div 
+                    className={`absolute inset-0 rounded-full bg-gradient-to-r ${accent.gradient} blur-md`}
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 0.3 }}
+                  />
 
-                  {/* Skill badge - larger size */}
-                  <div className="relative flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-card/80 border border-border/50 group-hover/item:border-primary/50 backdrop-blur-sm transition-all duration-300 group-hover/item:scale-105 group-hover/item:bg-card">
+                  {/* Skill badge */}
+                  <div className={`relative flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-neutral-800/80 border border-neutral-700/50 group-hover/item:border-neutral-600 backdrop-blur-sm transition-all duration-300 group-hover/item:scale-105`}>
                     {/* Flag for languages or Icon */}
                     {isLanguageCategory && flag ? (
                       <span className="text-xl">{flag}</span>

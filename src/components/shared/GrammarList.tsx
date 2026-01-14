@@ -122,9 +122,10 @@ export default function GrammarList({
                   collectionPath={collectionPath}
                 >
                   <Button
+                    type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-muted-foreground hover:bg-muted rounded-lg"
+                    className="h-8 w-8 text-muted-foreground hover:bg-muted rounded-lg cursor-pointer"
                   >
                     <Edit className="h-4 w-4" />
                   </Button>

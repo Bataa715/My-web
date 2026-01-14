@@ -64,6 +64,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useHobbies } from '@/contexts/HobbyContext';
 import { AddHobbyDialog } from '@/components/AddHobbyDialog';
 import { EditHobbyDialog } from '@/components/EditHobbyDialog';
+import { AddPersonalInfoDialog } from '@/components/AddPersonalInfoDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -122,27 +123,21 @@ const InfoCard = ({
   size?: 'small' | 'normal' | 'large';
 }) => {
   const sizeClasses = {
-    small: 'py-4 px-5',
-    normal: 'py-5 px-6',
-    large: 'py-6 px-7',
+    small: 'py-2.5 px-3 sm:py-4 sm:px-5',
+    normal: 'py-3 px-4 sm:py-5 sm:px-6',
+    large: 'py-4 px-5 sm:py-6 sm:px-7',
   };
 
   const textSizeClasses = {
-    small: 'text-2xl md:text-3xl',
-    normal: 'text-3xl md:text-4xl',
-    large: 'text-4xl md:text-5xl',
+    small: 'text-lg sm:text-2xl md:text-3xl',
+    normal: 'text-xl sm:text-3xl md:text-4xl',
+    large: 'text-2xl sm:text-4xl md:text-5xl',
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -30 }}
+      initial={{ opacity: 1, x: 0 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{
-        type: 'spring',
-        stiffness: 100,
-        damping: 15,
-        delay: 0.1 + index * 0.1,
-      }}
       whileHover={{ scale: 1.03, x: 8 }}
       className="group w-full"
     >
@@ -205,10 +200,12 @@ const InfoCardArrowLayout = ({
   infos,
   isEditMode,
   onEditClick,
+  onAddClick,
 }: {
   infos: PersonalInfoType[];
   isEditMode: boolean;
   onEditClick: (info: PersonalInfoType) => void;
+  onAddClick?: (info: PersonalInfoType) => void;
 }) => {
   const orderedInfo = useMemo(() => {
     if (!infos || infos.length === 0) return [];
@@ -239,18 +236,45 @@ const InfoCardArrowLayout = ({
             onEditClick={onEditClick}
           />
         ))}
+        {isEditMode && (
+          <AddPersonalInfoDialog onAdd={onAddClick}>
+            <motion.button
+              whileHover={{ scale: 1.02, x: 4 }}
+              className="w-full rounded-2xl p-[2px] bg-gradient-to-br from-primary/30 via-purple-500/20 to-cyan-500/30 hover:from-primary/60 hover:via-purple-500/40 hover:to-cyan-500/60 transition-all duration-500 group/add"
+            >
+              <div className="flex items-center justify-center gap-3 rounded-2xl bg-card/80 backdrop-blur-sm border border-dashed border-primary/30 group-hover/add:border-primary/60 transition-all duration-500 py-3 px-4">
+                <PlusCircle
+                  size={24}
+                  className="text-primary/60 group-hover/add:text-primary group-hover/add:scale-110 transition-all duration-300"
+                />
+                <span className="font-semibold text-muted-foreground group-hover/add:text-primary transition-colors duration-300">
+                  Мэдээлэл нэмэх
+                </span>
+              </div>
+            </motion.button>
+          </AddPersonalInfoDialog>
+        )}
       </div>
     );
   }
 
   // Diagonal staircase: top-right to bottom-left
   // Each card has same width, just different margin-left
-  const offsets = ['ml-[0%]', 'ml-[15%]', 'ml-[30%]', 'ml-[15%]', 'ml-0'];
+  const offsets = [
+    'ml-[0%]',
+    'ml-[5%] sm:ml-[15%]',
+    'ml-[10%] sm:ml-[30%]',
+    'ml-[5%] sm:ml-[15%]',
+    'ml-0',
+  ];
 
   return (
-    <div className="flex flex-col gap-2.5 w-full">
+    <div className="flex flex-col gap-2 sm:gap-2.5 w-full">
       {orderedInfo.map((info, index) => (
-        <div key={index} className={`w-[45%] min-w-[280px] ${offsets[index]}`}>
+        <div
+          key={index}
+          className={`w-full sm:w-[60%] md:w-[45%] min-w-0 sm:min-w-[280px] ${offsets[index]}`}
+        >
           <InfoCard
             info={info}
             index={index}
@@ -277,6 +301,12 @@ export default function AboutPage() {
 
   const nameRef = useRef<HTMLDivElement>(null);
   const [name, setName] = useState('Batuka');
+  const [introText, setIntroText] = useState('');
+  const [outroText, setOutroText] = useState('');
+  const [isEditingIntroText, setIsEditingIntroText] = useState(false);
+  const [editedIntroText, setEditedIntroText] = useState('');
+  const [isEditingOutroText, setIsEditingOutroText] = useState(false);
+  const [editedOutroText, setEditedOutroText] = useState('');
 
   const greetings = useMemo(
     () => ['Сайн уу', 'こんにちは', 'Hello', '안녕하세요', 'Привет', 'Hallo'],
@@ -370,6 +400,8 @@ export default function AboutPage() {
           const data = docSnap.data() as UserProfile;
           setName(data.name || 'Batuka');
           setPersonalInfo(data.personalInfo || []);
+          setIntroText(data.introText || '');
+          setOutroText(data.outroText || '');
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -420,21 +452,66 @@ export default function AboutPage() {
     }
   };
 
+  const handleSaveIntroText = async () => {
+    if (!user || !firestore) return;
+    setSaving(true);
+    try {
+      const userDocRef = doc(firestore, 'users', user.uid);
+      await updateDoc(userDocRef, { introText: editedIntroText });
+      setIntroText(editedIntroText);
+      setIsEditingIntroText(false);
+      toast({ title: 'Амжилттай', description: 'Текст шинэчлэгдлээ.' });
+    } catch (error) {
+      console.error('Error saving intro text:', error);
+      toast({
+        title: 'Алдаа',
+        description: 'Текст хадгалахад алдаа гарлаа.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveOutroText = async () => {
+    if (!user || !firestore) return;
+    setSaving(true);
+    try {
+      const userDocRef = doc(firestore, 'users', user.uid);
+      await updateDoc(userDocRef, { outroText: editedOutroText });
+      setOutroText(editedOutroText);
+      setIsEditingOutroText(false);
+      toast({ title: 'Амжилттай', description: 'Текст шинэчлэгдлээ.' });
+    } catch (error) {
+      console.error('Error saving outro text:', error);
+      toast({
+        title: 'Алдаа',
+        description: 'Текст хадгалахад алдаа гарлаа.',
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <>
       <InteractiveParticles className="fixed inset-0 z-0 pointer-events-none" />
       <div className="relative z-10 min-h-screen">
         {/* Hero Section */}
-        <section className="relative min-h-[calc(100vh-100px)] flex items-start justify-center px-4 pt-24 md:pt-28">
+        <section className="relative min-h-[calc(100vh-100px)] flex items-start justify-center px-3 sm:px-4 pt-16 sm:pt-24 md:pt-28">
           <div className="max-w-7xl mx-auto w-full">
-            <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-8 lg:gap-16 w-full">
+            <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-6 sm:gap-8 lg:gap-16 w-full">
               {/* Personal Info Cards */}
               <div className="w-full lg:w-1/2">
-                {personalInfo.length > 0 && (
+                {(personalInfo.length > 0 || isEditMode) && (
                   <InfoCardArrowLayout
                     infos={personalInfo}
                     isEditMode={isEditMode}
                     onEditClick={handleEditInfoClick}
+                    onAddClick={newInfo => {
+                      setPersonalInfo(prev => [...prev, newInfo]);
+                    }}
                   />
                 )}
               </div>
@@ -454,7 +531,7 @@ export default function AboutPage() {
                     >
                       {/* Glowing background */}
                       <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent blur-2xl rounded-full transform scale-150" />
-                      <h1 className="relative text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-foreground bg-clip-text text-transparent">
+                      <h1 className="relative text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-foreground bg-clip-text text-transparent">
                         {greetings[greetingIndex]}
                       </h1>
                     </motion.div>
@@ -481,24 +558,120 @@ export default function AboutPage() {
                     className="flex flex-col items-center lg:items-start gap-2"
                   >
                     <div className="flex items-baseline gap-3 flex-wrap justify-center lg:justify-start">
-                      <h2 className="text-xl md:text-2xl text-muted-foreground font-light">
-                        Миний нэрийг
-                      </h2>
+                      {isEditingIntroText ? (
+                        <div className="flex items-center gap-2">
+                          <Input
+                            value={editedIntroText}
+                            onChange={e => setEditedIntroText(e.target.value)}
+                            className="w-40 h-8 text-lg"
+                            placeholder="Текст..."
+                          />
+                          <Button
+                            onClick={handleSaveIntroText}
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            disabled={saving}
+                          >
+                            {saving ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Save className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setEditedIntroText(introText);
+                              setIsEditingIntroText(false);
+                            }}
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                          >
+                            <ArrowLeft className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <h2 className="text-base sm:text-xl md:text-2xl text-muted-foreground font-light flex items-center gap-2">
+                          {introText}
+                          {isEditMode && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => {
+                                setEditedIntroText(introText);
+                                setIsEditingIntroText(true);
+                              }}
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
+                          )}
+                        </h2>
+                      )}
                     </div>
 
                     {/* Name with spotlight effect */}
-                    <div className="relative py-2">
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/10 to-transparent blur-3xl" />
-                      <p className="spotlight-text text-6xl md:text-8xl font-black tracking-tighter relative">
+                    <div className="relative py-1 sm:py-2">
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/10 to-transparent blur-3xl pointer-events-none" />
+                      <p className="spotlight-text text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter relative">
                         {name}
                       </p>
                     </div>
 
-                    <h2 className="text-xl md:text-2xl text-muted-foreground font-light">
-                      гэдэг
-                    </h2>
+                    {isEditingOutroText ? (
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={editedOutroText}
+                          onChange={e => setEditedOutroText(e.target.value)}
+                          className="w-32 h-8 text-lg"
+                          placeholder="Текст..."
+                        />
+                        <Button
+                          onClick={handleSaveOutroText}
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                          disabled={saving}
+                        >
+                          {saving ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Save className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setEditedOutroText(outroText);
+                            setIsEditingOutroText(false);
+                          }}
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <h2 className="text-base sm:text-xl md:text-2xl text-muted-foreground font-light flex items-center gap-2">
+                        {outroText}
+                        {isEditMode && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => {
+                              setEditedOutroText(outroText);
+                              setIsEditingOutroText(true);
+                            }}
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </h2>
+                    )}
                   </motion.div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                 </div>
               </div>
             </div>

@@ -7,7 +7,13 @@ import { z } from 'zod';
 import { motion } from 'framer-motion';
 import { useAuth, useFirestore } from '@/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import {
+  doc,
+  setDoc,
+  collection,
+  addDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -19,7 +25,15 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
-import type { UserProfile, OrbitInfo } from '@/lib/types';
+import type {
+  UserProfile,
+  OrbitInfo,
+  Education,
+  Project,
+  Skill,
+  Hobby,
+} from '@/lib/types';
+import type { ExperienceItem } from '@/contexts/ExperienceContext';
 import Link from 'next/link';
 import { User, Mail, Lock, ArrowRight, Loader2, UserPlus } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -237,7 +251,24 @@ export default function SignupPage() {
           onboardingData.bio ||
           'Өөрийнхөө тухай товч танилцуулга энд бичнэ үү.',
         profileImage: profileImage,
-        personalInfo: [],
+        // Default personal info with sample data (matches InfoCardArrowLayout order)
+        personalInfo: [
+          { label: 'Орд', value: 'Энд ордоо оруулна уу', icon: 'Star' },
+          {
+            label: 'Төрсөн өдөр',
+            value: 'Энд төрсөн өдрөө оруулна уу',
+            icon: 'Cake',
+          },
+          { label: 'Нас', value: 'Энд насаа оруулна уу', icon: 'Calendar' },
+          { label: 'Өндөр', value: 'Энд өндрөө оруулна уу', icon: 'Ruler' },
+          { label: 'MBTI', value: 'Энд MBTI-ээ оруулна уу', icon: 'User' },
+        ],
+        // Default greeting and role for hero section
+        greeting: 'Энд мэндчилгээгээ оруулна уу',
+        role: 'Энд мэргэжлээ оруулна уу',
+        // Default intro/outro for about page
+        introText: 'Энд танилцуулга эхлэл',
+        outroText: 'Энд танилцуулга төгсгөл',
         homeHeroImage: homeHeroImage,
         aboutHeroImage: aboutHeroImage,
         toolsHeroImage: toolsHeroImage,
@@ -251,6 +282,135 @@ export default function SignupPage() {
       };
 
       await setDoc(doc(firestore, 'users', pendingUserData.uid), userProfile);
+
+      // Create default sample data for new user
+      const userId = pendingUserData.uid;
+
+      // Default Education (1-2 samples)
+      const defaultEducation: Omit<Education, 'id'>[] = [
+        {
+          degree: 'Бакалавр - Жишээ мэргэжил',
+          school: 'Энд сургуулийнхаа нэрийг оруулна уу',
+          startDate: new Date(2020, 8, 1),
+          endDate: new Date(2024, 5, 1),
+          score: '3.5 GPA',
+          createdAt: serverTimestamp() as any,
+        },
+      ];
+
+      // Default Projects (2 samples)
+      const defaultProjects: Omit<Project, 'id'>[] = [
+        {
+          name: 'Жишээ төсөл 1',
+          description:
+            'Энд таны хийсэн төслийн тайлбарыг оруулна. Юу хийсэн, ямар технологи ашигласан гэх мэт.',
+          technologies: ['React', 'TypeScript', 'Tailwind'],
+          link: 'https://github.com/yourusername/project',
+          live: 'https://your-project.vercel.app',
+          category: 'Веб',
+          image:
+            'https://i.pinimg.com/1200x/70/4b/79/704b799a7822e81adb26e81bf64e50c7.jpg',
+          createdAt: serverTimestamp() as any,
+        },
+        {
+          name: 'Жишээ төсөл 2',
+          description:
+            'Өөр нэг төслийн тайлбар. Та энд өөрийн бодит төслүүдийг нэмж болно.',
+          technologies: ['Next.js', 'Firebase'],
+          category: 'Апп',
+          image:
+            'https://i.pinimg.com/1200x/70/4b/79/704b799a7822e81adb26e81bf64e50c7.jpg',
+          createdAt: serverTimestamp() as any,
+        },
+      ];
+
+      // Default Skills (2 samples)
+      const defaultSkills: Omit<Skill, 'id'>[] = [
+        {
+          name: 'Frontend хөгжүүлэлт',
+          icon: 'Code',
+          items: ['React', 'TypeScript', 'Tailwind CSS', 'Next.js'],
+          createdAt: serverTimestamp() as any,
+        },
+        {
+          name: 'Backend хөгжүүлэлт',
+          icon: 'Server',
+          items: ['Node.js', 'Firebase', 'PostgreSQL'],
+          createdAt: serverTimestamp() as any,
+        },
+      ];
+
+      // Default Hobbies (2 samples)
+      const defaultHobbies: Omit<Hobby, 'id'>[] = [
+        {
+          title: 'Жишээ хобби 1',
+          description:
+            'Энд таны хоббигийн тайлбарыг оруулна. Юу хийх дуртай, яагаад сонирхдог гэх мэт.',
+          image:
+            'https://i.pinimg.com/1200x/70/4b/79/704b799a7822e81adb26e81bf64e50c7.jpg',
+          imageHint: 'hobby image',
+          emoji: '🎮',
+          createdAt: serverTimestamp() as any,
+        },
+        {
+          title: 'Жишээ хобби 2',
+          description:
+            'Өөр нэг хоббигийн тайлбар. Та энд өөрийн бодит хоббиудыг нэмж болно.',
+          image:
+            'https://i.pinimg.com/1200x/70/4b/79/704b799a7822e81adb26e81bf64e50c7.jpg',
+          imageHint: 'hobby image',
+          emoji: '📚',
+          createdAt: serverTimestamp() as any,
+        },
+      ];
+
+      // Default Experiences (1-2 samples)
+      const defaultExperiences: Omit<ExperienceItem, 'id'>[] = [
+        {
+          title: 'Жишээ туршлага 1',
+          description:
+            'Энд таны ажлын туршлагыг оруулна. Ямар компанид, ямар албан тушаалд ажилласан гэх мэт.',
+          icon: 'Briefcase',
+          image:
+            'https://i.pinimg.com/1200x/70/4b/79/704b799a7822e81adb26e81bf64e50c7.jpg',
+        },
+        {
+          title: 'Жишээ туршлага 2',
+          description:
+            'Өөр нэг туршлагын тайлбар. Та энд өөрийн бодит туршлагуудыг нэмж болно.',
+          icon: 'Building',
+          image:
+            'https://i.pinimg.com/1200x/70/4b/79/704b799a7822e81adb26e81bf64e50c7.jpg',
+        },
+      ];
+
+      // Add default education
+      for (const edu of defaultEducation) {
+        await addDoc(collection(firestore, `users/${userId}/education`), edu);
+      }
+
+      // Add default projects
+      for (const project of defaultProjects) {
+        await addDoc(
+          collection(firestore, `users/${userId}/projects`),
+          project
+        );
+      }
+
+      // Add default skills
+      for (const skill of defaultSkills) {
+        await addDoc(collection(firestore, `users/${userId}/skills`), skill);
+      }
+
+      // Add default hobbies
+      for (const hobby of defaultHobbies) {
+        await addDoc(collection(firestore, `users/${userId}/hobbies`), hobby);
+      }
+
+      // Add default experiences
+      for (const exp of defaultExperiences) {
+        await addDoc(collection(firestore, `users/${userId}/experiences`), exp);
+      }
 
       toast({
         title: 'Амжилттай бүртгэгдлээ! 🎉',

@@ -12,6 +12,7 @@ import {
   Lightbulb,
   CheckCircle2,
   ArrowRight,
+  Volume2,
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -23,6 +24,7 @@ interface FlashcardGameProps {
   words: Word[];
   wordType: 'english' | 'japanese';
   onComplete: (memorizedIds: string[]) => void;
+  onSaveProgress: (memorizedIds: string[]) => void;
   onExit: () => void;
 }
 
@@ -30,6 +32,7 @@ export default function FlashcardGame({
   words,
   wordType,
   onComplete,
+  onSaveProgress,
   onExit,
 }: FlashcardGameProps) {
   const [deck, setDeck] = useState<Word[]>([]);
@@ -41,6 +44,25 @@ export default function FlashcardGame({
 
   const [answeredCorrectly, setAnsweredCorrectly] = useState(0);
   const [answeredIncorrectly, setAnsweredIncorrectly] = useState(0);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Text-to-speech function
+  const speakWord = (text: string, lang: 'en-US' | 'ja-JP') => {
+    if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.9;
+      
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
   useEffect(() => {
     // Shuffle the words to start
@@ -106,9 +128,25 @@ export default function FlashcardGame({
       const w = word as EnglishWord;
       if (side === 'front')
         return (
-          <h2 className="text-4xl md:text-5xl font-bold text-center text-foreground">
-            {w.word}
-          </h2>
+          <div className="flex flex-col items-center gap-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center text-foreground">
+              {w.word}
+            </h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "rounded-full hover:bg-primary/20",
+                isSpeaking && "animate-pulse text-primary"
+              )}
+              onClick={(e) => {
+                e.stopPropagation();
+                speakWord(w.word, 'en-US');
+              }}
+            >
+              <Volume2 className="h-6 w-6" />
+            </Button>
+          </div>
         );
       return (
         <div className="text-center">
@@ -123,10 +161,24 @@ export default function FlashcardGame({
       if (side === 'front')
         return (
           <div className="text-center">
-            <h2 className="text-6xl md:text-7xl font-bold text-foreground">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground">
               {w.word}
             </h2>
             <p className="text-lg text-foreground/70 mt-2">{w.romaji}</p>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "rounded-full hover:bg-primary/20 mt-3",
+                isSpeaking && "animate-pulse text-primary"
+              )}
+              onClick={(e) => {
+                e.stopPropagation();
+                speakWord(w.word, 'ja-JP');
+              }}
+            >
+              <Volume2 className="h-6 w-6" />
+            </Button>
           </div>
         );
       return (
@@ -161,16 +213,28 @@ export default function FlashcardGame({
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={() => handleRestart(false)}>
-              <Repeat className="mr-2" /> Бүгдийг дахин давтах
+            <Button onClick={() => {
+              // Save memorized words before restarting
+              if (knownWords.length > 0) {
+                onSaveProgress(knownWords);
+              }
+              handleRestart(false);
+            }}>
+              <Repeat className="mr-2 h-4 w-4" /> <span className="text-sm">Бүгдийг давтах</span>
             </Button>
             {unknownWords.length > 0 && (
-              <Button variant="outline" onClick={() => handleRestart(true)}>
-                <Repeat className="mr-2" /> Алдсан үгсээ давтах
+              <Button variant="outline" className="w-full sm:w-auto" onClick={() => {
+                // Save memorized words before restarting
+                if (knownWords.length > 0) {
+                  onSaveProgress(knownWords);
+                }
+                handleRestart(true);
+              }}>
+                <Repeat className="mr-2 h-4 w-4" /> <span className="text-sm">Алдсан үгсээ давтах</span>
               </Button>
             )}
-            <Button variant="secondary" onClick={() => onComplete(knownWords)}>
-              <Check className="mr-2" /> Дуусгах
+            <Button variant="secondary" className="w-full sm:w-auto" onClick={() => onComplete(knownWords)}>
+              <Check className="mr-2 h-4 w-4" /> <span className="text-sm">Дуусгах</span>
             </Button>
           </div>
         </CardContent>
@@ -181,29 +245,29 @@ export default function FlashcardGame({
   const progress = (currentIndex / deck.length) * 100;
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <div className="flex items-center gap-4 mb-4">
-        <Button variant="ghost" size="icon" onClick={onExit}>
-          <ArrowLeft />
+    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4">
+      <div className="flex items-center gap-2 sm:gap-4 mb-4">
+        <Button variant="ghost" size="icon" className="shrink-0" onClick={onExit}>
+          <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className="flex-grow flex items-center gap-4">
-          <div className="flex items-center gap-2 text-red-400">
-            <X className="h-5 w-5" />
-            <span className="font-bold text-lg">{answeredIncorrectly}</span>
+        <div className="flex-grow flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1 text-red-400">
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="font-bold text-sm sm:text-lg">{answeredIncorrectly}</span>
           </div>
           <Progress value={progress} className="w-full h-2" />
-          <div className="flex items-center gap-2 text-green-400">
-            <Check className="h-5 w-5" />
-            <span className="font-bold text-lg">{answeredCorrectly}</span>
+          <div className="flex items-center gap-1 text-green-400">
+            <Check className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="font-bold text-sm sm:text-lg">{answeredCorrectly}</span>
           </div>
         </div>
-        <span className="text-sm text-muted-foreground font-mono whitespace-nowrap">
-          {currentIndex + 1} / {deck.length}
+        <span className="text-xs sm:text-sm text-muted-foreground font-mono whitespace-nowrap">
+          {currentIndex + 1}/{deck.length}
         </span>
       </div>
 
       <div
-        className="w-full h-[350px] [perspective:1200px] cursor-pointer"
+        className="w-full h-[280px] sm:h-[320px] md:h-[350px] [perspective:1200px] cursor-pointer"
         onClick={() => setIsFlipped(!isFlipped)}
       >
         <AnimatePresence initial={false}>
@@ -240,22 +304,22 @@ export default function FlashcardGame({
       </div>
 
       {isFlipped && (
-        <motion.div className="mt-6 grid grid-cols-2 gap-6">
+        <motion.div className="mt-4 md:mt-6 grid grid-cols-2 gap-4 md:gap-6">
           <Button
             variant="outline"
             size="icon"
-            className="w-24 h-24 rounded-full mx-auto bg-red-500/10 border-2 border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-300 hover:text-red-200 transition-all duration-300 transform hover:scale-105"
+            className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full mx-auto bg-red-500/10 border-2 border-red-500/20 hover:bg-red-500/20 hover:border-red-500/40 text-red-300 hover:text-red-200 transition-all duration-300 transform hover:scale-105"
             onClick={() => handleNextCard(false)}
           >
-            <X className="h-10 w-10" />
+            <X className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10" />
           </Button>
           <Button
             variant="outline"
             size="icon"
-            className="w-24 h-24 rounded-full mx-auto bg-green-500/10 border-2 border-green-500/20 hover:bg-green-500/20 hover:border-green-500/40 text-green-300 hover:text-green-200 transition-all duration-300 transform hover:scale-105"
+            className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full mx-auto bg-green-500/10 border-2 border-green-500/20 hover:bg-green-500/20 hover:border-green-500/40 text-green-300 hover:text-green-200 transition-all duration-300 transform hover:scale-105"
             onClick={() => handleNextCard(true)}
           >
-            <Check className="h-10 w-10" />
+            <Check className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10" />
           </Button>
         </motion.div>
       )}
