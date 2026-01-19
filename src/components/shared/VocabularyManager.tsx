@@ -89,6 +89,7 @@ import { motion } from 'framer-motion';
 import InteractiveParticles from './InteractiveParticles';
 import BackButton from './BackButton';
 import { autoGenerateVocabulary } from '@/ai/flows/auto-generate-vocabulary-flow';
+import { autoGenerateJapaneseVocabulary } from '@/ai/flows/auto-generate-japanese-vocabulary-flow';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
@@ -110,10 +111,16 @@ const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
 const AiAssistantDialog = ({
   onAddWords,
+  onAddJapaneseWords,
+  wordType,
 }: {
-  onAddWords: (
+  onAddWords?: (
     words: Omit<EnglishWord, 'id' | 'memorized' | 'favorite'>[]
   ) => Promise<void>;
+  onAddJapaneseWords?: (
+    words: Omit<JapaneseWord, 'id' | 'memorized' | 'favorite'>[]
+  ) => Promise<void>;
+  wordType: 'english' | 'japanese';
 }) => {
   const [text, setText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -126,6 +133,8 @@ const AiAssistantDialog = ({
   const [autoLevel, setAutoLevel] = useState<
     'beginner' | 'intermediate' | 'advanced'
   >('intermediate');
+
+  const isJapanese = wordType === 'japanese';
 
   const handleGenerate = async () => {
     if (!text.trim()) {
@@ -140,7 +149,9 @@ const AiAssistantDialog = ({
     try {
       const result = await generateVocabulary({ text });
       if (result.words && result.words.length > 0) {
-        await onAddWords(result.words);
+        if (onAddWords) {
+          await onAddWords(result.words);
+        }
         toast({
           title: 'Амжилттай',
           description: `${result.words.length} үг нэмэгдлээ.`,
@@ -177,25 +188,48 @@ const AiAssistantDialog = ({
     }
     setIsLoading(true);
     try {
-      const result = await autoGenerateVocabulary({
-        topic: autoTopic,
-        count: autoCount,
-        level: autoLevel,
-      });
-      if (result.words && result.words.length > 0) {
-        await onAddWords(result.words);
-        toast({
-          title: 'Амжилттай',
-          description: `${result.words.length} үг автоматаар үүсгэгдлээ.`,
+      if (isJapanese && onAddJapaneseWords) {
+        const result = await autoGenerateJapaneseVocabulary({
+          topic: autoTopic,
+          count: autoCount,
+          level: autoLevel,
         });
-        setIsOpen(false);
-        setAutoTopic('');
-      } else {
-        toast({
-          title: 'Үг үүсгэж чадсангүй',
-          description: 'AI үг үүсгэхэд алдаа гарлаа.',
-          variant: 'destructive',
+        if (result.words && result.words.length > 0) {
+          await onAddJapaneseWords(result.words);
+          toast({
+            title: 'Амжилттай',
+            description: `${result.words.length} япон үг автоматаар үүсгэгдлээ.`,
+          });
+          setIsOpen(false);
+          setAutoTopic('');
+        } else {
+          toast({
+            title: 'Үг үүсгэж чадсангүй',
+            description: 'AI үг үүсгэхэд алдаа гарлаа.',
+            variant: 'destructive',
+          });
+        }
+      } else if (onAddWords) {
+        const result = await autoGenerateVocabulary({
+          topic: autoTopic,
+          count: autoCount,
+          level: autoLevel,
         });
+        if (result.words && result.words.length > 0) {
+          await onAddWords(result.words);
+          toast({
+            title: 'Амжилттай',
+            description: `${result.words.length} үг автоматаар үүсгэгдлээ.`,
+          });
+          setIsOpen(false);
+          setAutoTopic('');
+        } else {
+          toast({
+            title: 'Үг үүсгэж чадсангүй',
+            description: 'AI үг үүсгэхэд алдаа гарлаа.',
+            variant: 'destructive',
+          });
+        }
       }
     } catch (error) {
       console.error(error);
@@ -209,7 +243,7 @@ const AiAssistantDialog = ({
     }
   };
 
-  const topicSuggestions = [
+  const topicSuggestionsEnglish = [
     'Business & Work',
     'Travel & Tourism',
     'Technology & IT',
@@ -222,6 +256,21 @@ const AiAssistantDialog = ({
     'Science & Research',
   ];
 
+  const topicSuggestionsJapanese = [
+    '日常生活 (Daily life)',
+    '旅行 (Travel)',
+    '食べ物 (Food)',
+    'ビジネス (Business)',
+    '学校 (School)',
+    'スポーツ (Sports)',
+    '家族 (Family)',
+    '買い物 (Shopping)',
+    '天気 (Weather)',
+    '趣味 (Hobbies)',
+  ];
+
+  const topicSuggestions = isJapanese ? topicSuggestionsJapanese : topicSuggestionsEnglish;
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -231,55 +280,62 @@ const AiAssistantDialog = ({
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>AI Туслахаар үгс нэмэх</DialogTitle>
+          <DialogTitle>
+            {isJapanese ? 'AI Туслахаар япон үгс нэмэх' : 'AI Туслахаар үгс нэмэх'}
+          </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="manual" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="manual" className="gap-2">
-              <BookOpen className="h-4 w-4" />
-              Текстээс
-            </TabsTrigger>
+        <Tabs defaultValue="auto" className="w-full">
+          <TabsList className={cn("grid w-full", isJapanese ? "grid-cols-1" : "grid-cols-2")}>
+            {!isJapanese && (
+              <TabsTrigger value="manual" className="gap-2">
+                <BookOpen className="h-4 w-4" />
+                Текстээс
+              </TabsTrigger>
+            )}
             <TabsTrigger value="auto" className="gap-2">
               <Sparkles className="h-4 w-4" />
               Автомат
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="manual" className="space-y-4 mt-4">
-            <p className="text-sm text-muted-foreground">
-              Англи, монгол үгс, тайлбар агуулсан текстээ хуулж тавина уу. AI
-              автоматаар ялгаж, хүснэгтэд нэмэх болно.
-            </p>
-            <div className="space-y-2">
-              <Label htmlFor="ai-text-input">Текст</Label>
-              <Textarea
-                id="ai-text-input"
-                value={text}
-                onChange={e => setText(e.target.value)}
-                placeholder="e.g. apple - алим
+          {!isJapanese && (
+            <TabsContent value="manual" className="space-y-4 mt-4">
+              <p className="text-sm text-muted-foreground">
+                Англи, монгол үгс, тайлбар агуулсан текстээ хуулж тавина уу. AI
+                автоматаар ялгаж, хүснэгтэд нэмэх болно.
+              </p>
+              <div className="space-y-2">
+                <Label htmlFor="ai-text-input">Текст</Label>
+                <Textarea
+                  id="ai-text-input"
+                  value={text}
+                  onChange={e => setText(e.target.value)}
+                  placeholder="e.g. apple - алим
 banana: гадил
 car: машин (A vehicle with four wheels)"
-                rows={8}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="secondary" type="button">
-                  Цуцлах
+                  rows={8}
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <DialogClose asChild>
+                  <Button variant="secondary" type="button">
+                    Цуцлах
+                  </Button>
+                </DialogClose>
+                <Button onClick={handleGenerate} disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isLoading ? 'Нэмж байна...' : 'Үгс нэмэх'}
                 </Button>
-              </DialogClose>
-              <Button onClick={handleGenerate} disabled={isLoading}>
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isLoading ? 'Нэмж байна...' : 'Үгс нэмэх'}
-              </Button>
-            </div>
-          </TabsContent>
+              </div>
+            </TabsContent>
+          )}
 
           <TabsContent value="auto" className="space-y-4 mt-4">
             <p className="text-sm text-muted-foreground">
-              Сэдэв болон хэдэн үг үүсгэхээ сонгоно уу. AI автоматаар үг
-              үүсгэнэ.
+              {isJapanese
+                ? 'Сэдэв болон хэдэн үг үүсгэхээ сонгоно уу. AI автоматаар япон үг үүсгэнэ.'
+                : 'Сэдэв болон хэдэн үг үүсгэхээ сонгоно уу. AI автоматаар үг үүсгэнэ.'}
             </p>
 
             <div className="space-y-4">
@@ -622,6 +678,57 @@ export default function VocabularyManager<T extends Word>({
     }
   };
 
+  const handleAddJapaneseWordsBatch = async (
+    newWords: Omit<JapaneseWord, 'id' | 'memorized' | 'favorite'>[]
+  ) => {
+    if (!user || !firestore) {
+      toast({
+        title: 'Алдаа',
+        description: 'Үгс нэмэхийн тулд нэвтэрнэ үү.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const userWordsCollection = collection(
+      firestore,
+      `users/${user.uid}/${collectionPath}`
+    );
+    const batch = writeBatch(firestore);
+    const wordsToAddLocally: T[] = [];
+
+    newWords.forEach(word => {
+      const docRef = doc(userWordsCollection);
+      batch.set(docRef, {
+        ...word,
+        memorized: false,
+        favorite: false,
+      });
+      wordsToAddLocally.push({
+        id: docRef.id,
+        ...word,
+        memorized: false,
+        favorite: false,
+      } as T);
+    });
+
+    try {
+      await batch.commit();
+      setWords(prev =>
+        [...prev, ...wordsToAddLocally].sort((a, b) =>
+          (a.word as string).localeCompare(b.word as string)
+        )
+      );
+    } catch (error) {
+      console.error('Error batch adding Japanese words:', error);
+      toast({
+        title: 'Алдаа',
+        description: 'Үгсийг бөөнөөр нэмэхэд алдаа гарлаа.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleDelete = async (wordId: string) => {
     if (!user || !firestore) {
       toast({
@@ -951,9 +1058,11 @@ export default function VocabularyManager<T extends Word>({
                     onChange={e => setSearchQuery(e.target.value)}
                     className="flex-1 sm:w-48 bg-background/50 border-0 rounded-xl"
                   />
-                  {wordType === 'english' && (
-                    <AiAssistantDialog onAddWords={handleAddWordsBatch} />
-                  )}
+                  <AiAssistantDialog
+                    wordType={wordType}
+                    onAddWords={wordType === 'english' ? handleAddWordsBatch : undefined}
+                    onAddJapaneseWords={wordType === 'japanese' ? handleAddJapaneseWordsBatch : undefined}
+                  />
                   <Dialog
                     open={isDialogOpen}
                     onOpenChange={isOpen => {
