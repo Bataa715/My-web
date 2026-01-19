@@ -2,12 +2,8 @@
 import type {NextConfig} from 'next';
 import path from 'path';
 
-const isStaticExport = process.env.STATIC_EXPORT === 'true';
-
 const nextConfig: NextConfig = {
   /* config options here */
-  output: isStaticExport ? 'export' : undefined,
-  trailingSlash: isStaticExport ? true : false,
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
@@ -21,7 +17,6 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    unoptimized: isStaticExport ? true : false,
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
