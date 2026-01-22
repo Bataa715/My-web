@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd apps/nextn && nx build nextn",
+  "buildCommand": "npx nx build nextn",
   "devCommand": "nx serve nextn",
   "installCommand": "npm install --legacy-peer-deps",
   "framework": "nextjs",
