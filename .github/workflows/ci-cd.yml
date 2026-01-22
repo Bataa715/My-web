@@ -37,7 +37,7 @@ jobs:
       
       - name: Run Nx affected commands
         run: |
-          npx nx affected --target=build --parallel=3
+          npx nx affected --target=build --exclude=my-web-workspace --parallel=3
       
       - name: Deploy to Vercel (Production)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
