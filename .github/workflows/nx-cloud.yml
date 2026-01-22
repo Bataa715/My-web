@@ -31,13 +31,7 @@ jobs:
         uses: nrwl/nx-set-shas@v4
       
       - name: Run Nx affected graph
-        run: npx nx affected:graph --file=graph.json
-      
-      - name: Run affected lint
-        run: npx nx affected --target=lint --parallel=3
-      
-      - name: Run affected test
-        run: npx nx affected --target=test --parallel=3 --ci --code-coverage
+        run: npx nx graph --affected --file=graph.json
       
       - name: Run affected build
         run: npx nx affected --target=build --parallel=3

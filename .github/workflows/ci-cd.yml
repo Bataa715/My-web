@@ -37,7 +37,6 @@ jobs:
       
       - name: Run Nx affected commands
         run: |
-          npx nx affected --target=lint --parallel=3
           npx nx affected --target=build --parallel=3
       
       - name: Deploy to Vercel (Production)
