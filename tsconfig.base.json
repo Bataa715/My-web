@@ -14,7 +14,9 @@
     "jsx": "preserve",
     "incremental": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@/*": ["apps/nextn/src/*"]
+    }
   },
   "files": [],
   "include": [],
@@ -22,6 +24,5 @@
     {
       "path": "./apps/nextn"
     }
-  ],
-  "exclude": ["node_modules", "dist", ".next", "android"]
+  ]
 }

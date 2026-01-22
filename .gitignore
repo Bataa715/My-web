@@ -10,8 +10,6 @@
 !.yarn/releases
 !.yarn/versions
 .modified
-.env
-*.env
 
 # testing
 /coverage
@@ -19,9 +17,11 @@
 # next.js
 /.next/
 /out/
+apps/nextn/.next/
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -40,9 +40,33 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# genkit
 .genkit/*
-.env*
 
 # firebase
 firebase-debug.log
 firestore-debug.log
+
+# environment variables
+.env
+.env*
+*.env
+.env*.local
+
+# nx
+.nx/cache
+.nx/workspace-data
+
+# python
+.venv/
+__pycache__/
+
+# IDE
+.vscode/
+.idea/
+.idx/
+
+# Android
+android/build/
+android/app/build/
+android/.gradle/

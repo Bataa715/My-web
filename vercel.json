@@ -1,0 +1,8 @@
+{
+  "buildCommand": "cd apps/nextn && nx build nextn",
+  "devCommand": "nx serve nextn",
+  "installCommand": "npm install --legacy-peer-deps",
+  "framework": "nextjs",
+  "outputDirectory": "apps/nextn/.next",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./apps/nextn"
+}
