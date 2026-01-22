@@ -2,6 +2,9 @@
   "name": "my-web-workspace",
   "version": "0.1.0",
   "private": true,
+  "nx": {
+    "includedScripts": []
+  },
   "scripts": {
     "dev": "nx serve nextn",
     "build": "nx build nextn",

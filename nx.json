@@ -5,6 +5,25 @@
     "appsDir": "apps",
     "libsDir": "libs"
   },
+  "plugins": [
+    {
+      "plugin": "@nx/next/plugin",
+      "exclude": ["my-web-workspace"],
+      "options": {
+        "buildTargetName": "build",
+        "devTargetName": "serve",
+        "startTargetName": "start"
+      }
+    }
+  ],
+  "targetDefaults": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test"]
+      }
+    }
+  },
   "tasksRunnerOptions": {
     "default": {
       "runner": "nx/tasks-runners/default",
