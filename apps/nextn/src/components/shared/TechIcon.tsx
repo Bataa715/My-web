@@ -485,15 +485,18 @@ const TechIcon = ({ techName, className }: TechIconProps) => {
   }
 
   // Simple Icons CDN URL - only generate if slug exists
-  const iconUrl = tech && tech.slug
-    ? `https://cdn.simpleicons.org/${tech.slug}/${tech.color}`
-    : null;
+  const iconUrl =
+    tech && tech.slug
+      ? `https://cdn.simpleicons.org/${tech.slug}/${tech.color}`
+      : null;
 
   if (!iconUrl || imageError) {
     // Use tech color if available for better visual distinction
-    const bgStyle = tech?.color ? { backgroundColor: `#${tech.color}` } : undefined;
+    const bgStyle = tech?.color
+      ? { backgroundColor: `#${tech.color}` }
+      : undefined;
     const textColor = tech?.color ? 'text-white' : 'text-neutral-300';
-    
+
     return (
       <TooltipProvider>
         <Tooltip>
@@ -501,7 +504,8 @@ const TechIcon = ({ techName, className }: TechIconProps) => {
             <div
               className={cn(
                 'flex h-8 w-8 items-center justify-center rounded-full border border-neutral-700',
-                !tech?.color && 'bg-gradient-to-br from-neutral-800 to-neutral-900',
+                !tech?.color &&
+                  'bg-gradient-to-br from-neutral-800 to-neutral-900',
                 className
               )}
               style={bgStyle}

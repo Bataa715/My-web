@@ -121,7 +121,9 @@ export default function TestGame({ words, wordType, onExit }: TestGameProps) {
           <div className="flex justify-center mb-4">
             <CheckCircle2 className="h-12 w-12 md:h-16 md:w-16 text-green-500" />
           </div>
-          <CardTitle className="text-2xl md:text-3xl font-bold">Тест дууслаа!</CardTitle>
+          <CardTitle className="text-2xl md:text-3xl font-bold">
+            Тест дууслаа!
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <CardDescription className="text-base md:text-lg mb-6">
@@ -132,7 +134,11 @@ export default function TestGame({ words, wordType, onExit }: TestGameProps) {
             <Button className="w-full sm:w-auto" onClick={handleRestart}>
               <Repeat className="mr-2 h-4 w-4" /> Дахин оролдох
             </Button>
-            <Button variant="outline" className="w-full sm:w-auto" onClick={onExit}>
+            <Button
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={onExit}
+            >
               <ArrowLeft className="mr-2 h-4 w-4" /> Буцах
             </Button>
           </div>
@@ -160,13 +166,15 @@ export default function TestGame({ words, wordType, onExit }: TestGameProps) {
             className="h-16 md:h-24 text-base md:text-xl"
             onClick={() => setGameMode('eng-to-mon')}
           >
-            <Languages className="mr-2 md:mr-4 h-5 w-5 md:h-6 md:w-6" /> Англи {'->'} Монгол
+            <Languages className="mr-2 md:mr-4 h-5 w-5 md:h-6 md:w-6" /> Англи{' '}
+            {'->'} Монгол
           </Button>
           <Button
             className="h-16 md:h-24 text-base md:text-xl"
             onClick={() => setGameMode('mon-to-eng')}
           >
-            <Book className="mr-2 md:mr-4 h-5 w-5 md:h-6 md:w-6" /> Монгол {'->'} Англи
+            <Book className="mr-2 md:mr-4 h-5 w-5 md:h-6 md:w-6" /> Монгол{' '}
+            {'->'} Англи
           </Button>
         </CardContent>
       </Card>
@@ -190,7 +198,12 @@ export default function TestGame({ words, wordType, onExit }: TestGameProps) {
   return (
     <div className="w-full max-w-2xl mx-auto px-2 sm:px-4">
       <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
-        <Button variant="ghost" size="icon" className="shrink-0" onClick={onExit}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="shrink-0"
+          onClick={onExit}
+        >
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="w-full">
@@ -215,7 +228,8 @@ export default function TestGame({ words, wordType, onExit }: TestGameProps) {
             const isCorrect = option === currentQuestion.correctAnswer;
             const isSelected = option === selectedAnswer;
 
-            let buttonClass = 'h-auto py-3 sm:py-4 text-sm sm:text-base md:text-lg justify-center';
+            let buttonClass =
+              'h-auto py-3 sm:py-4 text-sm sm:text-base md:text-lg justify-center';
             if (selectedAnswer) {
               if (isCorrect) {
                 buttonClass = cn(

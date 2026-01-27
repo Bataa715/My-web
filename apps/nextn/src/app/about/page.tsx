@@ -499,7 +499,7 @@ export default function AboutPage() {
       <InteractiveParticles className="fixed inset-0 z-0 pointer-events-none" />
       <div className="relative z-10 min-h-screen">
         {/* Hero Section */}
-        <section className="relative min-h-[calc(100vh-100px)] flex items-start justify-center px-3 sm:px-4 pt-16 sm:pt-24 md:pt-28">
+        <section className="relative min-h-[calc(100vh-100px)] flex items-start justify-center px-4 sm:px-6 md:px-8 pt-16 sm:pt-20 md:pt-24">
           <div className="max-w-7xl mx-auto w-full">
             <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-6 sm:gap-8 lg:gap-16 w-full">
               {/* Personal Info Cards */}
@@ -727,10 +727,10 @@ export default function AboutPage() {
 
         <section
           id="hobbies"
-          className="relative py-24 md:py-32 mt-16 md:mt-24 reveal z-10"
+          className="relative py-12 sm:py-16 md:py-20 lg:py-24 mt-12 sm:mt-16 md:mt-20 reveal z-10"
         >
-          <div className="container px-4 md:px-6">
-            <div className="text-center mb-12 sm:mb-24">
+          <div className="container mx-auto px-4 sm:px-6 md:px-8">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
               <h2 className="text-3xl md:text-5xl font-bold">
                 Миний хоббинууд
               </h2>
@@ -905,21 +905,21 @@ export default function AboutPage() {
                 )}
                 <Button
                   onClick={scrollPrev}
-                  className="absolute left-0 sm:left-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-card/80 backdrop-blur-md border border-primary/30 shadow-[0_0_20px_rgba(139,92,246,0.2)] hover:bg-primary/20 hover:border-primary/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] transition-all duration-300"
+                  className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-card/80 backdrop-blur-md border border-primary/30 shadow-[0_0_20px_rgba(139,92,246,0.2)] hover:bg-primary/20 hover:border-primary/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] transition-all duration-300"
                   variant="ghost"
                   size="icon"
                   disabled={displayItems.length === 0}
                 >
-                  <ArrowLeft className="h-5 w-5" />
+                  <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
                 <Button
                   onClick={scrollNext}
-                  className="absolute right-0 sm:right-4 top-1/2 -translate-y-1/2 z-10 h-12 w-12 rounded-full bg-card/80 backdrop-blur-md border border-primary/30 shadow-[0_0_20px_rgba(139,92,246,0.2)] hover:bg-primary/20 hover:border-primary/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] transition-all duration-300"
+                  className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-10 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-card/80 backdrop-blur-md border border-primary/30 shadow-[0_0_20px_rgba(139,92,246,0.2)] hover:bg-primary/20 hover:border-primary/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] transition-all duration-300"
                   variant="ghost"
                   size="icon"
                   disabled={displayItems.length === 0}
                 >
-                  <ArrowRight className="h-5 w-5" />
+                  <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </div>
             )}

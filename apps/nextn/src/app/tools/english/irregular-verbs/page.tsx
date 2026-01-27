@@ -21,7 +21,7 @@ import { initialEnglishWords } from '@/data/english';
 import { cn } from '@/lib/utils';
 
 // Filter only irregular verbs (those with " - " pattern)
-const irregularVerbs = initialEnglishWords.filter(word => 
+const irregularVerbs = initialEnglishWords.filter(word =>
   word.word.includes(' - ')
 );
 
@@ -43,17 +43,18 @@ export default function IrregularVerbsPage() {
 
   const filteredVerbs = useMemo(() => {
     let verbs = [...irregularVerbs];
-    
+
     if (shuffled) {
       verbs = verbs.sort(() => Math.random() - 0.5);
     }
-    
+
     if (!searchQuery.trim()) return verbs;
-    
+
     const query = searchQuery.toLowerCase();
-    return verbs.filter(verb => 
-      verb.word.toLowerCase().includes(query) ||
-      verb.translation.toLowerCase().includes(query)
+    return verbs.filter(
+      verb =>
+        verb.word.toLowerCase().includes(query) ||
+        verb.translation.toLowerCase().includes(query)
     );
   }, [searchQuery, shuffled]);
 
@@ -105,7 +106,10 @@ export default function IrregularVerbsPage() {
           </motion.p>
 
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="bg-orange-500/20 text-orange-300">
+            <Badge
+              variant="secondary"
+              className="bg-orange-500/20 text-orange-300"
+            >
               {irregularVerbs.length} үйл үг
             </Badge>
           </div>
@@ -120,7 +124,7 @@ export default function IrregularVerbsPage() {
                 <Input
                   placeholder="Үг хайх..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={e => setSearchQuery(e.target.value)}
                   className="pl-10 bg-background/50 w-full"
                 />
               </div>
@@ -128,7 +132,10 @@ export default function IrregularVerbsPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShuffled(!shuffled)}
-                className={cn("w-full sm:w-auto", shuffled ? 'bg-orange-500/20 border-orange-500/50' : '')}
+                className={cn(
+                  'w-full sm:w-auto',
+                  shuffled ? 'bg-orange-500/20 border-orange-500/50' : ''
+                )}
               >
                 <Shuffle className="h-4 w-4 mr-2" />
                 {shuffled ? 'Холигдсон' : 'Холих'}
@@ -150,12 +157,24 @@ export default function IrregularVerbsPage() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/30 hover:bg-muted/30">
-                    <TableHead className="font-semibold w-8 md:w-12 text-xs md:text-sm">#</TableHead>
-                    <TableHead className="font-semibold text-xs md:text-sm">Base</TableHead>
-                    <TableHead className="font-semibold text-xs md:text-sm">Past</TableHead>
-                    <TableHead className="font-semibold text-xs md:text-sm">P.P.</TableHead>
-                    <TableHead className="font-semibold text-xs md:text-sm">Орчуулга</TableHead>
-                    <TableHead className="font-semibold hidden lg:table-cell">Тайлбар</TableHead>
+                    <TableHead className="font-semibold w-8 md:w-12 text-xs md:text-sm">
+                      #
+                    </TableHead>
+                    <TableHead className="font-semibold text-xs md:text-sm">
+                      Base
+                    </TableHead>
+                    <TableHead className="font-semibold text-xs md:text-sm">
+                      Past
+                    </TableHead>
+                    <TableHead className="font-semibold text-xs md:text-sm">
+                      P.P.
+                    </TableHead>
+                    <TableHead className="font-semibold text-xs md:text-sm">
+                      Орчуулга
+                    </TableHead>
+                    <TableHead className="font-semibold hidden lg:table-cell">
+                      Тайлбар
+                    </TableHead>
                     <TableHead className="w-10 md:w-12"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -165,9 +184,9 @@ export default function IrregularVerbsPage() {
                     const baseForm = parts[0] || '';
                     const pastSimple = parts[1] || '';
                     const pastParticiple = parts[2] || '';
-                    
+
                     return (
-                      <TableRow 
+                      <TableRow
                         key={index}
                         className="hover:bg-orange-500/5 transition-colors"
                       >
@@ -205,7 +224,7 @@ export default function IrregularVerbsPage() {
                 </TableBody>
               </Table>
             </div>
-            
+
             {filteredVerbs.length === 0 && (
               <div className="text-center py-12 text-muted-foreground">
                 Хайлтад тохирох үг олдсонгүй
@@ -222,25 +241,37 @@ export default function IrregularVerbsPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
-                <h4 className="font-semibold text-orange-300 mb-2">Base Form (V1)</h4>
+                <h4 className="font-semibold text-orange-300 mb-2">
+                  Base Form (V1)
+                </h4>
                 <p className="text-sm text-muted-foreground">
                   Үндсэн хэлбэр - Present Simple-д хэрэглэнэ
                 </p>
-                <p className="text-sm mt-2 text-orange-200">Жишээ: go, eat, write</p>
+                <p className="text-sm mt-2 text-orange-200">
+                  Жишээ: go, eat, write
+                </p>
               </div>
               <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                <h4 className="font-semibold text-amber-300 mb-2">Past Simple (V2)</h4>
+                <h4 className="font-semibold text-amber-300 mb-2">
+                  Past Simple (V2)
+                </h4>
                 <p className="text-sm text-muted-foreground">
                   Өнгөрсөн цаг - Past Simple-д хэрэглэнэ
                 </p>
-                <p className="text-sm mt-2 text-amber-200">Жишээ: went, ate, wrote</p>
+                <p className="text-sm mt-2 text-amber-200">
+                  Жишээ: went, ate, wrote
+                </p>
               </div>
               <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                <h4 className="font-semibold text-yellow-300 mb-2">Past Participle (V3)</h4>
+                <h4 className="font-semibold text-yellow-300 mb-2">
+                  Past Participle (V3)
+                </h4>
                 <p className="text-sm text-muted-foreground">
                   Perfect tense болон Passive voice-д хэрэглэнэ
                 </p>
-                <p className="text-sm mt-2 text-yellow-200">Жишээ: gone, eaten, written</p>
+                <p className="text-sm mt-2 text-yellow-200">
+                  Жишээ: gone, eaten, written
+                </p>
               </div>
             </div>
           </CardContent>

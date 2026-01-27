@@ -237,11 +237,13 @@ export default function HomePage() {
 
   return (
     <div className="relative">
-      {/* Reduced particle count for better performance */}
-      <InteractiveParticles quantity={15} />
+      {/* Interactive particles background effect */}
+      <InteractiveParticles quantity={60} />
       {/* Hero with reserved space to prevent CLS */}
       <div className="min-h-[80vh]">
-        <Suspense fallback={<div className="w-full min-h-[80vh] bg-background" />}>
+        <Suspense
+          fallback={<div className="w-full min-h-[80vh] bg-background" />}
+        >
           <Hero />
         </Suspense>
       </div>
@@ -312,7 +314,9 @@ export default function HomePage() {
                     </div>
                     <Switch
                       checked={sectionSettings[section.id]?.visible !== false}
-                      onCheckedChange={() => toggleSectionVisibility(section.id)}
+                      onCheckedChange={() =>
+                        toggleSectionVisibility(section.id)
+                      }
                     />
                   </div>
                 ))}
@@ -328,9 +332,7 @@ export default function HomePage() {
 
       {/* Render visible sections */}
       {visibleSections.map(section => (
-        <div key={section.id}>
-          {section.component}
-        </div>
+        <div key={section.id}>{section.component}</div>
       ))}
 
       {/* Empty state when all sections are hidden */}

@@ -258,11 +258,14 @@ export default function ToolsPage() {
 
   // Get visible tools sorted by order
   const visibleTools = allTools
+    .map(tool => ({
+      ...tool,
+      order:
+        toolSettings[tool.id]?.order ??
+        allTools.findIndex(t => t.id === tool.id),
+    }))
     .filter(tool => toolSettings[tool.id]?.visible !== false)
-    .sort(
-      (a, b) =>
-        (toolSettings[a.id]?.order ?? 0) - (toolSettings[b.id]?.order ?? 0)
-    );
+    .sort((a, b) => a.order - b.order);
 
   const hiddenCount = allTools.length - visibleTools.length;
 
@@ -284,7 +287,7 @@ export default function ToolsPage() {
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent">
               Хэрэгслүүд
             </h1>
-            
+
             {/* Settings Button - Only visible in edit mode */}
             {isEditMode && (
               <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
@@ -297,79 +300,82 @@ export default function ToolsPage() {
                     <Settings className="h-5 w-5" />
                   </Button>
                 </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5" />
-                    Хэрэгслүүдийн тохиргоо
-                  </DialogTitle>
-                  <DialogDescription>
-                    Харуулах болон нуух хэрэгслүүдийг сонгоно уу.
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <div className="flex gap-2 mb-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={showAllTools}
-                    className="flex-1"
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Бүгдийг харуулах
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={hideAllTools}
-                    className="flex-1"
-                  >
-                    <EyeOff className="h-4 w-4 mr-2" />
-                    Бүгдийг нуух
-                  </Button>
-                </div>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      Хэрэгслүүдийн тохиргоо
+                    </DialogTitle>
+                    <DialogDescription>
+                      Харуулах болон нуух хэрэгслүүдийг сонгоно уу.
+                    </DialogDescription>
+                  </DialogHeader>
 
-                <ScrollArea className="max-h-[400px] pr-4">
-                  <div className="space-y-3">
-                    {allTools.map(tool => (
-                      <div
-                        key={tool.id}
-                        className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
-                          toolSettings[tool.id]?.visible !== false
-                            ? 'bg-card border-primary/20'
-                            : 'bg-muted/50 border-muted opacity-60'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`p-2 rounded-lg bg-gradient-to-br ${tool.gradient} text-white`}
-                          >
-                            {tool.icon}
-                          </div>
-                          <div>
-                            <p className="font-medium">{tool.title}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {tool.description}
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={toolSettings[tool.id]?.visible !== false}
-                          onCheckedChange={() => toggleToolVisibility(tool.id)}
-                        />
-                      </div>
-                    ))}
+                  <div className="flex gap-2 mb-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={showAllTools}
+                      className="flex-1"
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Бүгдийг харуулах
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={hideAllTools}
+                      className="flex-1"
+                    >
+                      <EyeOff className="h-4 w-4 mr-2" />
+                      Бүгдийг нуух
+                    </Button>
                   </div>
-                </ScrollArea>
 
-                <div className="text-sm text-muted-foreground text-center pt-2">
-                  {visibleTools.length} харагдаж байна • {hiddenCount} нуугдсан
-                </div>
-              </DialogContent>
-            </Dialog>
+                  <ScrollArea className="max-h-[400px] pr-4">
+                    <div className="space-y-3">
+                      {allTools.map(tool => (
+                        <div
+                          key={tool.id}
+                          className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                            toolSettings[tool.id]?.visible !== false
+                              ? 'bg-card border-primary/20'
+                              : 'bg-muted/50 border-muted opacity-60'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`p-2 rounded-lg bg-gradient-to-br ${tool.gradient} text-white`}
+                            >
+                              {tool.icon}
+                            </div>
+                            <div>
+                              <p className="font-medium">{tool.title}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {tool.description}
+                              </p>
+                            </div>
+                          </div>
+                          <Switch
+                            checked={toolSettings[tool.id]?.visible !== false}
+                            onCheckedChange={() =>
+                              toggleToolVisibility(tool.id)
+                            }
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+
+                  <div className="text-sm text-muted-foreground text-center pt-2">
+                    {visibleTools.length} харагдаж байна • {hiddenCount}{' '}
+                    нуугдсан
+                  </div>
+                </DialogContent>
+              </Dialog>
             )}
           </div>
-          
+
           {isEditMode && hiddenCount > 0 && (
             <p className="text-sm text-muted-foreground mt-2">
               {hiddenCount} хэрэгсэл нуугдсан •{' '}
@@ -385,19 +391,22 @@ export default function ToolsPage() {
 
         {/* Tools Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-8">
-          <AnimatePresence mode="popLayout">
-            {visibleTools.map((tool, i) => (
+          <AnimatePresence initial={false}>
+            {visibleTools.map(tool => (
               <motion.div
                 key={tool.id}
                 layout
-                initial={{ opacity: 0, y: 40, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
                 transition={{
-                  duration: 0.5,
-                  delay: i * 0.08,
-                  type: 'spring',
-                  stiffness: 100,
+                  layout: {
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 30,
+                  },
+                  opacity: { duration: 0.2 },
+                  scale: { duration: 0.2 },
                 }}
               >
                 <Link href={tool.href} className="group block h-full">
@@ -473,7 +482,9 @@ export default function ToolsPage() {
             className="text-center py-16"
           >
             <EyeOff className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Бүх хэрэгсэл нуугдсан</h3>
+            <h3 className="text-xl font-semibold mb-2">
+              Бүх хэрэгсэл нуугдсан
+            </h3>
             <p className="text-muted-foreground mb-4">
               Тохиргооноос хэрэгслүүдийг харуулна уу.
             </p>

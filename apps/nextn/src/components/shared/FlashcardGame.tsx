@@ -51,15 +51,15 @@ export default function FlashcardGame({
     if ('speechSynthesis' in window) {
       // Cancel any ongoing speech
       window.speechSynthesis.cancel();
-      
+
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
       utterance.rate = 0.9;
-      
+
       utterance.onstart = () => setIsSpeaking(true);
       utterance.onend = () => setIsSpeaking(false);
       utterance.onerror = () => setIsSpeaking(false);
-      
+
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -136,10 +136,10 @@ export default function FlashcardGame({
               variant="ghost"
               size="icon"
               className={cn(
-                "rounded-full hover:bg-primary/20",
-                isSpeaking && "animate-pulse text-primary"
+                'rounded-full hover:bg-primary/20',
+                isSpeaking && 'animate-pulse text-primary'
               )}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 speakWord(w.word, 'en-US');
               }}
@@ -169,10 +169,10 @@ export default function FlashcardGame({
               variant="ghost"
               size="icon"
               className={cn(
-                "rounded-full hover:bg-primary/20 mt-3",
-                isSpeaking && "animate-pulse text-primary"
+                'rounded-full hover:bg-primary/20 mt-3',
+                isSpeaking && 'animate-pulse text-primary'
               )}
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 speakWord(w.word, 'ja-JP');
               }}
@@ -213,28 +213,41 @@ export default function FlashcardGame({
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={() => {
-              // Save memorized words before restarting
-              if (knownWords.length > 0) {
-                onSaveProgress(knownWords);
-              }
-              handleRestart(false);
-            }}>
-              <Repeat className="mr-2 h-4 w-4" /> <span className="text-sm">Бүгдийг давтах</span>
-            </Button>
-            {unknownWords.length > 0 && (
-              <Button variant="outline" className="w-full sm:w-auto" onClick={() => {
+            <Button
+              onClick={() => {
                 // Save memorized words before restarting
                 if (knownWords.length > 0) {
                   onSaveProgress(knownWords);
                 }
-                handleRestart(true);
-              }}>
-                <Repeat className="mr-2 h-4 w-4" /> <span className="text-sm">Алдсан үгсээ давтах</span>
+                handleRestart(false);
+              }}
+            >
+              <Repeat className="mr-2 h-4 w-4" />{' '}
+              <span className="text-sm">Бүгдийг давтах</span>
+            </Button>
+            {unknownWords.length > 0 && (
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => {
+                  // Save memorized words before restarting
+                  if (knownWords.length > 0) {
+                    onSaveProgress(knownWords);
+                  }
+                  handleRestart(true);
+                }}
+              >
+                <Repeat className="mr-2 h-4 w-4" />{' '}
+                <span className="text-sm">Алдсан үгсээ давтах</span>
               </Button>
             )}
-            <Button variant="secondary" className="w-full sm:w-auto" onClick={() => onComplete(knownWords)}>
-              <Check className="mr-2 h-4 w-4" /> <span className="text-sm">Дуусгах</span>
+            <Button
+              variant="secondary"
+              className="w-full sm:w-auto"
+              onClick={() => onComplete(knownWords)}
+            >
+              <Check className="mr-2 h-4 w-4" />{' '}
+              <span className="text-sm">Дуусгах</span>
             </Button>
           </div>
         </CardContent>
@@ -247,18 +260,27 @@ export default function FlashcardGame({
   return (
     <div className="w-full max-w-2xl mx-auto px-2 sm:px-4">
       <div className="flex items-center gap-2 sm:gap-4 mb-4">
-        <Button variant="ghost" size="icon" className="shrink-0" onClick={onExit}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="shrink-0"
+          onClick={onExit}
+        >
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex-grow flex items-center gap-2 sm:gap-4">
           <div className="flex items-center gap-1 text-red-400">
             <X className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="font-bold text-sm sm:text-lg">{answeredIncorrectly}</span>
+            <span className="font-bold text-sm sm:text-lg">
+              {answeredIncorrectly}
+            </span>
           </div>
           <Progress value={progress} className="w-full h-2" />
           <div className="flex items-center gap-1 text-green-400">
             <Check className="h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="font-bold text-sm sm:text-lg">{answeredCorrectly}</span>
+            <span className="font-bold text-sm sm:text-lg">
+              {answeredCorrectly}
+            </span>
           </div>
         </div>
         <span className="text-xs sm:text-sm text-muted-foreground font-mono whitespace-nowrap">

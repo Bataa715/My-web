@@ -285,9 +285,9 @@ export default function Projects() {
   const { isEditMode } = useEditMode();
 
   return (
-    <section id="projects" className="py-12 md:py-24 lg:py-32">
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center mb-10">
+    <section id="projects" className="py-12 sm:py-16 md:py-20 lg:py-24">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
+        <div className="flex flex-col items-center justify-center space-y-4 text-center mb-8 sm:mb-10 md:mb-12">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-400 to-primary animate-gradient">
             Миний төслүүд
           </h2>
@@ -300,7 +300,7 @@ export default function Projects() {
 
         {!loading && (
           <div
-            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8 max-w-7xl mx-auto"
             style={{ perspective: '2000px' }}
           >
             {projects.map((project, index) => (

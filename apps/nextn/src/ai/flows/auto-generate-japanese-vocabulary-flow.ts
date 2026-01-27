@@ -6,7 +6,9 @@ import { z } from 'zod';
 const GeneratedJapaneseWordSchema = z.object({
   word: z.string().describe('The Japanese word (kanji/hiragana/katakana).'),
   romaji: z.string().describe('The romaji (romanized) reading of the word.'),
-  meaning: z.string().describe('The Mongolian meaning/translation of the word.'),
+  meaning: z
+    .string()
+    .describe('The Mongolian meaning/translation of the word.'),
 });
 
 // Define the schema for the flow's input

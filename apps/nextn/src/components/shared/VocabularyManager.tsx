@@ -269,7 +269,9 @@ const AiAssistantDialog = ({
     '趣味 (Hobbies)',
   ];
 
-  const topicSuggestions = isJapanese ? topicSuggestionsJapanese : topicSuggestionsEnglish;
+  const topicSuggestions = isJapanese
+    ? topicSuggestionsJapanese
+    : topicSuggestionsEnglish;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -281,12 +283,19 @@ const AiAssistantDialog = ({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {isJapanese ? 'AI Туслахаар япон үгс нэмэх' : 'AI Туслахаар үгс нэмэх'}
+            {isJapanese
+              ? 'AI Туслахаар япон үгс нэмэх'
+              : 'AI Туслахаар үгс нэмэх'}
           </DialogTitle>
         </DialogHeader>
 
         <Tabs defaultValue="auto" className="w-full">
-          <TabsList className={cn("grid w-full", isJapanese ? "grid-cols-1" : "grid-cols-2")}>
+          <TabsList
+            className={cn(
+              'grid w-full',
+              isJapanese ? 'grid-cols-1' : 'grid-cols-2'
+            )}
+          >
             {!isJapanese && (
               <TabsTrigger value="manual" className="gap-2">
                 <BookOpen className="h-4 w-4" />
@@ -324,7 +333,9 @@ car: машин (A vehicle with four wheels)"
                   </Button>
                 </DialogClose>
                 <Button onClick={handleGenerate} disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   {isLoading ? 'Нэмж байна...' : 'Үгс нэмэх'}
                 </Button>
               </div>
@@ -1060,8 +1071,14 @@ export default function VocabularyManager<T extends Word>({
                   />
                   <AiAssistantDialog
                     wordType={wordType}
-                    onAddWords={wordType === 'english' ? handleAddWordsBatch : undefined}
-                    onAddJapaneseWords={wordType === 'japanese' ? handleAddJapaneseWordsBatch : undefined}
+                    onAddWords={
+                      wordType === 'english' ? handleAddWordsBatch : undefined
+                    }
+                    onAddJapaneseWords={
+                      wordType === 'japanese'
+                        ? handleAddJapaneseWordsBatch
+                        : undefined
+                    }
                   />
                   <Dialog
                     open={isDialogOpen}
@@ -1135,16 +1152,28 @@ export default function VocabularyManager<T extends Word>({
                     className="bg-background/30 rounded-xl p-1 flex-nowrap"
                     onValueChange={value => setFilter((value as any) || 'all')}
                   >
-                    <ToggleGroupItem value="all" className="rounded-lg text-xs sm:text-sm whitespace-nowrap">
+                    <ToggleGroupItem
+                      value="all"
+                      className="rounded-lg text-xs sm:text-sm whitespace-nowrap"
+                    >
                       Бүгд
                     </ToggleGroupItem>
-                    <ToggleGroupItem value="memorized" className="rounded-lg text-xs sm:text-sm whitespace-nowrap">
+                    <ToggleGroupItem
+                      value="memorized"
+                      className="rounded-lg text-xs sm:text-sm whitespace-nowrap"
+                    >
                       Цээжилсэн
                     </ToggleGroupItem>
-                    <ToggleGroupItem value="not-memorized" className="rounded-lg text-xs sm:text-sm whitespace-nowrap">
+                    <ToggleGroupItem
+                      value="not-memorized"
+                      className="rounded-lg text-xs sm:text-sm whitespace-nowrap"
+                    >
                       Цээжлээгүй
                     </ToggleGroupItem>
-                    <ToggleGroupItem value="favorite" className="rounded-lg text-xs sm:text-sm whitespace-nowrap">
+                    <ToggleGroupItem
+                      value="favorite"
+                      className="rounded-lg text-xs sm:text-sm whitespace-nowrap"
+                    >
                       Онцолсон
                     </ToggleGroupItem>
                   </ToggleGroup>
@@ -1223,14 +1252,16 @@ export default function VocabularyManager<T extends Word>({
                         <TableHead
                           key={col.key as string}
                           className={cn(
-                            "font-semibold text-xs sm:text-sm whitespace-nowrap",
-                            idx > 1 && "hidden md:table-cell"
+                            'font-semibold text-xs sm:text-sm whitespace-nowrap',
+                            idx > 1 && 'hidden md:table-cell'
                           )}
                         >
                           {col.header}
                         </TableHead>
                       ))}
-                      <TableHead className="font-semibold text-xs sm:text-sm whitespace-nowrap">Цээжилсэн</TableHead>
+                      <TableHead className="font-semibold text-xs sm:text-sm whitespace-nowrap">
+                        Цээжилсэн
+                      </TableHead>
                       <TableHead className="text-right font-semibold text-xs sm:text-sm whitespace-nowrap">
                         Үйлдэл
                       </TableHead>
@@ -1247,11 +1278,11 @@ export default function VocabularyManager<T extends Word>({
                         )}
                       >
                         {columns.map((col, idx) => (
-                          <TableCell 
+                          <TableCell
                             key={`${word.id}-${col.key as string}`}
                             className={cn(
-                              "text-xs sm:text-sm",
-                              idx > 1 && "hidden md:table-cell"
+                              'text-xs sm:text-sm',
+                              idx > 1 && 'hidden md:table-cell'
                             )}
                           >
                             {word[col.key as keyof Word] as string}
@@ -1276,10 +1307,14 @@ export default function VocabularyManager<T extends Word>({
                             variant="ghost"
                             size="icon"
                             onClick={() => {
-                              const text = wordType === 'english' 
-                                ? (word as EnglishWord).word 
-                                : (word as JapaneseWord).word;
-                              speakWord(text, wordType === 'english' ? 'en-US' : 'ja-JP');
+                              const text =
+                                wordType === 'english'
+                                  ? (word as EnglishWord).word
+                                  : (word as JapaneseWord).word;
+                              speakWord(
+                                text,
+                                wordType === 'english' ? 'en-US' : 'ja-JP'
+                              );
                             }}
                             className="rounded-lg hover:text-primary"
                             title="Сонсох"

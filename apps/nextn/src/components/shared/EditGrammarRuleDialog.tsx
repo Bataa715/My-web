@@ -177,7 +177,11 @@ export function EditGrammarRuleDialog({
     };
 
     try {
-      const docRef = doc(firestore, `users/${user.uid}/${collectionPath}`, rule.id);
+      const docRef = doc(
+        firestore,
+        `users/${user.uid}/${collectionPath}`,
+        rule.id
+      );
       await updateDoc(docRef, updatedRuleData);
       onUpdateRule({
         ...updatedRuleData,

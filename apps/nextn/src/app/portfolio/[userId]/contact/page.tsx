@@ -2,6 +2,8 @@
 
 import { doc, getDoc } from 'firebase/firestore';
 import { notFound } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 import type { UserProfile } from '@/lib/types';
 import { Suspense, useEffect, useState, use } from 'react';
 import {

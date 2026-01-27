@@ -25,9 +25,12 @@ export function ThemeToggle() {
       if (!firestore || !user || hasSynced) return;
 
       try {
-        const settingsRef = doc(firestore, `users/${user.uid}/settings/preferences`);
+        const settingsRef = doc(
+          firestore,
+          `users/${user.uid}/settings/preferences`
+        );
         const settingsSnap = await getDoc(settingsRef);
-        
+
         if (settingsSnap.exists()) {
           const data = settingsSnap.data();
           if (data.theme && ['light', 'dark', 'system'].includes(data.theme)) {
@@ -52,7 +55,10 @@ export function ThemeToggle() {
       if (!firestore || !user) return;
 
       try {
-        const settingsRef = doc(firestore, `users/${user.uid}/settings/preferences`);
+        const settingsRef = doc(
+          firestore,
+          `users/${user.uid}/settings/preferences`
+        );
         await setDoc(settingsRef, { theme: newTheme }, { merge: true });
       } catch (error) {
         console.error('Error saving theme to Firestore:', error);

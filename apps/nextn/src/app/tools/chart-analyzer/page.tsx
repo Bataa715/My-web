@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import BackButton from '@/components/shared/BackButton';
+
+export const dynamic = 'force-dynamic';
 import {
   Card,
   CardContent,

@@ -26,6 +26,7 @@ import {
   Facebook,
   Sparkles,
   Code2,
+  Trash2,
 } from 'lucide-react';
 import { useState, useEffect, type FC } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -540,16 +541,16 @@ export default function Hero({
     try {
       // Create storage reference
       const storageRef = ref(storage, `users/${user.uid}/cv/${file.name}`);
-      
+
       // Upload file
       await uploadBytes(storageRef, file);
-      
+
       // Get download URL
       const downloadUrl = await getDownloadURL(storageRef);
-      
+
       // Update state
       setEditedLinks(prev => ({ ...prev, cvUrl: downloadUrl }));
-      
+
       toast({
         title: 'Амжилттай',
         description: 'CV файл амжилттай байршуулагдлаа.',
@@ -863,9 +864,9 @@ export default function Hero({
   return (
     <section
       id="home"
-      className="relative w-full flex items-center min-h-[calc(100vh-120px)] py-6 sm:py-12 overflow-hidden"
+      className="relative w-full flex items-center min-h-[calc(100vh-120px)] py-8 sm:py-12 md:py-16 overflow-hidden"
     >
-      <div className="container relative z-10 px-3 sm:px-4 md:px-6">
+      <div className="container mx-auto relative z-10 px-4 sm:px-6 md:px-8">
         <div className="grid items-center justify-center gap-6 sm:gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="flex flex-col justify-center space-y-4 sm:space-y-6 lg:order-2">
             <div className="relative flex items-center justify-center w-full max-w-[260px] sm:max-w-[400px] md:max-w-[500px] aspect-square mx-auto">
@@ -1520,21 +1521,9 @@ export default function Hero({
               {isEditingLinks ? (
                 <div className="space-y-3 max-w-sm">
                   <div className="space-y-2">
-                    <Label className="text-xs text-muted-foreground">CV файл байршуулах эсвэл холбоос оруулах</Label>
-                    <div className="flex items-center gap-2">
-                      <Upload className="h-6 w-6 text-muted-foreground shrink-0" />
-                      <Input
-                        value={editedLinks.cvUrl}
-                        onChange={e =>
-                          setEditedLinks({
-                            ...editedLinks,
-                            cvUrl: e.target.value,
-                          })
-                        }
-                        placeholder="CV-ний холбоос оруулах"
-                        className="h-8 text-sm"
-                      />
-                    </div>
+                    <Label className="text-xs text-muted-foreground">
+                      CV файл байршуулах (PDF)
+                    </Label>
                     <div className="flex items-center gap-2">
                       <input
                         type="file"
@@ -1562,7 +1551,7 @@ export default function Hero({
                             ) : (
                               <>
                                 <Upload className="mr-2 h-4 w-4" />
-                                PDF файл байршуулах
+                                PDF файл сонгох
                               </>
                             )}
                           </span>
@@ -1570,9 +1559,22 @@ export default function Hero({
                       </label>
                     </div>
                     {editedLinks.cvUrl && (
-                      <p className="text-xs text-muted-foreground truncate">
-                        Одоогийн: {editedLinks.cvUrl.includes('firebasestorage') ? 'Байршуулсан файл' : editedLinks.cvUrl}
-                      </p>
+                      <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
+                        <p className="text-xs text-muted-foreground truncate flex-1">
+                          ✓ Байршуулсан файл
+                        </p>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() =>
+                            setEditedLinks(prev => ({ ...prev, cvUrl: '' }))
+                          }
+                          className="h-6 px-2"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
                     )}
                   </div>
                   <div className="flex items-center gap-2">

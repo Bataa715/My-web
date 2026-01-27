@@ -55,7 +55,10 @@ export default function RootLayout({
       <head>
         {/* Preconnect to critical external resources */}
         <link rel="dns-prefetch" href="https://cdn.simpleicons.org" />
-        <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
+        <link
+          rel="dns-prefetch"
+          href="https://firebasestorage.googleapis.com"
+        />
       </head>
       <body
         className={`${jetbrainsMono.variable} min-h-screen bg-background font-body antialiased`}

@@ -10,7 +10,9 @@ const SuperChartAnalysisInputSchema = z.object({
       "A screenshot of a financial chart, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
 });
-export type SuperChartAnalysisInput = z.infer<typeof SuperChartAnalysisInputSchema>;
+export type SuperChartAnalysisInput = z.infer<
+  typeof SuperChartAnalysisInputSchema
+>;
 
 // Individual method analysis schema
 const MethodAnalysisSchema = z.object({
@@ -22,16 +24,28 @@ const MethodAnalysisSchema = z.object({
 
 const SuperChartAnalysisOutputSchema = z.object({
   // Individual method analyses
-  traditional: MethodAnalysisSchema.describe('Traditional техник шинжилгээ (Support/Resistance, Trendlines, Moving Averages)'),
-  ictSmc: MethodAnalysisSchema.describe('ICT/SMC шинжилгээ (Order Blocks, Fair Value Gaps, Liquidity)'),
-  wyckoff: MethodAnalysisSchema.describe('Wyckoff шинжилгээ (Accumulation/Distribution, Spring/Upthrust)'),
-  elliottWave: MethodAnalysisSchema.describe('Elliott Wave шинжилгээ (Wave Count, Impulse/Corrective)'),
-  fibonacci: MethodAnalysisSchema.describe('Fibonacci шинжилгээ (Retracements, Extensions, Key levels)'),
-  
+  traditional: MethodAnalysisSchema.describe(
+    'Traditional техник шинжилгээ (Support/Resistance, Trendlines, Moving Averages)'
+  ),
+  ictSmc: MethodAnalysisSchema.describe(
+    'ICT/SMC шинжилгээ (Order Blocks, Fair Value Gaps, Liquidity)'
+  ),
+  wyckoff: MethodAnalysisSchema.describe(
+    'Wyckoff шинжилгээ (Accumulation/Distribution, Spring/Upthrust)'
+  ),
+  elliottWave: MethodAnalysisSchema.describe(
+    'Elliott Wave шинжилгээ (Wave Count, Impulse/Corrective)'
+  ),
+  fibonacci: MethodAnalysisSchema.describe(
+    'Fibonacci шинжилгээ (Retracements, Extensions, Key levels)'
+  ),
+
   // Unified result
   unified: z.object({
     direction: z.enum(['BUY', 'SELL']).describe('Нэгдсэн чиглэл'),
-    consensusRatio: z.string().describe('Санал нийлсэн харьцаа (жишээ нь: 4/5 арга)'),
+    consensusRatio: z
+      .string()
+      .describe('Санал нийлсэн харьцаа (жишээ нь: 4/5 арга)'),
     entryPrice: z.number().describe('Орох үнэ'),
     stopLoss: z.number().describe('Stop Loss үнэ'),
     takeProfit1: z.number().describe('Take Profit 1'),
@@ -40,7 +54,9 @@ const SuperChartAnalysisOutputSchema = z.object({
     summary: z.string().describe('Нэгдсэн дүгнэлт'),
   }),
 });
-export type SuperChartAnalysisOutput = z.infer<typeof SuperChartAnalysisOutputSchema>;
+export type SuperChartAnalysisOutput = z.infer<
+  typeof SuperChartAnalysisOutputSchema
+>;
 
 const superAnalyzeChartPrompt = ai.definePrompt({
   name: 'superAnalyzeChartPrompt',
@@ -106,7 +122,9 @@ const superAnalyzeChartFlow = ai.defineFlow(
   async input => {
     const { output } = await superAnalyzeChartPrompt(input);
     if (!output) {
-      throw new Error('Failed to get a super chart analysis from the AI model.');
+      throw new Error(
+        'Failed to get a super chart analysis from the AI model.'
+      );
     }
     return output;
   }

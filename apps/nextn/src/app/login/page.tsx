@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+
+export const dynamic = 'force-dynamic';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/firebase';

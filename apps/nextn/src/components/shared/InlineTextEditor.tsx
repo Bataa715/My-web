@@ -97,20 +97,17 @@ export function InlineTextEditor({
           <Textarea
             ref={inputRef as React.RefObject<HTMLTextAreaElement>}
             value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
+            onChange={e => setEditValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className={cn(
-              'min-h-[100px] resize-y',
-              inputClassName
-            )}
+            className={cn('min-h-[100px] resize-y', inputClassName)}
             disabled={isSaving}
           />
         ) : (
           <Input
             ref={inputRef as React.RefObject<HTMLInputElement>}
             value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
+            onChange={e => setEditValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             className={inputClassName}
@@ -167,7 +164,9 @@ export function InlineTextEditor({
     >
       {children || (
         <span className={displayClassName}>
-          {value || <span className="text-muted-foreground italic">{placeholder}</span>}
+          {value || (
+            <span className="text-muted-foreground italic">{placeholder}</span>
+          )}
         </span>
       )}
       {isEditMode && !isEditing && (
@@ -176,7 +175,7 @@ export function InlineTextEditor({
             variant="secondary"
             size="icon"
             className="h-6 w-6 rounded-full shadow-md"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               shouldFocusRef.current = true;
               setIsEditing(true);
@@ -262,7 +261,7 @@ export function InlineArrayEditor<T>({
           renderEditItem(
             item,
             index,
-            (newItem) => handleItemChange(index, newItem),
+            newItem => handleItemChange(index, newItem),
             () => handleRemove(index)
           )
         )}
@@ -309,7 +308,8 @@ export function InlineArrayEditor<T>({
     <div
       className={cn(
         'group relative',
-        isEditMode && 'hover:bg-muted/30 rounded-lg p-2 -m-2 transition-colors cursor-pointer',
+        isEditMode &&
+          'hover:bg-muted/30 rounded-lg p-2 -m-2 transition-colors cursor-pointer',
         className
       )}
       onClick={() => isEditMode && setIsEditing(true)}
@@ -321,7 +321,7 @@ export function InlineArrayEditor<T>({
             variant="secondary"
             size="icon"
             className="h-6 w-6 rounded-full shadow-md"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               setIsEditing(true);
             }}

@@ -241,7 +241,7 @@ export default function GrammarRuleDetail({
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground tracking-tight">
                 <InlineTextEditor
                   value={rule.title}
-                  onSave={(newValue) => handleSectionUpdate('title', newValue)}
+                  onSave={newValue => handleSectionUpdate('title', newValue)}
                   isEditMode={isEditMode}
                   displayClassName="block"
                   placeholder="Дүрмийн нэр..."
@@ -251,7 +251,9 @@ export default function GrammarRuleDetail({
               <div className="text-sm sm:text-base md:text-lg text-foreground/80 max-w-2xl leading-relaxed">
                 <InlineTextEditor
                   value={rule.introduction}
-                  onSave={(newValue) => handleSectionUpdate('introduction', newValue)}
+                  onSave={newValue =>
+                    handleSectionUpdate('introduction', newValue)
+                  }
                   isEditMode={isEditMode}
                   multiline
                   displayClassName="block"
@@ -323,7 +325,7 @@ export default function GrammarRuleDetail({
 
           <InlineArrayEditor
             items={rule.usage}
-            onSave={(data) => handleSectionUpdate('usage', data)}
+            onSave={data => handleSectionUpdate('usage', data)}
             isEditMode={isEditMode}
             createEmpty={() => ({ condition: '', example: '' })}
             renderItem={(use, i) => (
@@ -344,26 +346,42 @@ export default function GrammarRuleDetail({
               </div>
             )}
             renderEditItem={(use, index, onChange, onRemove) => (
-              <div key={index} className="flex gap-2 items-start border p-3 rounded-md bg-muted/30">
+              <div
+                key={index}
+                className="flex gap-2 items-start border p-3 rounded-md bg-muted/30"
+              >
                 <div className="flex-1 space-y-2">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Нөхцөл</Label>
+                    <Label className="text-xs text-muted-foreground">
+                      Нөхцөл
+                    </Label>
                     <Input
                       value={use.condition}
-                      onChange={(e) => onChange({ ...use, condition: e.target.value })}
+                      onChange={e =>
+                        onChange({ ...use, condition: e.target.value })
+                      }
                       placeholder="Хэзээ хэрэглэх вэ..."
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Жишээ</Label>
+                    <Label className="text-xs text-muted-foreground">
+                      Жишээ
+                    </Label>
                     <Input
                       value={use.example}
-                      onChange={(e) => onChange({ ...use, example: e.target.value })}
+                      onChange={e =>
+                        onChange({ ...use, example: e.target.value })
+                      }
                       placeholder="Жишээ өгүүлбэр..."
                     />
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={onRemove} className="text-destructive hover:text-destructive">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onRemove}
+                  className="text-destructive hover:text-destructive"
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
@@ -394,8 +412,11 @@ export default function GrammarRuleDetail({
               <div className="p-5">
                 <InlineTextEditor
                   value={rule.form.regular}
-                  onSave={async (newValue) => {
-                    await handleSectionUpdate('form', { ...rule.form, regular: newValue });
+                  onSave={async newValue => {
+                    await handleSectionUpdate('form', {
+                      ...rule.form,
+                      regular: newValue,
+                    });
                   }}
                   isEditMode={isEditMode}
                   multiline
@@ -420,8 +441,11 @@ export default function GrammarRuleDetail({
               <div className="p-5">
                 <InlineTextEditor
                   value={rule.form.irregular}
-                  onSave={async (newValue) => {
-                    await handleSectionUpdate('form', { ...rule.form, irregular: newValue });
+                  onSave={async newValue => {
+                    await handleSectionUpdate('form', {
+                      ...rule.form,
+                      irregular: newValue,
+                    });
                   }}
                   isEditMode={isEditMode}
                   multiline
@@ -485,8 +509,11 @@ export default function GrammarRuleDetail({
                 <div className="p-5 space-y-4">
                   <InlineTextEditor
                     value={rule.structure.positive.formula}
-                    onSave={async (newValue) => {
-                      await handleStructureUpdate('positive', { ...rule.structure.positive, formula: newValue });
+                    onSave={async newValue => {
+                      await handleStructureUpdate('positive', {
+                        ...rule.structure.positive,
+                        formula: newValue,
+                      });
                     }}
                     isEditMode={isEditMode}
                     multiline
@@ -504,9 +531,12 @@ export default function GrammarRuleDetail({
                     </p>
                     <InlineTextEditor
                       value={rule.structure.positive.examples.join('\n')}
-                      onSave={async (newValue) => {
+                      onSave={async newValue => {
                         const examples = newValue.split('\n').filter(Boolean);
-                        await handleStructureUpdate('positive', { ...rule.structure.positive, examples });
+                        await handleStructureUpdate('positive', {
+                          ...rule.structure.positive,
+                          examples,
+                        });
                       }}
                       isEditMode={isEditMode}
                       multiline
@@ -539,8 +569,11 @@ export default function GrammarRuleDetail({
                 <div className="p-5 space-y-4">
                   <InlineTextEditor
                     value={rule.structure.negative.formula}
-                    onSave={async (newValue) => {
-                      await handleStructureUpdate('negative', { ...rule.structure.negative, formula: newValue });
+                    onSave={async newValue => {
+                      await handleStructureUpdate('negative', {
+                        ...rule.structure.negative,
+                        formula: newValue,
+                      });
                     }}
                     isEditMode={isEditMode}
                     multiline
@@ -558,9 +591,12 @@ export default function GrammarRuleDetail({
                     </p>
                     <InlineTextEditor
                       value={rule.structure.negative.examples.join('\n')}
-                      onSave={async (newValue) => {
+                      onSave={async newValue => {
                         const examples = newValue.split('\n').filter(Boolean);
-                        await handleStructureUpdate('negative', { ...rule.structure.negative, examples });
+                        await handleStructureUpdate('negative', {
+                          ...rule.structure.negative,
+                          examples,
+                        });
                       }}
                       isEditMode={isEditMode}
                       multiline
@@ -593,8 +629,11 @@ export default function GrammarRuleDetail({
                 <div className="p-5 space-y-4">
                   <InlineTextEditor
                     value={rule.structure.question.formula}
-                    onSave={async (newValue) => {
-                      await handleStructureUpdate('question', { ...rule.structure.question, formula: newValue });
+                    onSave={async newValue => {
+                      await handleStructureUpdate('question', {
+                        ...rule.structure.question,
+                        formula: newValue,
+                      });
                     }}
                     isEditMode={isEditMode}
                     multiline
@@ -612,9 +651,12 @@ export default function GrammarRuleDetail({
                     </p>
                     <InlineTextEditor
                       value={rule.structure.question.examples.join('\n')}
-                      onSave={async (newValue) => {
+                      onSave={async newValue => {
                         const examples = newValue.split('\n').filter(Boolean);
-                        await handleStructureUpdate('question', { ...rule.structure.question, examples });
+                        await handleStructureUpdate('question', {
+                          ...rule.structure.question,
+                          examples,
+                        });
                       }}
                       isEditMode={isEditMode}
                       multiline
@@ -653,7 +695,7 @@ export default function GrammarRuleDetail({
 
           <InlineArrayEditor
             items={rule.timeExpressions}
-            onSave={(data) => handleSectionUpdate('timeExpressions', data)}
+            onSave={data => handleSectionUpdate('timeExpressions', data)}
             isEditMode={isEditMode}
             createEmpty={() => ({ word: '', translation: '' })}
             renderItem={(exp, i) => (
@@ -674,20 +716,30 @@ export default function GrammarRuleDetail({
               </div>
             )}
             renderEditItem={(exp, index, onChange, onRemove) => (
-              <div key={index} className="flex gap-2 items-center border p-2 rounded-md bg-muted/30">
+              <div
+                key={index}
+                className="flex gap-2 items-center border p-2 rounded-md bg-muted/30"
+              >
                 <Input
                   value={exp.word}
-                  onChange={(e) => onChange({ ...exp, word: e.target.value })}
+                  onChange={e => onChange({ ...exp, word: e.target.value })}
                   placeholder="Үг..."
                   className="flex-1"
                 />
                 <Input
                   value={exp.translation}
-                  onChange={(e) => onChange({ ...exp, translation: e.target.value })}
+                  onChange={e =>
+                    onChange({ ...exp, translation: e.target.value })
+                  }
                   placeholder="Орчуулга..."
                   className="flex-1"
                 />
-                <Button variant="ghost" size="icon" onClick={onRemove} className="text-destructive hover:text-destructive shrink-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onRemove}
+                  className="text-destructive hover:text-destructive shrink-0"
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>

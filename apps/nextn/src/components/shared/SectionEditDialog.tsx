@@ -47,7 +47,9 @@ export function SectionEditDialog({
   const [saving, setSaving] = useState(false);
 
   // Usage state
-  const [usages, setUsages] = useState<{ condition: string; example: string }[]>([]);
+  const [usages, setUsages] = useState<
+    { condition: string; example: string }[]
+  >([]);
 
   // Form state
   const [formRegular, setFormRegular] = useState('');
@@ -58,12 +60,18 @@ export function SectionEditDialog({
   const [examples, setExamples] = useState('');
 
   // Time expressions state
-  const [timeExpressions, setTimeExpressions] = useState<{ word: string; translation: string }[]>([]);
+  const [timeExpressions, setTimeExpressions] = useState<
+    { word: string; translation: string }[]
+  >([]);
 
   const initializeState = () => {
     switch (sectionType) {
       case 'usage':
-        setUsages(initialData.length > 0 ? initialData : [{ condition: '', example: '' }]);
+        setUsages(
+          initialData.length > 0
+            ? initialData
+            : [{ condition: '', example: '' }]
+        );
         break;
       case 'form':
         setFormRegular(initialData.regular || '');
@@ -76,7 +84,9 @@ export function SectionEditDialog({
         setExamples(initialData.examples?.join('\n') || '');
         break;
       case 'time-expressions':
-        setTimeExpressions(initialData.length > 0 ? initialData : [{ word: '', translation: '' }]);
+        setTimeExpressions(
+          initialData.length > 0 ? initialData : [{ word: '', translation: '' }]
+        );
         break;
     }
   };
@@ -127,10 +137,15 @@ export function SectionEditDialog({
         return (
           <div className="space-y-4">
             {usages.map((usage, index) => (
-              <div key={index} className="flex gap-2 items-start border p-3 rounded-md bg-muted/30">
+              <div
+                key={index}
+                className="flex gap-2 items-start border p-3 rounded-md bg-muted/30"
+              >
                 <div className="flex-1 space-y-2">
                   <div>
-                    <Label className="text-xs text-muted-foreground">Нөхцөл</Label>
+                    <Label className="text-xs text-muted-foreground">
+                      Нөхцөл
+                    </Label>
                     <Input
                       value={usage.condition}
                       onChange={e => {
@@ -142,7 +157,9 @@ export function SectionEditDialog({
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Жишээ</Label>
+                    <Label className="text-xs text-muted-foreground">
+                      Жишээ
+                    </Label>
                     <Input
                       value={usage.example}
                       onChange={e => {
@@ -158,7 +175,9 @@ export function SectionEditDialog({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  onClick={() => setUsages(usages.filter((_, i) => i !== index))}
+                  onClick={() =>
+                    setUsages(usages.filter((_, i) => i !== index))
+                  }
                   className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -169,7 +188,9 @@ export function SectionEditDialog({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => setUsages([...usages, { condition: '', example: '' }])}
+              onClick={() =>
+                setUsages([...usages, { condition: '', example: '' }])
+              }
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               Хэрэглээ нэмэх
@@ -234,7 +255,10 @@ export function SectionEditDialog({
         return (
           <div className="space-y-4">
             {timeExpressions.map((exp, index) => (
-              <div key={index} className="flex gap-2 items-center border p-3 rounded-md bg-muted/30">
+              <div
+                key={index}
+                className="flex gap-2 items-center border p-3 rounded-md bg-muted/30"
+              >
                 <div className="flex-1 grid grid-cols-2 gap-2">
                   <div>
                     <Label className="text-xs text-muted-foreground">Үг</Label>
@@ -249,7 +273,9 @@ export function SectionEditDialog({
                     />
                   </div>
                   <div>
-                    <Label className="text-xs text-muted-foreground">Орчуулга</Label>
+                    <Label className="text-xs text-muted-foreground">
+                      Орчуулга
+                    </Label>
                     <Input
                       value={exp.translation}
                       onChange={e => {
@@ -265,7 +291,11 @@ export function SectionEditDialog({
                   type="button"
                   variant="ghost"
                   size="icon"
-                  onClick={() => setTimeExpressions(timeExpressions.filter((_, i) => i !== index))}
+                  onClick={() =>
+                    setTimeExpressions(
+                      timeExpressions.filter((_, i) => i !== index)
+                    )
+                  }
                   className="text-destructive hover:text-destructive"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -276,7 +306,12 @@ export function SectionEditDialog({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => setTimeExpressions([...timeExpressions, { word: '', translation: '' }])}
+              onClick={() =>
+                setTimeExpressions([
+                  ...timeExpressions,
+                  { word: '', translation: '' },
+                ])
+              }
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               Илэрхийлэл нэмэх

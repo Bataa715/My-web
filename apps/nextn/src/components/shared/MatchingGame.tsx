@@ -139,7 +139,12 @@ export default function MatchingGame({
   return (
     <div className="w-full max-w-3xl mx-auto px-2 sm:px-4 py-4 sm:py-6">
       <div className="flex items-center gap-2 sm:gap-4 mb-4 sm:mb-6">
-        <Button variant="ghost" size="icon" className="shrink-0" onClick={onExit}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="shrink-0"
+          onClick={onExit}
+        >
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <h2 className="text-lg sm:text-2xl font-bold">Үгсийг холбоно уу</h2>

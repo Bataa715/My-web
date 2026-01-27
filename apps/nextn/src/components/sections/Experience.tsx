@@ -150,15 +150,15 @@ export default function Experience() {
   const { isEditMode } = useEditMode();
 
   return (
-    <section id="experience" className="py-16 md:py-24 lg:py-32">
-      <div className="container px-4 md:px-6">
+    <section id="experience" className="py-12 sm:py-16 md:py-20 lg:py-24">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
         {/* Section Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12 md:mb-16"
+          className="text-center mb-8 sm:mb-10 md:mb-12"
         >
           <h2 className="text-3xl md:text-5xl font-bold">
             Миний <span className="text-primary">туршлага</span>
@@ -167,7 +167,7 @@ export default function Experience() {
 
         {/* Experience Grid */}
         <div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5 md:gap-6 max-w-6xl mx-auto"
           style={{ perspective: '1000px' }}
         >
           {experiences.map((experience, index) => (

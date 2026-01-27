@@ -38,7 +38,11 @@ const Footer = () => {
         <div className="flex items-center gap-2">
           {links.github && (
             <Button variant="ghost" size="icon" asChild>
-              <Link href={links.github} target="_blank" aria-label="GitHub профайл">
+              <Link
+                href={links.github}
+                target="_blank"
+                aria-label="GitHub профайл"
+              >
                 <Github aria-hidden="true" />
                 <span className="sr-only">GitHub профайл</span>
               </Link>
@@ -46,7 +50,11 @@ const Footer = () => {
           )}
           {links.instagram && (
             <Button variant="ghost" size="icon" asChild>
-              <Link href={links.instagram} target="_blank" aria-label="Instagram профайл">
+              <Link
+                href={links.instagram}
+                target="_blank"
+                aria-label="Instagram профайл"
+              >
                 <Instagram aria-hidden="true" />
                 <span className="sr-only">Instagram профайл</span>
               </Link>
@@ -54,7 +62,11 @@ const Footer = () => {
           )}
           {links.facebook && (
             <Button variant="ghost" size="icon" asChild>
-              <Link href={links.facebook} target="_blank" aria-label="Facebook хуудас">
+              <Link
+                href={links.facebook}
+                target="_blank"
+                aria-label="Facebook хуудас"
+              >
                 <Facebook aria-hidden="true" />
                 <span className="sr-only">Facebook хуудас</span>
               </Link>

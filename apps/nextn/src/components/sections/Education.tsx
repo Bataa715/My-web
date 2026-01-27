@@ -257,7 +257,7 @@ export default function Education() {
   return (
     <section
       id="education"
-      className="py-16 md:py-24 lg:py-32 relative overflow-hidden"
+      className="py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden"
     >
       {/* Background decoration */}
       <div className="absolute inset-0 pointer-events-none">
@@ -265,14 +265,14 @@ export default function Education() {
         <div className="absolute bottom-1/4 -right-32 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
       </div>
 
-      <div className="container px-4 md:px-6 relative">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8 relative">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="flex flex-col items-center justify-center space-y-4 text-center mb-12"
+          className="flex flex-col items-center justify-center space-y-4 text-center mb-8 sm:mb-10 md:mb-12"
         >
           <div className="flex items-center gap-4 justify-center">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-white via-neutral-200 to-neutral-400 bg-clip-text text-transparent">
@@ -293,7 +293,7 @@ export default function Education() {
         ) : (
           <motion.div
             layout
-            className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+            className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto"
             style={{ perspective: '1000px' }}
           >
             <AnimatePresence>

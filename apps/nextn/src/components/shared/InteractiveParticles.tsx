@@ -73,8 +73,8 @@ export default function InteractiveParticles({
             size: Math.random() * 2 + 1,
             alpha: 0,
             targetAlpha: parseFloat((Math.random() * 0.6 + 0.1).toFixed(1)),
-            dx: (Math.random() - 0.5) * 2,
-            dy: (Math.random() - 0.5) * 2,
+            dx: (Math.random() - 0.5) * 0.5,
+            dy: (Math.random() - 0.5) * 0.5,
             magnetism: 0.1 + Math.random() * 4,
           };
           circles.current.push(newCircle);
@@ -125,8 +125,8 @@ export default function InteractiveParticles({
           size: Math.random() * 2 + 1,
           alpha: 0,
           targetAlpha: parseFloat((Math.random() * 0.6 + 0.1).toFixed(1)),
-          dx: (Math.random() - 0.5) * 2,
-          dy: (Math.random() - 0.5) * 2,
+          dx: (Math.random() - 0.5) * 0.5,
+          dy: (Math.random() - 0.5) * 0.5,
           magnetism: 0.1 + Math.random() * 4,
         };
         circles.current.push(newCircle);
@@ -155,8 +155,8 @@ export default function InteractiveParticles({
     const size = Math.floor(Math.random() * 2) + 1;
     const alpha = 0;
     const targetAlpha = parseFloat((Math.random() * 0.6 + 0.1).toFixed(1));
-    const dx = (Math.random() - 0.5) * 0.2;
-    const dy = (Math.random() - 0.5) * 0.2;
+    const dx = (Math.random() - 0.5) * 0.05;
+    const dy = (Math.random() - 0.5) * 0.05;
     const magnetism = 0.1 + Math.random() * 4;
     return {
       x,
@@ -241,8 +241,20 @@ export default function InteractiveParticles({
       } else {
         circle.alpha = circle.targetAlpha * remapClosestEdge;
       }
+
+      // Update position with boundary checking
       circle.x += circle.dx;
       circle.y += circle.dy;
+
+      // Bounce off edges to keep particles within canvas
+      if (circle.x <= 0 || circle.x >= canvasSize.current.w) {
+        circle.dx *= -1;
+        circle.x = Math.max(0, Math.min(canvasSize.current.w, circle.x));
+      }
+      if (circle.y <= 0 || circle.y >= canvasSize.current.h) {
+        circle.dy *= -1;
+        circle.y = Math.max(0, Math.min(canvasSize.current.h, circle.y));
+      }
 
       const distanceX = mouse.current.x - (circle.x + circle.translateX);
       const distanceY = mouse.current.y - (circle.y + circle.translateY);

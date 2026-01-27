@@ -118,7 +118,9 @@ const CodeSnippet = ({
 
   const lineCount = code.split('\n').length;
   const shouldCollapse = lineCount > 5;
-  const previewCode = shouldCollapse ? code.split('\n').slice(0, 4).join('\n') + '\n...' : code;
+  const previewCode = shouldCollapse
+    ? code.split('\n').slice(0, 4).join('\n') + '\n...'
+    : code;
 
   return (
     <motion.div
@@ -142,7 +144,7 @@ const CodeSnippet = ({
               variant="ghost"
               size="sm"
               className="h-7 px-2 text-xs"
-              onClick={(e) => {
+              onClick={e => {
                 e.stopPropagation();
                 setIsExpanded(!isExpanded);
               }}
@@ -176,7 +178,7 @@ const CodeSnippet = ({
             variant="ghost"
             size="icon"
             className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               onEdit();
             }}
@@ -189,7 +191,7 @@ const CodeSnippet = ({
                 variant="ghost"
                 size="icon"
                 className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
-                onClick={(e) => e.stopPropagation()}
+                onClick={e => e.stopPropagation()}
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
@@ -225,7 +227,9 @@ const CodeSnippet = ({
       </AnimatePresence>
       {!isExpanded && shouldCollapse && (
         <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card/90 to-transparent pointer-events-none flex items-end justify-center pb-2">
-          <span className="text-xs text-muted-foreground">Дарж бүтнээр харах</span>
+          <span className="text-xs text-muted-foreground">
+            Дарж бүтнээр харах
+          </span>
         </div>
       )}
     </motion.div>

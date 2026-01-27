@@ -29,14 +29,62 @@ interface SkillCardProps {
 
 // Color accents based on index - matching Education style
 const cardAccents = [
-  { gradient: 'from-primary via-primary/80 to-primary/60', glow: 'primary', iconBg: 'bg-primary/20', iconBorder: 'border-primary/40', iconText: 'text-primary' },
-  { gradient: 'from-blue-500 via-blue-400 to-cyan-400', glow: 'blue-500', iconBg: 'bg-blue-500/20', iconBorder: 'border-blue-400/40', iconText: 'text-blue-400' },
-  { gradient: 'from-violet-500 via-purple-500 to-fuchsia-500', glow: 'violet-500', iconBg: 'bg-violet-500/20', iconBorder: 'border-violet-400/40', iconText: 'text-violet-400' },
-  { gradient: 'from-amber-500 via-orange-500 to-red-500', glow: 'amber-500', iconBg: 'bg-amber-500/20', iconBorder: 'border-amber-400/40', iconText: 'text-amber-400' },
-  { gradient: 'from-emerald-500 via-green-500 to-teal-500', glow: 'emerald-500', iconBg: 'bg-emerald-500/20', iconBorder: 'border-emerald-400/40', iconText: 'text-emerald-400' },
-  { gradient: 'from-rose-500 via-pink-500 to-fuchsia-500', glow: 'rose-500', iconBg: 'bg-rose-500/20', iconBorder: 'border-rose-400/40', iconText: 'text-rose-400' },
-  { gradient: 'from-cyan-500 via-teal-500 to-emerald-500', glow: 'cyan-500', iconBg: 'bg-cyan-500/20', iconBorder: 'border-cyan-400/40', iconText: 'text-cyan-400' },
-  { gradient: 'from-indigo-500 via-blue-500 to-purple-500', glow: 'indigo-500', iconBg: 'bg-indigo-500/20', iconBorder: 'border-indigo-400/40', iconText: 'text-indigo-400' },
+  {
+    gradient: 'from-primary via-primary/80 to-primary/60',
+    glow: 'primary',
+    iconBg: 'bg-primary/20',
+    iconBorder: 'border-primary/40',
+    iconText: 'text-primary',
+  },
+  {
+    gradient: 'from-blue-500 via-blue-400 to-cyan-400',
+    glow: 'blue-500',
+    iconBg: 'bg-blue-500/20',
+    iconBorder: 'border-blue-400/40',
+    iconText: 'text-blue-400',
+  },
+  {
+    gradient: 'from-violet-500 via-purple-500 to-fuchsia-500',
+    glow: 'violet-500',
+    iconBg: 'bg-violet-500/20',
+    iconBorder: 'border-violet-400/40',
+    iconText: 'text-violet-400',
+  },
+  {
+    gradient: 'from-amber-500 via-orange-500 to-red-500',
+    glow: 'amber-500',
+    iconBg: 'bg-amber-500/20',
+    iconBorder: 'border-amber-400/40',
+    iconText: 'text-amber-400',
+  },
+  {
+    gradient: 'from-emerald-500 via-green-500 to-teal-500',
+    glow: 'emerald-500',
+    iconBg: 'bg-emerald-500/20',
+    iconBorder: 'border-emerald-400/40',
+    iconText: 'text-emerald-400',
+  },
+  {
+    gradient: 'from-rose-500 via-pink-500 to-fuchsia-500',
+    glow: 'rose-500',
+    iconBg: 'bg-rose-500/20',
+    iconBorder: 'border-rose-400/40',
+    iconText: 'text-rose-400',
+  },
+  {
+    gradient: 'from-cyan-500 via-teal-500 to-emerald-500',
+    glow: 'cyan-500',
+    iconBg: 'bg-cyan-500/20',
+    iconBorder: 'border-cyan-400/40',
+    iconText: 'text-cyan-400',
+  },
+  {
+    gradient: 'from-indigo-500 via-blue-500 to-purple-500',
+    glow: 'indigo-500',
+    iconBg: 'bg-indigo-500/20',
+    iconBorder: 'border-indigo-400/40',
+    iconText: 'text-indigo-400',
+  },
 ];
 
 const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
@@ -132,7 +180,9 @@ const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
       {/* Card */}
       <div className="relative h-full rounded-2xl border border-neutral-800 bg-neutral-900/80 backdrop-blur-sm overflow-hidden">
         {/* Top gradient accent line */}
-        <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${accent.gradient}`} />
+        <div
+          className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${accent.gradient}`}
+        />
 
         {/* Spotlight effect */}
         <motion.div
@@ -150,14 +200,21 @@ const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
               {/* Glow behind icon */}
               <motion.div
                 className={`absolute inset-0 bg-gradient-to-r ${accent.gradient} rounded-2xl blur-xl`}
-                animate={{ scale: isHovered ? 1.2 : 0.8, opacity: isHovered ? 0.5 : 0.3 }}
+                animate={{
+                  scale: isHovered ? 1.2 : 0.8,
+                  opacity: isHovered ? 0.5 : 0.3,
+                }}
                 transition={{ duration: 0.3 }}
               />
-              <div className={`relative flex items-center justify-center w-16 h-16 rounded-2xl ${accent.iconBg} ${accent.iconText} border ${accent.iconBorder} group-hover:scale-110 transition-all duration-300`}>
+              <div
+                className={`relative flex items-center justify-center w-16 h-16 rounded-2xl ${accent.iconBg} ${accent.iconText} border ${accent.iconBorder} group-hover:scale-110 transition-all duration-300`}
+              >
                 {getIcon(skillGroup.icon)}
               </div>
             </div>
-            <h3 className={`text-xl md:text-2xl font-bold text-foreground transition-colors duration-300`}>
+            <h3
+              className={`text-xl md:text-2xl font-bold text-foreground transition-colors duration-300`}
+            >
               {skillGroup.name}
             </h3>
           </div>
@@ -170,14 +227,16 @@ const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
               return (
                 <div key={idx} className="group/item relative overflow-hidden">
                   {/* Glow effect */}
-                  <motion.div 
+                  <motion.div
                     className={`absolute inset-0 rounded-full bg-gradient-to-r ${accent.gradient} blur-md`}
                     initial={{ opacity: 0 }}
                     whileHover={{ opacity: 0.3 }}
                   />
 
                   {/* Skill badge */}
-                  <div className={`relative flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-neutral-800/80 border border-neutral-700/50 group-hover/item:border-neutral-600 backdrop-blur-sm transition-all duration-300 group-hover/item:scale-105`}>
+                  <div
+                    className={`relative flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-neutral-800/80 border border-neutral-700/50 group-hover/item:border-neutral-600 backdrop-blur-sm transition-all duration-300 group-hover/item:scale-105`}
+                  >
                     {/* Flag for languages or Icon */}
                     {isLanguageCategory && flag ? (
                       <span className="text-xl">{flag}</span>
@@ -207,15 +266,15 @@ const Skills = () => {
   const { isEditMode } = useEditMode();
 
   return (
-    <section id="skills" className="py-12 md:py-24 lg:py-32">
-      <div className="container px-4 md:px-6">
+    <section id="skills" className="py-12 sm:py-16 md:py-20 lg:py-24">
+      <div className="container mx-auto px-4 sm:px-6 md:px-8">
         {/* Section Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12 md:mb-16"
+          className="text-center mb-8 sm:mb-10 md:mb-12"
         >
           <h2 className="text-3xl md:text-5xl font-bold">
             Ур чадвар &amp; <span className="text-primary">Технологиуд</span>
@@ -223,7 +282,7 @@ const Skills = () => {
         </motion.div>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-7xl mx-auto">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
@@ -243,7 +302,7 @@ const Skills = () => {
           </div>
         ) : (
           <div
-            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-7xl mx-auto"
             style={{ perspective: '1000px' }}
           >
             {skills.map((skillGroup, index) => (
