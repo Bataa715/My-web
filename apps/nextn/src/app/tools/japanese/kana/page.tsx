@@ -142,7 +142,7 @@ export default function KanaPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-rose-400 via-pink-400 to-rose-500 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-rose-400 via-pink-400 to-rose-500 bg-clip-text text-transparent mb-4">
             {activeTab === 'hiragana' ? 'ひらがな' : 'カタカナ'}
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -216,7 +216,7 @@ export default function KanaPage() {
           </div>
           <div className="h-3 bg-white/10 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-gradient-to-r from-rose-500 to-pink-500"
+              className="h-full bg-linear-to-r from-rose-500 to-pink-500"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 1, delay: 0.3 }}
@@ -500,7 +500,7 @@ export default function KanaPage() {
             <Button
               onClick={() => setViewMode('game')}
               size="lg"
-              className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 shadow-lg shadow-rose-500/25 rounded-full px-6"
+              className="bg-linear-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 shadow-lg shadow-rose-500/25 rounded-full px-6"
             >
               <Gamepad2 className="w-5 h-5 mr-2" />
               Flashcard тоглоом
@@ -557,7 +557,7 @@ function KanaCard({
           onToggle();
         }}
         className={`
-          relative p-2 rounded-xl bg-gradient-to-br ${getTypeColor()}
+          relative p-2 rounded-xl bg-linear-to-br ${getTypeColor()}
           border transition-all duration-200 group
           ${isMemorized ? 'ring-2 ring-green-500/50' : ''}
         `}
@@ -577,7 +577,7 @@ function KanaCard({
     <motion.div
       whileHover={{ scale: 1.02 }}
       className={`
-        relative p-3 rounded-xl bg-gradient-to-br ${getTypeColor()}
+        relative p-3 rounded-xl bg-linear-to-br ${getTypeColor()}
         border transition-all duration-200 group cursor-pointer
         ${isMemorized ? 'ring-2 ring-green-500/50' : ''}
       `}

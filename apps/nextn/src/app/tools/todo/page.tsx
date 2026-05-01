@@ -16,7 +16,6 @@ import {
 } from 'firebase/firestore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Loader2,
@@ -28,13 +27,11 @@ import {
   Flag,
   CheckCircle2,
   Circle,
-  Clock,
   Target,
   TrendingUp,
   Zap,
 } from 'lucide-react';
-import BackButton from '@/components/shared/BackButton';
-import InteractiveParticles from '@/components/shared/InteractiveParticles';
+import ToolPageShell from '@/components/shared/ToolPageShell';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -54,7 +51,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Todo {
   id: string;
@@ -95,7 +92,6 @@ const categories = [
   { value: 'other', label: 'Бусад', emoji: '📌' },
 ];
 
-// Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
@@ -107,7 +103,6 @@ const itemVariants = {
   exit: { opacity: 0, x: -100, scale: 0.9 },
 };
 
-// Stat Card Component
 const StatCard = ({
   icon: Icon,
   label,
@@ -122,7 +117,7 @@ const StatCard = ({
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="bg-card/50 backdrop-blur-sm rounded-2xl p-4 border border-border/30"
+    className="bg-card/50 backdrop-blur-xs rounded-2xl p-4 border border-border/30"
   >
     <div className="flex items-center gap-3">
       <div className={cn('p-2.5 rounded-xl', color)}>
@@ -136,7 +131,6 @@ const StatCard = ({
   </motion.div>
 );
 
-// Todo Item Component
 const TodoItem = ({
   todo,
   onToggle,
@@ -163,19 +157,16 @@ const TodoItem = ({
         'group relative flex items-start gap-4 p-4 rounded-2xl border transition-all duration-300',
         todo.completed
           ? 'bg-muted/30 border-border/20'
-          : cn('bg-card/50 backdrop-blur-sm hover:bg-card/70', priority.border),
+          : cn('bg-card/50 backdrop-blur-xs hover:bg-card/70', priority.border),
         isOverdue && !todo.completed && 'border-red-500/50 bg-red-500/5'
       )}
     >
-      {/* Priority indicator */}
       <div
         className={cn(
           'absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl',
           priority.bg.replace('/10', '')
         )}
       />
-
-      {/* Checkbox */}
       <button
         onClick={onToggle}
         className={cn(
@@ -187,8 +178,6 @@ const TodoItem = ({
       >
         {todo.completed && <CheckCircle2 className="h-4 w-4 text-white" />}
       </button>
-
-      {/* Content */}
       <div className="flex-1 min-w-0">
         <p
           className={cn(
@@ -198,8 +187,6 @@ const TodoItem = ({
         >
           {todo.task}
         </p>
-
-        {/* Meta info */}
         <div className="flex flex-wrap items-center gap-2 mt-2">
           {category && (
             <span className="text-xs px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
@@ -234,8 +221,6 @@ const TodoItem = ({
           )}
         </div>
       </div>
-
-      {/* Delete button */}
       <Button
         variant="ghost"
         size="icon"
@@ -256,7 +241,6 @@ export default function TodoPage() {
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const { toast } = useToast();
 
-  // Form state
   const [newTask, setNewTask] = useState('');
   const [priority, setPriority] = useState<'high' | 'medium' | 'low'>('medium');
   const [dueDate, setDueDate] = useState('');
@@ -275,7 +259,6 @@ export default function TodoPage() {
       setLoading(false);
       return;
     }
-
     const q = query(todosRef, orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(
       q,
@@ -296,14 +279,12 @@ export default function TodoPage() {
         setLoading(false);
       }
     );
-
     return () => unsubscribe();
   }, [todosRef, toast]);
 
   const addTodo = async (e: FormEvent) => {
     e.preventDefault();
     if (newTask.trim() === '' || !todosRef) return;
-
     try {
       await addDoc(todosRef, {
         task: newTask,
@@ -321,10 +302,7 @@ export default function TodoPage() {
       toast({ title: 'Амжилттай нэмлээ!' });
     } catch (error) {
       console.error('Error adding todo:', error);
-      toast({
-        title: 'Алдаа гарлаа',
-        variant: 'destructive',
-      });
+      toast({ title: 'Алдаа гарлаа', variant: 'destructive' });
     }
   };
 
@@ -348,14 +326,12 @@ export default function TodoPage() {
     }
   };
 
-  // Filter todos
   const filteredTodos = todos.filter(todo => {
     if (filter === 'active') return !todo.completed;
     if (filter === 'completed') return todo.completed;
     return true;
   });
 
-  // Stats
   const completedCount = todos.filter(t => t.completed).length;
   const activeCount = todos.filter(t => !t.completed).length;
   const highPriorityCount = todos.filter(
@@ -364,83 +340,35 @@ export default function TodoPage() {
   const completionRate =
     todos.length > 0 ? Math.round((completedCount / todos.length) * 100) : 0;
 
-  if (loading) {
-    return (
-      <div className="min-h-screen relative flex justify-center items-center">
-        <InteractiveParticles quantity={30} />
-        <Loader2 className="h-10 w-10 animate-spin text-emerald-500" />
-      </div>
-    );
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen relative"
+    <ToolPageShell
+      title="Хийх зүйлс"
+      description="Өдрийн ажлаа төлөвлөж, бүтээмжээ нэмэгдүүлээрэй"
+      icon={<ListTodo className="h-8 w-8" />}
+      breadcrumbs={[
+        { label: 'Хэрэгслүүд', href: '/tools' },
+        { label: 'Todo' },
+      ]}
     >
-      <InteractiveParticles quantity={40} />
-
-      <div className="relative z-10 p-4 md:p-8">
-        <BackButton />
-
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center pt-6 pb-8"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', delay: 0.2 }}
-              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/30 mb-6"
-            >
-              <ListTodo className="h-10 w-10 text-white" />
-            </motion.div>
-            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 bg-clip-text text-transparent">
-              Хийх зүйлс
-            </h1>
-            <p className="text-muted-foreground mt-3 text-lg">
-              Өдрийн ажлаа төлөвлөж, бүтээмжээ нэмэгдүүлээрэй
-            </p>
-          </motion.div>
-
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : (
+        <div className="max-w-4xl mx-auto space-y-6 pt-2">
           {/* Stats */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8"
+            className="grid grid-cols-2 md:grid-cols-4 gap-3"
           >
-            <StatCard
-              icon={Target}
-              label="Нийт"
-              value={todos.length}
-              color="bg-blue-500/10 text-blue-500"
-            />
-            <StatCard
-              icon={Circle}
-              label="Идэвхтэй"
-              value={activeCount}
-              color="bg-amber-500/10 text-amber-500"
-            />
-            <StatCard
-              icon={CheckCircle2}
-              label="Дууссан"
-              value={completedCount}
-              color="bg-emerald-500/10 text-emerald-500"
-            />
-            <StatCard
-              icon={TrendingUp}
-              label="Гүйцэтгэл"
-              value={`${completionRate}%`}
-              color="bg-purple-500/10 text-purple-500"
-            />
+            <StatCard icon={Target} label="Нийт" value={todos.length} color="bg-primary/10 text-primary" />
+            <StatCard icon={Circle} label="Идэвхтэй" value={activeCount} color="bg-amber-500/10 text-amber-500" />
+            <StatCard icon={CheckCircle2} label="Дууссан" value={completedCount} color="bg-emerald-500/10 text-emerald-500" />
+            <StatCard icon={TrendingUp} label="Гүйцэтгэл" value={`${completionRate}%`} color="bg-accent/10 text-accent" />
           </motion.div>
 
-          {/* Main Content */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -448,7 +376,6 @@ export default function TodoPage() {
           >
             <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-3xl shadow-xl overflow-hidden">
               <CardContent className="p-6">
-                {/* Top bar */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                   <Tabs
                     value={filter}
@@ -456,52 +383,34 @@ export default function TodoPage() {
                     className="w-full sm:w-auto"
                   >
                     <TabsList className="bg-muted/50 rounded-xl p-1">
-                      <TabsTrigger
-                        value="all"
-                        className="rounded-lg data-[state=active]:bg-card"
-                      >
-                        Бүгд
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="active"
-                        className="rounded-lg data-[state=active]:bg-card"
-                      >
-                        Идэвхтэй
-                      </TabsTrigger>
-                      <TabsTrigger
-                        value="completed"
-                        className="rounded-lg data-[state=active]:bg-card"
-                      >
-                        Дууссан
-                      </TabsTrigger>
+                      <TabsTrigger value="all" className="rounded-lg data-[state=active]:bg-card">Бүгд</TabsTrigger>
+                      <TabsTrigger value="active" className="rounded-lg data-[state=active]:bg-card">Идэвхтэй</TabsTrigger>
+                      <TabsTrigger value="completed" className="rounded-lg data-[state=active]:bg-card">Дууссан</TabsTrigger>
                     </TabsList>
                   </Tabs>
-
                   <Button
                     onClick={() => setDialogOpen(true)}
-                    className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white rounded-xl gap-2 shadow-lg shadow-emerald-500/20"
+                    className="bg-primary text-primary-foreground rounded-xl gap-2 shadow-lg"
                   >
                     <Plus className="h-4 w-4" />
                     Шинэ
                   </Button>
                 </div>
 
-                {/* High priority alert */}
                 {highPriorityCount > 0 && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="flex items-center gap-3 p-3 mb-4 rounded-xl bg-red-500/10 border border-red-500/20"
+                    className="flex items-center gap-3 p-3 mb-4 rounded-xl bg-destructive/10 border border-destructive/20"
                   >
-                    <Zap className="h-5 w-5 text-red-500" />
-                    <p className="text-sm text-red-500">
+                    <Zap className="h-5 w-5 text-destructive" />
+                    <p className="text-sm text-destructive">
                       <span className="font-semibold">{highPriorityCount}</span>{' '}
                       чухал ажил хийгдээгүй байна
                     </p>
                   </motion.div>
                 )}
 
-                {/* Todo List */}
                 <motion.div
                   variants={containerVariants}
                   initial="hidden"
@@ -520,7 +429,6 @@ export default function TodoPage() {
                   </AnimatePresence>
                 </motion.div>
 
-                {/* Empty state */}
                 {filteredTodos.length === 0 && (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -528,7 +436,7 @@ export default function TodoPage() {
                     className="text-center py-16"
                   >
                     <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted/50 mb-4">
-                      <Sparkles className="h-10 w-10 text-emerald-500" />
+                      <Sparkles className="h-10 w-10 text-primary" />
                     </div>
                     <p className="text-lg font-medium text-muted-foreground">
                       {filter === 'completed'
@@ -553,14 +461,13 @@ export default function TodoPage() {
             </Card>
           </motion.div>
         </div>
-      </div>
+      )}
 
-      {/* Add Todo Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="bg-card/95 backdrop-blur-xl border-0 rounded-2xl max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center gap-2">
-              <Plus className="h-5 w-5 text-emerald-500" />
+              <Plus className="h-5 w-5 text-primary" />
               Шинэ ажил нэмэх
             </DialogTitle>
           </DialogHeader>
@@ -575,14 +482,10 @@ export default function TodoPage() {
                 autoFocus
               />
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Ач холбогдол</Label>
-                <Select
-                  value={priority}
-                  onValueChange={v => setPriority(v as any)}
-                >
+                <Select value={priority} onValueChange={v => setPriority(v as any)}>
                   <SelectTrigger className="bg-background/50 border-border/50 rounded-xl">
                     <SelectValue />
                   </SelectTrigger>
@@ -605,7 +508,6 @@ export default function TodoPage() {
                   </SelectContent>
                 </Select>
               </div>
-
               <div className="space-y-2">
                 <Label>Ангилал</Label>
                 <Select value={category} onValueChange={setCategory}>
@@ -614,11 +516,7 @@ export default function TodoPage() {
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
                     {categories.map(cat => (
-                      <SelectItem
-                        key={cat.value}
-                        value={cat.value}
-                        className="rounded-lg"
-                      >
+                      <SelectItem key={cat.value} value={cat.value} className="rounded-lg">
                         <span className="flex items-center gap-2">
                           {cat.emoji} {cat.label}
                         </span>
@@ -628,7 +526,6 @@ export default function TodoPage() {
                 </Select>
               </div>
             </div>
-
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
@@ -641,16 +538,13 @@ export default function TodoPage() {
                 className="bg-background/50 border-border/50 rounded-xl"
               />
             </div>
-
             <DialogFooter className="gap-2 pt-4">
               <DialogClose asChild>
-                <Button type="button" variant="ghost" className="rounded-xl">
-                  Цуцлах
-                </Button>
+                <Button type="button" variant="ghost" className="rounded-xl">Цуцлах</Button>
               </DialogClose>
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl"
+                className="bg-primary text-primary-foreground rounded-xl"
                 disabled={!newTask.trim()}
               >
                 Нэмэх
@@ -659,6 +553,6 @@ export default function TodoPage() {
           </form>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </ToolPageShell>
   );
 }

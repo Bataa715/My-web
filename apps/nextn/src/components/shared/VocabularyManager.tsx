@@ -945,7 +945,7 @@ export default function VocabularyManager<T extends Word>({
           <Card className="text-center p-12 mt-8 bg-card/50 backdrop-blur-xl border-0 rounded-2xl max-w-md mx-auto">
             <CardContent className="flex flex-col items-center gap-4">
               <div
-                className={`p-4 rounded-full bg-gradient-to-br from-${gradientColors.from}-500/20 to-${gradientColors.to}-500/20`}
+                className={`p-4 rounded-full bg-linear-to-br from-${gradientColors.from}-500/20 to-${gradientColors.to}-500/20`}
               >
                 <Sparkles
                   className={`h-10 w-10 text-${gradientColors.from}-400`}
@@ -1017,10 +1017,10 @@ export default function VocabularyManager<T extends Word>({
             className="relative"
           >
             <div
-              className={`absolute inset-0 bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500/30 via-purple-500/30 to-fuchsia-500/30' : 'from-rose-500/30 via-pink-500/30 to-fuchsia-500/30'} blur-3xl rounded-full scale-150`}
+              className={`absolute inset-0 bg-linear-to-r ${wordType === 'english' ? 'from-violet-500/30 via-purple-500/30 to-fuchsia-500/30' : 'from-rose-500/30 via-pink-500/30 to-fuchsia-500/30'} blur-3xl rounded-full scale-150`}
             />
             <div
-              className={`relative p-5 rounded-2xl bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'} backdrop-blur-sm border ${wordType === 'english' ? 'border-violet-500/20' : 'border-rose-500/20'}`}
+              className={`relative p-5 rounded-2xl bg-linear-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'} backdrop-blur-xs border ${wordType === 'english' ? 'border-violet-500/20' : 'border-rose-500/20'}`}
             >
               <GraduationCap
                 className={`h-12 w-12 ${wordType === 'english' ? 'text-violet-400' : 'text-rose-400'}`}
@@ -1029,7 +1029,7 @@ export default function VocabularyManager<T extends Word>({
           </motion.div>
 
           <motion.h1
-            className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-headline bg-gradient-to-r ${wordType === 'english' ? 'from-violet-400 via-purple-400 to-fuchsia-400' : 'from-rose-400 via-pink-400 to-fuchsia-400'} bg-clip-text text-transparent px-4`}
+            className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-headline bg-linear-to-r ${wordType === 'english' ? 'from-violet-400 via-purple-400 to-fuchsia-400' : 'from-rose-400 via-pink-400 to-fuchsia-400'} bg-clip-text text-transparent px-4`}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -1053,7 +1053,7 @@ export default function VocabularyManager<T extends Word>({
                 <div className="flex-1">
                   <CardTitle className="flex items-center gap-3">
                     <div
-                      className={`p-2 rounded-lg bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
+                      className={`p-2 rounded-lg bg-linear-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
                     >
                       <BookOpen
                         className={`h-5 w-5 ${wordType === 'english' ? 'text-violet-400' : 'text-rose-400'}`}
@@ -1092,7 +1092,7 @@ export default function VocabularyManager<T extends Word>({
                         onClick={() => openDialog()}
                         disabled={!user}
                         size="sm"
-                        className={`whitespace-nowrap bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0`}
+                        className={`whitespace-nowrap bg-linear-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0`}
                       >
                         <PlusCircle className="mr-2 h-4 w-4" /> Шинэ үг
                       </Button>
@@ -1131,7 +1131,7 @@ export default function VocabularyManager<T extends Word>({
                           </DialogClose>
                           <Button
                             type="submit"
-                            className={`bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500' : 'from-rose-500 to-pink-500'} text-white border-0`}
+                            className={`bg-linear-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500' : 'from-rose-500 to-pink-500'} text-white border-0`}
                           >
                             Хадгалах
                           </Button>
@@ -1207,7 +1207,7 @@ export default function VocabularyManager<T extends Word>({
                         <div className="grid grid-cols-6 gap-2 pr-4">
                           <Button
                             variant={
-                              alphabetFilter === 'all' ? 'default' : 'outline'
+                              alphabetFilter === 'all' ? 'default' : 'outline-solid'
                             }
                             onClick={() => handleAlphabetSelect('all')}
                           >
@@ -1219,7 +1219,7 @@ export default function VocabularyManager<T extends Word>({
                               variant={
                                 alphabetFilter === letter
                                   ? 'default'
-                                  : 'outline'
+                                  : 'outline-solid'
                               }
                               onClick={() => handleAlphabetSelect(letter)}
                             >
@@ -1405,13 +1405,13 @@ export default function VocabularyManager<T extends Word>({
                     number => (
                       <Button
                         key={number}
-                        variant={currentPage === number ? 'default' : 'outline'}
+                        variant={currentPage === number ? 'default' : 'outline-solid'}
                         size="icon"
                         onClick={() => paginate(number)}
                         className={cn(
                           'rounded-lg',
                           currentPage === number
-                            ? `${wordType === 'english' ? 'bg-gradient-to-r from-violet-500 to-purple-500' : 'bg-gradient-to-r from-rose-500 to-pink-500'} border-0`
+                            ? `${wordType === 'english' ? 'bg-linear-to-r from-violet-500 to-purple-500' : 'bg-linear-to-r from-rose-500 to-pink-500'} border-0`
                             : 'bg-background/30 border-0'
                         )}
                       >
@@ -1442,7 +1442,7 @@ export default function VocabularyManager<T extends Word>({
           transition={{ delay: 0.4 }}
         >
           <h2
-            className={`text-3xl font-bold text-center mb-8 bg-gradient-to-r ${wordType === 'english' ? 'from-violet-400 via-purple-400 to-fuchsia-400' : 'from-rose-400 via-pink-400 to-fuchsia-400'} bg-clip-text text-transparent`}
+            className={`text-3xl font-bold text-center mb-8 bg-linear-to-r ${wordType === 'english' ? 'from-violet-400 via-purple-400 to-fuchsia-400' : 'from-rose-400 via-pink-400 to-fuchsia-400'} bg-clip-text text-transparent`}
           >
             Сонирхолтой аргууд
           </h2>
@@ -1452,11 +1452,11 @@ export default function VocabularyManager<T extends Word>({
                 className={`bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden hover:shadow-lg ${wordType === 'english' ? 'hover:shadow-violet-500/20' : 'hover:shadow-rose-500/20'} transition-all duration-500 group`}
               >
                 <div
-                  className={`absolute inset-0 bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/10 to-purple-500/10' : 'from-rose-500/10 to-pink-500/10'} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                  className={`absolute inset-0 bg-linear-to-br ${wordType === 'english' ? 'from-violet-500/10 to-purple-500/10' : 'from-rose-500/10 to-pink-500/10'} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                 />
                 <CardHeader className="flex-row items-center gap-4 relative">
                   <div
-                    className={`p-3 rounded-xl bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
+                    className={`p-3 rounded-xl bg-linear-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
                   >
                     <BookOpen
                       className={`w-6 h-6 ${wordType === 'english' ? 'text-violet-400' : 'text-rose-400'}`}
@@ -1469,7 +1469,7 @@ export default function VocabularyManager<T extends Word>({
                     Картаар эргүүлж цээжилсэн үгээ бататгах.
                   </CardDescription>
                   <Button
-                    className={`mt-4 w-full bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0 rounded-xl`}
+                    className={`mt-4 w-full bg-linear-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0 rounded-xl`}
                     onClick={() => setGameMode('flashcard')}
                     disabled={filteredWords.length === 0}
                   >
@@ -1493,11 +1493,11 @@ export default function VocabularyManager<T extends Word>({
                 className={`bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden hover:shadow-lg ${wordType === 'english' ? 'hover:shadow-violet-500/20' : 'hover:shadow-rose-500/20'} transition-all duration-500 group`}
               >
                 <div
-                  className={`absolute inset-0 bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/10 to-purple-500/10' : 'from-rose-500/10 to-pink-500/10'} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                  className={`absolute inset-0 bg-linear-to-br ${wordType === 'english' ? 'from-violet-500/10 to-purple-500/10' : 'from-rose-500/10 to-pink-500/10'} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                 />
                 <CardHeader className="flex-row items-center gap-4 relative">
                   <div
-                    className={`p-3 rounded-xl bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
+                    className={`p-3 rounded-xl bg-linear-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
                   >
                     <Brain
                       className={`w-6 h-6 ${wordType === 'english' ? 'text-violet-400' : 'text-rose-400'}`}
@@ -1510,7 +1510,7 @@ export default function VocabularyManager<T extends Word>({
                     Орчуулга, утга зэргийг сонголтот тестээр шалгуулах.
                   </CardDescription>
                   <Button
-                    className={`mt-4 w-full bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0 rounded-xl`}
+                    className={`mt-4 w-full bg-linear-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0 rounded-xl`}
                     onClick={() => setGameMode('test')}
                     disabled={filteredWords.length < 4}
                   >
@@ -1534,11 +1534,11 @@ export default function VocabularyManager<T extends Word>({
                 className={`bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden hover:shadow-lg ${wordType === 'english' ? 'hover:shadow-violet-500/20' : 'hover:shadow-rose-500/20'} transition-all duration-500 group`}
               >
                 <div
-                  className={`absolute inset-0 bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/10 to-purple-500/10' : 'from-rose-500/10 to-pink-500/10'} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                  className={`absolute inset-0 bg-linear-to-br ${wordType === 'english' ? 'from-violet-500/10 to-purple-500/10' : 'from-rose-500/10 to-pink-500/10'} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                 />
                 <CardHeader className="flex-row items-center gap-4 relative">
                   <div
-                    className={`p-3 rounded-xl bg-gradient-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
+                    className={`p-3 rounded-xl bg-linear-to-br ${wordType === 'english' ? 'from-violet-500/20 to-purple-500/20' : 'from-rose-500/20 to-pink-500/20'}`}
                   >
                     <LinkIcon
                       className={`w-6 h-6 ${wordType === 'english' ? 'text-violet-400' : 'text-rose-400'}`}
@@ -1553,7 +1553,7 @@ export default function VocabularyManager<T extends Word>({
                       : 'Япон болон Монгол үгсийг зөв хооронд нь холбох.'}
                   </CardDescription>
                   <Button
-                    className={`mt-4 w-full bg-gradient-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0 rounded-xl`}
+                    className={`mt-4 w-full bg-linear-to-r ${wordType === 'english' ? 'from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600' : 'from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600'} text-white border-0 rounded-xl`}
                     onClick={() => setGameMode('matching')}
                     disabled={filteredWords.length < 5}
                   >

@@ -6,8 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import BackButton from '@/components/shared/BackButton';
-import InteractiveParticles from '@/components/shared/InteractiveParticles';
+import ToolPageShell from '@/components/shared/ToolPageShell';
 import {
   Bot,
   Send,
@@ -44,12 +43,10 @@ export default function AIChatPage() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto scroll to bottom when new messages arrive
   useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
@@ -59,7 +56,6 @@ export default function AIChatPage() {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedImage(reader.result as string);
@@ -70,13 +66,12 @@ export default function AIChatPage() {
 
   const removeImage = () => {
     setSelectedImage(null);
-    setImageFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if ((!input.trim() && !selectedImage) || isLoading) return;
 
@@ -93,17 +88,14 @@ export default function AIChatPage() {
     const currentImage = selectedImage;
     setInput('');
     setSelectedImage(null);
-    setImageFile(null);
     setIsLoading(true);
 
     try {
-      // Build conversation context from last few messages
       const recentMessages = messages.slice(-4);
       const context = recentMessages
         .map(m => `${m.role === 'user' ? 'Хэрэглэгч' : 'AI'}: ${m.content}`)
         .join('\n');
 
-      // Call actual AI
       const response = await askStudyAssistant({
         question: currentInput || 'Энэ зургийг тайлбарлана уу',
         imageBase64: currentImage || undefined,
@@ -134,39 +126,19 @@ export default function AIChatPage() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 20 }}
-      transition={{ duration: 0.5, ease: 'easeInOut' }}
-      className="relative min-h-screen"
+    <ToolPageShell
+      title="AI Хичээлийн Туслах"
+      description="Зураг эсвэл текстээр асуултаа илгээнэ үү"
+      eyebrow="Хичээлийн туслах"
+      icon={<Bot className="h-8 w-8" />}
+      breadcrumbs={[
+        { label: 'Хэрэгслүүд', href: '/tools' },
+        { label: 'AI Chat' },
+      ]}
     >
-      <InteractiveParticles className="fixed inset-0 z-0 pointer-events-none" />
-
-      <div className="relative z-10 max-w-4xl mx-auto px-4 md:px-6 py-8 space-y-6">
-        <BackButton />
-
-        {/* Hero Section */}
-        <div className="text-center pt-4 pb-2">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 mb-4"
-          >
-            <Bot className="h-4 w-4" />
-            <span className="text-sm font-medium">Хичээлийн туслах</span>
-          </motion.div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-500 bg-clip-text text-transparent mb-2">
-            AI Хичээлийн Туслах
-          </h1>
-          <p className="text-muted-foreground">
-            Зураг эсвэл текстээр асуултаа илгээнэ үү
-          </p>
-        </div>
-
+      <div className="max-w-4xl mx-auto space-y-4 pt-2">
         {/* Quick Action Chips */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex flex-wrap gap-2">
           {[
             { label: 'Анагаах', icon: <Sparkles className="h-3 w-3" /> },
             { label: 'Биологи', icon: <BookOpen className="h-3 w-3" /> },
@@ -190,7 +162,6 @@ export default function AIChatPage() {
         {/* Chat Container */}
         <Card className="border-primary/20 bg-card/50 backdrop-blur-xl">
           <CardContent className="p-0">
-            {/* Messages */}
             <ScrollArea
               className="h-[calc(100vh-380px)] min-h-[400px] p-4"
               ref={scrollAreaRef}
@@ -211,7 +182,7 @@ export default function AIChatPage() {
                       )}
                     >
                       {message.role === 'assistant' && (
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center">
+                        <div className="shrink-0 w-8 h-8 rounded-full bg-linear-to-br from-primary to-accent flex items-center justify-center">
                           <Bot className="h-4 w-4 text-white" />
                         </div>
                       )}
@@ -247,7 +218,7 @@ export default function AIChatPage() {
                       </div>
 
                       {message.role === 'user' && (
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                        <div className="shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
                           <User className="h-4 w-4 text-primary" />
                         </div>
                       )}
@@ -255,14 +226,13 @@ export default function AIChatPage() {
                   ))}
                 </AnimatePresence>
 
-                {/* Loading indicator */}
                 {isLoading && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="flex gap-3"
                   >
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center">
+                    <div className="shrink-0 w-8 h-8 rounded-full bg-linear-to-br from-primary to-accent flex items-center justify-center">
                       <Bot className="h-4 w-4 text-white" />
                     </div>
                     <div className="bg-muted/50 border border-border/50 rounded-2xl px-4 py-3">
@@ -278,9 +248,7 @@ export default function AIChatPage() {
               </div>
             </ScrollArea>
 
-            {/* Input Area */}
             <div className="border-t border-border/50 p-4">
-              {/* Selected Image Preview */}
               {selectedImage && (
                 <div className="mb-3 relative inline-block">
                   <Image
@@ -309,17 +277,15 @@ export default function AIChatPage() {
                   accept="image/*"
                   className="hidden"
                 />
-
                 <Button
                   type="button"
                   variant="outline"
                   size="icon"
-                  className="flex-shrink-0"
+                  className="shrink-0"
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <ImagePlus className="h-5 w-5" />
                 </Button>
-
                 <Input
                   ref={inputRef}
                   value={input}
@@ -328,11 +294,10 @@ export default function AIChatPage() {
                   className="flex-1"
                   disabled={isLoading}
                 />
-
                 <Button
                   type="submit"
                   disabled={(!input.trim() && !selectedImage) || isLoading}
-                  className="flex-shrink-0 bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600"
+                  className="shrink-0 bg-linear-to-r from-primary to-accent hover:opacity-90"
                 >
                   {isLoading ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
@@ -345,12 +310,11 @@ export default function AIChatPage() {
           </CardContent>
         </Card>
 
-        {/* Info */}
-        <p className="text-center text-xs text-muted-foreground mt-4">
+        <p className="text-center text-xs text-muted-foreground">
           AI туслах нь хичээлтэй холбоотой асуултуудад хариулах зориулалттай.
           Зураг болон текстээр асуулт илгээх боломжтой.
         </p>
       </div>
-    </motion.div>
+    </ToolPageShell>
   );
 }

@@ -125,7 +125,7 @@ const CodeSnippet = ({
   return (
     <motion.div
       variants={itemVariants}
-      className="group relative bg-card/50 backdrop-blur-sm rounded-2xl border border-border/50 overflow-hidden cursor-pointer hover:border-primary/30 transition-colors"
+      className="group relative bg-card/50 backdrop-blur-xs rounded-2xl border border-border/50 overflow-hidden cursor-pointer hover:border-primary/30 transition-colors"
       onClick={() => shouldCollapse && setIsExpanded(!isExpanded)}
     >
       <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b border-border/50">
@@ -226,7 +226,7 @@ const CodeSnippet = ({
         </motion.pre>
       </AnimatePresence>
       {!isExpanded && shouldCollapse && (
-        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-card/90 to-transparent pointer-events-none flex items-end justify-center pb-2">
+        <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-t from-card/90 to-transparent pointer-events-none flex items-end justify-center pb-2">
           <span className="text-xs text-muted-foreground">
             Дарж бүтнээр харах
           </span>
@@ -312,7 +312,7 @@ const ItemDialog = ({
             </DialogClose>
             <Button
               type="submit"
-              className="rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white"
+              className="rounded-xl bg-linear-to-r from-orange-500 to-amber-500 text-white"
             >
               Хадгалах
             </Button>
@@ -755,7 +755,7 @@ export default function LanguageDojoPage({
                         </div>
                         <Button
                           onClick={() => openDialog('notes')}
-                          className="rounded-xl gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
+                          className="rounded-xl gap-2 bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
                         >
                           <PlusCircle className="h-4 w-4" />
                           <span className="hidden sm:inline">Шинэ</span>
@@ -782,7 +782,7 @@ export default function LanguageDojoPage({
                               onClick={() => setViewingNote(note)}
                             >
                               <div
-                                className="h-48 bg-card/50 backdrop-blur-sm border-0 rounded-2xl overflow-hidden hover:bg-card/70 transition-all hover:scale-[1.02] hover:shadow-lg p-4 flex flex-col relative"
+                                className="h-48 bg-card/50 backdrop-blur-xs border-0 rounded-2xl overflow-hidden hover:bg-card/70 transition-all hover:scale-[1.02] hover:shadow-lg p-4 flex flex-col relative"
                                 style={{
                                   boxShadow: `0 4px 20px rgba(${accentColor}, 0.1)`,
                                 }}
@@ -908,7 +908,7 @@ export default function LanguageDojoPage({
                           </div>
                           <Button
                             onClick={() => openDialog('chapters')}
-                            className="rounded-xl gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
+                            className="rounded-xl gap-2 bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
                           >
                             <PlusCircle className="h-4 w-4" />
                             <span className="hidden sm:inline">Шинэ бүлэг</span>
@@ -934,7 +934,7 @@ export default function LanguageDojoPage({
                                 onClick={() => setSelectedChapter(chapter)}
                               >
                                 <div
-                                  className="bg-card/50 backdrop-blur-sm rounded-2xl p-5 hover:bg-card/70 transition-all hover:scale-[1.02]"
+                                  className="bg-card/50 backdrop-blur-xs rounded-2xl p-5 hover:bg-card/70 transition-all hover:scale-[1.02]"
                                   style={{
                                     boxShadow: `0 4px 20px rgba(${accentColor}, 0.1)`,
                                   }}
@@ -1084,7 +1084,7 @@ export default function LanguageDojoPage({
                                   className="group"
                                 >
                                   <div
-                                    className="bg-card/50 backdrop-blur-sm rounded-2xl p-4 hover:bg-card/70 transition-all cursor-pointer"
+                                    className="bg-card/50 backdrop-blur-xs rounded-2xl p-4 hover:bg-card/70 transition-all cursor-pointer"
                                     style={{
                                       boxShadow: `0 4px 20px rgba(${accentColor}, 0.1)`,
                                     }}
@@ -1209,7 +1209,7 @@ export default function LanguageDojoPage({
                               setViewingNote(null);
                               openDialog('notes', viewingNote);
                             }}
-                            className="rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white gap-2"
+                            className="rounded-xl bg-linear-to-r from-orange-500 to-amber-500 text-white gap-2"
                           >
                             <Edit className="h-4 w-4" />
                             Засах
@@ -1232,7 +1232,7 @@ export default function LanguageDojoPage({
                   </div>
                   <Button
                     onClick={() => openDialog('snippets')}
-                    className="rounded-xl gap-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
+                    className="rounded-xl gap-2 bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
                   >
                     <PlusCircle className="h-4 w-4" />
                     <span className="hidden sm:inline">Шинэ</span>

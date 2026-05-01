@@ -176,11 +176,11 @@ export default function WritingPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.2 }}
-              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/30 mb-6"
+              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-linear-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/30 mb-6"
             >
               <PenTool className="h-10 w-10 text-white" />
             </motion.div>
-            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-violet-400 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent">
+            <h1 className="text-4xl sm:text-5xl font-bold bg-linear-to-r from-violet-400 via-purple-500 to-fuchsia-500 bg-clip-text text-transparent">
               Writing Practice
             </h1>
             <p className="text-muted-foreground mt-3 text-lg">
@@ -203,7 +203,7 @@ export default function WritingPage() {
               className={cn(
                 'flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all',
                 mode === 'check'
-                  ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30'
+                  ? 'bg-linear-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30'
                   : 'bg-card/50 text-muted-foreground hover:text-foreground'
               )}
             >
@@ -218,7 +218,7 @@ export default function WritingPage() {
               className={cn(
                 'flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all',
                 mode === 'prompt'
-                  ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30'
+                  ? 'bg-linear-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30'
                   : 'bg-card/50 text-muted-foreground hover:text-foreground'
               )}
             >
@@ -283,7 +283,7 @@ export default function WritingPage() {
                       <Button
                         onClick={handleCheck}
                         disabled={loading || !text.trim()}
-                        className="bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-xl gap-2 px-6"
+                        className="bg-linear-to-r from-violet-500 to-purple-600 text-white rounded-xl gap-2 px-6"
                       >
                         {loading ? (
                           <>
@@ -308,7 +308,7 @@ export default function WritingPage() {
                     animate={{ opacity: 1, y: 0 }}
                   >
                     <Tabs defaultValue="overview" className="space-y-6">
-                      <TabsList className="bg-card/50 backdrop-blur-sm rounded-xl p-1 w-full justify-start overflow-x-auto">
+                      <TabsList className="bg-card/50 backdrop-blur-xs rounded-xl p-1 w-full justify-start overflow-x-auto">
                         <TabsTrigger
                           value="overview"
                           className="rounded-lg gap-2"
@@ -609,7 +609,7 @@ export default function WritingPage() {
                     <Button
                       onClick={handleGeneratePrompt}
                       disabled={loading}
-                      className="w-full bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-xl gap-2"
+                      className="w-full bg-linear-to-r from-violet-500 to-purple-600 text-white rounded-xl gap-2"
                     >
                       {loading ? (
                         <>
@@ -634,7 +634,7 @@ export default function WritingPage() {
                     className="space-y-6"
                   >
                     {/* Main Prompt */}
-                    <Card className="bg-gradient-to-br from-violet-500/10 to-purple-500/10 border-0 rounded-3xl">
+                    <Card className="bg-linear-to-br from-violet-500/10 to-purple-500/10 border-0 rounded-3xl">
                       <CardContent className="pt-6">
                         <div className="text-center mb-4">
                           <span className="text-sm text-violet-400 font-medium">
@@ -721,7 +721,7 @@ export default function WritingPage() {
                         setText('');
                         setCheckResult(null);
                       }}
-                      className="w-full bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-xl gap-2 h-12"
+                      className="w-full bg-linear-to-r from-violet-500 to-purple-600 text-white rounded-xl gap-2 h-12"
                     >
                       <PenTool className="h-5 w-5" />
                       Бичиж эхлэх

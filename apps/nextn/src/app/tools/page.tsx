@@ -1,17 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from '@/components/ui/card';
-import Link from 'next/link';
-import {
-  ArrowRight,
   Timer,
   Code as CodeIcon,
   BookOpen,
@@ -22,129 +14,147 @@ import {
   ListTodo,
   Bot,
   Settings,
-  Eye,
   EyeOff,
-  GripVertical,
 } from 'lucide-react';
-import InteractiveParticles from '@/components/shared/InteractiveParticles';
 import BackButton from '@/components/shared/BackButton';
+import PageHeader from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useFirebase } from '@/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { useEditMode } from '@/contexts/EditModeContext';
+import ToolCard, { type Tool } from '@/components/tools/ToolCard';
+import type { ToolSettings } from '@/components/tools/ToolSettingsDialog';
 
-interface Tool {
-  id: string;
-  title: string;
-  description: string;
-  href: string;
-  icon: React.ReactNode;
-  gradient: string;
-  shadowColor: string;
-}
+// Lazy: only loaded if user actually opens settings (edit mode)
+const ToolSettingsDialog = dynamic(
+  () => import('@/components/tools/ToolSettingsDialog'),
+  { ssr: false, loading: () => null }
+);
+
+// Lazy: heavy canvas — render after first paint
+const InteractiveParticles = dynamic(
+  () => import('@/components/shared/InteractiveParticles'),
+  { ssr: false }
+);
 
 const allTools: Tool[] = [
   {
     id: 'english',
     title: 'Англи хэл',
-    description: 'Англи хэл сурах хэрэгслүүд',
+    description: 'Үг сурах · Дүрэм · Дасгал',
     href: '/tools/english',
     icon: <BookOpen className="h-7 w-7" />,
     gradient: 'from-blue-500 to-cyan-400',
     shadowColor: 'rgba(59, 130, 246, 0.5)',
+    glow: '59, 130, 246',
+    accent: '#3b82f6',
+    tag: 'Хэл',
   },
   {
     id: 'japanese',
     title: 'Япон хэл',
-    description: 'Япон хэл сурах хэрэгслүүд',
+    description: 'Hiragana · Katakana · Kanji',
     href: '/tools/japanese',
     icon: <BookOpen className="h-7 w-7" />,
     gradient: 'from-rose-500 to-pink-400',
     shadowColor: 'rgba(244, 63, 94, 0.5)',
+    glow: '244, 63, 94',
+    accent: '#f43f5e',
+    tag: 'Хэл',
   },
   {
     id: 'portfolio',
     title: 'Portfolio',
-    description: 'Portfolio мэдээлэл засах, QR код',
+    description: 'Портфолио засах · QR · линк',
     href: '/tools/portfolio',
     icon: <User className="h-7 w-7" />,
     gradient: 'from-violet-500 to-purple-400',
     shadowColor: 'rgba(139, 92, 246, 0.5)',
+    glow: '139, 92, 246',
+    accent: '#8b5cf6',
+    tag: 'Хувийн',
   },
   {
     id: 'todo',
     title: 'Todo List',
-    description: 'Хийх зүйлсийн жагсаалт',
+    description: 'Хийх ажил · Тэмдэглэл',
     href: '/tools/todo',
     icon: <ListTodo className="h-7 w-7" />,
     gradient: 'from-green-500 to-emerald-400',
     shadowColor: 'rgba(16, 185, 129, 0.5)',
+    glow: '16, 185, 129',
+    accent: '#10b981',
+    tag: 'Бүтээмж',
   },
   {
     id: 'fitness',
     title: 'Fitness Tracker',
-    description: 'Биеийн тамирын дасгал хянах хэрэгсэл',
+    description: 'Дасгал · Биеийн жин',
     href: '/tools/fitness',
     icon: <LayoutGrid className="h-7 w-7" />,
     gradient: 'from-emerald-500 to-teal-400',
     shadowColor: 'rgba(16, 185, 129, 0.5)',
+    glow: '20, 184, 166',
+    accent: '#14b8a6',
+    tag: 'Эрүүл',
   },
   {
     id: 'programming',
     title: 'Програмчлал',
-    description: 'Код бичиж сурах хэрэгслүүд',
+    description: 'Алгоритм · HTML · JS',
     href: '/tools/programming',
     icon: <CodeIcon className="h-7 w-7" />,
     gradient: 'from-orange-500 to-amber-400',
     shadowColor: 'rgba(249, 115, 22, 0.5)',
+    glow: '249, 115, 22',
+    accent: '#f97316',
+    tag: 'Код',
   },
   {
     id: 'trader-ai',
     title: 'TraderAi',
-    description: 'AI-аар алтны ханшийн зураг шинжлэх',
+    description: 'AI алтны зураг шинжилгээ',
     href: '/tools/trader-ai',
     icon: <TrendingUp className="h-7 w-7" />,
     gradient: 'from-yellow-500 to-lime-400',
     shadowColor: 'rgba(234, 179, 8, 0.5)',
+    glow: '234, 179, 8',
+    accent: '#eab308',
+    tag: 'AI',
   },
   {
     id: 'pomodoro',
     title: 'Pomodoro Timer',
-    description: 'Төвлөрлийг сайжруулах цаг',
+    description: 'Төвлөрөл · 25 минут циклүүд',
     href: '/tools/pomodoro',
     icon: <Timer className="h-7 w-7" />,
     gradient: 'from-red-500 to-rose-400',
     shadowColor: 'rgba(239, 68, 68, 0.5)',
+    glow: '239, 68, 68',
+    accent: '#ef4444',
+    tag: 'Бүтээмж',
   },
   {
     id: 'ai-chat',
     title: 'AI Туслах',
-    description: 'Хичээлтэй холбоотой асуултад хариулах AI',
+    description: 'Хичээлийн чат туслах',
     href: '/tools/ai-chat',
     icon: <Bot className="h-7 w-7" />,
     gradient: 'from-indigo-500 to-blue-400',
     shadowColor: 'rgba(99, 102, 241, 0.5)',
+    glow: '99, 102, 241',
+    accent: '#6366f1',
+    tag: 'AI',
   },
 ];
 
-interface ToolSettings {
-  [toolId: string]: {
-    visible: boolean;
-    order: number;
-  };
-}
+const ALL_CATEGORIES = 'Бүгд';
+
+const uniqueCategories = [
+  ALL_CATEGORIES,
+  ...Array.from(new Set(allTools.map(t => t.tag))),
+];
 
 export default function ToolsPage() {
   const { firestore, user } = useFirebase();
@@ -153,39 +163,32 @@ export default function ToolsPage() {
   const [toolSettings, setToolSettings] = useState<ToolSettings>({});
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORIES);
 
-  // Initialize default settings
   useEffect(() => {
-    const defaultSettings: ToolSettings = {};
+    const defaults: ToolSettings = {};
     allTools.forEach((tool, index) => {
-      defaultSettings[tool.id] = { visible: true, order: index };
+      defaults[tool.id] = { visible: true, order: index };
     });
-    setToolSettings(defaultSettings);
+    setToolSettings(defaults);
   }, []);
 
-  // Load settings from Firestore
   useEffect(() => {
     async function loadSettings() {
       if (!firestore || !user) {
         setIsLoading(false);
         return;
       }
-
       try {
-        const settingsRef = doc(firestore, `users/${user.uid}/settings/tools`);
-        const settingsSnap = await getDoc(settingsRef);
-
-        if (settingsSnap.exists()) {
-          const savedSettings = settingsSnap.data() as ToolSettings;
-          // Merge with defaults to handle new tools
-          const mergedSettings: ToolSettings = {};
+        const ref = doc(firestore, `users/${user.uid}/settings/tools`);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const saved = snap.data() as ToolSettings;
+          const merged: ToolSettings = {};
           allTools.forEach((tool, index) => {
-            mergedSettings[tool.id] = savedSettings[tool.id] || {
-              visible: true,
-              order: index,
-            };
+            merged[tool.id] = saved[tool.id] || { visible: true, order: index };
           });
-          setToolSettings(mergedSettings);
+          setToolSettings(merged);
         }
       } catch (error) {
         console.error('Error loading tool settings:', error);
@@ -193,23 +196,16 @@ export default function ToolsPage() {
         setIsLoading(false);
       }
     }
-
     loadSettings();
   }, [firestore, user]);
 
-  // Save settings to Firestore
   const saveSettings = async (newSettings: ToolSettings) => {
     setToolSettings(newSettings);
-
     if (!firestore || !user) return;
-
     try {
-      const settingsRef = doc(firestore, `users/${user.uid}/settings/tools`);
-      await setDoc(settingsRef, newSettings);
-      toast({
-        title: 'Амжилттай',
-        description: 'Тохиргоо хадгалагдлаа.',
-      });
+      const ref = doc(firestore, `users/${user.uid}/settings/tools`);
+      await setDoc(ref, newSettings);
+      toast({ title: 'Амжилттай', description: 'Тохиргоо хадгалагдлаа.' });
     } catch (error) {
       console.error('Error saving tool settings:', error);
       toast({
@@ -220,52 +216,61 @@ export default function ToolsPage() {
     }
   };
 
-  // Toggle tool visibility
-  const toggleToolVisibility = (toolId: string) => {
-    const newSettings = {
+  const toggleTool = (toolId: string) => {
+    saveSettings({
       ...toolSettings,
       [toolId]: {
         ...toolSettings[toolId],
         visible: !toolSettings[toolId]?.visible,
       },
-    };
-    saveSettings(newSettings);
-  };
-
-  // Show all tools
-  const showAllTools = () => {
-    const newSettings: ToolSettings = {};
-    allTools.forEach((tool, index) => {
-      newSettings[tool.id] = {
-        visible: true,
-        order: toolSettings[tool.id]?.order ?? index,
-      };
     });
-    saveSettings(newSettings);
   };
 
-  // Hide all tools
-  const hideAllTools = () => {
-    const newSettings: ToolSettings = {};
-    allTools.forEach((tool, index) => {
-      newSettings[tool.id] = {
-        visible: false,
-        order: toolSettings[tool.id]?.order ?? index,
-      };
+  const showAll = () => {
+    const next: ToolSettings = {};
+    allTools.forEach((t, i) => {
+      next[t.id] = { visible: true, order: toolSettings[t.id]?.order ?? i };
     });
-    saveSettings(newSettings);
+    saveSettings(next);
   };
 
-  // Get visible tools sorted by order
-  const visibleTools = allTools
-    .map(tool => ({
-      ...tool,
-      order:
-        toolSettings[tool.id]?.order ??
-        allTools.findIndex(t => t.id === tool.id),
-    }))
-    .filter(tool => toolSettings[tool.id]?.visible !== false)
-    .sort((a, b) => a.order - b.order);
+  const hideAll = () => {
+    const next: ToolSettings = {};
+    allTools.forEach((t, i) => {
+      next[t.id] = { visible: false, order: toolSettings[t.id]?.order ?? i };
+    });
+    saveSettings(next);
+  };
+
+  const visibleTools = useMemo(
+    () =>
+      allTools
+        .map(tool => ({
+          ...tool,
+          order:
+            toolSettings[tool.id]?.order ??
+            allTools.findIndex(t => t.id === tool.id),
+        }))
+        .filter(tool => toolSettings[tool.id]?.visible !== false)
+        .sort((a, b) => a.order - b.order),
+    [toolSettings]
+  );
+
+  const filteredTools = useMemo(
+    () =>
+      selectedCategory === ALL_CATEGORIES
+        ? visibleTools
+        : visibleTools.filter(t => t.tag === selectedCategory),
+    [visibleTools, selectedCategory]
+  );
+
+  const categoryCount = useMemo(() => {
+    const counts: Record<string, number> = { [ALL_CATEGORIES]: visibleTools.length };
+    visibleTools.forEach(t => {
+      counts[t.tag] = (counts[t.tag] ?? 0) + 1;
+    });
+    return counts;
+  }, [visibleTools]);
 
   const hiddenCount = allTools.length - visibleTools.length;
 
@@ -277,204 +282,115 @@ export default function ToolsPage() {
       transition={{ duration: 0.5, ease: 'easeInOut' }}
       className="relative min-h-screen"
     >
-      <InteractiveParticles quantity={60} />
+      <InteractiveParticles quantity={40} />
       <div className="space-y-8 px-4 md:px-6 relative z-10 pb-16">
         <BackButton />
 
-        {/* Hero Section */}
-        <div className="text-center pt-8 pb-4">
-          <div className="flex items-center justify-center gap-4">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent">
-              Хэрэгслүүд
-            </h1>
+        <div className="relative pt-6">
+          <PageHeader
+            eyebrow="Хэрэгслүүд"
+            icon={<Sparkles className="h-3.5 w-3.5" />}
+            title="Бүтээмж · Сурах · AI"
+            description="Англи · Япон хэл, программчлал болон бүтээмжийн хэрэгслүүдийг нэг дороос ашигла."
+          />
 
-            {/* Settings Button - Only visible in edit mode */}
-            {isEditMode && (
-              <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="rounded-full border-primary/30 hover:border-primary hover:bg-primary/10"
-                  >
-                    <Settings className="h-5 w-5" />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <Settings className="h-5 w-5" />
-                      Хэрэгслүүдийн тохиргоо
-                    </DialogTitle>
-                    <DialogDescription>
-                      Харуулах болон нуух хэрэгслүүдийг сонгоно уу.
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <div className="flex gap-2 mb-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={showAllTools}
-                      className="flex-1"
-                    >
-                      <Eye className="h-4 w-4 mr-2" />
-                      Бүгдийг харуулах
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={hideAllTools}
-                      className="flex-1"
-                    >
-                      <EyeOff className="h-4 w-4 mr-2" />
-                      Бүгдийг нуух
-                    </Button>
-                  </div>
-
-                  <ScrollArea className="max-h-[400px] pr-4">
-                    <div className="space-y-3">
-                      {allTools.map(tool => (
-                        <div
-                          key={tool.id}
-                          className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
-                            toolSettings[tool.id]?.visible !== false
-                              ? 'bg-card border-primary/20'
-                              : 'bg-muted/50 border-muted opacity-60'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`p-2 rounded-lg bg-gradient-to-br ${tool.gradient} text-white`}
-                            >
-                              {tool.icon}
-                            </div>
-                            <div>
-                              <p className="font-medium">{tool.title}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {tool.description}
-                              </p>
-                            </div>
-                          </div>
-                          <Switch
-                            checked={toolSettings[tool.id]?.visible !== false}
-                            onCheckedChange={() =>
-                              toggleToolVisibility(tool.id)
-                            }
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-
-                  <div className="text-sm text-muted-foreground text-center pt-2">
-                    {visibleTools.length} харагдаж байна • {hiddenCount}{' '}
-                    нуугдсан
-                  </div>
-                </DialogContent>
-              </Dialog>
-            )}
-          </div>
-
-          {isEditMode && hiddenCount > 0 && (
-            <p className="text-sm text-muted-foreground mt-2">
-              {hiddenCount} хэрэгсэл нуугдсан •{' '}
-              <button
-                onClick={() => setIsSettingsOpen(true)}
-                className="text-primary hover:underline"
-              >
-                Тохиргоо
-              </button>
-            </p>
+          {isEditMode && (
+            <div className="absolute top-2 right-0">
+              <ToolSettingsDialog
+                open={isSettingsOpen}
+                onOpenChange={setIsSettingsOpen}
+                allTools={allTools}
+                toolSettings={toolSettings}
+                visibleCount={visibleTools.length}
+                hiddenCount={hiddenCount}
+                onToggle={toggleTool}
+                onShowAll={showAll}
+                onHideAll={hideAll}
+              />
+            </div>
           )}
         </div>
 
-        {/* Tools Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-8">
-          <AnimatePresence initial={false}>
-            {visibleTools.map(tool => (
-              <motion.div
-                key={tool.id}
-                layout
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{
-                  layout: {
-                    type: 'spring',
-                    stiffness: 300,
-                    damping: 30,
-                  },
-                  opacity: { duration: 0.2 },
-                  scale: { duration: 0.2 },
-                }}
+        {isEditMode && hiddenCount > 0 && (
+          <p className="text-sm text-muted-foreground mt-2 text-center">
+            {hiddenCount} хэрэгсэл нуугдсан •{' '}
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="text-primary hover:underline"
+            >
+              Тохиргоо
+            </button>
+          </p>
+        )}
+
+        {/* ── Category filter tabs ── */}
+        {!isLoading && visibleTools.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+            {uniqueCategories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`filter-tab ${selectedCategory === cat ? 'filter-tab-active' : ''}`}
               >
-                <Link href={tool.href} className="group block h-full">
-                  <div
-                    className="relative h-full rounded-2xl p-[1px] transition-all duration-500 group-hover:scale-[1.02]"
-                    style={{
-                      background: `linear-gradient(135deg, ${tool.gradient.includes('blue') ? '#3b82f6' : tool.gradient.includes('rose') ? '#f43f5e' : tool.gradient.includes('violet') ? '#8b5cf6' : tool.gradient.includes('emerald') ? '#10b981' : tool.gradient.includes('orange') ? '#f97316' : tool.gradient.includes('yellow') ? '#eab308' : tool.gradient.includes('green') ? '#22c55e' : '#ef4444'}40, transparent)`,
-                    }}
-                  >
-                    <Card
-                      className="relative h-full bg-card/80 backdrop-blur-xl border-0 rounded-2xl overflow-hidden transition-all duration-500"
-                      style={{
-                        boxShadow: `0 0 0 rgba(0,0,0,0)`,
-                      }}
-                      onMouseEnter={e => {
-                        e.currentTarget.style.boxShadow = `0 20px 40px -15px ${tool.shadowColor}`;
-                      }}
-                      onMouseLeave={e => {
-                        e.currentTarget.style.boxShadow = `0 0 0 rgba(0,0,0,0)`;
-                      }}
-                    >
-                      {/* Background gradient blob */}
-                      <div
-                        className={`absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br ${tool.gradient} rounded-full opacity-20 blur-3xl group-hover:opacity-40 group-hover:scale-150 transition-all duration-700`}
-                      />
-
-                      {/* Shimmer effect */}
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                      </div>
-
-                      <CardHeader className="relative z-10 pb-2">
-                        <div className="flex items-start justify-between">
-                          <div
-                            className={`p-3.5 rounded-xl bg-gradient-to-br ${tool.gradient} text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}
-                          >
-                            {tool.icon}
-                          </div>
-                        </div>
-                      </CardHeader>
-
-                      <CardContent className="relative z-10 pt-4">
-                        <CardTitle className="text-xl font-bold mb-2 group-hover:text-primary transition-colors duration-300">
-                          {tool.title}
-                        </CardTitle>
-                        <CardDescription className="text-muted-foreground/80 line-clamp-2">
-                          {tool.description}
-                        </CardDescription>
-
-                        {/* Bottom accent line */}
-                        <div className="mt-4 flex items-center gap-2">
-                          <div
-                            className={`h-1 w-0 group-hover:w-12 bg-gradient-to-r ${tool.gradient} rounded-full transition-all duration-500`}
-                          />
-                          <span className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-                            Нээх
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </Link>
-              </motion.div>
+                {cat}
+                <span
+                  className="inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full text-[10px] font-bold ml-0.5"
+                  style={{
+                    background: selectedCategory === cat
+                      ? 'hsl(var(--primary) / 0.2)'
+                      : 'hsl(var(--muted))',
+                    color: selectedCategory === cat
+                      ? 'hsl(var(--primary))'
+                      : 'hsl(var(--muted-foreground))',
+                  }}
+                >
+                  {categoryCount[cat] ?? 0}
+                </span>
+              </button>
             ))}
-          </AnimatePresence>
+          </div>
+        )}
+
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6 pt-2"
+          style={{ perspective: '1500px' }}
+        >
+          {isLoading
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl min-h-[230px] skeleton"
+                  style={{ animationDelay: `${i * 80}ms` }}
+                />
+              ))
+            : (
+              <AnimatePresence initial={false}>
+                {filteredTools.map((tool, idx) => (
+                  <ToolCard key={tool.id} tool={tool} index={idx} />
+                ))}
+              </AnimatePresence>
+            )}
         </div>
 
-        {/* Empty state when all tools are hidden */}
+        {filteredTools.length === 0 && !isLoading && visibleTools.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-12"
+          >
+            <p className="text-muted-foreground text-sm">
+              <span className="font-semibold text-foreground">{selectedCategory}</span>{' '}
+              ангилалд хэрэгсэл олдсонгүй.
+            </p>
+            <button
+              onClick={() => setSelectedCategory(ALL_CATEGORIES)}
+              className="mt-3 text-sm text-primary hover:underline"
+            >
+              Бүгдийг харах
+            </button>
+          </motion.div>
+        )}
+
         {visibleTools.length === 0 && !isLoading && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useFirebase } from '@/firebase';
 import {
   collection,
-  getDocs,
+  onSnapshot,
   doc,
   query,
   orderBy,
@@ -23,6 +23,7 @@ import {
   deleteDoc,
   updateDoc,
 } from 'firebase/firestore';
+import { readCache, writeCache } from '@/lib/firestore-cache';
 
 // Helper function to convert Timestamp or Date to Date
 const toDate = (value: any): Date => {
@@ -66,20 +67,29 @@ export function EducationProvider({ children }: { children: ReactNode }) {
       setEducation([]);
       return;
     }
+
+    // 1. Cache hydrate
+    const cacheKey = `education::${user.uid}`;
+    const cached = readCache<Education[]>(cacheKey);
+    if (cached && cached.length) {
+      setEducation(cached);
+      setLoading(false);
+    }
+
     const educationCollectionRef = collection(
       firestore,
       `users/${user.uid}/education`
     );
+    const q = query(educationCollectionRef, orderBy('startDate', 'asc'));
 
-    const fetchEducation = async () => {
-      setLoading(true);
-      try {
-        const q = query(educationCollectionRef, orderBy('startDate', 'asc'));
-        const educationSnapshot = await getDocs(q);
-        const educationList = educationSnapshot.docs.map(doc => {
-          const data = doc.data();
+    // 2. Live snapshot
+    const unsubscribe = onSnapshot(
+      q,
+      snapshot => {
+        const educationList = snapshot.docs.map(d => {
+          const data = d.data();
           return {
-            id: doc.id,
+            id: d.id,
             ...data,
             startDate: toDate(data.startDate),
             endDate: toDate(data.endDate),
@@ -87,19 +97,20 @@ export function EducationProvider({ children }: { children: ReactNode }) {
           } as Education;
         });
         setEducation(educationList);
-      } catch (error) {
-        console.error('Error fetching education: ', error);
+        writeCache(cacheKey, educationList);
+        setLoading(false);
+      },
+      error => {
+        console.error('Error subscribing to education: ', error);
         toast({
           title: 'Алдаа',
           description: 'Боловсролын мэдээллийг дуудахад алдаа гарлаа.',
           variant: 'destructive',
         });
-      } finally {
         setLoading(false);
       }
-    };
-
-    fetchEducation();
+    );
+    return () => unsubscribe();
   }, [firestore, user, toast]);
 
   const addEducation = async (edu: Omit<Education, 'id' | 'createdAt'>) => {

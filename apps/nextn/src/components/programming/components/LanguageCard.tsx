@@ -61,7 +61,7 @@ export default function LanguageCard({
     >
       <Link href={`/tools/programming/${language.id}`}>
         <div
-          className="bg-gray-900/50 backdrop-blur-sm border p-6 rounded-2xl h-full flex flex-col justify-between hover:scale-105 transition-all cursor-pointer"
+          className="bg-gray-900/50 backdrop-blur-xs border p-6 rounded-2xl h-full flex flex-col justify-between hover:scale-105 transition-all cursor-pointer"
           style={cardStyle}
         >
           <div>

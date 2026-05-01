@@ -116,7 +116,7 @@ export default function TestGame({ words, wordType, onExit }: TestGameProps) {
 
   if (isFinished) {
     return (
-      <Card className="w-full max-w-2xl mx-auto p-4 md:p-8 text-center bg-card/80 backdrop-blur-sm border-primary/20">
+      <Card className="w-full max-w-2xl mx-auto p-4 md:p-8 text-center bg-card/80 backdrop-blur-xs border-primary/20">
         <CardHeader>
           <div className="flex justify-center mb-4">
             <CheckCircle2 className="h-12 w-12 md:h-16 md:w-16 text-green-500" />

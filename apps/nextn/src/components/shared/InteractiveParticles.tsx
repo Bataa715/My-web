@@ -43,53 +43,68 @@ export default function InteractiveParticles({
     if (canvasRef.current) {
       context.current = canvasRef.current.getContext('2d');
     }
+
+    // Disable entirely on mobile / reduced motion (huge perf win)
+    if (typeof window !== 'undefined') {
+      if (
+        window.innerWidth < 768 ||
+        window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      ) {
+        return;
+      }
+    }
+
     initCanvas();
-    animate();
+    let rafId = 0;
+    let isVisible = !document.hidden;
+
+    const loop = () => {
+      if (isVisible) animateOnce();
+      rafId = window.requestAnimationFrame(loop);
+    };
+    rafId = window.requestAnimationFrame(loop);
+
     window.addEventListener('resize', initCanvas);
 
-    // Listen to document-level mouse events for particle interaction
+    // Pause animation when tab hidden — saves huge CPU
+    const handleVisibility = () => {
+      isVisible = !document.hidden;
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    // Throttled mouse tracking with rAF
+    let pendingMove: { x: number; y: number } | null = null;
     const handleDocumentMouseMove = (e: MouseEvent) => {
-      if (canvasRef.current) {
+      pendingMove = { x: e.clientX, y: e.clientY };
+    };
+    const flushMouse = () => {
+      if (pendingMove && canvasRef.current) {
         const rect = canvasRef.current.getBoundingClientRect();
         const { w, h } = canvasSize.current;
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const x = pendingMove.x - rect.left;
+        const y = pendingMove.y - rect.top;
         mouse.current.x = x;
         mouse.current.y = y;
         mouse.current.sentX = (x / w) * 2 - 1;
         mouse.current.sentY = (y / h) * 2 - 1;
+        pendingMove = null;
       }
+      mouseRafId = window.requestAnimationFrame(flushMouse);
     };
+    let mouseRafId = window.requestAnimationFrame(flushMouse);
 
-    // Listen to document-level click events for creating new particles
-    const handleDocumentClick = () => {
-      if (canvasRef.current) {
-        for (let i = 0; i < 5; i++) {
-          const newCircle = {
-            x: mouse.current.x,
-            y: mouse.current.y,
-            translateX: 0,
-            translateY: 0,
-            size: Math.random() * 2 + 1,
-            alpha: 0,
-            targetAlpha: parseFloat((Math.random() * 0.6 + 0.1).toFixed(1)),
-            dx: (Math.random() - 0.5) * 0.5,
-            dy: (Math.random() - 0.5) * 0.5,
-            magnetism: 0.1 + Math.random() * 4,
-          };
-          circles.current.push(newCircle);
-        }
-      }
-    };
-
-    document.addEventListener('mousemove', handleDocumentMouseMove);
-    document.addEventListener('click', handleDocumentClick);
+    document.addEventListener('mousemove', handleDocumentMouseMove, {
+      passive: true,
+    });
 
     return () => {
+      window.cancelAnimationFrame(rafId);
+      window.cancelAnimationFrame(mouseRafId);
       window.removeEventListener('resize', initCanvas);
       document.removeEventListener('mousemove', handleDocumentMouseMove);
-      document.removeEventListener('click', handleDocumentClick);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -201,7 +216,13 @@ export default function InteractiveParticles({
 
   const drawParticles = () => {
     clearContext();
-    const particleCount = quantity;
+    // Hard cap: cheap on desktop, off on mobile (handled in main effect).
+    let particleCount = Math.min(quantity, 18);
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 1024) {
+        particleCount = Math.min(particleCount, 10);
+      }
+    }
     for (let i = 0; i < particleCount; i++) {
       const circle = circleParams();
       drawCircle(circle);
@@ -220,9 +241,12 @@ export default function InteractiveParticles({
     return remapped > 0 ? remapped : 0;
   };
 
-  const animate = () => {
+  // Single-frame body (loop is handled by useEffect to allow proper cleanup)
+  const animateOnce = () => {
     clearContext();
-    circles.current.forEach((circle: any, i: number) => {
+    const list = circles.current;
+    for (let i = 0; i < list.length; i++) {
+      const circle = list[i];
       // Handle the alpha value
       const edge = [
         circle.x + circle.translateX,
@@ -272,62 +296,24 @@ export default function InteractiveParticles({
         circle.translateY += (0 - circle.translateY) / ease;
       }
 
-      // circle gets out of the canvas
-      if (
-        circle.x < -circle.size ||
-        circle.x > canvasSize.current.w + circle.size ||
-        circle.y < -circle.size ||
-        circle.y > canvasSize.current.h + circle.size ||
-        circle.alpha <= 0
-      ) {
-        // remove the circle from the array
-        circles.current.splice(i, 1);
-        // create a new circle
-        const newCircle = circleParams();
-        drawCircle(newCircle);
-        // update the circle position
-      } else {
-        drawCircle(
-          {
-            ...circle,
-            x: circle.x,
-            y: circle.y,
-            translateX: circle.translateX,
-            translateY: circle.translateY,
-            alpha: circle.alpha,
-          },
-          true
-        );
-      }
-    });
-
-    // Draw lines between nearby particles
-    for (let i = 0; i < circles.current.length; i++) {
-      for (let j = i + 1; j < circles.current.length; j++) {
-        const A = circles.current[i];
-        const B = circles.current[j];
-
-        const d = Math.sqrt(
-          (A.x + A.translateX - (B.x + B.translateX)) ** 2 +
-            (A.y + A.translateY - (B.y + B.translateY)) ** 2
-        );
-
-        if (d < 100) {
-          if (context.current) {
-            const alpha = 1 - d / 100;
-            context.current.beginPath();
-            context.current.moveTo(A.x + A.translateX, A.y + A.translateY);
-            context.current.lineTo(B.x + B.translateX, B.y + B.translateY);
-            context.current.strokeStyle = `rgba(139, 92, 246, ${alpha})`;
-            context.current.lineWidth = 0.5;
-            context.current.stroke();
-          }
-        }
-      }
+      // Draw without re-pushing into list
+      drawCircle(
+        {
+          ...circle,
+          x: circle.x,
+          y: circle.y,
+          translateX: circle.translateX,
+          translateY: circle.translateY,
+          alpha: circle.alpha,
+        },
+        true
+      );
     }
-
-    window.requestAnimationFrame(animate);
+    // NOTE: O(n²) line-connection loop removed for huge CPU savings.
   };
+
+  // (legacy recursive `animate` removed)
+  const animate = animateOnce;
 
   return (
     <div

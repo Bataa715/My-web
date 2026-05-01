@@ -112,11 +112,11 @@ export default function SpeakingPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.2 }}
-              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-pink-500 to-rose-600 shadow-lg shadow-pink-500/30 mb-6"
+              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-linear-to-br from-pink-500 to-rose-600 shadow-lg shadow-pink-500/30 mb-6"
             >
               <Mic className="h-10 w-10 text-white" />
             </motion.div>
-            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-pink-400 via-rose-500 to-red-500 bg-clip-text text-transparent">
+            <h1 className="text-4xl sm:text-5xl font-bold bg-linear-to-r from-pink-400 via-rose-500 to-red-500 bg-clip-text text-transparent">
               Speaking Practice
             </h1>
             <p className="text-muted-foreground mt-3 text-lg">
@@ -186,7 +186,7 @@ export default function SpeakingPage() {
                   <Button
                     onClick={handleGenerate}
                     disabled={loading || !topic.trim()}
-                    className="bg-gradient-to-r from-pink-500 to-rose-600 text-white rounded-xl gap-2 px-6"
+                    className="bg-linear-to-r from-pink-500 to-rose-600 text-white rounded-xl gap-2 px-6"
                   >
                     {loading ? (
                       <>
@@ -214,7 +214,7 @@ export default function SpeakingPage() {
                 exit={{ opacity: 0 }}
               >
                 <Tabs defaultValue="situation" className="space-y-6">
-                  <TabsList className="bg-card/50 backdrop-blur-sm rounded-xl p-1 w-full justify-start overflow-x-auto">
+                  <TabsList className="bg-card/50 backdrop-blur-xs rounded-xl p-1 w-full justify-start overflow-x-auto">
                     <TabsTrigger value="situation" className="rounded-lg gap-2">
                       <MessageCircle className="h-4 w-4" />
                       Нөхцөл байдал
@@ -237,7 +237,7 @@ export default function SpeakingPage() {
                   <TabsContent value="situation">
                     <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-3xl">
                       <CardContent className="pt-6 space-y-6">
-                        <div className="p-6 bg-gradient-to-br from-pink-500/10 to-rose-500/10 rounded-2xl border border-pink-500/20">
+                        <div className="p-6 bg-linear-to-br from-pink-500/10 to-rose-500/10 rounded-2xl border border-pink-500/20">
                           <h3 className="text-lg font-semibold text-pink-500 mb-3">
                             🎭 Scenario
                           </h3>
@@ -433,9 +433,9 @@ export default function SpeakingPage() {
                               initial={{ opacity: 0, y: 10 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.1 }}
-                              className="flex items-center gap-4 p-4 bg-gradient-to-r from-pink-500/10 to-rose-500/10 rounded-xl border border-pink-500/20"
+                              className="flex items-center gap-4 p-4 bg-linear-to-r from-pink-500/10 to-rose-500/10 rounded-xl border border-pink-500/20"
                             >
-                              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-pink-500/20 text-pink-500 flex items-center justify-center font-bold">
+                              <span className="shrink-0 w-8 h-8 rounded-full bg-pink-500/20 text-pink-500 flex items-center justify-center font-bold">
                                 {index + 1}
                               </span>
                               <p className="flex-1 font-medium">{question}</p>

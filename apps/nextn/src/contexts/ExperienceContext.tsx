@@ -10,13 +10,14 @@ import {
 import { useFirebase } from '@/firebase';
 import {
   collection,
-  getDocs,
+  onSnapshot,
   addDoc,
   updateDoc,
   deleteDoc,
   doc,
 } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
+import { readCache, writeCache } from '@/lib/firestore-cache';
 
 export interface ExperienceItem {
   id: string;
@@ -48,38 +49,49 @@ export const ExperienceProvider = ({ children }: { children: ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchExperiences = async () => {
-      if (!firestore || !user) {
-        setLoading(false);
-        return;
-      }
+    if (!firestore || !user) {
+      setLoading(false);
+      setExperiences([]);
+      return;
+    }
 
-      try {
-        const experiencesRef = collection(
-          firestore,
-          'users',
-          user.uid,
-          'experiences'
-        );
-        const snapshot = await getDocs(experiencesRef);
-        const experiencesData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
+    // 1. Hydrate from cache for instant first paint
+    const cacheKey = `experiences::${user.uid}`;
+    const cached = readCache<ExperienceItem[]>(cacheKey);
+    if (cached && cached.length) {
+      setExperiences(cached);
+      setLoading(false);
+    }
+
+    // 2. Live snapshot subscription
+    const experiencesRef = collection(
+      firestore,
+      'users',
+      user.uid,
+      'experiences'
+    );
+    const unsubscribe = onSnapshot(
+      experiencesRef,
+      snapshot => {
+        const experiencesData = snapshot.docs.map(d => ({
+          id: d.id,
+          ...d.data(),
         })) as ExperienceItem[];
         setExperiences(experiencesData);
-      } catch (error) {
-        console.error('Error fetching experiences:', error);
+        writeCache(cacheKey, experiencesData);
+        setLoading(false);
+      },
+      error => {
+        console.error('Error subscribing to experiences:', error);
         toast({
           title: 'Алдаа',
           description: 'Туршлагын мэдээллийг татахад алдаа гарлаа.',
           variant: 'destructive',
         });
-      } finally {
         setLoading(false);
       }
-    };
-
-    fetchExperiences();
+    );
+    return () => unsubscribe();
   }, [firestore, user, toast]);
 
   const addExperience = async (experience: Omit<ExperienceItem, 'id'>) => {

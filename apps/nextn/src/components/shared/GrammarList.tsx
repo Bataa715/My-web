@@ -76,18 +76,18 @@ export default function GrammarList({
           >
             {/* Gradient border effect */}
             <div
-              className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${gradientFrom}/20 via-transparent ${gradientTo}/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+              className={`absolute inset-0 rounded-2xl bg-linear-to-br ${gradientFrom}/20 via-transparent ${gradientTo}/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
             />
 
             <Link
               href={`${pathname}/${rule.id}`}
-              className="flex-grow relative"
+              className="grow relative"
             >
               <CardHeader className="pb-2">
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
                     <div
-                      className={`p-2 rounded-lg bg-gradient-to-br ${gradientFrom}/20 ${gradientTo}/20 shrink-0`}
+                      className={`p-2 rounded-lg bg-linear-to-br ${gradientFrom}/20 ${gradientTo}/20 shrink-0`}
                     >
                       <BookOpen className={`h-4 w-4 ${textColor}`} />
                     </div>
@@ -97,7 +97,7 @@ export default function GrammarList({
                   </div>
                   <Badge
                     variant="secondary"
-                    className={`bg-gradient-to-r ${gradientFrom}/10 ${gradientTo}/10 border-0 ${textColor}`}
+                    className={`bg-linear-to-r ${gradientFrom}/10 ${gradientTo}/10 border-0 ${textColor}`}
                   >
                     {rule.category}
                   </Badge>
@@ -115,7 +115,7 @@ export default function GrammarList({
             </CardContent>
 
             {isEditMode && rule.id && (
-              <div className="absolute top-2 right-2 flex gap-1 bg-background/80 backdrop-blur-sm rounded-xl p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute top-2 right-2 flex gap-1 bg-background/80 backdrop-blur-xs rounded-xl p-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <EditGrammarRuleDialog
                   rule={rule}
                   onUpdateRule={onUpdateRule}
@@ -172,7 +172,7 @@ export default function GrammarList({
           <Card className="text-center p-12 bg-card/50 backdrop-blur-xl border-0 rounded-2xl">
             <CardContent className="flex flex-col items-center gap-4">
               <div
-                className={`p-4 rounded-full bg-gradient-to-br ${gradientFrom}/20 ${gradientTo}/20`}
+                className={`p-4 rounded-full bg-linear-to-br ${gradientFrom}/20 ${gradientTo}/20`}
               >
                 <BookOpen className={`h-10 w-10 ${textColor}`} />
               </div>

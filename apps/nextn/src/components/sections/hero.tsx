@@ -135,38 +135,43 @@ const OrbitItem: FC<OrbitItemProps> = ({
         scale: 1,
         x: `calc(-50% + ${xPos}px)`,
         y: `calc(-50% + ${yPos}px)`,
-        rotate: -360, // Counter-rotate to keep icons upright
       }}
       transition={{
         opacity: { duration: 0.5, delay: 0.5 + index * 0.1 },
         scale: {
-          duration: 0.5,
+          duration: 0.6,
           delay: 0.5 + index * 0.1,
           type: 'spring',
-          stiffness: 120,
+          stiffness: 140,
+          damping: 16,
         },
         x: {
-          duration: 0.5,
+          duration: 0.6,
           delay: 0.5 + index * 0.1,
           type: 'spring',
-          stiffness: 120,
+          stiffness: 140,
+          damping: 18,
         },
         y: {
-          duration: 0.5,
+          duration: 0.6,
           delay: 0.5 + index * 0.1,
           type: 'spring',
-          stiffness: 120,
+          stiffness: 140,
+          damping: 18,
         },
-        rotate: { duration: 60, repeat: Infinity, ease: 'linear' },
       }}
-      whileHover={{ scale: 1.15 }}
+      whileHover={{ scale: 1.18 }}
       whileTap={{ scale: 0.95 }}
     >
-      <div className="relative group">
+      {/* Counter-rotate so the icon always stays upright. Pure CSS = no stutter. */}
+      <div
+        className="orbit-counter relative group h-full w-full"
+        style={{ ['--orbit-duration' as string]: '60s' }}
+      >
         {/* Glowing ring on hover */}
         <div
           className={cn(
-            'absolute -inset-1 rounded-full bg-gradient-to-r from-primary via-purple-500 to-primary opacity-0 blur-sm transition-opacity duration-300',
+            'absolute -inset-1 rounded-full bg-linear-to-r from-primary via-purple-500 to-primary opacity-0 blur-xs transition-opacity duration-300',
             'group-hover:opacity-70',
             selectedOrbit?.id === item.id &&
               'opacity-70 animate-[spin_3s_linear_infinite]'
@@ -866,104 +871,161 @@ export default function Hero({
       id="home"
       className="relative w-full flex items-center min-h-[calc(100vh-120px)] py-8 sm:py-12 md:py-16 overflow-hidden"
     >
+      {/* Modern hero spotlight: layered conic + radial glow, dot grid, subtle vignette */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-0">
+        <div className="absolute left-1/2 top-1/2 h-[760px] w-[760px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 [background:conic-gradient(from_180deg_at_50%_50%,hsl(var(--primary)/0.35),transparent_40%,hsl(var(--primary)/0.25)_70%,transparent)] blur-3xl" />
+        <div className="absolute -top-20 left-10 h-72 w-72 rounded-full bg-primary/15 blur-[100px]" />
+        <div className="absolute bottom-0 right-10 h-80 w-80 rounded-full bg-purple-500/15 blur-[110px]" />
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+            backgroundSize: '64px 64px',
+            maskImage:
+              'radial-gradient(ellipse at center, black 25%, transparent 75%)',
+          }}
+        />
+      </div>
       <div className="container mx-auto relative z-10 px-4 sm:px-6 md:px-8">
         <div className="grid items-center justify-center gap-6 sm:gap-10 lg:grid-cols-2 lg:gap-16">
           <div className="flex flex-col justify-center space-y-4 sm:space-y-6 lg:order-2">
             <div className="relative flex items-center justify-center w-full max-w-[260px] sm:max-w-[400px] md:max-w-[500px] aspect-square mx-auto">
-              {/* Animated background rings - faster rotation */}
+              {/* ═══════════════════════════════════════════════════
+                  PORTAL RING SYSTEM — smooth compass / gate aesthetic
+                  All rings are pure-CSS GPU animations (orbit-rotate /
+                  orbit-rotate-reverse keyframes in globals.css).
+                  ═══════════════════════════════════════════════════ */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                {/* Inner ring - fastest, dotted */}
-                <motion.div
-                  className="absolute w-[220px] h-[220px] sm:w-[320px] sm:h-[320px] md:w-[400px] md:h-[400px] rounded-full transform-gpu"
+
+                {/* 0 ── Ambient pulse aura behind everything */}
+                <div
+                  className="orbit-aura absolute rounded-full"
                   style={{
-                    border: '2px dotted',
-                    borderColor: 'hsl(var(--primary) / 0.3)',
-                    willChange: 'transform',
-                  }}
-                  animate={{ rotate: 360 }}
-                  transition={{
-                    duration: 15,
-                    repeat: Infinity,
-                    ease: 'linear',
+                    width: '80%',
+                    height: '80%',
+                    background:
+                      'radial-gradient(circle, hsl(var(--primary)/0.20) 0%, transparent 70%)',
+                    filter: 'blur(28px)',
                   }}
                 />
 
-                {/* Middle ring - simple border */}
-                <motion.div
-                  className="absolute w-[250px] h-[250px] sm:w-[360px] sm:h-[360px] md:w-[450px] md:h-[450px] rounded-full border border-primary/15 transform-gpu"
-                  style={{ willChange: 'transform' }}
-                  animate={{ rotate: -360 }}
-                  transition={{
-                    duration: 20,
-                    repeat: Infinity,
-                    ease: 'linear',
+                {/* 1 ── Outer portal arc ring — fast CW (13s)
+                      Three bright arc sections give the compass-needle look */}
+                <div
+                  className="orbit-rotate absolute w-[258px] h-[258px] sm:w-[392px] sm:h-[392px] md:w-[494px] md:h-[494px] rounded-full"
+                  style={{
+                    background:
+                      'conic-gradient(from 0deg,' +
+                      '  hsl(var(--primary))        0deg  10deg,' +
+                      '  hsl(var(--primary)/0.25)  10deg  55deg,' +
+                      '  transparent               55deg 168deg,' +
+                      '  hsl(var(--primary)/0.85) 168deg 178deg,' +
+                      '  transparent              178deg 295deg,' +
+                      '  hsl(var(--primary)/0.55) 295deg 305deg,' +
+                      '  transparent              305deg 352deg,' +
+                      '  hsl(var(--primary))       352deg 360deg)',
+                    WebkitMaskImage:
+                      'radial-gradient(closest-side, transparent calc(100% - 3px), black calc(100% - 3px))',
+                    maskImage:
+                      'radial-gradient(closest-side, transparent calc(100% - 3px), black calc(100% - 3px))',
+                    filter: 'drop-shadow(0 0 7px hsl(var(--primary)/0.65))',
+                    ['--orbit-duration' as string]: '13s',
                   }}
                 />
 
-                {/* Glowing accent dots on rings */}
-                <motion.div
-                  className="absolute w-[250px] h-[250px] sm:w-[360px] sm:h-[360px] md:w-[450px] md:h-[450px] transform-gpu"
-                  style={{ willChange: 'transform' }}
-                  animate={{ rotate: 360 }}
-                  transition={{
-                    duration: 12,
-                    repeat: Infinity,
-                    ease: 'linear',
+                {/* 2 ── Dashed compass ring — medium CCW (37s) */}
+                <div
+                  className="orbit-rotate-reverse absolute w-[228px] h-[228px] sm:w-[352px] sm:h-[352px] md:w-[444px] md:h-[444px] rounded-full"
+                  style={{
+                    border: '1.5px dashed hsl(var(--primary)/0.28)',
+                    ['--orbit-duration' as string]: '37s',
                   }}
-                >
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary shadow-lg shadow-primary/50" />
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-purple-500 shadow-lg shadow-purple-500/50" />
-                </motion.div>
+                />
 
-                <motion.div
-                  className="absolute w-[220px] h-[220px] sm:w-[320px] sm:h-[320px] md:w-[400px] md:h-[400px] transform-gpu"
-                  style={{ willChange: 'transform' }}
-                  animate={{ rotate: -360 }}
-                  transition={{
-                    duration: 10,
-                    repeat: Infinity,
-                    ease: 'linear',
+                {/* 3 ── Inner accent arc ring — medium CW (21s)
+                      Four short accent arcs at diagonal positions */}
+                <div
+                  className="orbit-rotate absolute w-[196px] h-[196px] sm:w-[300px] sm:h-[300px] md:w-[378px] md:h-[378px] rounded-full"
+                  style={{
+                    background:
+                      'conic-gradient(from 45deg,' +
+                      '  transparent             0deg  76deg,' +
+                      '  hsl(var(--accent)/0.9)  76deg  84deg,' +
+                      '  transparent             84deg 166deg,' +
+                      '  hsl(var(--primary)/0.6) 166deg 174deg,' +
+                      '  transparent            174deg 256deg,' +
+                      '  hsl(var(--accent)/0.8) 256deg 264deg,' +
+                      '  transparent            264deg 346deg,' +
+                      '  hsl(var(--primary)/0.5) 346deg 360deg)',
+                    WebkitMaskImage:
+                      'radial-gradient(closest-side, transparent calc(100% - 2.5px), black calc(100% - 2.5px))',
+                    maskImage:
+                      'radial-gradient(closest-side, transparent calc(100% - 2.5px), black calc(100% - 2.5px))',
+                    filter: 'drop-shadow(0 0 4px hsl(var(--accent)/0.45))',
+                    ['--orbit-duration' as string]: '21s',
                   }}
-                >
-                  <div className="absolute top-1/2 left-0 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary/70" />
-                  <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-purple-400/70" />
-                </motion.div>
-              </div>
+                />
 
-              {/* Floating particles */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {[...Array(8)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute rounded-full"
+                {/* 4 ── Cardinal glow dots — fastest CW (8s)
+                      Four jewels that blaze around the dashed ring */}
+                <div
+                  className="orbit-rotate absolute w-[228px] h-[228px] sm:w-[352px] sm:h-[352px] md:w-[444px] md:h-[444px]"
+                  style={{ ['--orbit-duration' as string]: '8s' }}
+                >
+                  {/* North — largest/brightest */}
+                  <div
+                    className="absolute top-[-5px] left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary"
                     style={{
-                      width: 4 + Math.random() * 4,
-                      height: 4 + Math.random() * 4,
-                      left: `${15 + Math.random() * 70}%`,
-                      top: `${15 + Math.random() * 70}%`,
-                      background:
-                        i % 2 === 0
-                          ? 'hsl(var(--primary) / 0.5)'
-                          : 'rgb(168, 85, 247, 0.5)',
-                    }}
-                    animate={{
-                      y: [0, -30, 0],
-                      x: [0, 15 * (i % 2 === 0 ? 1 : -1), 0],
-                      opacity: [0.3, 0.7, 0.3],
-                      scale: [1, 1.3, 1],
-                    }}
-                    transition={{
-                      duration: 2.5 + Math.random() * 2,
-                      repeat: Infinity,
-                      delay: i * 0.3,
+                      boxShadow:
+                        '0 0 10px 3px hsl(var(--primary)/0.8), 0 0 22px 6px hsl(var(--primary)/0.35)',
                     }}
                   />
-                ))}
+                  {/* South */}
+                  <div
+                    className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary/80"
+                    style={{ boxShadow: '0 0 7px 2px hsl(var(--primary)/0.6)' }}
+                  />
+                  {/* East */}
+                  <div
+                    className="absolute right-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full"
+                    style={{
+                      background: 'hsl(var(--accent))',
+                      boxShadow: '0 0 8px 2px hsl(var(--accent)/0.65)',
+                    }}
+                  />
+                  {/* West */}
+                  <div
+                    className="absolute left-[-3px] top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full"
+                    style={{
+                      background: 'hsl(var(--accent)/0.75)',
+                      boxShadow: '0 0 5px 2px hsl(var(--accent)/0.4)',
+                    }}
+                  />
+                </div>
+
+                {/* 5 ── Slow outer boundary — very slow CW (110s) */}
+                <div
+                  className="orbit-rotate absolute w-[280px] h-[280px] sm:w-[428px] sm:h-[428px] md:w-[536px] md:h-[536px] rounded-full"
+                  style={{
+                    border: '1px solid hsl(var(--primary)/0.08)',
+                    ['--orbit-duration' as string]: '110s',
+                  }}
+                />
+
+                {/* 6 ── Second faint reverse boundary — very slow CCW (85s) */}
+                <div
+                  className="orbit-rotate-reverse absolute w-[262px] h-[262px] sm:w-[402px] sm:h-[402px] md:w-[504px] md:h-[504px] rounded-full"
+                  style={{
+                    border: '1px solid hsl(var(--primary)/0.06)',
+                    ['--orbit-duration' as string]: '85s',
+                  }}
+                />
               </div>
 
               <div
                 className={cn(
-                  'relative transition-all duration-500 [transform-style:preserve-3d] z-20',
+                  'relative transition-all duration-500 transform-3d z-20',
                   isEditingOrbit
                     ? 'w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px]'
                     : 'w-40 h-40 sm:w-64 sm:h-64 md:w-80 md:h-80'
@@ -977,11 +1039,11 @@ export default function Hero({
                       animate={{ rotateY: 0, opacity: 1, scale: 1 }}
                       exit={{ rotateY: 180, opacity: 0, scale: 0.8 }}
                       transition={{ duration: 0.5, ease: 'easeInOut' }}
-                      className="absolute inset-0 flex flex-col items-center justify-center rounded-full text-center overflow-visible [transform-style:preserve-3d]"
+                      className="absolute inset-0 flex flex-col items-center justify-center rounded-full text-center overflow-visible transform-3d"
                     >
                       {/* Inner content container */}
                       <div
-                        className="absolute inset-0 rounded-full bg-gradient-to-br from-card via-card/98 to-muted backdrop-blur-sm overflow-hidden border-4 border-background/80 shadow-2xl shadow-primary/20"
+                        className="absolute inset-0 rounded-full bg-linear-to-br from-card via-card/98 to-muted backdrop-blur-xs overflow-hidden border-4 border-background/80 shadow-2xl shadow-primary/20"
                         onClick={handleContentClick}
                       >
                         {selectedOrbit.backgroundImage && !isEditingOrbit && (
@@ -990,10 +1052,12 @@ export default function Hero({
                               src={selectedOrbit.backgroundImage}
                               alt={selectedOrbit.title}
                               fill
+                              sizes="(max-width: 768px) 100vw, 600px"
                               className="object-cover rounded-full z-0 opacity-30"
+                              unoptimized={/\.gif(\?|$)/i.test(selectedOrbit.backgroundImage)}
                             />
                             {/* Dark overlay for better text visibility */}
-                            <div className="absolute inset-0 z-10 bg-gradient-to-b from-background/70 via-background/50 to-background/70" />
+                            <div className="absolute inset-0 z-10 bg-linear-to-b from-background/70 via-background/50 to-background/70" />
                           </>
                         )}
 
@@ -1166,7 +1230,7 @@ export default function Hero({
                         duration: 0.5,
                         ease: 'easeInOut',
                       }}
-                      className="relative w-full h-full group [transform-style:preserve-3d]"
+                      className="relative w-full h-full group transform-3d"
                     >
                       <div className="avatar-glow-wrapper w-full h-full rounded-full overflow-hidden">
                         <Avatar className="w-full h-full border-4 border-background/80 shadow-2xl shadow-primary/20">
@@ -1175,7 +1239,7 @@ export default function Hero({
                             alt={name}
                             className="object-cover"
                           />
-                          <AvatarFallback className="text-6xl font-bold bg-gradient-to-br from-primary/20 to-purple-500/20">
+                          <AvatarFallback className="text-6xl font-bold bg-linear-to-br from-primary/20 to-purple-500/20">
                             {name?.charAt(0) || 'K'}
                           </AvatarFallback>
                         </Avatar>
@@ -1192,7 +1256,7 @@ export default function Hero({
                       <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[100]"
+                        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-100"
                         style={{ pointerEvents: 'auto' }}
                       >
                         <Button
@@ -1214,7 +1278,7 @@ export default function Hero({
                       <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="absolute inset-0 flex items-center justify-center z-[100]"
+                        className="absolute inset-0 flex items-center justify-center z-100"
                         style={{ pointerEvents: 'auto' }}
                       >
                         <Button
@@ -1231,15 +1295,10 @@ export default function Hero({
                   </>
                 )}
 
-                {/* Orbiting items container - rotates slowly like solar system */}
-                <motion.div
-                  className={cn('absolute inset-0 z-10 pointer-events-none')}
-                  animate={{ rotate: 360 }}
-                  transition={{
-                    duration: 60,
-                    repeat: Infinity,
-                    ease: 'linear',
-                  }}
+                {/* Orbiting items container — pure CSS rotation, GPU-driven, never stutters */}
+                <div
+                  className="orbit-rotate absolute inset-0 z-10 pointer-events-none"
+                  style={{ ['--orbit-duration' as string]: '60s' }}
                 >
                   {orbitInfo.map((item, index) => (
                     <OrbitItem
@@ -1252,7 +1311,7 @@ export default function Hero({
                       isEditing={!!selectedOrbit && isEditingOrbit}
                     />
                   ))}
-                </motion.div>
+                </div>
               </div>
             </div>
           </div>
@@ -1266,7 +1325,7 @@ export default function Hero({
                 className="flex items-center gap-2"
               >
                 {isEditingRole ? (
-                  <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-primary/20 via-primary/5 to-primary/20 border border-primary/30">
+                  <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-linear-to-r from-primary/20 via-primary/5 to-primary/20 border border-primary/30">
                     <Input
                       value={editedRole}
                       onChange={e => setEditedRole(e.target.value)}
@@ -1298,14 +1357,14 @@ export default function Hero({
                   </span>
                 ) : (
                   <>
-                    <span className="group relative inline-flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full bg-gradient-to-r from-primary/20 via-primary/5 to-primary/20 border border-primary/30 text-primary text-xs sm:text-sm font-semibold overflow-hidden shadow-lg shadow-primary/10">
-                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                      <span className="relative flex items-center gap-2.5">
-                        <span className="relative flex h-2 w-2">
+                    <span className="group relative inline-flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-primary/30 bg-primary/8 backdrop-blur-md text-primary text-[11px] sm:text-xs font-mono uppercase tracking-[0.18em] overflow-hidden shadow-sm shadow-primary/10">
+                      <span className="absolute inset-0 bg-linear-to-r from-transparent via-primary/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                      <span className="relative flex items-center gap-2">
+                        <span className="relative flex h-1.5 w-1.5">
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
                         </span>
-                        <Code2 className="h-4 w-4" />
+                        <Code2 className="h-3.5 w-3.5" />
                         {role || 'Энд мэргэжлээ оруулна уу'}
                       </span>
                     </span>
@@ -1425,7 +1484,7 @@ export default function Hero({
                       </motion.span>
                       <div className="flex items-center gap-3">
                         <motion.h1
-                          className="text-3xl sm:text-4xl md:text-5xl xl:text-7xl font-bold tracking-tight"
+                          className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.05]"
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{
@@ -1434,7 +1493,7 @@ export default function Hero({
                             stiffness: 100,
                           }}
                         >
-                          <span className="bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] animate-gradient bg-clip-text text-transparent drop-shadow-lg">
+                          <span className="bg-linear-to-br from-foreground via-foreground to-foreground/60 bg-clip-text text-transparent drop-shadow-sm">
                             {name}
                           </span>
                         </motion.h1>
@@ -1494,7 +1553,7 @@ export default function Hero({
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.4, delay: 0.4 }}
                     >
-                      <div className="max-w-[90vw] sm:max-w-[650px] text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed">
+                      <div className="max-w-[90vw] sm:max-w-[650px] text-muted-foreground text-sm sm:text-base md:text-[17px] leading-relaxed text-balance">
                         <span>
                           {bio ||
                             'Өөрийнхөө тухай товч танилцуулга энд бичнэ үү.'}
@@ -1659,12 +1718,12 @@ export default function Hero({
                 <div className="flex flex-wrap items-center gap-2 lg:gap-4">
                   {socialLinks.cvUrl && (
                     <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
                     >
                       <Button
                         asChild
-                        className="relative group bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] hover:bg-[length:100%_auto] text-primary-foreground font-semibold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all duration-300"
+                        className="group h-11 rounded-xl bg-linear-to-r from-primary to-primary/80 text-primary-foreground font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 transition-all duration-300"
                       >
                         <Link
                           href={socialLinks.cvUrl}
@@ -1678,20 +1737,20 @@ export default function Hero({
                     </motion.div>
                   )}
                   <Dialog>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-card/40 backdrop-blur-md px-2 py-1.5">
                       {socialButtons.map((social, index) => (
                         <DialogTrigger key={social.type} asChild>
                           <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.5 + index * 0.05 }}
-                            whileHover={{ scale: 1.1 }}
+                            whileHover={{ scale: 1.1, y: -2 }}
                             whileTap={{ scale: 0.95 }}
                           >
                             <Button
-                              variant="outline"
+                              variant="ghost"
                               size="icon"
-                              className="rounded-full border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary hover:shadow-lg hover:shadow-primary/25 transition-all duration-300"
+                              className="h-9 w-9 rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all duration-300"
                               onClick={() => {
                                 setSelectedSocial(social);
                                 setIsQrLoading(true);

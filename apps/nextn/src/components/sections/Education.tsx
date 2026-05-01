@@ -25,6 +25,7 @@ import { useEducation } from '@/contexts/EducationContext';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { AddEducationDialog } from '../AddEducationDialog';
 import { EditEducationDialog } from '../EditEducationDialog';
+import PageHeader from '../shared/PageHeader';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -91,19 +92,12 @@ function EducationCard({
     setIsHovered(false);
   };
 
-  // Color accents based on index
   const accents = [
-    { gradient: 'from-primary via-primary/80 to-primary/60', glow: 'primary' },
-    { gradient: 'from-blue-500 via-blue-400 to-cyan-400', glow: 'blue-500' },
-    {
-      gradient: 'from-violet-500 via-purple-500 to-fuchsia-500',
-      glow: 'violet-500',
-    },
-    { gradient: 'from-amber-500 via-orange-500 to-red-500', glow: 'amber-500' },
-    {
-      gradient: 'from-emerald-500 via-green-500 to-teal-500',
-      glow: 'emerald-500',
-    },
+    { gradient: 'from-primary to-primary/60' },
+    { gradient: 'from-accent to-accent/60' },
+    { gradient: 'from-primary to-accent' },
+    { gradient: 'from-accent to-primary/60' },
+    { gradient: 'from-primary/80 via-accent/70 to-primary/60' },
   ];
   const accent = accents[index % accents.length];
 
@@ -128,28 +122,26 @@ function EducationCard({
       {/* Glow effect */}
       <motion.div
         className={cn(
-          'absolute -inset-1 rounded-2xl bg-gradient-to-r opacity-0 blur-xl transition-opacity duration-500',
+          'absolute -inset-1 rounded-2xl bg-linear-to-r opacity-0 blur-xl transition-opacity duration-500',
           accent.gradient
         )}
         animate={{ opacity: isHovered ? 0.4 : 0 }}
       />
 
       {/* Card */}
-      <div className="relative h-full rounded-2xl border border-neutral-800 bg-neutral-900/80 backdrop-blur-sm overflow-hidden">
+      <div className="relative h-full rounded-2xl border border-border/60 bg-card/60 backdrop-blur-md overflow-hidden">
         {/* Top gradient accent */}
         <div
           className={cn(
-            'absolute top-0 left-0 right-0 h-1 bg-gradient-to-r',
+            'absolute top-0 left-0 right-0 h-1 bg-linear-to-r',
             accent.gradient
           )}
         />
 
         {/* Spotlight effect */}
-        <motion.div
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{
-            background: `radial-gradient(600px circle at ${mouseX.get() * 100 + 50}% ${mouseY.get() * 100 + 50}%, rgba(255,255,255,0.06), transparent 40%)`,
-          }}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-2xl"
+          style={{ background: 'radial-gradient(circle at 50% 30%, hsl(var(--primary) / 0.07), transparent 60%)' }}
         />
 
         {/* Edit buttons */}
@@ -159,7 +151,7 @@ function EducationCard({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 bg-neutral-800/80 hover:bg-neutral-700 text-neutral-400 hover:text-white rounded-lg backdrop-blur-sm"
+                className="h-8 w-8 bg-card/80 hover:bg-card text-muted-foreground hover:text-foreground rounded-lg backdrop-blur-xs"
               >
                 <Edit className="h-4 w-4" />
               </Button>
@@ -169,7 +161,7 @@ function EducationCard({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 bg-neutral-800/80 hover:bg-red-500/20 text-neutral-400 hover:text-red-400 rounded-lg backdrop-blur-sm"
+                  className="h-8 w-8 bg-card/80 hover:bg-destructive/20 text-muted-foreground hover:text-destructive rounded-lg backdrop-blur-xs"
                   aria-label="Delete education"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -203,27 +195,27 @@ function EducationCard({
           {/* Icon */}
           <div
             className={cn(
-              'w-14 h-14 rounded-xl flex items-center justify-center mb-5 bg-gradient-to-br',
+              'w-14 h-14 rounded-xl flex items-center justify-center mb-5 bg-linear-to-br',
               accent.gradient
             )}
           >
-            <GraduationCap className="w-7 h-7 text-white" />
+            <GraduationCap className="w-7 h-7 text-primary-foreground" />
           </div>
 
           {/* Degree title */}
-          <h3 className="text-xl font-bold text-white mb-3 line-clamp-2">
+          <h3 className="text-xl font-bold text-foreground mb-3 line-clamp-2">
             {edu.degree}
           </h3>
 
           {/* School */}
-          <div className="flex items-center gap-2 text-neutral-400 mb-3">
-            <Building2 className="w-4 h-4 flex-shrink-0" />
+          <div className="flex items-center gap-2 text-muted-foreground mb-3">
+            <Building2 className="w-4 h-4 shrink-0" />
             <span className="text-sm line-clamp-1">{edu.school}</span>
           </div>
 
           {/* Date */}
-          <div className="flex items-center gap-2 text-neutral-500 mb-4">
-            <Calendar className="w-4 h-4 flex-shrink-0" />
+          <div className="flex items-center gap-2 text-muted-foreground/70 mb-4">
+            <Calendar className="w-4 h-4 shrink-0" />
             <span className="text-sm">
               {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
             </span>
@@ -233,18 +225,18 @@ function EducationCard({
           {edu.score && (
             <div
               className={cn(
-                'inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold bg-gradient-to-r',
+                'inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold bg-linear-to-r',
                 accent.gradient
               )}
             >
-              <Award className="w-4 h-4 text-white" />
-              <span className="text-white">{edu.score}</span>
+              <Award className="w-4 h-4 text-primary-foreground" />
+              <span className="text-primary-foreground">{edu.score}</span>
             </div>
           )}
         </div>
 
         {/* Bottom decorative element */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-neutral-950/50 to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-linear-to-t from-background/50 to-transparent pointer-events-none" />
       </div>
     </motion.div>
   );
@@ -259,27 +251,14 @@ export default function Education() {
       id="education"
       className="py-12 sm:py-16 md:py-20 lg:py-24 relative overflow-hidden"
     >
-      {/* Background decoration */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 -left-32 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-32 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
-      </div>
-
       <div className="container mx-auto px-4 sm:px-6 md:px-8 relative">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="flex flex-col items-center justify-center space-y-4 text-center mb-8 sm:mb-10 md:mb-12"
-        >
-          <div className="flex items-center gap-4 justify-center">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-white via-neutral-200 to-neutral-400 bg-clip-text text-transparent">
-              Боловсрол
-            </h2>
-          </div>
-        </motion.div>
+        <PageHeader
+          eyebrow="Боловсрол"
+          icon={<GraduationCap className="h-3.5 w-3.5" />}
+          title="Сурсан, судалсан зам"
+          description="Албан болон албан бус боловсролын аяллын товч хураангуй."
+        />
+        <div className="mb-10" />
 
         {loading ? (
           <div className="flex justify-center items-center py-16">
@@ -314,14 +293,14 @@ export default function Education() {
                   transition={{ duration: 0.3, delay: education.length * 0.1 }}
                 >
                   <AddEducationDialog>
-                    <button className="flex h-full min-h-[280px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-700 bg-neutral-900/50 text-neutral-500 transition-all duration-300 hover:border-primary hover:bg-primary/5 hover:text-primary group">
-                      <div className="w-16 h-16 rounded-2xl bg-neutral-800 group-hover:bg-primary/20 flex items-center justify-center mb-4 transition-colors duration-300">
+                    <button className="flex h-full min-h-[280px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/60 bg-card/30 backdrop-blur-md text-muted-foreground transition-all duration-300 hover:border-primary hover:bg-primary/5 hover:text-primary group">
+                      <div className="w-16 h-16 rounded-2xl bg-muted group-hover:bg-primary/20 flex items-center justify-center mb-4 transition-colors duration-300">
                         <PlusCircle className="w-8 h-8" />
                       </div>
                       <span className="font-semibold text-lg">
                         Боловсрол нэмэх
                       </span>
-                      <span className="text-sm text-neutral-600 mt-1">
+                      <span className="text-sm text-muted-foreground/60 mt-1">
                         Шинэ мэдээлэл нэмэх
                       </span>
                     </button>

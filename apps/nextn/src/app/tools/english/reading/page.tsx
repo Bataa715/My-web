@@ -111,11 +111,11 @@ export default function ReadingPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.2 }}
-              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/30 mb-6"
+              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-linear-to-br from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/30 mb-6"
             >
               <BookOpen className="h-10 w-10 text-white" />
             </motion.div>
-            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 bg-clip-text text-transparent">
+            <h1 className="text-4xl sm:text-5xl font-bold bg-linear-to-r from-emerald-400 via-green-500 to-teal-500 bg-clip-text text-transparent">
               Reading Practice
             </h1>
             <p className="text-muted-foreground mt-3 text-lg">
@@ -171,7 +171,7 @@ export default function ReadingPage() {
                   <Button
                     onClick={handleAnalyze}
                     disabled={loading || !text.trim()}
-                    className="bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl gap-2 px-6"
+                    className="bg-linear-to-r from-emerald-500 to-green-600 text-white rounded-xl gap-2 px-6"
                   >
                     {loading ? (
                       <>
@@ -199,7 +199,7 @@ export default function ReadingPage() {
                 exit={{ opacity: 0 }}
               >
                 <Tabs defaultValue="summary" className="space-y-6">
-                  <TabsList className="bg-card/50 backdrop-blur-sm rounded-xl p-1 w-full justify-start overflow-x-auto">
+                  <TabsList className="bg-card/50 backdrop-blur-xs rounded-xl p-1 w-full justify-start overflow-x-auto">
                     <TabsTrigger value="summary" className="rounded-lg gap-2">
                       <Lightbulb className="h-4 w-4" />
                       Хураангуй
@@ -312,7 +312,7 @@ export default function ReadingPage() {
                           <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden">
                             <CardContent className="pt-6">
                               <div className="flex items-start gap-3 mb-4">
-                                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold">
+                                <span className="shrink-0 w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold">
                                   {qIndex + 1}
                                 </span>
                                 <p className="text-lg font-medium">

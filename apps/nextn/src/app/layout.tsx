@@ -4,34 +4,49 @@ import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { EditModeProvider } from '@/contexts/EditModeContext';
-import { ProjectProvider } from '@/contexts/ProjectContext';
-import { SkillsProvider } from '@/contexts/SkillsContext';
 import MainLayout from '@/components/MainLayout';
-import { EducationProvider } from '@/contexts/EducationContext';
-import { HobbyProvider } from '@/contexts/HobbyContext';
-import { ExperienceProvider } from '@/contexts/ExperienceContext';
-import IntroOverlay from '@/components/IntroOverlay';
 import { I18nProvider } from '@/contexts/I18nContext';
+import MotionProvider from '@/app/providers/MotionProvider';
 import { JetBrains_Mono } from 'next/font/google';
 
 const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
+  subsets: ['latin', 'cyrillic'],
   variable: '--font-jetbrainsMono',
   display: 'swap',
   preload: true,
 });
 
 export const metadata: Metadata = {
-  title: 'PersonalWeb',
-  description: 'Англи • Япон • Программчлал сурах хувийн систем',
+  title: {
+    default: 'PersonalWeb — Portfolio',
+    template: '%s · PersonalWeb',
+  },
+  description:
+    'Хувийн портфолио, англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
+  keywords: [
+    'portfolio',
+    'developer',
+    'Mongolia',
+    'англи хэл',
+    'япон хэл',
+    'программчлал',
+  ],
   icons: {
     icon: '/favicon.ico',
   },
   metadataBase: new URL('https://personalweb.com'),
   openGraph: {
-    title: 'PersonalWeb',
-    description: 'Англи • Япон • Программчлал сурах хувийн систем',
+    title: 'PersonalWeb — Portfolio',
+    description:
+      'Хувийн портфолио, англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
     type: 'website',
+    locale: 'mn_MN',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PersonalWeb — Portfolio',
+    description:
+      'Хувийн портфолио, англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
   },
   robots: {
     index: true,
@@ -43,6 +58,10 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0f' },
+  ],
 };
 
 export default function RootLayout({
@@ -51,7 +70,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="mn" suppressHydrationWarning>
+    <html
+      lang="mn"
+      suppressHydrationWarning
+      className={jetbrainsMono.variable}
+    >
       <head>
         {/* Preconnect to critical external resources */}
         <link rel="dns-prefetch" href="https://cdn.simpleicons.org" />
@@ -61,7 +84,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${jetbrainsMono.variable} min-h-screen bg-background font-body antialiased`}
+        className={`min-h-screen bg-background font-mono antialiased`}
       >
         <ThemeProvider
           attribute="class"
@@ -72,18 +95,10 @@ export default function RootLayout({
           <FirebaseClientProvider>
             <EditModeProvider>
               <I18nProvider>
-                <EducationProvider>
-                  <ExperienceProvider>
-                    <ProjectProvider>
-                      <SkillsProvider>
-                        <HobbyProvider>
-                          <MainLayout>{children}</MainLayout>
-                          <Toaster />
-                        </HobbyProvider>
-                      </SkillsProvider>
-                    </ProjectProvider>
-                  </ExperienceProvider>
-                </EducationProvider>
+                <MotionProvider>
+                  <MainLayout>{children}</MainLayout>
+                </MotionProvider>
+                <Toaster />
               </I18nProvider>
             </EditModeProvider>
           </FirebaseClientProvider>

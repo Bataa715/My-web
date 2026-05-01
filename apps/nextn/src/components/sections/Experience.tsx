@@ -3,11 +3,12 @@
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useRef, useState } from 'react';
 import Image from 'next/image';
-import { PlusCircle, Trash2, Edit, AlertTriangle } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, AlertTriangle, Briefcase } from 'lucide-react';
 import { useExperience } from '@/contexts/ExperienceContext';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { AddExperienceDialog } from '../AddExperienceDialog';
 import { EditExperienceDialog } from '../EditExperienceDialog';
+import PageHeader from '../shared/PageHeader';
 import { Button } from '../ui/button';
 import {
   AlertDialog,
@@ -94,12 +95,12 @@ const ExperienceCard = ({
       className="group relative"
     >
       {/* Card with glass morphism effect */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card/90 via-card/70 to-card/50 backdrop-blur-xl border border-border/30 p-6 h-full transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10">
+      <div className="relative overflow-hidden rounded-3xl bg-linear-to-br from-card/90 via-card/70 to-card/50 backdrop-blur-xl border border-border/30 p-6 h-full transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10">
         {/* Animated gradient border on hover */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-primary/20 via-transparent to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 rounded-3xl bg-linear-to-r from-primary/20 via-transparent to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         {/* Top glow accent */}
-        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-32 h-2 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full blur-md opacity-60 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-32 h-2 bg-linear-to-r from-transparent via-primary to-transparent rounded-full blur-md opacity-60 group-hover:opacity-100 transition-opacity" />
 
         {/* Spotlight effect */}
         <div
@@ -112,7 +113,7 @@ const ExperienceCard = ({
         {/* Content */}
         <div className="relative z-10 flex gap-5 items-start">
           {/* Image container with glow effect */}
-          <div className="relative flex-shrink-0">
+          <div className="relative shrink-0">
             {/* Glow behind image */}
             <div className="absolute inset-0 bg-primary/30 rounded-2xl blur-xl scale-90 group-hover:scale-110 transition-transform duration-500" />
 
@@ -122,6 +123,7 @@ const ExperienceCard = ({
                 src={imageSrc}
                 alt={experience.title}
                 fill
+                sizes="(max-width: 768px) 80px, 112px"
                 className="object-contain p-2 group-hover:scale-110 transition-transform duration-500"
               />
             </div>
@@ -139,7 +141,7 @@ const ExperienceCard = ({
         </div>
 
         {/* Bottom gradient fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-card/50 to-transparent pointer-events-none rounded-b-3xl" />
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-card/50 to-transparent pointer-events-none rounded-b-3xl" />
       </div>
     </motion.div>
   );
@@ -152,18 +154,13 @@ export default function Experience() {
   return (
     <section id="experience" className="py-12 sm:py-16 md:py-20 lg:py-24">
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
-        {/* Section Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8 sm:mb-10 md:mb-12"
-        >
-          <h2 className="text-3xl md:text-5xl font-bold">
-            Миний <span className="text-primary">туршлага</span>
-          </h2>
-        </motion.div>
+        <PageHeader
+          eyebrow="Туршлага"
+          icon={<Briefcase className="h-3.5 w-3.5" />}
+          title="Төсөл, ажлын туршлага"
+          description="Ажиллаж байсан баг, өөрийн хийсэн өврмөц төслүүд."
+        />
+        <div className="mb-10" />
 
         {/* Experience Grid */}
         <div
@@ -179,7 +176,7 @@ export default function Experience() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 bg-black/50 hover:bg-black/70 text-white rounded-md"
+                      className="h-7 w-7 bg-card/80 hover:bg-card text-muted-foreground hover:text-foreground rounded-md"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -189,7 +186,7 @@ export default function Experience() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 bg-black/50 hover:bg-destructive/80 text-white rounded-md"
+                        className="h-7 w-7 bg-card/80 hover:bg-destructive/20 text-muted-foreground hover:text-destructive rounded-md"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -227,7 +224,7 @@ export default function Experience() {
               className="h-full min-h-[200px]"
             >
               <AddExperienceDialog>
-                <button className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-700 bg-neutral-900/30 text-neutral-500 transition-all duration-300 hover:border-primary hover:bg-neutral-900/50 hover:text-primary hover:shadow-lg hover:shadow-primary/10">
+                <button className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/60 bg-card/30 backdrop-blur-md text-muted-foreground transition-all duration-300 hover:border-primary hover:bg-primary/5 hover:text-primary hover:shadow-lg hover:shadow-primary/10">
                   <PlusCircle size={48} />
                   <span className="mt-4 font-semibold">
                     Шинэ туршлага нэмэх

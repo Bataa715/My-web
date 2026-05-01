@@ -143,11 +143,11 @@ export default function ListeningPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.2 }}
-              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/30 mb-6"
+              className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-linear-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/30 mb-6"
             >
               <Headphones className="h-10 w-10 text-white" />
             </motion.div>
-            <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
+            <h1 className="text-4xl sm:text-5xl font-bold bg-linear-to-r from-amber-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
               Listening Practice
             </h1>
             <p className="text-muted-foreground mt-3 text-lg">
@@ -217,7 +217,7 @@ export default function ListeningPage() {
                   <Button
                     onClick={handleGenerate}
                     disabled={loading || !topic.trim()}
-                    className="bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl gap-2 px-6"
+                    className="bg-linear-to-r from-amber-500 to-orange-600 text-white rounded-xl gap-2 px-6"
                   >
                     {loading ? (
                       <>
@@ -245,7 +245,7 @@ export default function ListeningPage() {
                 exit={{ opacity: 0 }}
               >
                 <Tabs defaultValue="listen" className="space-y-6">
-                  <TabsList className="bg-card/50 backdrop-blur-sm rounded-xl p-1 w-full justify-start overflow-x-auto">
+                  <TabsList className="bg-card/50 backdrop-blur-xs rounded-xl p-1 w-full justify-start overflow-x-auto">
                     <TabsTrigger value="listen" className="rounded-lg gap-2">
                       <Headphones className="h-4 w-4" />
                       Сонсох
@@ -275,7 +275,7 @@ export default function ListeningPage() {
                     <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-3xl">
                       <CardContent className="pt-6 space-y-6">
                         {/* Audio Controls */}
-                        <div className="flex items-center justify-center gap-4 p-6 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-2xl">
+                        <div className="flex items-center justify-center gap-4 p-6 bg-linear-to-br from-amber-500/10 to-orange-500/10 rounded-2xl">
                           <Button
                             onClick={speakScript}
                             size="lg"
@@ -283,7 +283,7 @@ export default function ListeningPage() {
                               'h-16 w-16 rounded-full',
                               isPlaying
                                 ? 'bg-red-500 hover:bg-red-600'
-                                : 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700'
+                                : 'bg-linear-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700'
                             )}
                           >
                             {isPlaying ? (
@@ -418,7 +418,7 @@ export default function ListeningPage() {
                           <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl">
                             <CardContent className="pt-6">
                               <div className="flex items-start gap-3 mb-3">
-                                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
+                                <span className="shrink-0 w-8 h-8 rounded-full bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
                                   {index + 1}
                                 </span>
                                 <div className="flex-1">
@@ -503,7 +503,7 @@ export default function ListeningPage() {
                         {!showFillBlanksResults && (
                           <Button
                             onClick={() => setShowFillBlanksResults(true)}
-                            className="bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl"
+                            className="bg-linear-to-r from-amber-500 to-orange-600 text-white rounded-xl"
                           >
                             Шалгах
                           </Button>

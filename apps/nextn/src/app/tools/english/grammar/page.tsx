@@ -191,15 +191,15 @@ export default function EnglishGrammarPage() {
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 via-indigo-500/30 to-purple-500/30 blur-3xl rounded-full scale-150" />
-            <div className="relative p-5 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 backdrop-blur-sm border border-blue-500/20">
+            <div className="absolute inset-0 bg-linear-to-r from-blue-500/30 via-indigo-500/30 to-purple-500/30 blur-3xl rounded-full scale-150" />
+            <div className="relative p-5 rounded-2xl bg-linear-to-br from-blue-500/20 to-indigo-500/20 backdrop-blur-xs border border-blue-500/20">
               <BookText className="h-12 w-12 text-blue-400" />
             </div>
           </motion.div>
 
           <div className="flex items-center gap-4">
             <motion.h1
-              className="text-4xl md:text-5xl font-bold font-headline bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent"
+              className="text-4xl md:text-5xl font-bold font-headline bg-linear-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -215,7 +215,7 @@ export default function EnglishGrammarPage() {
                   <Button
                     variant="default"
                     size="sm"
-                    className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl gap-2"
+                    className="bg-linear-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl gap-2"
                   >
                     <Wand2 className="h-4 w-4" />
                     AI-ээр үүсгэх
@@ -290,12 +290,12 @@ export default function EnglishGrammarPage() {
                 <Button
                   key={category}
                   variant={
-                    selectedCategory === category ? 'default' : 'outline'
+                    selectedCategory === category ? 'default' : 'outline-solid'
                   }
                   onClick={() => setSelectedCategory(category)}
                   className={`rounded-full transition-all duration-300 ${
                     selectedCategory === category
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-0 shadow-lg shadow-blue-500/25'
+                      ? 'bg-linear-to-r from-blue-500 to-indigo-500 text-white border-0 shadow-lg shadow-blue-500/25'
                       : 'bg-card/50 backdrop-blur-xl border-0 hover:bg-blue-500/10'
                   }`}
                 >

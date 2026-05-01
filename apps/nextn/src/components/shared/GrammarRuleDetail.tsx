@@ -218,7 +218,7 @@ export default function GrammarRuleDetail({
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-primary/10 to-accent/10 border border-primary/20">
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-primary/20 via-primary/10 to-accent/10 border border-primary/20">
         <div className="absolute inset-0 bg-grid-white/5" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
@@ -227,7 +227,7 @@ export default function GrammarRuleDetail({
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 sm:gap-6">
             <div className="space-y-3 sm:space-y-4">
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-primary/20 backdrop-blur-sm border border-primary/30">
+                <div className="flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-primary/20 backdrop-blur-xs border border-primary/30">
                   <BookOpen className="h-5 w-5 sm:h-7 sm:w-7 text-primary" />
                 </div>
                 <Badge
@@ -273,7 +273,7 @@ export default function GrammarRuleDetail({
                     type="button"
                     variant="secondary"
                     size="sm"
-                    className="gap-2 bg-background/50 backdrop-blur-sm hover:bg-background/80 cursor-pointer"
+                    className="gap-2 bg-background/50 backdrop-blur-xs hover:bg-background/80 cursor-pointer"
                   >
                     <Edit className="h-4 w-4" />
                     Засах
@@ -313,14 +313,14 @@ export default function GrammarRuleDetail({
       </div>
 
       {/* Usage Section */}
-      <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-background to-muted/30">
+      <Card className="overflow-hidden border-0 shadow-lg bg-linear-to-br from-background to-muted/30">
         <CardContent className="p-4 sm:p-6 md:p-8">
           <SectionHeader
             icon={Lightbulb}
             number={1}
             titleMn="Хэрэглээ"
             titleEn="Usage"
-            gradient="bg-gradient-to-br from-amber-500 to-orange-600"
+            gradient="bg-linear-to-br from-amber-500 to-orange-600"
           />
 
           <InlineArrayEditor
@@ -333,7 +333,7 @@ export default function GrammarRuleDetail({
                 key={i}
                 className="group relative pl-6 py-4 pr-4 rounded-xl bg-amber-500/5 border border-amber-500/10 hover:border-amber-500/20 transition-all mb-4 last:mb-0"
               >
-                <div className="absolute left-0 top-0 bottom-0 w-1 rounded-full bg-gradient-to-b from-amber-500 to-orange-600" />
+                <div className="absolute left-0 top-0 bottom-0 w-1 rounded-full bg-linear-to-b from-amber-500 to-orange-600" />
                 <div className="space-y-2">
                   <p className="font-semibold text-foreground">
                     {use.condition}
@@ -391,14 +391,14 @@ export default function GrammarRuleDetail({
       </Card>
 
       {/* Form Section */}
-      <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-background to-muted/30">
+      <Card className="overflow-hidden border-0 shadow-lg bg-linear-to-br from-background to-muted/30">
         <CardContent className="p-4 sm:p-6 md:p-8">
           <SectionHeader
             icon={FileText}
             number={2}
             titleMn="Үйл үгний хэлбэр"
             titleEn="Verb Form"
-            gradient="bg-gradient-to-br from-blue-500 to-cyan-600"
+            gradient="bg-linear-to-br from-blue-500 to-cyan-600"
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -464,14 +464,14 @@ export default function GrammarRuleDetail({
       </Card>
 
       {/* Structure Section */}
-      <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-background to-muted/30">
+      <Card className="overflow-hidden border-0 shadow-lg bg-linear-to-br from-background to-muted/30">
         <CardContent className="p-4 sm:p-6 md:p-8">
           <SectionHeader
             icon={MessageSquare}
             number={3}
             titleMn="Өгүүлбэрийн бүтэц"
             titleEn="Sentence Structure"
-            gradient="bg-gradient-to-br from-emerald-500 to-teal-600"
+            gradient="bg-linear-to-br from-emerald-500 to-teal-600"
           />
 
           <Tabs defaultValue="positive" className="w-full">
@@ -683,14 +683,14 @@ export default function GrammarRuleDetail({
       </Card>
 
       {/* Time Expressions Section */}
-      <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-background to-muted/30">
+      <Card className="overflow-hidden border-0 shadow-lg bg-linear-to-br from-background to-muted/30">
         <CardContent className="p-4 sm:p-6 md:p-8">
           <SectionHeader
             icon={Clock}
             number={4}
             titleMn="Цаг хугацааны илэрхийлэл"
             titleEn="Time Expressions"
-            gradient="bg-gradient-to-br from-pink-500 to-rose-600"
+            gradient="bg-linear-to-br from-pink-500 to-rose-600"
           />
 
           <InlineArrayEditor
@@ -701,7 +701,7 @@ export default function GrammarRuleDetail({
             renderItem={(exp, i) => (
               <div
                 key={i}
-                className="inline-flex group relative px-4 py-2.5 rounded-xl bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-500/20 hover:border-pink-500/40 transition-all hover:scale-105 mr-3 mb-3"
+                className="inline-flex group relative px-4 py-2.5 rounded-xl bg-linear-to-br from-pink-500/10 to-rose-500/10 border border-pink-500/20 hover:border-pink-500/40 transition-all hover:scale-105 mr-3 mb-3"
               >
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-pink-500" />

@@ -214,15 +214,15 @@ export default function MaterialManager({
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 via-cyan-500/30 to-teal-500/30 blur-3xl rounded-full scale-150" />
-            <div className="relative p-5 rounded-2xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-sm border border-blue-500/20">
+            <div className="absolute inset-0 bg-linear-to-r from-blue-500/30 via-cyan-500/30 to-teal-500/30 blur-3xl rounded-full scale-150" />
+            <div className="relative p-5 rounded-2xl bg-linear-to-br from-blue-500/20 to-cyan-500/20 backdrop-blur-xs border border-blue-500/20">
               <BookOpen className="h-12 w-12 text-blue-400" />
             </div>
           </motion.div>
 
           <div className="flex items-center gap-4">
             <motion.h1
-              className="text-4xl md:text-5xl font-bold font-headline bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent"
+              className="text-4xl md:text-5xl font-bold font-headline bg-linear-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -291,12 +291,12 @@ export default function MaterialManager({
                 <motion.div key={material.id} variants={itemVariants}>
                   <Card className="relative group bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden shadow-lg shadow-blue-500/5 hover:shadow-blue-500/10 transition-all duration-500">
                     {/* Gradient border effect */}
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/20 via-transparent to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-blue-500/20 via-transparent to-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                     <CardHeader className="relative">
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
+                          <div className="p-2 rounded-lg bg-linear-to-br from-blue-500/20 to-cyan-500/20">
                             <FileText className="h-5 w-5 text-blue-400" />
                           </div>
                           <CardTitle className="text-xl font-semibold">
@@ -358,7 +358,7 @@ export default function MaterialManager({
               <motion.div variants={itemVariants}>
                 <Card className="text-center p-12 bg-card/50 backdrop-blur-xl border-0 rounded-2xl">
                   <CardContent className="flex flex-col items-center gap-4">
-                    <div className="p-4 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20">
+                    <div className="p-4 rounded-full bg-linear-to-br from-blue-500/20 to-cyan-500/20">
                       <BookOpen className="h-10 w-10 text-blue-400" />
                     </div>
                     <p className="text-muted-foreground text-lg">
@@ -370,7 +370,7 @@ export default function MaterialManager({
                         dialogTitle={dialogTitle}
                         dialogDescription={dialogDescription}
                       >
-                        <Button className="mt-4 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0">
+                        <Button className="mt-4 bg-linear-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0">
                           <PlusCircle className="mr-2 h-4 w-4" />
                           Эхний материалаа нэмэх
                         </Button>

@@ -239,7 +239,7 @@ export default function Timer() {
   return (
     <div className="flex flex-col items-center gap-8">
       {/* Mode Selector */}
-      <div className="flex gap-2 p-1.5 bg-card/50 backdrop-blur-sm rounded-2xl border border-border/30">
+      <div className="flex gap-2 p-1.5 bg-card/50 backdrop-blur-xs rounded-2xl border border-border/30">
         {(Object.keys(modeConfig) as Mode[]).map(m => {
           const config = modeConfig[m];
           const ModeIcon = config.icon;
@@ -251,7 +251,7 @@ export default function Timer() {
                 'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all',
                 mode === m
                   ? cn(
-                      'bg-gradient-to-r text-white shadow-lg',
+                      'bg-linear-to-r text-white shadow-lg',
                       config.color,
                       config.glowColor
                     )
@@ -296,7 +296,7 @@ export default function Timer() {
               animate={isActive ? { scale: [1, 1.1, 1] } : {}}
               transition={{ duration: 1, repeat: Infinity }}
               className={cn(
-                'p-3 rounded-2xl bg-gradient-to-br',
+                'p-3 rounded-2xl bg-linear-to-br',
                 currentConfig.color
               )}
             >
@@ -320,7 +320,7 @@ export default function Timer() {
           onClick={resetTimer}
           variant="outline"
           size="icon"
-          className="h-14 w-14 rounded-2xl border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card"
+          className="h-14 w-14 rounded-2xl border-border/50 bg-card/50 backdrop-blur-xs hover:bg-card"
         >
           <RotateCw className="h-5 w-5" />
         </Button>
@@ -331,7 +331,7 @@ export default function Timer() {
           whileTap={{ scale: 0.95 }}
           className={cn(
             'flex items-center justify-center gap-3 h-16 px-10 rounded-2xl text-white font-semibold text-lg shadow-xl transition-all',
-            'bg-gradient-to-r',
+            'bg-linear-to-r',
             currentConfig.color,
             currentConfig.glowColor
           )}
@@ -367,7 +367,7 @@ export default function Timer() {
           onClick={skipToNext}
           variant="outline"
           size="icon"
-          className="h-14 w-14 rounded-2xl border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card"
+          className="h-14 w-14 rounded-2xl border-border/50 bg-card/50 backdrop-blur-xs hover:bg-card"
         >
           <SkipForward className="h-5 w-5" />
         </Button>
@@ -376,7 +376,7 @@ export default function Timer() {
           onClick={() => setIsSettingsOpen(true)}
           variant="outline"
           size="icon"
-          className="h-14 w-14 rounded-2xl border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card"
+          className="h-14 w-14 rounded-2xl border-border/50 bg-card/50 backdrop-blur-xs hover:bg-card"
         >
           <Settings className="h-5 w-5" />
         </Button>
@@ -388,7 +388,7 @@ export default function Timer() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex items-center gap-3 px-5 py-3 bg-card/50 backdrop-blur-sm rounded-2xl border border-border/30"
+          className="flex items-center gap-3 px-5 py-3 bg-card/50 backdrop-blur-xs rounded-2xl border border-border/30"
         >
           <div className="p-2 rounded-xl bg-rose-500/10">
             <Flame className="h-5 w-5 text-rose-500" />
@@ -403,7 +403,7 @@ export default function Timer() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex items-center gap-3 px-5 py-3 bg-card/50 backdrop-blur-sm rounded-2xl border border-border/30"
+          className="flex items-center gap-3 px-5 py-3 bg-card/50 backdrop-blur-xs rounded-2xl border border-border/30"
         >
           <div className="p-2 rounded-xl bg-amber-500/10">
             <Target className="h-5 w-5 text-amber-500" />
@@ -490,7 +490,7 @@ export default function Timer() {
             <Button
               onClick={handleSettingsSave}
               className={cn(
-                'bg-gradient-to-r text-white rounded-xl',
+                'bg-linear-to-r text-white rounded-xl',
                 currentConfig.color
               )}
             >

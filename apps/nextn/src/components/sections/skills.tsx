@@ -3,9 +3,10 @@ import { useSkills } from '@/contexts/SkillsContext';
 import { Skeleton } from '../ui/skeleton';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { Button } from '../ui/button';
-import { PlusCircle, Trash2, Edit, AlertTriangle } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, AlertTriangle, Sparkles } from 'lucide-react';
 import { AddSkillDialog } from '../AddSkillDialog';
 import { EditSkillDialog } from '../EditSkillDialog';
+import PageHeader from '../shared/PageHeader';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -171,86 +172,82 @@ const SkillCard = ({ skillGroup, index }: SkillCardProps) => {
       }}
       className="group relative h-full cursor-pointer"
     >
-      {/* Glow effect behind card */}
+      {/* Soft outer glow on hover */}
       <motion.div
-        className={`absolute -inset-1 rounded-2xl bg-gradient-to-r ${accent.gradient} opacity-0 blur-xl transition-opacity duration-500`}
-        animate={{ opacity: isHovered ? 0.4 : 0 }}
+        className={`absolute -inset-px rounded-3xl bg-linear-to-br ${accent.gradient} opacity-0 blur-2xl transition-opacity duration-500`}
+        animate={{ opacity: isHovered ? 0.25 : 0 }}
       />
 
       {/* Card */}
-      <div className="relative h-full rounded-2xl border border-neutral-800 bg-neutral-900/80 backdrop-blur-sm overflow-hidden">
-        {/* Top gradient accent line */}
+      <div className="relative h-full rounded-3xl border border-border/50 bg-card/50 backdrop-blur-xl overflow-hidden transition-colors duration-300 group-hover:border-border">
+        {/* Ambient corner orb */}
         <div
-          className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${accent.gradient}`}
+          aria-hidden
+          className={`pointer-events-none absolute -top-16 -right-16 h-44 w-44 rounded-full bg-linear-to-br ${accent.gradient} opacity-[0.18] blur-3xl transition-opacity duration-500 group-hover:opacity-30`}
         />
 
-        {/* Spotlight effect */}
+        {/* Spotlight */}
         <motion.div
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           style={{
-            background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255,255,255,0.06), transparent 40%)`,
+            background: `radial-gradient(520px circle at ${mousePosition.x}px ${mousePosition.y}px, hsl(var(--primary) / 0.08), transparent 45%)`,
           }}
         />
 
         {/* Content */}
-        <div className="relative z-10 p-6 pt-8">
-          {/* Icon and Title */}
-          <div className="flex items-center gap-4 mb-6">
-            <div className="relative">
-              {/* Glow behind icon */}
-              <motion.div
-                className={`absolute inset-0 bg-gradient-to-r ${accent.gradient} rounded-2xl blur-xl`}
-                animate={{
-                  scale: isHovered ? 1.2 : 0.8,
-                  opacity: isHovered ? 0.5 : 0.3,
-                }}
-                transition={{ duration: 0.3 }}
+        <div className="relative z-10 flex h-full flex-col p-5 sm:p-6">
+          {/* Header */}
+          <div className="flex items-center gap-3.5 mb-5">
+            <div className="relative shrink-0">
+              <div
+                className={`absolute inset-0 rounded-2xl bg-linear-to-br ${accent.gradient} opacity-30 blur-md transition-opacity duration-300 group-hover:opacity-60`}
               />
               <div
-                className={`relative flex items-center justify-center w-16 h-16 rounded-2xl ${accent.iconBg} ${accent.iconText} border ${accent.iconBorder} group-hover:scale-110 transition-all duration-300`}
+                className={`relative flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl ${accent.iconBg} ${accent.iconText} border ${accent.iconBorder} backdrop-blur-md transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-3`}
               >
-                {getIcon(skillGroup.icon)}
+                <span className="[&>svg]:h-6 [&>svg]:w-6 sm:[&>svg]:h-7 sm:[&>svg]:w-7">
+                  {getIcon(skillGroup.icon)}
+                </span>
               </div>
             </div>
-            <h3
-              className={`text-xl md:text-2xl font-bold text-foreground transition-colors duration-300`}
-            >
-              {skillGroup.name}
-            </h3>
+
+            <div className="min-w-0 flex-1">
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-foreground leading-tight truncate">
+                {skillGroup.name}
+              </h3>
+              <p className="mt-0.5 text-[11px] font-mono uppercase tracking-[0.16em] text-muted-foreground">
+                {skillGroup.items.length}{' '}
+                {isLanguageCategory ? 'хэл' : 'технологи'}
+              </p>
+            </div>
           </div>
 
+          {/* Divider */}
+          <div className="mb-4 h-px bg-linear-to-r from-transparent via-border/70 to-transparent" />
+
           {/* Skills tags */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-2.5">
             {skillGroup.items.map((item, idx) => {
               const flag = languageFlags[item.toLowerCase()];
 
               return (
-                <div key={idx} className="group/item relative overflow-hidden">
-                  {/* Glow effect */}
-                  <motion.div
-                    className={`absolute inset-0 rounded-full bg-gradient-to-r ${accent.gradient} blur-md`}
-                    initial={{ opacity: 0 }}
-                    whileHover={{ opacity: 0.3 }}
-                  />
+                <div
+                  key={idx}
+                  className="group/item relative inline-flex items-center gap-2 rounded-xl border border-border/60 bg-background/40 px-3 py-1.5 backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/5 hover:shadow-sm hover:shadow-primary/10"
+                >
+                  {/* Flag for languages or Icon */}
+                  {isLanguageCategory && flag ? (
+                    <span className="text-base leading-none">{flag}</span>
+                  ) : (
+                    <div className="w-4 h-4 shrink-0">
+                      <TechIcon techName={item} className="w-4 h-4" />
+                    </div>
+                  )}
 
-                  {/* Skill badge */}
-                  <div
-                    className={`relative flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-neutral-800/80 border border-neutral-700/50 group-hover/item:border-neutral-600 backdrop-blur-sm transition-all duration-300 group-hover/item:scale-105`}
-                  >
-                    {/* Flag for languages or Icon */}
-                    {isLanguageCategory && flag ? (
-                      <span className="text-xl">{flag}</span>
-                    ) : (
-                      <div className="w-6 h-6 flex-shrink-0">
-                        <TechIcon techName={item} className="w-6 h-6" />
-                      </div>
-                    )}
-
-                    {/* Name */}
-                    <span className="text-sm md:text-base font-medium text-foreground/80 group-hover/item:text-primary transition-colors duration-300 whitespace-nowrap">
-                      {item}
-                    </span>
-                  </div>
+                  {/* Name */}
+                  <span className="text-xs sm:text-sm font-medium text-foreground/85 group-hover/item:text-foreground transition-colors duration-200 whitespace-nowrap">
+                    {item}
+                  </span>
                 </div>
               );
             })}
@@ -268,25 +265,20 @@ const Skills = () => {
   return (
     <section id="skills" className="py-12 sm:py-16 md:py-20 lg:py-24">
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
-        {/* Section Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-8 sm:mb-10 md:mb-12"
-        >
-          <h2 className="text-3xl md:text-5xl font-bold">
-            Ур чадвар &amp; <span className="text-primary">Технологиуд</span>
-          </h2>
-        </motion.div>
+        <PageHeader
+          eyebrow="Ур чадвар"
+          icon={<Sparkles className="h-3.5 w-3.5" />}
+          title="Технологи болон хэрэгслийн хураангуй"
+          description="Одоогийн байдлаар эзэмшиж буй frontend, backend болон AI хэрэгслүүд."
+        />
+        <div className="mb-10" />
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-7xl mx-auto">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="rounded-2xl bg-neutral-900/50 border border-neutral-800 p-6"
+                className="rounded-2xl bg-card/50 border border-border/60 p-6"
               >
                 <div className="flex items-center gap-4 mb-5">
                   <Skeleton className="h-14 w-14 rounded-xl" />
@@ -362,7 +354,7 @@ const Skills = () => {
                 className="h-full min-h-[200px]"
               >
                 <AddSkillDialog>
-                  <button className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-neutral-700 bg-neutral-900/30 text-neutral-500 transition-all duration-300 hover:border-primary hover:bg-neutral-900/50 hover:text-primary hover:shadow-lg hover:shadow-primary/10">
+                  <button className="flex h-full w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/60 bg-card/30 backdrop-blur-md text-muted-foreground transition-all duration-300 hover:border-primary hover:bg-primary/5 hover:text-primary hover:shadow-lg hover:shadow-primary/10">
                     <PlusCircle size={48} />
                     <span className="mt-4 font-semibold">
                       Шинэ ур чадвар нэмэх

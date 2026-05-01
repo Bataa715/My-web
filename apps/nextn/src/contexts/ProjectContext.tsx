@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useFirebase } from '@/firebase';
 import {
   collection,
-  getDocs,
+  onSnapshot,
   doc,
   query,
   orderBy,
@@ -23,6 +23,7 @@ import {
   deleteDoc,
   updateDoc,
 } from 'firebase/firestore';
+import { readCache, writeCache, clearCache } from '@/lib/firestore-cache';
 
 interface ProjectContextType {
   projects: Project[];
@@ -51,39 +52,49 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       setProjects([]);
       return;
     }
+
+    // 1. Hydrate from localStorage cache for instant first paint
+    const cacheKey = `projects::${user.uid}`;
+    const cached = readCache<Project[]>(cacheKey);
+    if (cached && cached.length) {
+      setProjects(cached);
+      setLoading(false);
+    }
+
+    // 2. Subscribe to live snapshot — auto-updates on any DB change
     const projectsCollectionRef = collection(
       firestore,
       `users/${user.uid}/projects`
     );
+    const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'));
 
-    const fetchProjects = async () => {
-      setLoading(true);
-      try {
-        const q = query(projectsCollectionRef, orderBy('createdAt', 'desc'));
-        const projectSnapshot = await getDocs(q);
-
-        const projectList = projectSnapshot.docs.map(doc => {
-          const data = doc.data();
+    const unsubscribe = onSnapshot(
+      q,
+      snapshot => {
+        const projectList = snapshot.docs.map(d => {
+          const data = d.data();
           return {
-            id: doc.id,
+            id: d.id,
             ...data,
             createdAt: (data.createdAt as Timestamp)?.toDate(),
           } as Project;
         });
         setProjects(projectList);
-      } catch (error) {
-        console.error('Error fetching projects: ', error);
+        writeCache(cacheKey, projectList);
+        setLoading(false);
+      },
+      error => {
+        console.error('Error subscribing to projects: ', error);
         toast({
           title: 'Алдаа',
           description: 'Төслүүдийг дуудахад алдаа гарлаа.',
           variant: 'destructive',
         });
-      } finally {
         setLoading(false);
       }
-    };
+    );
 
-    fetchProjects();
+    return () => unsubscribe();
   }, [firestore, user, toast]);
 
   const addProject = async (project: Omit<Project, 'id' | 'createdAt'>) => {

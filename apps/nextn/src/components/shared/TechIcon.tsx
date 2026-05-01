@@ -467,7 +467,7 @@ const TechIcon = ({ techName, className }: TechIconProps) => {
           <TooltipTrigger asChild>
             <div
               className={cn(
-                'relative flex h-8 w-8 items-center justify-center rounded-full border border-neutral-700 bg-gradient-to-br from-neutral-800 to-neutral-900 overflow-hidden shadow-lg',
+                'relative flex h-8 w-8 items-center justify-center rounded-full border border-neutral-700 bg-linear-to-br from-neutral-800 to-neutral-900 overflow-hidden shadow-lg',
                 className
               )}
             >
@@ -505,7 +505,7 @@ const TechIcon = ({ techName, className }: TechIconProps) => {
               className={cn(
                 'flex h-8 w-8 items-center justify-center rounded-full border border-neutral-700',
                 !tech?.color &&
-                  'bg-gradient-to-br from-neutral-800 to-neutral-900',
+                  'bg-linear-to-br from-neutral-800 to-neutral-900',
                 className
               )}
               style={bgStyle}

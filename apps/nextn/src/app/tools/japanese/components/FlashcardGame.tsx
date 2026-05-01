@@ -346,12 +346,12 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', delay: 0.2 }}
-          className="w-24 h-24 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center"
+          className="w-24 h-24 rounded-full bg-linear-to-br from-rose-400 to-pink-500 flex items-center justify-center"
         >
           <Trophy className="w-12 h-12 text-white" />
         </motion.div>
 
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-rose-400 to-pink-500 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold bg-linear-to-r from-rose-400 to-pink-500 bg-clip-text text-transparent">
           Session Complete!
         </h2>
 
@@ -385,7 +385,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
         <div className="flex gap-4">
           <Button
             onClick={restartSession}
-            className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600"
+            className="bg-linear-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Practice Again
@@ -541,7 +541,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
           >
             {/* Front of card */}
             <div
-              className="absolute inset-0 backface-hidden rounded-3xl bg-gradient-to-br from-rose-500/20 to-pink-500/20 backdrop-blur-xl border border-white/10 flex flex-col items-center justify-center p-6 shadow-2xl"
+              className="absolute inset-0 backface-hidden rounded-3xl bg-linear-to-br from-rose-500/20 to-pink-500/20 backdrop-blur-xl border border-white/10 flex flex-col items-center justify-center p-6 shadow-2xl"
               style={{ backfaceVisibility: 'hidden' }}
             >
               <Badge
@@ -588,7 +588,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
 
             {/* Back of card */}
             <div
-              className="absolute inset-0 backface-hidden rounded-3xl bg-gradient-to-br from-pink-500/20 to-rose-500/20 backdrop-blur-xl border border-white/10 flex flex-col items-center justify-center p-6 shadow-2xl"
+              className="absolute inset-0 backface-hidden rounded-3xl bg-linear-to-br from-pink-500/20 to-rose-500/20 backdrop-blur-xl border border-white/10 flex flex-col items-center justify-center p-6 shadow-2xl"
               style={{
                 backfaceVisibility: 'hidden',
                 transform: 'rotateY(180deg)',
@@ -665,12 +665,12 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
             placeholder={
               gameMode === 'character' ? 'Type romaji...' : 'Type character...'
             }
-            className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-center text-xl w-48 focus:outline-none focus:border-rose-500/50"
+            className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-center text-xl w-48 focus:outline-hidden focus:border-rose-500/50"
             autoFocus
           />
           <Button
             onClick={handleTypingSubmit}
-            className="bg-gradient-to-r from-rose-500 to-pink-500"
+            className="bg-linear-to-r from-rose-500 to-pink-500"
           >
             Check
           </Button>

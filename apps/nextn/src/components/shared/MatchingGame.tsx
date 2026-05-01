@@ -116,7 +116,7 @@ export default function MatchingGame({
 
   if (isFinished) {
     return (
-      <Card className="w-full max-w-2xl mx-auto p-8 text-center bg-card/80 backdrop-blur-sm border-primary/20">
+      <Card className="w-full max-w-2xl mx-auto p-8 text-center bg-card/80 backdrop-blur-xs border-primary/20">
         <CardContent className="p-0">
           <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-3xl font-bold mb-4">Баяр хүргэе!</h2>

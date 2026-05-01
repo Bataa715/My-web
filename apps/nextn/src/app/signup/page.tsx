@@ -35,7 +35,16 @@ import type {
 } from '@/lib/types';
 import type { ExperienceItem } from '@/contexts/ExperienceContext';
 import Link from 'next/link';
-import { User, Mail, Lock, ArrowRight, Loader2, UserPlus } from 'lucide-react';
+import {
+  User,
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  Eye,
+  EyeOff,
+} from 'lucide-react';
+import AuthShell from '@/components/auth/AuthShell';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import OnboardingDialog from '@/components/OnboardingDialog';
 import { useRouter } from 'next/navigation';
@@ -68,6 +77,7 @@ export default function SignupPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [pendingUserData, setPendingUserData] = useState<{
     uid: string;
     name: string;
@@ -435,232 +445,166 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-background via-background to-background">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-80 h-80 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-full blur-3xl" />
-      </div>
-
-      {/* Floating Shapes */}
-      <motion.div
-        className="absolute top-32 right-20 w-4 h-4 bg-purple-500/40 rounded-full"
-        animate={{
-          y: [0, -20, 0],
-          opacity: [0.4, 0.8, 0.4],
-        }}
-        transition={{ duration: 3, repeat: Infinity }}
-      />
-      <motion.div
-        className="absolute top-20 left-32 w-3 h-3 bg-cyan-500/40 rounded-full"
-        animate={{
-          y: [0, 20, 0],
-          opacity: [0.4, 0.8, 0.4],
-        }}
-        transition={{ duration: 4, repeat: Infinity, delay: 0.5 }}
-      />
-      <motion.div
-        className="absolute bottom-40 right-1/4 w-5 h-5 bg-pink-500/40 rounded-full"
-        animate={{
-          y: [0, -15, 0],
-          opacity: [0.4, 0.8, 0.4],
-        }}
-        transition={{ duration: 3.5, repeat: Infinity, delay: 1 }}
-      />
-      <motion.div
-        className="absolute bottom-20 left-20 w-6 h-6 bg-blue-500/30 rounded-full"
-        animate={{
-          y: [0, 25, 0],
-          opacity: [0.3, 0.6, 0.3],
-        }}
-        transition={{ duration: 5, repeat: Infinity, delay: 0.7 }}
-      />
-
-      {/* Grid Pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-          backgroundSize: '50px 50px',
-        }}
-      />
-
-      {/* Signup Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="relative z-10 w-full max-w-md mx-4"
+    <>
+      <AuthShell
+        title="Бүртгүүлэх"
+        subtitle="Шинэ хэрэглэгчийн бүртгэл хэдхэн секундэд."
+        showcaseEyebrow="PersonalWeb"
+        showcaseTitle="Бүх хэрэгслээ нэг бүртгэлээр."
+        showcaseDescription="Бүртгүүлээд портфолио, хэл сурах, програмчлал болон бүтээмжийн хэрэгслүүдийг шууд эхлүүл."
+        showcaseBullets={[
+          'Хувийн портфолио — QR + хуваалцах линк',
+          'Англи · Япон хэлний дасгал, үг сурах',
+          'AI туслах + Trader AI зургийн анализ',
+          'Pomodoro, Todo, Fitness — өдрийн төлөвлөгөө',
+        ]}
+        switchLabel="Бүртгэлтэй юу?"
+        switchHref="/login"
+        switchCta="Нэвтрэх"
       >
-        <div className="relative">
-          {/* Glow Effect */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-cyan-500/20 rounded-3xl blur-xl opacity-70" />
-
-          {/* Card */}
-          <div className="relative bg-background/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
-                className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 mb-4 shadow-lg shadow-purple-500/25"
-              >
-                <UserPlus className="w-8 h-8 text-white" />
-              </motion.div>
-              <motion.h1
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text"
-              >
-                Бүртгүүлэх
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-muted-foreground mt-2"
-              >
-                Шинэ хэрэглэгчийн бүртгэл үүсгэх
-              </motion.p>
-            </div>
-
-            {/* Form */}
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-5"
-              >
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 }}
-                >
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm font-medium flex items-center gap-2">
-                          <User className="w-4 h-4 text-muted-foreground" />
-                          Нэр
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Таны нэр"
-                            className="h-12 bg-white/5 border-white/10 rounded-xl pl-4 focus:border-purple-500/50 focus:ring-purple-500/20 transition-all"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm font-medium flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-muted-foreground" />
-                          И-мэйл
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="name@example.com"
-                            className="h-12 bg-white/5 border-white/10 rounded-xl pl-4 focus:border-purple-500/50 focus:ring-purple-500/20 transition-all"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 }}
-                >
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm font-medium flex items-center gap-2">
-                          <Lock className="w-4 h-4 text-muted-foreground" />
-                          Нууц үг
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="••••••••"
-                            className="h-12 bg-white/5 border-white/10 rounded-xl pl-4 focus:border-purple-500/50 focus:ring-purple-500/20 transition-all"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full h-12 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium shadow-lg shadow-purple-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/30 hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        Бүртгүүлэх
-                        <ArrowRight className="w-4 h-4" />
-                      </span>
-                    )}
-                  </Button>
-                </motion.div>
-              </form>
-            </Form>
-
-            {/* Footer */}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
-              className="mt-8 text-center"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25, duration: 0.4 }}
             >
-              <p className="text-sm text-muted-foreground">
-                Бүртгэлтэй юу?{' '}
-                <Link
-                  href="/login"
-                  className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
-                >
-                  Нэвтрэх
-                </Link>
-              </p>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Нэр
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative input-group rounded-xl">
+                        <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                          autoComplete="name"
+                          placeholder="Таны нэр"
+                          className="h-12 pl-10 pr-3 rounded-xl bg-muted/30 border-border/60 focus-visible:border-primary/60 focus-visible:ring-primary/30"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </motion.div>
-          </div>
-        </div>
-      </motion.div>
 
-      {/* Onboarding Dialog */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.32, duration: 0.4 }}
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      И-мэйл
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative input-group rounded-xl">
+                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                          type="email"
+                          autoComplete="email"
+                          placeholder="name@example.com"
+                          className="h-12 pl-10 pr-3 rounded-xl bg-muted/30 border-border/60 focus-visible:border-primary/60 focus-visible:ring-primary/30"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.39, duration: 0.4 }}
+            >
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Нууц үг
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative input-group rounded-xl">
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          autoComplete="new-password"
+                          placeholder="Дор хаяж 6 тэмдэгт"
+                          className="h-12 pl-10 pr-11 rounded-xl bg-muted/30 border-border/60 focus-visible:border-primary/60 focus-visible:ring-primary/30"
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(v => !v)}
+                          aria-label={showPassword ? 'Нууц үг нуух' : 'Нууц үг харах'}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.46, duration: 0.4 }}
+              className="pt-1"
+            >
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="group w-full h-12 rounded-xl bg-linear-to-r from-primary to-primary/80 hover:from-primary hover:to-primary text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <span className="inline-flex items-center gap-2">
+                    Бүртгүүлэх
+                    <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
+                  </span>
+                )}
+              </Button>
+            </motion.div>
+
+            <p className="text-[11px] text-center text-muted-foreground/80 leading-relaxed">
+              Бүртгүүлснээр та манай{' '}
+              <Link href="/" className="underline hover:text-foreground">
+                үйлчилгээний нөхцөл
+              </Link>{' '}
+              болон{' '}
+              <Link href="/" className="underline hover:text-foreground">
+                нууцлалын бодлого
+              </Link>
+              -г зөвшөөрч байна.
+            </p>
+          </form>
+        </Form>
+      </AuthShell>
+
       {pendingUserData && (
         <OnboardingDialog
           open={showOnboarding}
@@ -668,6 +612,6 @@ export default function SignupPage() {
           userName={pendingUserData.name}
         />
       )}
-    </div>
+    </>
   );
 }

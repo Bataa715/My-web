@@ -61,11 +61,19 @@ import { useTranslation } from 'react-i18next';
 const Header = () => {
   const { isEditMode, setIsEditMode } = useEditMode();
   const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const { toast } = useToast();
   const pathname = usePathname();
   const router = useRouter();
   const { t } = useTranslation();
   const { language, setLanguage, languages } = useLanguage();
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const mainLinks = [
     { href: '/', label: t('common.home'), icon: Home },
@@ -128,7 +136,14 @@ const Header = () => {
   return (
     <header className="sticky top-0 left-0 w-full z-50 min-h-[60px] md:min-h-[72px]">
       <div className="relative">
-        <div className="mx-3 md:mx-4 mt-3 md:mt-4 grid grid-cols-[1fr_auto_1fr] items-center p-2 px-4 bg-black/20 backdrop-blur-md rounded-2xl border border-white/10">
+        <div
+          className={cn(
+            'mx-3 md:mx-4 mt-3 md:mt-4 grid grid-cols-[1fr_auto_1fr] items-center p-2 px-4 rounded-2xl border transition-all duration-300',
+            isScrolled
+              ? 'bg-background/75 border-border/50 shadow-lg shadow-primary/5 backdrop-blur-xl'
+              : 'bg-background/20 border-white/8 backdrop-blur-md'
+          )}
+        >
           <div className="flex justify-self-start items-center gap-2">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
@@ -172,7 +187,7 @@ const Header = () => {
               </SheetContent>
             </Sheet>
 
-            <nav className="hidden md:flex items-center gap-4">
+            <nav className="hidden md:flex items-center gap-1">
               {mainLinks.map(link => {
                 const isActive =
                   (pathname.startsWith(link.href) && link.href !== '/') ||
@@ -182,11 +197,16 @@ const Header = () => {
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      'text-sm font-medium transition-colors hover:text-primary',
-                      isActive ? 'text-primary' : 'text-muted-foreground'
+                      'relative px-3 py-1.5 text-sm font-medium rounded-xl transition-all duration-200',
+                      isActive
+                        ? 'text-primary bg-primary/10'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                     )}
                   >
                     {link.label}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-[2px] rounded-full bg-primary shadow-[0_0_6px_hsl(var(--primary)/0.8)]" />
+                    )}
                   </Link>
                 );
               })}
@@ -196,9 +216,9 @@ const Header = () => {
           <div className="justify-self-center">
             <Link
               href="/"
-              className="font-bold text-2xl tracking-tighter text-foreground hover:text-primary transition-colors"
+              className="font-bold text-xl md:text-2xl tracking-tight gradient-text-animated hover:opacity-90 transition-opacity"
             >
-              {appName}
+              {appName || 'PersonalWeb'}
             </Link>
           </div>
 
@@ -250,8 +270,12 @@ const Header = () => {
             {user && !isUserLoading && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Settings className="h-5 w-5" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn('relative', isEditMode && 'badge-pulse')}
+                  >
+                    <Settings className={cn('h-5 w-5 transition-colors duration-200', isEditMode && 'text-primary')} />
                     <span className="sr-only">{t('common.settings')}</span>
                   </Button>
                 </DropdownMenuTrigger>

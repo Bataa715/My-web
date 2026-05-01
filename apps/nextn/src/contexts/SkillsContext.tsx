@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useFirebase, useMemoFirebase } from '@/firebase';
 import {
   collection,
-  getDocs,
+  onSnapshot,
   addDoc,
   deleteDoc,
   doc,
@@ -23,6 +23,7 @@ import {
   serverTimestamp,
   writeBatch,
 } from 'firebase/firestore';
+import { readCache, writeCache } from '@/lib/firestore-cache';
 
 interface SkillsContextType {
   skills: Skill[];
@@ -51,39 +52,49 @@ export function SkillsProvider({ children }: { children: ReactNode }) {
   }, [user, firestore]);
 
   useEffect(() => {
-    if (!skillsCollectionRef) {
+    if (!skillsCollectionRef || !user) {
       if (!user) {
         setLoading(false);
         setSkills([]);
       }
       return;
     }
-    const fetchSkills = async () => {
-      setLoading(true);
-      try {
-        const q = query(skillsCollectionRef, orderBy('createdAt', 'asc'));
-        const skillsSnapshot = await getDocs(q);
 
-        const skillsList = skillsSnapshot.docs.map(doc => {
-          const data = doc.data();
+    // 1. Hydrate from cache
+    const cacheKey = `skills::${user.uid}`;
+    const cached = readCache<Skill[]>(cacheKey);
+    if (cached && cached.length) {
+      setSkills(cached);
+      setLoading(false);
+    }
+
+    // 2. Live snapshot
+    const q = query(skillsCollectionRef, orderBy('createdAt', 'asc'));
+    const unsubscribe = onSnapshot(
+      q,
+      snapshot => {
+        const skillsList = snapshot.docs.map(d => {
+          const data = d.data();
           return {
-            id: doc.id,
+            id: d.id,
             ...data,
             createdAt: (data.createdAt as Timestamp)?.toDate(),
           } as Skill;
         });
         setSkills(skillsList);
-      } catch (error) {
+        writeCache(cacheKey, skillsList);
+        setLoading(false);
+      },
+      () => {
         toast({
           title: 'Алдаа',
           description: 'Ур чадваруудыг дуудахад алдаа гарлаа.',
           variant: 'destructive',
         });
-      } finally {
         setLoading(false);
       }
-    };
-    fetchSkills();
+    );
+    return () => unsubscribe();
   }, [skillsCollectionRef, toast, user, firestore]);
 
   const addSkillGroup = async (group: Omit<Skill, 'id' | 'createdAt'>) => {

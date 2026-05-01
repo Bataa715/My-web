@@ -206,7 +206,7 @@ export function EditGrammarRuleDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {cloneElement(children as React.ReactElement, {
+        {cloneElement(children as React.ReactElement<any>, {
           onClick: () => setOpen(true),
         })}
       </DialogTrigger>

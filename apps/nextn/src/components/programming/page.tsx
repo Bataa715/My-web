@@ -140,7 +140,7 @@ export default function ProgrammingPage() {
         <div className="flex justify-between items-center">
           <BackButton />
           <AddLanguageDialog onAddLanguage={handleAddLanguage}>
-            <Button className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white border-0 shadow-lg shadow-orange-500/25">
+            <Button className="bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white border-0 shadow-lg shadow-orange-500/25">
               <PlusCircle className="mr-2 h-4 w-4" />
               Шинэ хэл нэмэх
             </Button>
@@ -158,7 +158,7 @@ export default function ProgrammingPage() {
             <Code className="h-4 w-4" />
             <span className="text-sm font-medium">Код бичиж сур</span>
           </motion.div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-linear-to-r from-orange-500 via-amber-500 to-yellow-500 bg-clip-text text-transparent">
             Programm language
           </h1>
         </div>

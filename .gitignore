@@ -56,6 +56,7 @@ firestore-debug.log
 # nx
 .nx/cache
 .nx/workspace-data
+graph.json
 
 # python
 .venv/

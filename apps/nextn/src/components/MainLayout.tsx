@@ -106,25 +106,30 @@ const FloatingNav = () => {
         transition={{
           duration: 0.2,
         }}
-        className="fixed bottom-10 inset-x-0 max-w-xs mx-auto z-50 flex items-center justify-center space-x-4"
+        className="fixed bottom-6 inset-x-0 max-w-xs mx-auto z-50 flex items-center justify-center"
       >
-        <div className="flex items-center justify-center p-2 rounded-full border border-neutral-700 bg-neutral-900/80 backdrop-blur-md shadow-lg">
+        <nav
+          aria-label="Үндсэн навигац"
+          className="flex items-center justify-center p-1.5 rounded-full border border-border/60 bg-background/70 backdrop-blur-xl shadow-2xl shadow-primary/10"
+        >
           <TooltipProvider>
             {navItems.map(navItem => (
               <Tooltip key={navItem.link}>
                 <TooltipTrigger asChild>
                   <Link
                     href={navItem.link}
+                    aria-label={navItem.name}
+                    aria-current={navItem.active ? 'page' : undefined}
                     className={cn(
-                      'relative flex items-center justify-center w-12 h-12 rounded-full text-sm font-medium transition-colors duration-300',
+                      'relative flex items-center justify-center w-11 h-11 rounded-full text-sm font-medium transition-colors duration-300',
                       navItem.active
-                        ? 'text-primary'
-                        : 'text-neutral-400 hover:text-neutral-200'
+                        ? 'text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground'
                     )}
                   >
                     {navItem.active && (
                       <motion.span
-                        className="absolute inset-0 z-0 bg-neutral-800 rounded-full"
+                        className="absolute inset-0 z-0 bg-primary rounded-full shadow-lg shadow-primary/40"
                         layoutId="active-nav-item"
                         transition={{
                           type: 'spring',
@@ -142,7 +147,7 @@ const FloatingNav = () => {
               </Tooltip>
             ))}
           </TooltipProvider>
-        </div>
+        </nav>
       </motion.div>
     </AnimatePresence>
   );
@@ -172,6 +177,17 @@ export default function MainLayout({
     );
   }, [pathname]);
 
+  // Hard-cap auth wait at 2.5s. If Firebase hasn't responded by then,
+  // assume signed-out and redirect — prevents infinite spinner.
+  const [authTimedOut, setAuthTimedOut] = useState(false);
+  useEffect(() => {
+    if (!isUserLoading) return;
+    const t = setTimeout(() => setAuthTimedOut(true), 2500);
+    return () => clearTimeout(t);
+  }, [isUserLoading]);
+
+  const stillWaitingForAuth = isUserLoading && !authTimedOut;
+
   const userImageProp = useMemo((): keyof UserProfile | undefined => {
     if (pathname === '/tools') return 'toolsHeroImage';
     if (pathname === '/') return 'homeHeroImage';
@@ -180,7 +196,7 @@ export default function MainLayout({
   }, [pathname]);
 
   useEffect(() => {
-    if (isUserLoading) return;
+    if (stillWaitingForAuth) return;
 
     if (!user && !isPublicPath) {
       router.push('/login');
@@ -191,7 +207,7 @@ export default function MainLayout({
       router.push('/');
       return;
     }
-  }, [isUserLoading, user, isPublicPath, router, pathname]);
+  }, [stillWaitingForAuth, user, isPublicPath, router, pathname]);
 
   useEffect(() => {
     if (isUserLoading || !firestore) return;
@@ -274,10 +290,50 @@ export default function MainLayout({
     }
   };
 
-  if ((isUserLoading || !user) && !isPublicPath) {
+  if ((stillWaitingForAuth || !user) && !isPublicPath) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="flex flex-col items-center gap-5 select-none">
+          {/* Layered spinning rings — matches hero portal aesthetic */}
+          <div className="relative w-20 h-20">
+            {/* Outer arc ring */}
+            <div
+              className="orbit-rotate absolute inset-0 rounded-full"
+              style={{
+                background:
+                  'conic-gradient(from 0deg, hsl(var(--primary)) 0deg 40deg, transparent 40deg 360deg)',
+                WebkitMaskImage:
+                  'radial-gradient(closest-side, transparent calc(100% - 3px), black calc(100% - 3px))',
+                maskImage:
+                  'radial-gradient(closest-side, transparent calc(100% - 3px), black calc(100% - 3px))',
+                filter: 'drop-shadow(0 0 6px hsl(var(--primary)/0.7))',
+                ['--orbit-duration' as string]: '1.1s',
+              }}
+            />
+            {/* Inner accent arc */}
+            <div
+              className="orbit-rotate-reverse absolute inset-[10px] rounded-full"
+              style={{
+                background:
+                  'conic-gradient(from 120deg, hsl(var(--accent)) 0deg 30deg, transparent 30deg 360deg)',
+                WebkitMaskImage:
+                  'radial-gradient(closest-side, transparent calc(100% - 2px), black calc(100% - 2px))',
+                maskImage:
+                  'radial-gradient(closest-side, transparent calc(100% - 2px), black calc(100% - 2px))',
+                filter: 'drop-shadow(0 0 4px hsl(var(--accent)/0.6))',
+                ['--orbit-duration' as string]: '0.8s',
+              }}
+            />
+            {/* Centre dot */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-2.5 h-2.5 rounded-full bg-primary orbit-aura"
+                   style={{ boxShadow: '0 0 8px 2px hsl(var(--primary)/0.6)' }} />
+            </div>
+          </div>
+          <p className="text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground animate-pulse-slow">
+            Уншиж байна…
+          </p>
+        </div>
       </div>
     );
   }
@@ -289,7 +345,7 @@ export default function MainLayout({
   return (
     <>
       <IntroOverlay />
-      <div className="min-h-screen p-3 md:p-4 lg:p-6 bg-neutral-950">
+      <div className="min-h-screen p-3 md:p-4 lg:p-6 bg-background">
         <div className="animated-border-wrapper">
           <div className="relative z-10 flex min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] flex-col rounded-[1.6rem] bg-background overflow-hidden shadow-2xl shadow-primary/5">
             {heroImage && (
@@ -298,10 +354,12 @@ export default function MainLayout({
                   src={heroImage}
                   alt="Background"
                   fill
+                  sizes="100vw"
                   className="object-cover"
                   priority
+                  unoptimized={/\.gif(\?|$)/i.test(heroImage)}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-transparent" />
               </div>
             )}
 

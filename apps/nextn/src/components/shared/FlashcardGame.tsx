@@ -191,7 +191,7 @@ export default function FlashcardGame({
 
   if (isFinished) {
     return (
-      <Card className="w-full max-w-2xl mx-auto p-8 text-center bg-card/80 backdrop-blur-sm border-primary/20">
+      <Card className="w-full max-w-2xl mx-auto p-8 text-center bg-card/80 backdrop-blur-xs border-primary/20">
         <CardContent className="p-0">
           <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4" />
           <h2 className="text-3xl font-bold mb-4">Баяр хүргэе!</h2>
@@ -268,7 +268,7 @@ export default function FlashcardGame({
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <div className="flex-grow flex items-center gap-2 sm:gap-4">
+        <div className="grow flex items-center gap-2 sm:gap-4">
           <div className="flex items-center gap-1 text-red-400">
             <X className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="font-bold text-sm sm:text-lg">
@@ -289,13 +289,13 @@ export default function FlashcardGame({
       </div>
 
       <div
-        className="w-full h-[280px] sm:h-[320px] md:h-[350px] [perspective:1200px] cursor-pointer"
+        className="w-full h-[280px] sm:h-[320px] md:h-[350px] perspective-distant cursor-pointer"
         onClick={() => setIsFlipped(!isFlipped)}
       >
         <AnimatePresence initial={false}>
           <motion.div
             key={currentIndex}
-            className="relative w-full h-full [transform-style:preserve-3d]"
+            className="relative w-full h-full transform-3d"
             initial={{ opacity: 0, scale: 0.8, y: 50 }}
             animate={{
               opacity: 1,
@@ -307,14 +307,14 @@ export default function FlashcardGame({
             transition={{ duration: 0.5, ease: 'easeInOut' }}
           >
             {/* Front of Card */}
-            <div className="absolute w-full h-full [backface-visibility:hidden]">
+            <div className="absolute w-full h-full backface-hidden">
               <div className="card-face card-front flex items-center justify-center p-6">
                 {currentWord && getCardContent(currentWord, 'front')}
               </div>
             </div>
             {/* Back of Card */}
             <div
-              className="absolute w-full h-full [backface-visibility:hidden]"
+              className="absolute w-full h-full backface-hidden"
               style={{ transform: 'rotateY(180deg)' }}
             >
               <div className="card-face card-back flex items-center justify-center p-6">

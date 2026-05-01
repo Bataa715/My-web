@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useFirebase } from '@/firebase';
 import {
   collection,
-  getDocs,
+  onSnapshot,
   doc,
   query,
   Timestamp,
@@ -22,6 +22,7 @@ import {
   deleteDoc,
   updateDoc,
 } from 'firebase/firestore';
+import { readCache, writeCache } from '@/lib/firestore-cache';
 
 const toDateSafe = (value: any): Date => {
   if (!value) return new Date();
@@ -62,42 +63,49 @@ export function HobbyProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    const cacheKey = `hobbies::${user.uid}`;
+    const cached = readCache<Hobby[]>(cacheKey);
+    if (cached && cached.length) {
+      setHobbies(cached);
+      setLoading(false);
+    }
+
     const hobbiesCollectionRef = collection(
       firestore,
       `users/${user.uid}/hobbies`
     );
 
-    const fetchHobbies = async () => {
-      setLoading(true);
-      try {
-        const snapshot = await getDocs(hobbiesCollectionRef);
-        const hobbiesList = snapshot.docs.map(doc => {
-          const data = doc.data();
+    const unsubscribe = onSnapshot(
+      hobbiesCollectionRef,
+      snapshot => {
+        const hobbiesList = snapshot.docs.map(d => {
+          const data = d.data();
           return {
-            id: doc.id,
+            id: d.id,
             ...data,
             createdAt: toDateSafe(data.createdAt),
           } as Hobby;
         });
-        setHobbies(
-          hobbiesList.sort(
-            (a, b) =>
-              (a.createdAt as Date).getTime() - (b.createdAt as Date).getTime()
-          )
+        const sorted = hobbiesList.sort(
+          (a, b) =>
+            (a.createdAt as Date).getTime() -
+            (b.createdAt as Date).getTime()
         );
-      } catch (error) {
-        console.error('Error fetching hobbies: ', error);
+        setHobbies(sorted);
+        writeCache(cacheKey, sorted);
+        setLoading(false);
+      },
+      error => {
+        console.error('Error subscribing to hobbies: ', error);
         toast({
           title: 'Алдаа',
           description: 'Хоббины мэдээллийг дуудахад алдаа гарлаа.',
           variant: 'destructive',
         });
-      } finally {
         setLoading(false);
       }
-    };
-
-    fetchHobbies();
+    );
+    return () => unsubscribe();
   }, [firestore, user, toast]);
 
   const addHobby = async (hobby: Omit<Hobby, 'id' | 'createdAt'>) => {

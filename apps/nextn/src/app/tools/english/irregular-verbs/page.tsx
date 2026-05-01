@@ -81,14 +81,14 @@ export default function IrregularVerbsPage() {
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/30 via-amber-500/30 to-yellow-500/30 blur-3xl rounded-full scale-150" />
-            <div className="relative p-5 rounded-2xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 backdrop-blur-sm border border-orange-500/20">
+            <div className="absolute inset-0 bg-linear-to-r from-orange-500/30 via-amber-500/30 to-yellow-500/30 blur-3xl rounded-full scale-150" />
+            <div className="relative p-5 rounded-2xl bg-linear-to-br from-orange-500/20 to-amber-500/20 backdrop-blur-xs border border-orange-500/20">
               <BookOpen className="h-12 w-12 text-orange-400" />
             </div>
           </motion.div>
 
           <motion.h1
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-headline bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-400 bg-clip-text text-transparent px-4"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold font-headline bg-linear-to-r from-orange-400 via-amber-400 to-yellow-400 bg-clip-text text-transparent px-4"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -116,7 +116,7 @@ export default function IrregularVerbsPage() {
         </div>
 
         {/* Search and Controls */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+        <Card className="bg-card/50 backdrop-blur-xs border-border/50">
           <CardContent className="p-3 md:p-4">
             <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
               <div className="relative flex-1">
@@ -145,8 +145,8 @@ export default function IrregularVerbsPage() {
         </Card>
 
         {/* Verbs Table */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50 overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-orange-500/10 to-amber-500/10 border-b border-border/50">
+        <Card className="bg-card/50 backdrop-blur-xs border-border/50 overflow-hidden">
+          <CardHeader className="bg-linear-to-r from-orange-500/10 to-amber-500/10 border-b border-border/50">
             <CardTitle className="flex items-center gap-2 text-orange-400">
               <BookOpen className="h-5 w-5" />
               Irregular Verbs хүснэгт
@@ -234,7 +234,7 @@ export default function IrregularVerbsPage() {
         </Card>
 
         {/* Quick Reference Card */}
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+        <Card className="bg-card/50 backdrop-blur-xs border-border/50">
           <CardHeader>
             <CardTitle className="text-lg">Формат тайлбар</CardTitle>
           </CardHeader>

@@ -1,4 +1,5 @@
 import type {NextConfig} from 'next';
+import path from 'node:path';
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -8,11 +9,25 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   // Skip trailing slash redirect for cleaner URLs
   skipTrailingSlashRedirect: true,
+  // Pin Turbopack root to silence multi-lockfile warning (Next 16+)
+  turbopack: {
+    root: path.join(__dirname, '..', '..'),
+  },
+  // Tree-shake heavy barrel imports → faster dev compile + smaller client JS
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      'framer-motion',
+      'date-fns',
+      'firebase',
+      'firebase/firestore',
+      'firebase/auth',
+      '@radix-ui/react-icons',
+      'react-i18next',
+    ],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],

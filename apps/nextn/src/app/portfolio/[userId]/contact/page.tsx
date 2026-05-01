@@ -146,7 +146,7 @@ export default function PortfolioContactPage({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.8 }}
-          className="flex items-center justify-between p-6 rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-sm"
+          className="flex items-center justify-between p-6 rounded-2xl border border-primary/20 bg-card/50 backdrop-blur-xs"
         >
           <div className="flex items-center gap-3">
             <Mail className="h-5 w-5 text-primary" />

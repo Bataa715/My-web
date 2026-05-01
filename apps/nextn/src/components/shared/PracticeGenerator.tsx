@@ -56,8 +56,8 @@ const MCQCard = ({ mcq, index }: { mcq: GeneratedMCQ; index: number }) => {
                   ? 'default'
                   : selectedOption === option
                     ? 'destructive'
-                    : 'outline'
-                : 'outline'
+                    : 'outline-solid'
+                : 'outline-solid'
             }
             className="w-full justify-start text-left h-auto py-2"
             onClick={() => !isAnswered && handleAnswer(option)}

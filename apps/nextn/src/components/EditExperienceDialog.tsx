@@ -106,6 +106,7 @@ export const EditExperienceDialog = ({
                     src={img.src}
                     alt={img.label}
                     fill
+                    sizes="96px"
                     className="object-contain p-2"
                   />
                   {image === img.src && (

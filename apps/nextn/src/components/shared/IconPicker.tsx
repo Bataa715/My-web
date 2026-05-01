@@ -67,7 +67,7 @@ const IconPicker = ({
               {filteredIcons.map(iconName => (
                 <Button
                   key={iconName}
-                  variant={selectedIcon === iconName ? 'default' : 'outline'}
+                  variant={selectedIcon === iconName ? 'default' : 'outline-solid'}
                   size="icon"
                   onClick={() => handleIconClick(iconName)}
                   className="h-12 w-12 flex-col gap-1.5"

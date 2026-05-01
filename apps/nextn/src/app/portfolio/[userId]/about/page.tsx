@@ -149,17 +149,17 @@ const InfoCard = ({
       <div
         className={cn(
           'relative rounded-2xl overflow-hidden transition-all duration-500',
-          'bg-gradient-to-r from-card/90 via-card/70 to-transparent backdrop-blur-xl',
+          'bg-linear-to-r from-card/90 via-card/70 to-transparent backdrop-blur-xl',
           'border-l-4 border-primary/60 group-hover:border-primary',
           'group-hover:shadow-xl group-hover:shadow-primary/20',
           sizeClasses[size]
         )}
       >
         {/* Animated background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-linear-to-r from-primary/10 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         {/* Glow effect on left border */}
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary blur-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Content */}
         <div className="relative z-10 flex items-center justify-between gap-4">
@@ -172,7 +172,7 @@ const InfoCard = ({
           <span
             className={cn(
               'font-black text-foreground tracking-tight',
-              'bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text',
+              'bg-linear-to-r from-foreground to-foreground/80 bg-clip-text',
               'group-hover:from-primary group-hover:to-foreground group-hover:text-transparent',
               'transition-all duration-300',
               textSizeClasses[size]
@@ -453,15 +453,15 @@ export default function AboutPage() {
                       transition={{ duration: 0.5, ease: 'easeInOut' }}
                     >
                       {/* Glowing background */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent blur-2xl rounded-full transform scale-150" />
-                      <h1 className="relative text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-foreground bg-clip-text text-transparent">
+                      <div className="absolute inset-0 bg-linear-to-r from-primary/20 via-primary/10 to-transparent blur-2xl rounded-full transform scale-150" />
+                      <h1 className="relative text-5xl md:text-7xl font-bold tracking-tight bg-linear-to-r from-primary via-primary/80 to-foreground bg-clip-text text-transparent">
                         {greetings[greetingIndex]}
                       </h1>
                     </motion.div>
                   </AnimatePresence>
                   {/* Animated underline */}
                   <motion.div
-                    className="h-1 bg-gradient-to-r from-primary via-primary/50 to-transparent rounded-full mt-2"
+                    className="h-1 bg-linear-to-r from-primary via-primary/50 to-transparent rounded-full mt-2"
                     initial={{ width: 0 }}
                     animate={{ width: '80%' }}
                     transition={{ duration: 0.8, delay: 0.3 }}
@@ -488,7 +488,7 @@ export default function AboutPage() {
 
                     {/* Name with spotlight effect */}
                     <div className="relative py-2">
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/10 to-transparent blur-3xl" />
+                      <div className="absolute inset-0 bg-linear-to-r from-primary/30 via-primary/10 to-transparent blur-3xl" />
                       <p className="spotlight-text text-6xl md:text-8xl font-black tracking-tighter relative">
                         {name}
                       </p>
@@ -498,7 +498,7 @@ export default function AboutPage() {
                       гэдэг
                     </h2>
                   </motion.div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="absolute inset-0 bg-linear-to-t from-transparent to-white/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
               </div>
             </div>
@@ -613,8 +613,8 @@ export default function AboutPage() {
                                 onClick={() => setActiveIndex(index)}
                               >
                                 <AddHobbyDialog>
-                                  <button className="relative h-full w-full rounded-2xl p-[2px] bg-gradient-to-br from-primary/30 via-purple-500/20 to-cyan-500/30 hover:from-primary/60 hover:via-purple-500/40 hover:to-cyan-500/60 transition-all duration-500 group/add">
-                                    <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl bg-card/80 backdrop-blur-sm border border-dashed border-primary/30 group-hover/add:border-primary/60 transition-all duration-500">
+                                  <button className="relative h-full w-full rounded-2xl p-[2px] bg-linear-to-br from-primary/30 via-purple-500/20 to-cyan-500/30 hover:from-primary/60 hover:via-purple-500/40 hover:to-cyan-500/60 transition-all duration-500 group/add">
+                                    <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl bg-card/80 backdrop-blur-xs border border-dashed border-primary/30 group-hover/add:border-primary/60 transition-all duration-500">
                                       <div className="relative">
                                         <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover/add:bg-primary/40 transition-all duration-500"></div>
                                         <PlusCircle
@@ -638,8 +638,8 @@ export default function AboutPage() {
                               style={style}
                               onClick={() => setActiveIndex(index)}
                             >
-                              <div className="relative h-full w-full rounded-2xl p-[2px] bg-gradient-to-br from-primary/80 via-purple-500/50 to-cyan-500/80 shadow-[0_0_30px_rgba(139,92,246,0.3)] group-hover:shadow-[0_0_50px_rgba(139,92,246,0.5)] transition-all duration-500">
-                                <Card className="relative bg-card/90 backdrop-blur-sm h-full w-full overflow-hidden rounded-2xl transition-all duration-500 group-hover:-translate-y-1">
+                              <div className="relative h-full w-full rounded-2xl p-[2px] bg-linear-to-br from-primary/80 via-purple-500/50 to-cyan-500/80 shadow-[0_0_30px_rgba(139,92,246,0.3)] group-hover:shadow-[0_0_50px_rgba(139,92,246,0.5)] transition-all duration-500">
+                                <Card className="relative bg-card/90 backdrop-blur-xs h-full w-full overflow-hidden rounded-2xl transition-all duration-500 group-hover:-translate-y-1">
                                   {isEditMode && (
                                     <div className="absolute top-3 right-3 flex gap-2 z-20">
                                       <EditHobbyDialog hobby={hobby}>
@@ -692,14 +692,16 @@ export default function AboutPage() {
                                     src={hobby.image}
                                     alt={hobby.title}
                                     fill
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                                     data-ai-hint={`3D ${hobby.imageHint || hobby.title}`}
+                                    unoptimized={/\.gif(\?|$)/i.test(hobby.image)}
                                   />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500"></div>
+                                  <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500"></div>
 
                                   {/* Shimmer overlay effect */}
                                   <div
-                                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full"
+                                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full"
                                     style={{
                                       transition:
                                         'transform 1s ease-in-out, opacity 0.5s',
@@ -708,7 +710,7 @@ export default function AboutPage() {
 
                                   <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
                                     <div className="flex items-center gap-2 mb-2">
-                                      <div className="h-1 w-8 bg-gradient-to-r from-primary to-purple-400 rounded-full"></div>
+                                      <div className="h-1 w-8 bg-linear-to-r from-primary to-purple-400 rounded-full"></div>
                                     </div>
                                     <CardTitle className="text-lg md:text-xl font-bold tracking-tight group-hover:text-primary transition-colors duration-300">
                                       {hobby.title}

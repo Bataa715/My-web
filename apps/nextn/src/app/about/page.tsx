@@ -62,6 +62,7 @@ import {
 } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useHobbies } from '@/contexts/HobbyContext';
+import { HobbyProvider } from '@/contexts/HobbyContext';
 import { AddHobbyDialog } from '@/components/AddHobbyDialog';
 import { EditHobbyDialog } from '@/components/EditHobbyDialog';
 import { AddPersonalInfoDialog } from '@/components/AddPersonalInfoDialog';
@@ -78,6 +79,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import InteractiveParticles from '@/components/shared/InteractiveParticles';
+import PageHeader from '@/components/shared/PageHeader';
 
 // Icon map for personal info icons
 const iconMap: Record<string, React.ReactNode> = {
@@ -108,13 +110,11 @@ const displayLabelMap: Record<string, string> = {
 
 const getDisplayLabel = (label: string) => displayLabelMap[label] || label;
 
-// InfoCard component - clean minimal design without icons
+// InfoCard component - modern glass tile
 const InfoCard = ({
   info,
-  index,
   isEditMode,
   onEditClick,
-  size = 'normal',
 }: {
   info: PersonalInfoType;
   index: number;
@@ -122,57 +122,34 @@ const InfoCard = ({
   onEditClick: (info: PersonalInfoType) => void;
   size?: 'small' | 'normal' | 'large';
 }) => {
-  const sizeClasses = {
-    small: 'py-2.5 px-3 sm:py-4 sm:px-5',
-    normal: 'py-3 px-4 sm:py-5 sm:px-6',
-    large: 'py-4 px-5 sm:py-6 sm:px-7',
-  };
-
-  const textSizeClasses = {
-    small: 'text-lg sm:text-2xl md:text-3xl',
-    normal: 'text-xl sm:text-3xl md:text-4xl',
-    large: 'text-2xl sm:text-4xl md:text-5xl',
-  };
-
   return (
     <motion.div
-      initial={{ opacity: 1, x: 0 }}
-      animate={{ opacity: 1, x: 0 }}
-      whileHover={{ scale: 1.03, x: 8 }}
-      className="group w-full"
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.35 }}
+      className="group relative h-full"
     >
-      <div
-        className={cn(
-          'relative rounded-2xl overflow-hidden transition-all duration-500',
-          'bg-gradient-to-r from-card/90 via-card/70 to-transparent backdrop-blur-xl',
-          'border-l-4 border-primary/60 group-hover:border-primary',
-          'group-hover:shadow-xl group-hover:shadow-primary/20',
-          sizeClasses[size]
-        )}
-      >
-        {/* Animated background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute -inset-px rounded-2xl bg-linear-to-br from-primary/40 via-accent/15 to-transparent opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="relative h-full overflow-hidden rounded-2xl border border-border/60 bg-card/50 backdrop-blur-xl p-4 sm:p-5 transition-colors duration-300 group-hover:border-primary/40">
+        {/* Corner accent */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-primary/15 blur-2xl opacity-60 transition-opacity duration-500 group-hover:opacity-100"
+        />
 
-        {/* Glow effect on left border */}
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="relative z-10 flex h-full flex-col justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20">
+              {getIcon(info.icon)}
+            </span>
+            <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+              {getDisplayLabel(info.label)}
+            </span>
+          </div>
 
-        {/* Content */}
-        <div className="relative z-10 flex items-center justify-between gap-4">
-          {/* Label */}
-          <span className="text-xs md:text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary transition-colors duration-300">
-            {getDisplayLabel(info.label)}
-          </span>
-
-          {/* Value */}
-          <span
-            className={cn(
-              'font-black text-foreground tracking-tight',
-              'bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text',
-              'group-hover:from-primary group-hover:to-foreground group-hover:text-transparent',
-              'transition-all duration-300',
-              textSizeClasses[size]
-            )}
-          >
+          <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground tracking-tight leading-tight break-words">
             {info.value}
           </span>
         </div>
@@ -181,7 +158,7 @@ const InfoCard = ({
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-1/2 -translate-y-1/2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-background/80 hover:bg-primary/20 rounded-full border border-primary/50"
+            className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-background/70 hover:bg-primary/15 rounded-full border border-border/70"
             onClick={e => {
               e.stopPropagation();
               onEditClick(info);
@@ -195,7 +172,7 @@ const InfoCard = ({
   );
 };
 
-// InfoCardArrowLayout - Diagonal staircase pattern (top-right to bottom-left)
+// InfoCardArrowLayout - modern responsive bento grid
 const InfoCardArrowLayout = ({
   infos,
   isEditMode,
@@ -210,84 +187,56 @@ const InfoCardArrowLayout = ({
   const orderedInfo = useMemo(() => {
     if (!infos || infos.length === 0) return [];
     const infoMap = new Map(infos.map(i => [i.label, i]));
-    // Order: Орд (top) -> Төрсөн өдөр -> Нас (center) -> Өндөр -> MBTI (bottom)
     const order = ['Орд', 'Төрсөн өдөр', 'Нас', 'Өндөр', 'MBTI'];
-
     const mainItems = order
       .map(label => infoMap.get(label))
       .filter(Boolean) as PersonalInfoType[];
-    if (mainItems.length >= 5) {
-      return mainItems.slice(0, 5);
-    }
-
     const remaining = infos.filter(i => !order.includes(i.label));
-    return [...mainItems, ...remaining].slice(0, 5);
+    return [...mainItems, ...remaining];
   }, [infos]);
 
-  if (!orderedInfo || orderedInfo.length < 5) {
-    return (
-      <div className="flex flex-col gap-3 w-full max-w-md">
-        {orderedInfo.map((info, index) => (
-          <InfoCard
-            key={index}
-            info={info}
-            index={index}
-            isEditMode={isEditMode}
-            onEditClick={onEditClick}
-          />
-        ))}
-        {isEditMode && (
-          <AddPersonalInfoDialog onAdd={onAddClick}>
-            <motion.button
-              whileHover={{ scale: 1.02, x: 4 }}
-              className="w-full rounded-2xl p-[2px] bg-gradient-to-br from-primary/30 via-purple-500/20 to-cyan-500/30 hover:from-primary/60 hover:via-purple-500/40 hover:to-cyan-500/60 transition-all duration-500 group/add"
-            >
-              <div className="flex items-center justify-center gap-3 rounded-2xl bg-card/80 backdrop-blur-sm border border-dashed border-primary/30 group-hover/add:border-primary/60 transition-all duration-500 py-3 px-4">
-                <PlusCircle
-                  size={24}
-                  className="text-primary/60 group-hover/add:text-primary group-hover/add:scale-110 transition-all duration-300"
-                />
-                <span className="font-semibold text-muted-foreground group-hover/add:text-primary transition-colors duration-300">
-                  Мэдээлэл нэмэх
-                </span>
-              </div>
-            </motion.button>
-          </AddPersonalInfoDialog>
-        )}
-      </div>
-    );
-  }
-
-  // Diagonal staircase: top-right to bottom-left
-  // Each card has same width, just different margin-left
-  const offsets = [
-    'ml-[0%]',
-    'ml-[5%] sm:ml-[15%]',
-    'ml-[10%] sm:ml-[30%]',
-    'ml-[5%] sm:ml-[15%]',
-    'ml-0',
-  ];
-
   return (
-    <div className="flex flex-col gap-2 sm:gap-2.5 w-full">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 w-full">
       {orderedInfo.map((info, index) => (
-        <div
+        <InfoCard
           key={index}
-          className={`w-full sm:w-[60%] md:w-[45%] min-w-0 sm:min-w-[280px] ${offsets[index]}`}
-        >
-          <InfoCard
-            info={info}
-            index={index}
-            isEditMode={isEditMode}
-            onEditClick={onEditClick}
-          />
-        </div>
+          info={info}
+          index={index}
+          isEditMode={isEditMode}
+          onEditClick={onEditClick}
+        />
       ))}
+      {isEditMode && (
+        <AddPersonalInfoDialog onAdd={onAddClick}>
+          <motion.button
+            whileHover={{ y: -4 }}
+            className="group relative h-full min-h-[120px] overflow-hidden rounded-2xl border-2 border-dashed border-border/60 bg-card/30 backdrop-blur-md transition-all duration-300 hover:border-primary/60 hover:bg-primary/5"
+          >
+            <div className="flex h-full flex-col items-center justify-center gap-2 p-4">
+              <PlusCircle
+                size={28}
+                className="text-muted-foreground group-hover:text-primary transition-colors duration-300"
+              />
+              <span className="text-xs font-mono uppercase tracking-[0.16em] text-muted-foreground group-hover:text-primary transition-colors duration-300">
+                Мэдээлэл нэмэх
+              </span>
+            </div>
+          </motion.button>
+        </AddPersonalInfoDialog>
+      )}
     </div>
   );
 };
 
 export default function AboutPage() {
+  return (
+    <HobbyProvider>
+      <AboutPageInner />
+    </HobbyProvider>
+  );
+}
+
+function AboutPageInner() {
   const { firestore, user, isUserLoading } = useFirebase();
   const { isEditMode } = useEditMode();
   const { hobbies, loading: hobbiesLoading, deleteHobby } = useHobbies();
@@ -384,9 +333,18 @@ export default function AboutPage() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const scrollNext = () => setActiveIndex(prev => (prev + 1) % totalItems);
-  const scrollPrev = () =>
-    setActiveIndex(prev => (prev - 1 + totalItems) % totalItems);
+  // Unbounded index so rotation always continues forward/backward (no jerky wrap-around spin)
+  const scrollNext = () => setActiveIndex(prev => prev + 1);
+  const scrollPrev = () => setActiveIndex(prev => prev - 1);
+  const goToIndex = (target: number) => {
+    setActiveIndex(prev => {
+      const currentMod = ((prev % totalItems) + totalItems) % totalItems;
+      let delta = target - currentMod;
+      if (delta > totalItems / 2) delta -= totalItems;
+      else if (delta < -totalItems / 2) delta += totalItems;
+      return prev + delta;
+    });
+  };
 
   useEffect(() => {
     if (isUserLoading || !user || !firestore) return;
@@ -497,13 +455,47 @@ export default function AboutPage() {
   return (
     <>
       <InteractiveParticles className="fixed inset-0 z-0 pointer-events-none" />
+
+      {/* Global aurora backdrop */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      >
+        <div className="absolute -top-40 -left-32 h-[480px] w-[480px] rounded-full bg-primary/20 blur-[120px]" />
+        <div className="absolute top-1/3 -right-40 h-[520px] w-[520px] rounded-full bg-accent/15 blur-[140px]" />
+        <div className="absolute bottom-0 left-1/3 h-[420px] w-[420px] rounded-full bg-primary/10 blur-[120px]" />
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage:
+              'radial-gradient(currentColor 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+      </div>
+
       <div className="relative z-10 min-h-screen">
         {/* Hero Section */}
-        <section className="relative min-h-[calc(100vh-100px)] flex items-start justify-center px-4 sm:px-6 md:px-8 pt-16 sm:pt-20 md:pt-24">
-          <div className="max-w-7xl mx-auto w-full">
-            <div className="flex flex-col lg:flex-row items-center lg:items-center justify-center lg:justify-between gap-6 sm:gap-8 lg:gap-16 w-full">
+        <section className="relative min-h-[calc(100vh-100px)] flex items-center justify-center px-4 sm:px-6 md:px-8 pt-12 sm:pt-16 md:pt-20 pb-10">
+          {/* Hero spotlight */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-0">
+            <div className="absolute left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 [background:conic-gradient(from_180deg_at_50%_50%,hsl(var(--primary)/0.32),transparent_40%,hsl(var(--primary)/0.22)_70%,transparent)] blur-3xl" />
+            <div
+              className="absolute inset-0 opacity-[0.05]"
+              style={{
+                backgroundImage:
+                  'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
+                backgroundSize: '64px 64px',
+                maskImage:
+                  'radial-gradient(ellipse at center, black 25%, transparent 75%)',
+              }}
+            />
+          </div>
+
+          <div className="max-w-7xl mx-auto w-full relative">
+            <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
               {/* Personal Info Cards */}
-              <div className="w-full lg:w-1/2">
+              <div className="w-full order-2 lg:order-1">
                 {(personalInfo.length > 0 || isEditMode) && (
                   <InfoCardArrowLayout
                     infos={personalInfo}
@@ -516,105 +508,100 @@ export default function AboutPage() {
                 )}
               </div>
 
-              {/* Text Content - Enhanced Design */}
-              <div className="flex flex-col items-center lg:items-start text-center lg:text-left lg:w-1/2">
-                {/* Greeting with glowing effect */}
-                <div className="relative mb-6">
+              {/* Text Content */}
+              <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-1 lg:order-2">
+                {/* Greeting eyebrow + animated word */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/8 backdrop-blur-md px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.2em] text-primary"
+                >
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
+                  </span>
+                  Танилцуулга
+                </motion.div>
+
+                <div className="relative mt-5 mb-3 h-[3.5rem] sm:h-[5rem] md:h-[6.5rem] flex items-center">
                   <AnimatePresence mode="wait">
-                    <motion.div
+                    <motion.h1
                       key={greetingIndex}
-                      className="relative"
-                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -20, scale: 0.9 }}
-                      transition={{ duration: 0.5, ease: 'easeInOut' }}
+                      initial={{ opacity: 0, y: 18 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -18 }}
+                      transition={{ duration: 0.45, ease: 'easeInOut' }}
+                      className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight bg-linear-to-br from-foreground via-foreground to-foreground/60 bg-clip-text text-transparent leading-[1.05]"
                     >
-                      {/* Glowing background */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-transparent blur-2xl rounded-full transform scale-150" />
-                      <h1 className="relative text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-foreground bg-clip-text text-transparent">
-                        {greetings[greetingIndex]}
-                      </h1>
-                    </motion.div>
+                      {greetings[greetingIndex]}
+                    </motion.h1>
                   </AnimatePresence>
-                  {/* Animated underline */}
-                  <motion.div
-                    className="h-1 bg-gradient-to-r from-primary via-primary/50 to-transparent rounded-full mt-2"
-                    initial={{ width: 0 }}
-                    animate={{ width: '80%' }}
-                    transition={{ duration: 0.8, delay: 0.3 }}
-                  />
                 </div>
 
-                {/* Name section with enhanced styling */}
-                <div className="relative group" ref={nameRef}>
+                {/* Intro - Name - Outro */}
+                <div className="relative group w-full" ref={nameRef}>
                   <motion.div
-                    initial={{ opacity: 0, y: 40 }}
+                    initial={{ opacity: 0, y: 24 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.9,
-                      delay: 0.4,
-                      ease: [0.2, 0.65, 0.3, 0.9],
-                    }}
+                    transition={{ duration: 0.7, delay: 0.2, ease: [0.2, 0.65, 0.3, 0.9] }}
                     className="flex flex-col items-center lg:items-start gap-2"
                   >
-                    <div className="flex items-baseline gap-3 flex-wrap justify-center lg:justify-start">
-                      {isEditingIntroText ? (
-                        <div className="flex items-center gap-2">
-                          <Input
-                            value={editedIntroText}
-                            onChange={e => setEditedIntroText(e.target.value)}
-                            className="w-40 h-8 text-lg"
-                            placeholder="Текст..."
-                          />
+                    {isEditingIntroText ? (
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={editedIntroText}
+                          onChange={e => setEditedIntroText(e.target.value)}
+                          className="w-40 h-8 text-lg"
+                          placeholder="Текст..."
+                        />
+                        <Button
+                          onClick={handleSaveIntroText}
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                          disabled={saving}
+                        >
+                          {saving ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Save className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setEditedIntroText(introText);
+                            setIsEditingIntroText(false);
+                          }}
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <h2 className="text-sm sm:text-base md:text-lg text-muted-foreground font-mono uppercase tracking-[0.18em] flex items-center gap-2">
+                        {introText}
+                        {isEditMode && (
                           <Button
-                            onClick={handleSaveIntroText}
-                            size="icon"
                             variant="ghost"
-                            className="h-8 w-8"
-                            disabled={saving}
-                          >
-                            {saving ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Save className="h-4 w-4" />
-                            )}
-                          </Button>
-                          <Button
+                            size="icon"
+                            className="h-6 w-6"
                             onClick={() => {
                               setEditedIntroText(introText);
-                              setIsEditingIntroText(false);
+                              setIsEditingIntroText(true);
                             }}
-                            size="icon"
-                            variant="ghost"
-                            className="h-8 w-8"
                           >
-                            <ArrowLeft className="h-4 w-4" />
+                            <Edit className="h-3 w-3" />
                           </Button>
-                        </div>
-                      ) : (
-                        <h2 className="text-base sm:text-xl md:text-2xl text-muted-foreground font-light flex items-center gap-2">
-                          {introText}
-                          {isEditMode && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={() => {
-                                setEditedIntroText(introText);
-                                setIsEditingIntroText(true);
-                              }}
-                            >
-                              <Edit className="h-3 w-3" />
-                            </Button>
-                          )}
-                        </h2>
-                      )}
-                    </div>
+                        )}
+                      </h2>
+                    )}
 
-                    {/* Name with spotlight effect */}
+                    {/* Name with mouse-tracked spotlight gradient */}
                     <div className="relative py-1 sm:py-2">
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/10 to-transparent blur-3xl pointer-events-none" />
-                      <p className="spotlight-text text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter relative">
+                      <p className="spotlight-text text-5xl sm:text-7xl md:text-8xl xl:text-[7.5rem] font-black tracking-tighter leading-[0.95]">
                         {name}
                       </p>
                     </div>
@@ -653,7 +640,7 @@ export default function AboutPage() {
                         </Button>
                       </div>
                     ) : (
-                      <h2 className="text-base sm:text-xl md:text-2xl text-muted-foreground font-light flex items-center gap-2">
+                      <h2 className="text-sm sm:text-base md:text-lg text-muted-foreground font-mono uppercase tracking-[0.18em] flex items-center gap-2">
                         {outroText}
                         {isEditMode && (
                           <Button
@@ -671,7 +658,6 @@ export default function AboutPage() {
                       </h2>
                     )}
                   </motion.div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
                 </div>
               </div>
             </div>
@@ -730,11 +716,13 @@ export default function AboutPage() {
           className="relative py-12 sm:py-16 md:py-20 lg:py-24 mt-12 sm:mt-16 md:mt-20 reveal z-10"
         >
           <div className="container mx-auto px-4 sm:px-6 md:px-8">
-            <div className="text-center mb-8 sm:mb-10 md:mb-12">
-              <h2 className="text-3xl md:text-5xl font-bold">
-                Миний хоббинууд
-              </h2>
-            </div>
+            <PageHeader
+              eyebrow="Сонирхол"
+              icon={<Heart className="h-3.5 w-3.5" />}
+              title="Миний хоббинууд"
+              description="Чөлөөт цагаар хийдэг, урам зориг өгдөг зүйлүүд."
+            />
+            <div className="mb-10" />
 
             {hobbiesLoading ? (
               <div className="flex justify-center items-center h-[350px]">
@@ -765,17 +753,21 @@ export default function AboutPage() {
                       <AnimatePresence>
                         {displayItems.map((hobby, index) => {
                           const angle = index * anglePerItem;
-                          const isVisible =
-                            Math.abs(
-                              (activeIndex - index + totalItems) % totalItems
-                            ) <= 2 ||
-                            Math.abs(
-                              (activeIndex - index - totalItems) % totalItems
-                            ) <= 2;
+                          const activeMod =
+                            ((activeIndex % totalItems) + totalItems) %
+                            totalItems;
+                          let diff = Math.abs(index - activeMod);
+                          if (diff > totalItems / 2) diff = totalItems - diff;
+                          const isFront = diff === 0;
+                          // Smooth opacity & blur falloff for natural depth
+                          const opacity = Math.max(0.15, 1 - diff * 0.32);
+                          const blurAmount = Math.min(diff * 1.2, 4);
+                          const isInteractive = diff <= 1;
                           const style: CSSProperties = {
                             transform: `rotateY(${angle}deg) translateZ(${carouselRadius}px)`,
-                            opacity: isVisible ? 1 : 0.2,
-                            pointerEvents: isVisible ? 'auto' : 'none',
+                            opacity,
+                            filter: isFront ? 'none' : `blur(${blurAmount}px)`,
+                            pointerEvents: isInteractive ? 'auto' : 'none',
                           };
                           if (hobby.id === 'add-new-hobby') {
                             return (
@@ -783,11 +775,11 @@ export default function AboutPage() {
                                 className="carousel-item"
                                 style={style}
                                 key={hobby.id}
-                                onClick={() => setActiveIndex(index)}
+                                onClick={() => goToIndex(index)}
                               >
                                 <AddHobbyDialog>
-                                  <button className="relative h-full w-full rounded-2xl p-[2px] bg-gradient-to-br from-primary/30 via-purple-500/20 to-cyan-500/30 hover:from-primary/60 hover:via-purple-500/40 hover:to-cyan-500/60 transition-all duration-500 group/add">
-                                    <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl bg-card/80 backdrop-blur-sm border border-dashed border-primary/30 group-hover/add:border-primary/60 transition-all duration-500">
+                                  <button className="relative h-full w-full rounded-2xl p-[2px] bg-linear-to-br from-primary/30 via-accent/20 to-primary/20 hover:from-primary/60 hover:via-accent/40 hover:to-primary/40 transition-all duration-500 group/add">
+                                    <div className="flex h-full w-full flex-col items-center justify-center rounded-2xl bg-card/80 backdrop-blur-xs border border-dashed border-primary/30 group-hover/add:border-primary/60 transition-all duration-500">
                                       <div className="relative">
                                         <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover/add:bg-primary/40 transition-all duration-500"></div>
                                         <PlusCircle
@@ -809,10 +801,10 @@ export default function AboutPage() {
                               className="carousel-item group"
                               key={hobby.id}
                               style={style}
-                              onClick={() => setActiveIndex(index)}
+                              onClick={() => goToIndex(index)}
                             >
-                              <div className="relative h-full w-full rounded-2xl p-[2px] bg-gradient-to-br from-primary/80 via-purple-500/50 to-cyan-500/80 shadow-[0_0_30px_rgba(139,92,246,0.3)] group-hover:shadow-[0_0_50px_rgba(139,92,246,0.5)] transition-all duration-500">
-                                <Card className="relative bg-card/90 backdrop-blur-sm h-full w-full overflow-hidden rounded-2xl transition-all duration-500 group-hover:-translate-y-1">
+                              <div className="relative h-full w-full rounded-2xl p-[2px] bg-linear-to-br from-primary via-accent/60 to-primary/70 shadow-[0_0_30px_hsl(var(--primary)/0.3)] group-hover:shadow-[0_0_50px_hsl(var(--primary)/0.5)] transition-all duration-500">
+                                <Card className="relative bg-card/90 backdrop-blur-xs h-full w-full overflow-hidden rounded-2xl transition-all duration-500 group-hover:-translate-y-1">
                                   {isEditMode && (
                                     <div className="absolute top-3 right-3 flex gap-2 z-20">
                                       <EditHobbyDialog hobby={hobby}>
@@ -865,14 +857,16 @@ export default function AboutPage() {
                                     src={hobby.image}
                                     alt={hobby.title}
                                     fill
+                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                                     data-ai-hint={`3D ${hobby.imageHint || hobby.title}`}
+                                    unoptimized={/\.gif(\?|$)/i.test(hobby.image)}
                                   />
-                                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500"></div>
+                                  <div className="absolute inset-0 bg-linear-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500"></div>
 
                                   {/* Shimmer overlay effect */}
                                   <div
-                                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full"
+                                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-linear-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full"
                                     style={{
                                       transition:
                                         'transform 1s ease-in-out, opacity 0.5s',
@@ -881,7 +875,7 @@ export default function AboutPage() {
 
                                   <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
                                     <div className="flex items-center gap-2 mb-2">
-                                      <div className="h-1 w-8 bg-gradient-to-r from-primary to-purple-400 rounded-full"></div>
+                                      <div className="h-1 w-8 bg-linear-to-r from-primary to-accent rounded-full"></div>
                                     </div>
                                     <CardTitle className="text-lg md:text-xl font-bold tracking-tight group-hover:text-primary transition-colors duration-300">
                                       {hobby.title}
@@ -905,7 +899,7 @@ export default function AboutPage() {
                 )}
                 <Button
                   onClick={scrollPrev}
-                  className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-card/80 backdrop-blur-md border border-primary/30 shadow-[0_0_20px_rgba(139,92,246,0.2)] hover:bg-primary/20 hover:border-primary/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] transition-all duration-300"
+                  className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 h-11 w-11 rounded-full bg-card/60 backdrop-blur-xl border border-border/60 text-foreground/80 hover:text-primary hover:border-primary/60 hover:bg-primary/5 transition-all duration-300"
                   variant="ghost"
                   size="icon"
                   disabled={displayItems.length === 0}
@@ -914,7 +908,7 @@ export default function AboutPage() {
                 </Button>
                 <Button
                   onClick={scrollNext}
-                  className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-10 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-card/80 backdrop-blur-md border border-primary/30 shadow-[0_0_20px_rgba(139,92,246,0.2)] hover:bg-primary/20 hover:border-primary/60 hover:shadow-[0_0_30px_rgba(139,92,246,0.4)] transition-all duration-300"
+                  className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-10 h-11 w-11 rounded-full bg-card/60 backdrop-blur-xl border border-border/60 text-foreground/80 hover:text-primary hover:border-primary/60 hover:bg-primary/5 transition-all duration-300"
                   variant="ghost"
                   size="icon"
                   disabled={displayItems.length === 0}
@@ -937,7 +931,9 @@ export default function AboutPage() {
             height: 100%;
             position: absolute;
             transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+            transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+            backface-visibility: hidden;
           }
           .carousel-item {
             position: absolute;
@@ -947,20 +943,13 @@ export default function AboutPage() {
             left: 0;
             background: transparent;
             transition:
-              opacity 0.6s,
-              transform 0.6s;
+              opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
             cursor: pointer;
-          }
-          .spotlight-text {
-            color: transparent;
-            background-clip: text;
-            -webkit-background-clip: text;
-            background-image: radial-gradient(
-              circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-              hsl(var(--primary)) 20%,
-              white 80%
-            );
-            transition: background-image 0.3s;
+            will-change: transform, opacity, filter;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
           }
         `}</style>
       </div>
