@@ -18,11 +18,21 @@ import {
   BookCopy,
   GraduationCap,
   RefreshCw,
+  Zap,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import ToolPageShell from '@/components/shared/ToolPageShell';
 
 const englishSkillsConfig = [
+  {
+    id: 'mylingo',
+    title: 'MyLingo',
+    description: '10,000 үгийн тоглоомт суралцал',
+    href: '/tools/english/mylingo',
+    icon: <Zap className="h-7 w-7" />,
+    gradient: 'from-primary to-accent',
+    shadowColor: 'hsl(var(--primary) / 0.5)',
+  },
   {
     id: 'vocabulary',
     title: 'Vocabulary',
