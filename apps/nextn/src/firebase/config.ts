@@ -1,30 +1,15 @@
-// Firebase config — values are inlined at build time by Next.js.
-// IMPORTANT: must use static `process.env.NAME` access (not bracket notation)
-// for Next.js to inline NEXT_PUBLIC_* variables into the client bundle.
+// Firebase config for project: studio-7407955062-e8810
+// These are public client-side values (safe to commit — security is enforced
+// by Firestore security rules and Firebase Auth, not by keeping these secret).
 export const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  apiKey: 'AIzaSyDx1EpImAU5zjcv4Sgox6cNa1GNzwk6ffc',
+  authDomain: 'studio-7407955062-e8810.firebaseapp.com',
+  projectId: 'studio-7407955062-e8810',
+  storageBucket: 'studio-7407955062-e8810.firebasestorage.app',
+  messagingSenderId: '70574616620',
+  appId: '1:70574616620:web:30a4d2d37e35b520e62189',
+  measurementId: 'G-J6CM1J53W4',
 };
-
-// Static check using direct property access — these get inlined as literal
-// strings at build time, so the missing-vars detection works in the browser.
-const missing: string[] = [];
-if (!firebaseConfig.apiKey) missing.push('NEXT_PUBLIC_FIREBASE_API_KEY');
-if (!firebaseConfig.authDomain) missing.push('NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN');
-if (!firebaseConfig.projectId) missing.push('NEXT_PUBLIC_FIREBASE_PROJECT_ID');
-if (!firebaseConfig.storageBucket) missing.push('NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET');
-if (!firebaseConfig.messagingSenderId) missing.push('NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID');
-if (!firebaseConfig.appId) missing.push('NEXT_PUBLIC_FIREBASE_APP_ID');
-
-if (missing.length > 0 && typeof window !== 'undefined') {
-  console.warn('⚠️ Some Firebase environment variables are missing:', missing);
-  console.warn('The app may not work correctly without these variables.');
-}
 
 export const db = firebaseConfig;
 

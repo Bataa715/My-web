@@ -13,18 +13,6 @@ import { getStorage } from 'firebase/storage';
 const APP_NAME = 'personal-web';
 
 export function initializeFirebase() {
-  // Validate required config first — throw early with a clear message.
-  const required = ['apiKey', 'authDomain', 'projectId', 'appId'] as const;
-  for (const key of required) {
-    if (!firebaseConfig[key]) {
-      throw new Error(
-        `Missing Firebase config value: NEXT_PUBLIC_FIREBASE_${key
-          .replace(/([A-Z])/g, '_$1')
-          .toUpperCase()}`
-      );
-    }
-  }
-
   const existing = getApps().find(a => a.name === APP_NAME);
   const app = existing ?? initializeApp(firebaseConfig, APP_NAME);
   return getSdks(app);
