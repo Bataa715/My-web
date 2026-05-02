@@ -26,7 +26,6 @@ import {
 import {
   useState,
   useEffect,
-  useCallback,
   type CSSProperties,
   useMemo,
   useRef,
@@ -36,31 +35,22 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useFirebase } from '@/firebase';
 import type {
   UserProfile,
-  Hobby,
   PersonalInfoItem as PersonalInfoType,
 } from '@/lib/types';
 import { useEditMode } from '@/contexts/EditModeContext';
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Card, CardTitle } from '@/components/ui/card';
 import { useHobbies } from '@/contexts/HobbyContext';
 import { HobbyProvider } from '@/contexts/HobbyContext';
 import { AddHobbyDialog } from '@/components/AddHobbyDialog';
@@ -77,7 +67,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { cn } from '@/lib/utils';
 import InteractiveParticles from '@/components/shared/InteractiveParticles';
 import PageHeader from '@/components/shared/PageHeader';
 
@@ -345,6 +334,15 @@ function AboutPageInner() {
       return prev + delta;
     });
   };
+
+  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
+
+  // Auto-rotate: pauses on hover, stops in edit mode
+  useEffect(() => {
+    if (displayItems.length < 2 || isEditMode || isCarouselHovered) return;
+    const id = setInterval(() => setActiveIndex(prev => prev + 1), 3500);
+    return () => clearInterval(id);
+  }, [displayItems.length, isEditMode, isCarouselHovered]);
 
   useEffect(() => {
     if (isUserLoading || !user || !firestore) return;
@@ -729,7 +727,12 @@ function AboutPageInner() {
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
               </div>
             ) : (
-              <div className="relative flex items-center justify-center h-[350px]">
+              <>
+              <div
+                className="relative flex items-center justify-center h-[350px]"
+                onMouseEnter={() => setIsCarouselHovered(true)}
+                onMouseLeave={() => setIsCarouselHovered(false)}
+              >
                 {displayItems.length === 0 && !isEditMode ? (
                   <div className="text-center">
                     <p className="text-muted-foreground">Хобби олдсонгүй.</p>
@@ -916,6 +919,27 @@ function AboutPageInner() {
                   <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </div>
+
+              {/* Dot indicators */}
+              {hobbies.length > 1 && !isEditMode && (
+                <div className="flex justify-center gap-2 mt-5">
+                  {hobbies.map((_, i) => {
+                    const activeMod = ((activeIndex % hobbies.length) + hobbies.length) % hobbies.length;
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => goToIndex(i)}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          activeMod === i
+                            ? 'w-6 bg-primary'
+                            : 'w-1.5 bg-muted-foreground/30 hover:bg-primary/50'
+                        }`}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+              </>
             )}
           </div>
         </section>
@@ -931,7 +955,7 @@ function AboutPageInner() {
             height: 100%;
             position: absolute;
             transform-style: preserve-3d;
-            transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: transform;
             backface-visibility: hidden;
           }
@@ -943,9 +967,9 @@ function AboutPageInner() {
             left: 0;
             background: transparent;
             transition:
-              opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-              filter 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+              opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: pointer;
             will-change: transform, opacity, filter;
             backface-visibility: hidden;
