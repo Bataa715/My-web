@@ -39,10 +39,10 @@ export interface FirebaseContextState {
 
 // Return type for useFirebase()
 export interface FirebaseServicesAndUser {
-  firebaseApp: FirebaseApp;
-  firestore: Firestore;
-  auth: Auth;
-  storage: FirebaseStorage;
+  firebaseApp: FirebaseApp | null;
+  firestore: Firestore | null;
+  auth: Auth | null;
+  storage: FirebaseStorage | null;
   user: User | null;
   isUserLoading: boolean;
   userError: Error | null;
@@ -108,18 +108,6 @@ export const useFirebase = (): FirebaseServicesAndUser => {
 
   if (context === undefined) {
     throw new Error('useFirebase must be used within a FirebaseProvider.');
-  }
-
-  if (
-    !context.areServicesAvailable ||
-    !context.firebaseApp ||
-    !context.firestore ||
-    !context.auth ||
-    !context.storage
-  ) {
-    throw new Error(
-      'Firebase core services not available. Check FirebaseProvider props.'
-    );
   }
 
   return {

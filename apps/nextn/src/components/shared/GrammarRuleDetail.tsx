@@ -17,7 +17,7 @@ import {
   CheckCircle2,
   XCircle,
   HelpCircle,
-  Sparkles,
+  
 } from 'lucide-react';
 import {
   AlertDialog,
@@ -339,7 +339,6 @@ export default function GrammarRuleDetail({
                     {use.condition}
                   </p>
                   <p className="text-muted-foreground italic flex items-start gap-2">
-                    <Sparkles className="h-4 w-4 mt-1 shrink-0 text-amber-500" />
                     <span>&quot;{use.example}&quot;</span>
                   </p>
                 </div>
@@ -434,7 +433,6 @@ export default function GrammarRuleDetail({
             <div className="rounded-xl border border-purple-500/20 bg-purple-500/5 overflow-hidden">
               <div className="px-5 py-3 bg-purple-500/10 border-b border-purple-500/20">
                 <h4 className="font-semibold text-purple-400 flex items-center gap-2">
-                  <Sparkles className="h-4 w-4" />
                   Irregular Verbs
                 </h4>
               </div>

@@ -99,7 +99,17 @@ const displayLabelMap: Record<string, string> = {
 
 const getDisplayLabel = (label: string) => displayLabelMap[label] || label;
 
-// InfoCard component - modern glass tile
+// Per-label accent palette (matches /tools card design language)
+const accentPalette: Record<string, { accent: string; glow: string }> = {
+  'Орд':         { accent: '#a855f7', glow: '168, 85, 247' }, // purple
+  'Төрсөн өдөр': { accent: '#f43f5e', glow: '244, 63, 94' },  // rose
+  'Нас':         { accent: '#f97316', glow: '249, 115, 22' }, // orange
+  'Өндөр':       { accent: '#22d3ee', glow: '34, 211, 238' }, // cyan
+  'MBTI':        { accent: '#3b82f6', glow: '59, 130, 246' }, // blue
+};
+const defaultAccent = { accent: '#a855f7', glow: '168, 85, 247' };
+
+// InfoCard component - bold gradient-border tile (matches SubToolCard look)
 const InfoCard = ({
   info,
   isEditMode,
@@ -111,51 +121,128 @@ const InfoCard = ({
   onEditClick: (info: PersonalInfoType) => void;
   size?: 'small' | 'normal' | 'large';
 }) => {
+  const { accent, glow } = accentPalette[info.label] || defaultAccent;
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 16, scale: 0.96 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true }}
       whileHover={{ y: -4 }}
-      transition={{ duration: 0.35 }}
+      transition={{ duration: 0.4, type: 'spring', stiffness: 110 }}
       className="group relative h-full"
     >
-      <div className="absolute -inset-px rounded-2xl bg-linear-to-br from-primary/40 via-accent/15 to-transparent opacity-0 blur-md transition-opacity duration-500 group-hover:opacity-100" />
-      <div className="relative h-full overflow-hidden rounded-2xl border border-border/60 bg-card/50 backdrop-blur-xl p-4 sm:p-5 transition-colors duration-300 group-hover:border-primary/40">
-        {/* Corner accent */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-primary/15 blur-2xl opacity-60 transition-opacity duration-500 group-hover:opacity-100"
-        />
+      {/* Gradient border ring */}
+      <div
+        className="relative h-full rounded-2xl p-[2px] transition-all duration-500 group-hover:p-[3px]"
+        style={{
+          background: `linear-gradient(135deg, ${accent}, rgba(${glow}, 0.25) 45%, transparent 70%, ${accent})`,
+          boxShadow: `0 12px 32px -20px rgba(${glow}, 0.5)`,
+        }}
+        onMouseEnter={e => {
+          (e.currentTarget as HTMLDivElement).style.boxShadow = `0 22px 50px -18px rgba(${glow}, 0.7), 0 0 0 1px rgba(${glow}, 0.3)`;
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLDivElement).style.boxShadow = `0 12px 32px -20px rgba(${glow}, 0.5)`;
+        }}
+      >
+        <div className="relative h-full rounded-[14px] bg-card overflow-hidden p-3 sm:p-4">
+          {/* Tinted top wash */}
+          <div
+            className="absolute inset-x-0 top-0 h-24 pointer-events-none"
+            style={{
+              background: `radial-gradient(ellipse at top, rgba(${glow}, 0.18), transparent 70%)`,
+            }}
+            aria-hidden
+          />
+          {/* Subtle grid pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.05] pointer-events-none"
+            style={{
+              backgroundImage:
+                'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)',
+              backgroundSize: '20px 20px',
+              color: accent,
+            }}
+            aria-hidden
+          />
+          {/* Glow blob */}
+          <div
+            className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full blur-3xl opacity-30 transition-opacity duration-500 group-hover:opacity-60"
+            style={{ background: accent }}
+            aria-hidden
+          />
+          {/* Corner decorations */}
+          <div
+            className="pointer-events-none absolute top-2 left-2 h-3 w-3 border-t-2 border-l-2 rounded-tl-md opacity-50 group-hover:opacity-100 transition-opacity duration-300"
+            style={{ borderColor: accent }}
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute bottom-2 right-2 h-3 w-3 border-b-2 border-r-2 rounded-br-md opacity-50 group-hover:opacity-100 transition-opacity duration-300"
+            style={{ borderColor: accent }}
+            aria-hidden
+          />
 
-        <div className="relative z-10 flex h-full flex-col justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20">
-              {getIcon(info.icon)}
-            </span>
-            <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
-              {getDisplayLabel(info.label)}
+          <div className="relative z-10 flex h-full flex-col justify-between gap-3 min-h-[110px]">
+            <div className="flex items-center gap-2">
+              <span
+                className="inline-flex h-7 w-7 items-center justify-center rounded-lg border-2 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
+                style={{
+                  background: `rgba(${glow}, 0.12)`,
+                  borderColor: `rgba(${glow}, 0.45)`,
+                  color: accent,
+                }}
+              >
+                {getIcon(info.icon)}
+              </span>
+              <span
+                className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.2em] font-bold"
+                style={{ color: accent }}
+              >
+                {getDisplayLabel(info.label)}
+              </span>
+              <span className="ml-auto relative flex h-1.5 w-1.5">
+                <span
+                  className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50"
+                  style={{ background: accent }}
+                />
+                <span
+                  className="relative inline-flex rounded-full h-1.5 w-1.5"
+                  style={{
+                    background: accent,
+                    boxShadow: `0 0 8px ${accent}`,
+                  }}
+                />
+              </span>
+            </div>
+
+            <span
+              className="text-lg sm:text-xl md:text-2xl font-extrabold tracking-tight leading-none whitespace-nowrap"
+              style={{
+                background: `linear-gradient(135deg, hsl(var(--foreground)), ${accent})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              {info.value}
             </span>
           </div>
 
-          <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground tracking-tight leading-tight break-words">
-            {info.value}
-          </span>
+          {isEditMode && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-background/70 hover:bg-primary/15 rounded-full border border-border/70"
+              onClick={e => {
+                e.stopPropagation();
+                onEditClick(info);
+              }}
+            >
+              <Edit className="h-3.5 w-3.5 text-primary" />
+            </Button>
+          )}
         </div>
-
-        {isEditMode && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 z-30 bg-background/70 hover:bg-primary/15 rounded-full border border-border/70"
-            onClick={e => {
-              e.stopPropagation();
-              onEditClick(info);
-            }}
-          >
-            <Edit className="h-3.5 w-3.5 text-primary" />
-          </Button>
-        )}
       </div>
     </motion.div>
   );
@@ -185,7 +272,7 @@ const InfoCardArrowLayout = ({
   }, [infos]);
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 w-full">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 w-full">
       {orderedInfo.map((info, index) => (
         <InfoCard
           key={index}
@@ -335,14 +422,12 @@ function AboutPageInner() {
     });
   };
 
-  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
-
-  // Auto-rotate: pauses on hover, stops in edit mode
+  // Auto-rotate continuously; stops only in edit mode
   useEffect(() => {
-    if (displayItems.length < 2 || isEditMode || isCarouselHovered) return;
-    const id = setInterval(() => setActiveIndex(prev => prev + 1), 3500);
+    if (displayItems.length < 2 || isEditMode) return;
+    const id = setInterval(() => setActiveIndex(prev => prev + 1), 5000);
     return () => clearInterval(id);
-  }, [displayItems.length, isEditMode, isCarouselHovered]);
+  }, [displayItems.length, isEditMode]);
 
   useEffect(() => {
     if (isUserLoading || !user || !firestore) return;
@@ -454,14 +539,11 @@ function AboutPageInner() {
     <>
       <InteractiveParticles className="fixed inset-0 z-0 pointer-events-none" />
 
-      {/* Global aurora backdrop */}
+      {/* Global backdrop — neutral, only a faint dot grid */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       >
-        <div className="absolute -top-40 -left-32 h-[480px] w-[480px] rounded-full bg-primary/20 blur-[120px]" />
-        <div className="absolute top-1/3 -right-40 h-[520px] w-[520px] rounded-full bg-accent/15 blur-[140px]" />
-        <div className="absolute bottom-0 left-1/3 h-[420px] w-[420px] rounded-full bg-primary/10 blur-[120px]" />
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
@@ -475,9 +557,8 @@ function AboutPageInner() {
       <div className="relative z-10 min-h-screen">
         {/* Hero Section */}
         <section className="relative min-h-[calc(100vh-100px)] flex items-center justify-center px-4 sm:px-6 md:px-8 pt-12 sm:pt-16 md:pt-20 pb-10">
-          {/* Hero spotlight */}
-          <div aria-hidden className="pointer-events-none absolute inset-0 -z-0">
-            <div className="absolute left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 [background:conic-gradient(from_180deg_at_50%_50%,hsl(var(--primary)/0.32),transparent_40%,hsl(var(--primary)/0.22)_70%,transparent)] blur-3xl" />
+          {/* Subtle grid mask only — no colored spotlight */}
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 top-32 -z-0">
             <div
               className="absolute inset-0 opacity-[0.05]"
               style={{
@@ -507,30 +588,44 @@ function AboutPageInner() {
               </div>
 
               {/* Text Content */}
-              <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-1 lg:order-2">
+              <div className="flex flex-col items-center lg:items-start text-center lg:text-left order-1 lg:order-2 relative">
+                {/* Decorative side rail (desktop) */}
+                <div
+                  aria-hidden
+                  className="hidden lg:block absolute -left-6 top-2 bottom-4 w-px bg-linear-to-b from-transparent via-primary/40 to-transparent"
+                />
+
                 {/* Greeting eyebrow + animated word */}
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/8 backdrop-blur-md px-3 py-1.5 text-[11px] font-mono uppercase tracking-[0.2em] text-primary"
+                  className="inline-flex items-center gap-2.5 rounded-full border-2 border-primary/40 bg-linear-to-r from-primary/15 via-primary/8 to-transparent backdrop-blur-md px-4 py-2 text-[11px] font-mono uppercase tracking-[0.22em] text-primary shadow-[0_8px_24px_-12px_hsl(var(--primary)/0.5)]"
                 >
-                  <span className="relative flex h-1.5 w-1.5">
+                  <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-primary shadow-[0_0_10px_hsl(var(--primary))]" />
                   </span>
                   Танилцуулга
+                  
+        
                 </motion.div>
 
-                <div className="relative mt-5 mb-3 h-[3.5rem] sm:h-[5rem] md:h-[6.5rem] flex items-center">
+                {/* Animated greeting (in different languages) */}
+                <div className="relative mt-6 mb-3 h-[3.5rem] sm:h-[5rem] md:h-[6.5rem] flex items-center gap-3">
+                  {/* Vertical accent bar */}
+                  <span
+                    aria-hidden
+                    className="hidden sm:block self-stretch w-[3px] rounded-full bg-linear-to-b from-primary via-accent/60 to-transparent"
+                  />
                   <AnimatePresence mode="wait">
                     <motion.h1
                       key={greetingIndex}
-                      initial={{ opacity: 0, y: 18 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -18 }}
-                      transition={{ duration: 0.45, ease: 'easeInOut' }}
-                      className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight bg-linear-to-br from-foreground via-foreground to-foreground/60 bg-clip-text text-transparent leading-[1.05]"
+                      initial={{ opacity: 0, y: 18, filter: 'blur(8px)' }}
+                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                      exit={{ opacity: 0, y: -18, filter: 'blur(8px)' }}
+                      transition={{ duration: 0.5, ease: 'easeInOut' }}
+                      className="font-mono text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight bg-linear-to-br from-foreground via-primary/90 to-foreground/50 bg-clip-text text-transparent leading-[1.05]"
                     >
                       {greetings[greetingIndex]}
                     </motion.h1>
@@ -579,7 +674,8 @@ function AboutPageInner() {
                         </Button>
                       </div>
                     ) : (
-                      <h2 className="text-sm sm:text-base md:text-lg text-muted-foreground font-mono uppercase tracking-[0.18em] flex items-center gap-2">
+                      <h2 className="text-sm sm:text-base md:text-lg text-muted-foreground font-mono uppercase tracking-[0.2em] flex items-center gap-2">
+                        <span className="inline-block h-px w-6 bg-linear-to-r from-primary to-transparent" aria-hidden />
                         {introText}
                         {isEditMode && (
                           <Button
@@ -597,11 +693,21 @@ function AboutPageInner() {
                       </h2>
                     )}
 
-                    {/* Name with mouse-tracked spotlight gradient */}
+                    {/* Name with mouse-tracked spotlight gradient + glow underline */}
                     <div className="relative py-1 sm:py-2">
-                      <p className="spotlight-text text-5xl sm:text-7xl md:text-8xl xl:text-[7.5rem] font-black tracking-tighter leading-[0.95]">
+                      {/* Backdrop glow */}
+                      <div
+                        aria-hidden
+                        className="pointer-events-none absolute inset-x-0 -inset-y-2 bg-linear-to-r from-primary/0 via-primary/15 to-primary/0 blur-3xl opacity-60"
+                      />
+                      <p className="relative spotlight-text font-mono text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-black tracking-tighter leading-[0.95]">
                         {name}
                       </p>
+                      {/* Animated underline */}
+                      <span
+                        aria-hidden
+                        className="block mt-1 h-[3px] w-0 group-hover:w-full max-w-[260px] bg-linear-to-r from-primary via-accent to-transparent rounded-full transition-all duration-700"
+                      />
                     </div>
 
                     {isEditingOutroText ? (
@@ -717,8 +823,6 @@ function AboutPageInner() {
             <PageHeader
               eyebrow="Сонирхол"
               icon={<Heart className="h-3.5 w-3.5" />}
-              title="Миний хоббинууд"
-              description="Чөлөөт цагаар хийдэг, урам зориг өгдөг зүйлүүд."
             />
             <div className="mb-10" />
 
@@ -728,11 +832,7 @@ function AboutPageInner() {
               </div>
             ) : (
               <>
-              <div
-                className="relative flex items-center justify-center h-[350px]"
-                onMouseEnter={() => setIsCarouselHovered(true)}
-                onMouseLeave={() => setIsCarouselHovered(false)}
-              >
+              <div className="relative flex items-center justify-center h-[350px]">
                 {displayItems.length === 0 && !isEditMode ? (
                   <div className="text-center">
                     <p className="text-muted-foreground">Хобби олдсонгүй.</p>
@@ -900,24 +1000,6 @@ function AboutPageInner() {
                     </div>
                   </div>
                 )}
-                <Button
-                  onClick={scrollPrev}
-                  className="absolute left-2 sm:left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 h-11 w-11 rounded-full bg-card/60 backdrop-blur-xl border border-border/60 text-foreground/80 hover:text-primary hover:border-primary/60 hover:bg-primary/5 transition-all duration-300"
-                  variant="ghost"
-                  size="icon"
-                  disabled={displayItems.length === 0}
-                >
-                  <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-                </Button>
-                <Button
-                  onClick={scrollNext}
-                  className="absolute right-2 sm:right-4 md:right-8 top-1/2 -translate-y-1/2 z-10 h-11 w-11 rounded-full bg-card/60 backdrop-blur-xl border border-border/60 text-foreground/80 hover:text-primary hover:border-primary/60 hover:bg-primary/5 transition-all duration-300"
-                  variant="ghost"
-                  size="icon"
-                  disabled={displayItems.length === 0}
-                >
-                  <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
-                </Button>
               </div>
 
               {/* Dot indicators */}
@@ -955,7 +1037,7 @@ function AboutPageInner() {
             height: 100%;
             position: absolute;
             transform-style: preserve-3d;
-            transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 2.8s cubic-bezier(0.22, 0.61, 0.36, 1);
             will-change: transform;
             backface-visibility: hidden;
           }
@@ -967,9 +1049,9 @@ function AboutPageInner() {
             left: 0;
             background: transparent;
             transition:
-              opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+              opacity 2.4s cubic-bezier(0.22, 0.61, 0.36, 1),
+              transform 2.4s cubic-bezier(0.22, 0.61, 0.36, 1),
+              filter 2.4s cubic-bezier(0.22, 0.61, 0.36, 1);
             cursor: pointer;
             will-change: transform, opacity, filter;
             backface-visibility: hidden;

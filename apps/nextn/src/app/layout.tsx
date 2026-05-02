@@ -5,6 +5,7 @@ import './globals.css';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
 import { EditModeProvider } from '@/contexts/EditModeContext';
 import MainLayout from '@/components/MainLayout';
+import PageTransition from '@/components/PageTransition';
 import { I18nProvider } from '@/contexts/I18nContext';
 import MotionProvider from '@/app/providers/MotionProvider';
 import { JetBrains_Mono } from 'next/font/google';
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
     template: '%s · PersonalWeb',
   },
   description:
-    'Хувийн портфолио, англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
+    'Хувийн , англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
   keywords: [
     'portfolio',
     'developer',
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'PersonalWeb — Portfolio',
     description:
-      'Хувийн портфолио, англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
+      'Хувийн , англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
     type: 'website',
     locale: 'mn_MN',
   },
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'PersonalWeb — Portfolio',
     description:
-      'Хувийн портфолио, англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
+      'Хувийн , англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
   },
   robots: {
     index: true,
@@ -97,6 +98,7 @@ export default function RootLayout({
               <I18nProvider>
                 <MotionProvider>
                   <MainLayout>{children}</MainLayout>
+                  <PageTransition />
                 </MotionProvider>
                 <Toaster />
               </I18nProvider>

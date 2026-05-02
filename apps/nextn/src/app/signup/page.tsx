@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { motion } from 'framer-motion';
 import { useAuth, useFirestore } from '@/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import {
@@ -33,7 +32,6 @@ import type {
   Skill,
   Hobby,
 } from '@/lib/types';
-import type { ExperienceItem } from '@/contexts/ExperienceContext';
 import Link from 'next/link';
 import {
   User,
@@ -374,26 +372,6 @@ export default function SignupPage() {
         },
       ];
 
-      // Default Experiences (1-2 samples)
-      const defaultExperiences: Omit<ExperienceItem, 'id'>[] = [
-        {
-          title: 'Жишээ туршлага 1',
-          description:
-            'Энд таны ажлын туршлагыг оруулна. Ямар компанид, ямар албан тушаалд ажилласан гэх мэт.',
-          icon: 'Briefcase',
-          image:
-            'https://i.pinimg.com/1200x/70/4b/79/704b799a7822e81adb26e81bf64e50c7.jpg',
-        },
-        {
-          title: 'Жишээ туршлага 2',
-          description:
-            'Өөр нэг туршлагын тайлбар. Та энд өөрийн бодит туршлагуудыг нэмж болно.',
-          icon: 'Building',
-          image:
-            'https://i.pinimg.com/1200x/70/4b/79/704b799a7822e81adb26e81bf64e50c7.jpg',
-        },
-      ];
-
       // Add default education
       for (const edu of defaultEducation) {
         await addDoc(collection(firestore, `users/${userId}/education`), edu);
@@ -415,11 +393,6 @@ export default function SignupPage() {
       // Add default hobbies
       for (const hobby of defaultHobbies) {
         await addDoc(collection(firestore, `users/${userId}/hobbies`), hobby);
-      }
-
-      // Add default experiences
-      for (const exp of defaultExperiences) {
-        await addDoc(collection(firestore, `users/${userId}/experiences`), exp);
       }
 
       toast({
@@ -448,28 +421,14 @@ export default function SignupPage() {
     <>
       <AuthShell
         title="Бүртгүүлэх"
-        subtitle="Шинэ хэрэглэгчийн бүртгэл хэдхэн секундэд."
-        showcaseEyebrow="PersonalWeb"
-        showcaseTitle="Бүх хэрэгслээ нэг бүртгэлээр."
-        showcaseDescription="Бүртгүүлээд портфолио, хэл сурах, програмчлал болон бүтээмжийн хэрэгслүүдийг шууд эхлүүл."
-        showcaseBullets={[
-          'Хувийн портфолио — QR + хуваалцах линк',
-          'Англи · Япон хэлний дасгал, үг сурах',
-          'AI туслах + Trader AI зургийн анализ',
-          'Pomodoro, Todo, Fitness — өдрийн төлөвлөгөө',
-        ]}
+        subtitle="Шинэ хэрэглэгчийн бүртгэл."
         switchLabel="Бүртгэлтэй юу?"
         switchHref="/login"
         switchCta="Нэвтрэх"
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25, duration: 0.4 }}
-            >
-              <FormField
+            <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
@@ -492,14 +451,8 @@ export default function SignupPage() {
                   </FormItem>
                 )}
               />
-            </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.32, duration: 0.4 }}
-            >
-              <FormField
+            <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
@@ -523,14 +476,8 @@ export default function SignupPage() {
                   </FormItem>
                 )}
               />
-            </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.39, duration: 0.4 }}
-            >
-              <FormField
+            <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
@@ -566,18 +513,11 @@ export default function SignupPage() {
                   </FormItem>
                 )}
               />
-            </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.46, duration: 0.4 }}
-              className="pt-1"
-            >
-              <Button
+            <Button
                 type="submit"
                 disabled={isLoading}
-                className="group w-full h-12 rounded-xl bg-linear-to-r from-primary to-primary/80 hover:from-primary hover:to-primary text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
+                className="group w-full h-12 rounded-xl bg-linear-to-r from-primary to-primary/80 hover:from-primary hover:to-primary text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
               >
                 {isLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -588,7 +528,6 @@ export default function SignupPage() {
                   </span>
                 )}
               </Button>
-            </motion.div>
 
             <p className="text-[11px] text-center text-muted-foreground/80 leading-relaxed">
               Бүртгүүлснээр та манай{' '}

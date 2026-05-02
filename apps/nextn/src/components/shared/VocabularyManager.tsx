@@ -55,7 +55,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Link as LinkIcon,
-  Sparkles,
   GraduationCap,
   Volume2,
 } from 'lucide-react';
@@ -303,7 +302,6 @@ const AiAssistantDialog = ({
               </TabsTrigger>
             )}
             <TabsTrigger value="auto" className="gap-2">
-              <Sparkles className="h-4 w-4" />
               Автомат
             </TabsTrigger>
           </TabsList>
@@ -426,11 +424,7 @@ car: машин (A vehicle with four wheels)"
                 disabled={isLoading}
                 className="gap-2"
               >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Sparkles className="h-4 w-4" />
-                )}
+                {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 {isLoading ? 'Үүсгэж байна...' : 'Үг үүсгэх'}
               </Button>
             </div>
@@ -944,13 +938,7 @@ export default function VocabularyManager<T extends Word>({
           <BackButton />
           <Card className="text-center p-12 mt-8 bg-card/50 backdrop-blur-xl border-0 rounded-2xl max-w-md mx-auto">
             <CardContent className="flex flex-col items-center gap-4">
-              <div
-                className={`p-4 rounded-full bg-linear-to-br from-${gradientColors.from}-500/20 to-${gradientColors.to}-500/20`}
-              >
-                <Sparkles
-                  className={`h-10 w-10 text-${gradientColors.from}-400`}
-                />
-              </div>
+
               <p className="text-muted-foreground text-lg">
                 Үгсийн санг харахын тулд нэвтэрнэ үү.
               </p>
@@ -1207,7 +1195,7 @@ export default function VocabularyManager<T extends Word>({
                         <div className="grid grid-cols-6 gap-2 pr-4">
                           <Button
                             variant={
-                              alphabetFilter === 'all' ? 'default' : 'outline-solid'
+                              alphabetFilter === 'all' ? 'default' : 'outline'
                             }
                             onClick={() => handleAlphabetSelect('all')}
                           >
@@ -1219,7 +1207,7 @@ export default function VocabularyManager<T extends Word>({
                               variant={
                                 alphabetFilter === letter
                                   ? 'default'
-                                  : 'outline-solid'
+                                  : 'outline'
                               }
                               onClick={() => handleAlphabetSelect(letter)}
                             >
@@ -1405,7 +1393,7 @@ export default function VocabularyManager<T extends Word>({
                     number => (
                       <Button
                         key={number}
-                        variant={currentPage === number ? 'default' : 'outline-solid'}
+                        variant={currentPage === number ? 'default' : 'outline'}
                         size="icon"
                         onClick={() => paginate(number)}
                         className={cn(

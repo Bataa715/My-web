@@ -241,10 +241,9 @@ export default function Projects() {
     <section id="projects" className="py-12 sm:py-16 md:py-20 lg:py-24">
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
         <PageHeader
-          eyebrow="Төслүүд"
+          eyebrow="Миний төслүүд"
           icon={<FolderKanban className="h-3.5 w-3.5" />}
-          title="Миний төслүүд"
-          description="Бүтээсэн бүтээгдэхүүнүүд, эксперимент болон оролцсон төслүүд."
+          title="Бүтээсэн бүтээлүүд"
         />
         {loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 lg:gap-8 max-w-7xl mx-auto">

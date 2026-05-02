@@ -1,11 +1,53 @@
 import type {NextConfig} from 'next';
 import path from 'node:path';
+import fs from 'node:fs';
+
+// ─── Robust .env.local loader (workspace root + apps/nextn) ─────────────
+// Nx runs Next.js with cwd = workspace root, but Next.js looks for env files
+// next to next.config.ts. We manually merge both locations so env vars resolve
+// reliably, and explicitly populate process.env BEFORE the rest of the config.
+function loadEnvFile(filePath: string) {
+  if (!fs.existsSync(filePath)) return;
+  const content = fs.readFileSync(filePath, 'utf-8');
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+    const key = line.slice(0, eq).trim();
+    let value = line.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (process.env[key] === undefined) {
+      process.env[key] = value;
+    }
+  }
+}
+
+const workspaceRoot = path.join(__dirname, '..', '..');
+loadEnvFile(path.join(__dirname, '.env.local'));
+loadEnvFile(path.join(workspaceRoot, '.env.local'));
 
 const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
+  // Inline NEXT_PUBLIC_* Firebase vars at build time so they are guaranteed
+  // available in the client bundle (Turbopack + Nx workspace edge case).
+  env: {
+    NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -16,14 +58,14 @@ const nextConfig: NextConfig = {
     root: path.join(__dirname, '..', '..'),
   },
   // Tree-shake heavy barrel imports → faster dev compile + smaller client JS
+  // NOTE: do NOT add `firebase`, `firebase/firestore`, `firebase/auth` here —
+  // it strips required side-effect registrations and causes runtime errors
+  // ("Service firestore is not available").
   experimental: {
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
       'date-fns',
-      'firebase',
-      'firebase/firestore',
-      'firebase/auth',
       '@radix-ui/react-icons',
       'react-i18next',
     ],

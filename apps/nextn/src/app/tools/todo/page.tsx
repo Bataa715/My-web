@@ -21,7 +21,7 @@ import {
   Loader2,
   Trash2,
   ListTodo,
-  Sparkles,
+  
   Plus,
   Calendar,
   Flag,
@@ -435,9 +435,7 @@ export default function TodoPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center py-16"
                   >
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted/50 mb-4">
-                      <Sparkles className="h-10 w-10 text-primary" />
-                    </div>
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted/50 mb-4" />
                     <p className="text-lg font-medium text-muted-foreground">
                       {filter === 'completed'
                         ? 'Дууссан ажил алга'

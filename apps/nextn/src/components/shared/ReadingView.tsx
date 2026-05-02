@@ -18,7 +18,6 @@ import {
   Wand2,
   MessageSquarePlus,
   Loader2,
-  Sparkles,
   Pencil,
   Trash2,
 } from 'lucide-react';
@@ -295,9 +294,7 @@ export default function ReadingView({ material }: ReadingViewProps) {
             <div className="mt-4 p-4 border-t">
               {aiAction === 'translate' && (
                 <div>
-                  <h4 className="font-bold mb-2 flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-primary" /> Орчуулга
-                  </h4>
+                  <h4 className="font-bold mb-2">Орчуулга</h4>
                   <p className="italic text-muted-foreground">
                     {aiResponse.translation}
                   </p>
@@ -306,18 +303,13 @@ export default function ReadingView({ material }: ReadingViewProps) {
               {aiAction === 'correct' && (
                 <div className="space-y-3">
                   <div>
-                    <h4 className="font-bold mb-2 flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-primary" /> Зассан
-                      хувилбар
-                    </h4>
+                    <h4 className="font-bold mb-2">Зассан хувилбар</h4>
                     <p className="p-2 bg-green-900/20 rounded-md text-green-300">
                       {aiResponse.correction}
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-bold mb-2 flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-primary" /> Тайлбар
-                    </h4>
+                    <h4 className="font-bold mb-2">Зассан</h4>
                     <p className="text-sm text-muted-foreground">
                       {aiResponse.explanation}
                     </p>

@@ -17,7 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { AddMaterialDialog } from '@/components/shared/AddMaterialDialog';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Trash2, BookOpen, Sparkles, FileText } from 'lucide-react';
+import { PlusCircle, Trash2, BookOpen, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import BackButton from '@/components/shared/BackButton';
 import {
@@ -270,9 +270,7 @@ export default function MaterialManager({
           >
             <Card className="max-w-md mx-auto bg-card/50 backdrop-blur-xl border-0 rounded-2xl p-8 shadow-lg shadow-blue-500/5">
               <CardContent className="flex flex-col items-center gap-4">
-                <div className="p-4 rounded-full bg-blue-500/10">
-                  <Sparkles className="h-8 w-8 text-blue-400" />
-                </div>
+
                 <p className="text-muted-foreground text-lg">
                   Материал харахын тулд нэвтэрнэ үү.
                 </p>

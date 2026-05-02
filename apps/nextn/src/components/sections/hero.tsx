@@ -24,7 +24,6 @@ import {
   PlayCircle,
   Download,
   Facebook,
-  Sparkles,
   Code2,
   Trash2,
 } from 'lucide-react';
@@ -869,13 +868,10 @@ export default function Hero({
   return (
     <section
       id="home"
-      className="relative w-full flex items-center min-h-[calc(100vh-120px)] py-8 sm:py-12 md:py-16 overflow-hidden"
+      className="relative w-full flex items-center min-h-[calc(100vh-120px)] py-8 sm:py-12 md:py-16"
     >
-      {/* Modern hero spotlight: layered conic + radial glow, dot grid, subtle vignette */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-0">
-        <div className="absolute left-1/2 top-1/2 h-[760px] w-[760px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 [background:conic-gradient(from_180deg_at_50%_50%,hsl(var(--primary)/0.35),transparent_40%,hsl(var(--primary)/0.25)_70%,transparent)] blur-3xl" />
-        <div className="absolute -top-20 left-10 h-72 w-72 rounded-full bg-primary/15 blur-[100px]" />
-        <div className="absolute bottom-0 right-10 h-80 w-80 rounded-full bg-purple-500/15 blur-[110px]" />
+      {/* Subtle grid mask only — no colored tint over the hero image */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 top-32 -z-0 overflow-hidden">
         <div
           className="absolute inset-0 opacity-[0.05]"
           style={{
@@ -1432,7 +1428,6 @@ export default function Hero({
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
                       >
-                        <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary animate-pulse" />
                         {isEditingGreeting ? (
                           <div className="flex items-center gap-2">
                             <Input

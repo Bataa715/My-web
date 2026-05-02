@@ -293,47 +293,10 @@ export default function MainLayout({
   if ((stillWaitingForAuth || !user) && !isPublicPath) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="flex flex-col items-center gap-5 select-none">
-          {/* Layered spinning rings — matches hero portal aesthetic */}
-          <div className="relative w-20 h-20">
-            {/* Outer arc ring */}
-            <div
-              className="orbit-rotate absolute inset-0 rounded-full"
-              style={{
-                background:
-                  'conic-gradient(from 0deg, hsl(var(--primary)) 0deg 40deg, transparent 40deg 360deg)',
-                WebkitMaskImage:
-                  'radial-gradient(closest-side, transparent calc(100% - 3px), black calc(100% - 3px))',
-                maskImage:
-                  'radial-gradient(closest-side, transparent calc(100% - 3px), black calc(100% - 3px))',
-                filter: 'drop-shadow(0 0 6px hsl(var(--primary)/0.7))',
-                ['--orbit-duration' as string]: '1.1s',
-              }}
-            />
-            {/* Inner accent arc */}
-            <div
-              className="orbit-rotate-reverse absolute inset-[10px] rounded-full"
-              style={{
-                background:
-                  'conic-gradient(from 120deg, hsl(var(--accent)) 0deg 30deg, transparent 30deg 360deg)',
-                WebkitMaskImage:
-                  'radial-gradient(closest-side, transparent calc(100% - 2px), black calc(100% - 2px))',
-                maskImage:
-                  'radial-gradient(closest-side, transparent calc(100% - 2px), black calc(100% - 2px))',
-                filter: 'drop-shadow(0 0 4px hsl(var(--accent)/0.6))',
-                ['--orbit-duration' as string]: '0.8s',
-              }}
-            />
-            {/* Centre dot */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-2.5 h-2.5 rounded-full bg-primary orbit-aura"
-                   style={{ boxShadow: '0 0 8px 2px hsl(var(--primary)/0.6)' }} />
-            </div>
-          </div>
-          <p className="text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground animate-pulse-slow">
-            Уншиж байна…
-          </p>
-        </div>
+        <div
+          className="h-8 w-8 rounded-full border-2 border-muted-foreground/20 border-t-primary animate-spin"
+          aria-label="Loading"
+        />
       </div>
     );
   }
@@ -349,7 +312,7 @@ export default function MainLayout({
         <div className="animated-border-wrapper">
           <div className="relative z-10 flex min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] flex-col rounded-[1.6rem] bg-background overflow-hidden shadow-2xl shadow-primary/5">
             {heroImage && (
-              <div className="absolute top-0 left-0 w-full h-[50vh] -z-10">
+              <div className="absolute top-[88px] md:top-[100px] left-0 w-full h-[50vh] -z-10">
                 <Image
                   src={heroImage}
                   alt="Background"
@@ -359,7 +322,10 @@ export default function MainLayout({
                   priority
                   unoptimized={/\.gif(\?|$)/i.test(heroImage)}
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-background via-background/60 to-transparent" />
+                {/* Soft top fade so image emerges from page background */}
+                <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-background to-transparent pointer-events-none" />
+                {/* Soft bottom fade — mirrors the top edge */}
+                <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-background to-transparent pointer-events-none" />
               </div>
             )}
 

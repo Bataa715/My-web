@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Github, Instagram, Facebook, Heart, ArrowUpRight } from 'lucide-react';
+import { Github, Instagram, Facebook } from 'lucide-react';
 import { useFirebase } from '@/firebase';
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
@@ -14,28 +14,26 @@ const navLinks = [
 ];
 
 const Footer = () => {
-  const { firestore, user } = useFirebase();
-  const [appName, setAppName] = useState('PersonalWeb');
+  const { firestore, user, isUserLoading } = useFirebase();
   const [links, setLinks] = useState({ github: '', instagram: '', facebook: '' });
 
   useEffect(() => {
-    if (user && firestore) {
-      const userDocRef = doc(firestore, 'users', user.uid);
-      getDoc(userDocRef).then(docSnap => {
+    if (isUserLoading || !user || !firestore) return;
+    const userDocRef = doc(firestore, 'users', user.uid);
+    getDoc(userDocRef)
+      .then(docSnap => {
         if (docSnap.exists()) {
           const data = docSnap.data() as UserProfile;
-          setAppName(data.name || 'PersonalWeb');
           setLinks({
             github: data.github || '',
             instagram: data.instagram || '',
             facebook: data.facebook || '',
           });
         }
-      });
-    }
-  }, [user, firestore]);
+      })
+      .catch(() => {});
+  }, [user, firestore, isUserLoading]);
 
-  const year = new Date().getFullYear();
   const socials = [
     { href: links.github, label: 'GitHub', icon: Github },
     { href: links.instagram, label: 'Instagram', icon: Instagram },
@@ -43,81 +41,57 @@ const Footer = () => {
   ].filter(s => s.href);
 
   return (
-    <footer className="relative mt-20 border-t border-border/40">
-      {/* Ambient glow above the border */}
-      <div className="absolute inset-x-0 -top-24 h-32 bg-linear-to-b from-transparent to-primary/5 pointer-events-none" aria-hidden />
-      {/* Glowing border line */}
-      <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/50 to-transparent" aria-hidden />
+    <footer className="relative mt-12">
+      {/* Ambient glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 -top-16 h-20 bg-linear-to-b from-transparent via-primary/4 to-primary/8"
+      />
+      {/* Top glowing line */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/60 to-transparent"
+      />
 
       <div className="container mx-auto px-4 sm:px-6">
-        {/* Main columns */}
-        <div className="py-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-12">
-          {/* Brand */}
-          <div className="space-y-3">
-            <Link href="/" className="inline-block">
-              <span className="text-xl font-bold gradient-text">{appName}</span>
-            </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-[220px]">
-              Хувийн portfolio — миний ажлын туршлага, төслүүд болон тэмдэглэлүүд.
-            </p>
-            <p className="flex items-center gap-1.5 text-xs text-muted-foreground/50">
-              Made with{' '}
-              <Heart className="h-3 w-3 text-rose-500 fill-rose-500 animate-pulse-slow" aria-hidden="true" />{' '}
-              in Mongolia
-            </p>
-          </div>
+        {/* Main content */}
+        <div className="flex flex-col items-center gap-4 py-5">
 
-          {/* Navigation */}
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground/50">
-              Навигаци
-            </p>
-            <ul className="space-y-2">
-              {navLinks.map(link => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="group inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
-                    <ArrowUpRight className="h-3.5 w-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Nav links */}
+          <nav className="flex flex-wrap items-center justify-center gap-x-1 gap-y-2">
+            {navLinks.map((link, i) => (
+              <span key={link.href} className="flex items-center">
+                <Link
+                  href={link.href}
+                  className="relative px-3 py-1 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 group"
+                >
+                  <span className="relative z-10">{link.label}</span>
+                  <span className="absolute inset-0 rounded-md bg-primary/0 group-hover:bg-primary/6 transition-colors duration-200" />
+                </Link>
+                {i < navLinks.length - 1 && (
+                  <span className="h-3 w-px bg-border/60" aria-hidden />
+                )}
+              </span>
+            ))}
+          </nav>
 
-          {/* Social links */}
+          {/* Social icons */}
           {socials.length > 0 && (
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground/50">
-                Холбоо барих
-              </p>
-              <div className="flex flex-col gap-2">
-                {socials.map(social => (
-                  <Link
-                    key={social.label}
-                    href={social.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group inline-flex items-center gap-2.5 text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
-                    <span className="flex items-center justify-center h-7 w-7 rounded-lg border border-border/60 bg-card/50 group-hover:border-primary/40 group-hover:bg-primary/8 transition-all duration-200">
-                      <social.icon className="h-3.5 w-3.5" aria-hidden="true" />
-                    </span>
-                    {social.label}
-                  </Link>
-                ))}
-              </div>
+            <div className="flex items-center gap-3">
+              {socials.map(social => (
+                <Link
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={social.label}
+                  className="group relative flex h-8 w-8 items-center justify-center rounded-lg border border-border/50 bg-card/40 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:bg-primary/10 hover:scale-110 hover:shadow-lg hover:shadow-primary/15"
+                >
+                  <social.icon className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary transition-colors duration-300" aria-hidden />
+                </Link>
+              ))}
             </div>
           )}
-        </div>
-
-        {/* Bottom bar */}
-        <div className="py-4 border-t border-border/30 flex items-center justify-center">
-          <p className="text-xs text-muted-foreground/40">
-            © {year} {appName}. Бүх эрх хуулиар хамгаалагдсан.
-          </p>
         </div>
       </div>
     </footer>

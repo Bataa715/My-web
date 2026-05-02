@@ -25,9 +25,6 @@
     "nx:affected": "nx affected:build"
   },
   "dependencies": {
-    "@capacitor/android": "^8.0.0",
-    "@capacitor/cli": "^8.0.0",
-    "@capacitor/core": "^8.0.0",
     "@genkit-ai/google-genai": "^1.20.0",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.3",
@@ -60,7 +57,7 @@
     "i18next-browser-languagedetector": "^8.0.0",
     "lucide-react": "^0.577.0",
     "next": "^16.2.4",
-    "next-themes": "^0.4.6",
+    "next-themes": "^0.3.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",

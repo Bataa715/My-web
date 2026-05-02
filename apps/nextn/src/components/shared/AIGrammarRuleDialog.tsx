@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label';
 import type { GrammarRule } from '@/lib/types';
 import {
   Loader2,
-  Sparkles,
+  
   BookOpen,
   Clock,
   HelpCircle,
@@ -179,7 +179,6 @@ export function AIGrammarRuleDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
             AI-ээр дүрэм үүсгэх
           </DialogTitle>
           <DialogDescription>
@@ -286,9 +285,7 @@ export function AIGrammarRuleDialog({
             >
               <div className="relative">
                 <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-                <div className="relative bg-primary rounded-full p-4">
-                  <Sparkles className="h-8 w-8 text-primary-foreground animate-pulse" />
-                </div>
+                <div className="relative bg-primary rounded-full p-4" />
               </div>
               <div className="text-center space-y-2">
                 <h3 className="text-lg font-semibold">
@@ -349,7 +346,6 @@ export function AIGrammarRuleDialog({
               </div>
 
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Sparkles className="h-4 w-4" />
                 AI-ээр үүсгэсэн дүрэм. Хадгалахын өмнө шалгана уу.
               </div>
 

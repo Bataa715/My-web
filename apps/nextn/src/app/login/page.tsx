@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import {
   Mail,
   Lock,
@@ -90,28 +89,15 @@ export default function LoginPage() {
 
   return (
     <AuthShell
-      title="Тавтай морил"
-      subtitle="И-мэйл хаягаараа нэвтэрч үргэлжлүүлнэ үү."
-      showcaseTitle="Хувийн портфолиогоо нэг дороос."
-      showcaseDescription="Нэвтрээд портфолио, хэл сурах, програмчлал, бүтээмжийн хэрэгслүүдээ удирдана уу."
-      showcaseBullets={[
-        'Англи · Япон хэлний дасгал, үг сурах',
-        'Программчлалын хэрэгслүүд + AI туслах',
-        'Pomodoro, Todo, Fitness — өдөр тутмын бүтээмж',
-        'Бүх төхөөрөмж дээр sync болсон таны мэдээлэл',
-      ]}
+      title="Нэвтрэх"
+      subtitle="Имэйл болон нууц үгээрээ нэвтэрнэ үү."
       switchLabel="Шинэ хэрэглэгч үү?"
       switchHref="/signup"
       switchCta="Бүртгүүлэх"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.4 }}
-          >
-            <FormField
+          <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
@@ -135,14 +121,8 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45, duration: 0.4 }}
-          >
-            <FormField
+          <FormField
               control={form.control}
               name="password"
               render={({ field }) => (
@@ -178,17 +158,11 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-          </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55, duration: 0.4 }}
-          >
-            <Button
+          <Button
               type="submit"
               disabled={isLoading}
-              className="group w-full h-12 rounded-xl bg-linear-to-r from-primary to-primary/80 hover:from-primary hover:to-primary text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
+              className="group w-full h-12 rounded-xl bg-linear-to-r from-primary to-primary/80 hover:from-primary hover:to-primary text-primary-foreground font-semibold shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -199,7 +173,6 @@ export default function LoginPage() {
                 </span>
               )}
             </Button>
-          </motion.div>
         </form>
       </Form>
     </AuthShell>

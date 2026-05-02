@@ -3,7 +3,7 @@ import { useSkills } from '@/contexts/SkillsContext';
 import { Skeleton } from '../ui/skeleton';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { Button } from '../ui/button';
-import { PlusCircle, Trash2, Edit, AlertTriangle, Sparkles } from 'lucide-react';
+import { PlusCircle, Trash2, Edit, AlertTriangle } from 'lucide-react';
 import { AddSkillDialog } from '../AddSkillDialog';
 import { EditSkillDialog } from '../EditSkillDialog';
 import PageHeader from '../shared/PageHeader';
@@ -267,9 +267,6 @@ const Skills = () => {
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
         <PageHeader
           eyebrow="Ур чадвар"
-          icon={<Sparkles className="h-3.5 w-3.5" />}
-          title="Технологи болон хэрэгслийн хураангуй"
-          description="Одоогийн байдлаар эзэмшиж буй frontend, backend болон AI хэрэгслүүд."
         />
         <div className="mb-10" />
 

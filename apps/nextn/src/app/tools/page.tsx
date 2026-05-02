@@ -1,36 +1,23 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 import {
   Timer,
   Code as CodeIcon,
   BookOpen,
   LayoutGrid,
-  TrendingUp,
-  User,
-  Sparkles,
   ListTodo,
   Bot,
-  Settings,
-  EyeOff,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpRight,
 } from 'lucide-react';
-import BackButton from '@/components/shared/BackButton';
+import Link from 'next/link';
 import PageHeader from '@/components/shared/PageHeader';
-import { Button } from '@/components/ui/button';
-import { useFirebase } from '@/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { useToast } from '@/hooks/use-toast';
-import { useEditMode } from '@/contexts/EditModeContext';
-import ToolCard, { type Tool } from '@/components/tools/ToolCard';
-import type { ToolSettings } from '@/components/tools/ToolSettingsDialog';
-
-// Lazy: only loaded if user actually opens settings (edit mode)
-const ToolSettingsDialog = dynamic(
-  () => import('@/components/tools/ToolSettingsDialog'),
-  { ssr: false, loading: () => null }
-);
+import { type Tool } from '@/components/tools/ToolCard';
+import { cn } from '@/lib/utils';
 
 // Lazy: heavy canvas — render after first paint
 const InteractiveParticles = dynamic(
@@ -62,18 +49,6 @@ const allTools: Tool[] = [
     glow: '244, 63, 94',
     accent: '#f43f5e',
     tag: 'Хэл',
-  },
-  {
-    id: 'portfolio',
-    title: 'Portfolio',
-    description: 'Портфолио засах · QR · линк',
-    href: '/tools/portfolio',
-    icon: <User className="h-7 w-7" />,
-    gradient: 'from-violet-500 to-purple-400',
-    shadowColor: 'rgba(139, 92, 246, 0.5)',
-    glow: '139, 92, 246',
-    accent: '#8b5cf6',
-    tag: 'Хувийн',
   },
   {
     id: 'todo',
@@ -112,18 +87,6 @@ const allTools: Tool[] = [
     tag: 'Код',
   },
   {
-    id: 'trader-ai',
-    title: 'TraderAi',
-    description: 'AI алтны зураг шинжилгээ',
-    href: '/tools/trader-ai',
-    icon: <TrendingUp className="h-7 w-7" />,
-    gradient: 'from-yellow-500 to-lime-400',
-    shadowColor: 'rgba(234, 179, 8, 0.5)',
-    glow: '234, 179, 8',
-    accent: '#eab308',
-    tag: 'AI',
-  },
-  {
     id: 'pomodoro',
     title: 'Pomodoro Timer',
     description: 'Төвлөрөл · 25 минут циклүүд',
@@ -149,132 +112,21 @@ const allTools: Tool[] = [
   },
 ];
 
-const ALL_CATEGORIES = 'Бүгд';
-
-const uniqueCategories = [
-  ALL_CATEGORIES,
-  ...Array.from(new Set(allTools.map(t => t.tag))),
-];
-
 export default function ToolsPage() {
-  const { firestore, user } = useFirebase();
-  const { toast } = useToast();
-  const { isEditMode } = useEditMode();
-  const [toolSettings, setToolSettings] = useState<ToolSettings>({});
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState(ALL_CATEGORIES);
+  const [[current, direction], setPage] = useState([0, 0]);
 
-  useEffect(() => {
-    const defaults: ToolSettings = {};
-    allTools.forEach((tool, index) => {
-      defaults[tool.id] = { visible: true, order: index };
-    });
-    setToolSettings(defaults);
-  }, []);
-
-  useEffect(() => {
-    async function loadSettings() {
-      if (!firestore || !user) {
-        setIsLoading(false);
-        return;
-      }
-      try {
-        const ref = doc(firestore, `users/${user.uid}/settings/tools`);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          const saved = snap.data() as ToolSettings;
-          const merged: ToolSettings = {};
-          allTools.forEach((tool, index) => {
-            merged[tool.id] = saved[tool.id] || { visible: true, order: index };
-          });
-          setToolSettings(merged);
-        }
-      } catch (error) {
-        console.error('Error loading tool settings:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadSettings();
-  }, [firestore, user]);
-
-  const saveSettings = async (newSettings: ToolSettings) => {
-    setToolSettings(newSettings);
-    if (!firestore || !user) return;
-    try {
-      const ref = doc(firestore, `users/${user.uid}/settings/tools`);
-      await setDoc(ref, newSettings);
-      toast({ title: 'Амжилттай', description: 'Тохиргоо хадгалагдлаа.' });
-    } catch (error) {
-      console.error('Error saving tool settings:', error);
-      toast({
-        title: 'Алдаа',
-        description: 'Тохиргоо хадгалахад алдаа гарлаа.',
-        variant: 'destructive',
-      });
-    }
+  const paginate = (dir: number) => {
+    const next = current + dir;
+    if (next < 0 || next >= allTools.length) return;
+    setPage([next, dir]);
   };
 
-  const toggleTool = (toolId: string) => {
-    saveSettings({
-      ...toolSettings,
-      [toolId]: {
-        ...toolSettings[toolId],
-        visible: !toolSettings[toolId]?.visible,
-      },
-    });
-  };
+  const goTo = (i: number) => setPage([i, i > current ? 1 : -1]);
 
-  const showAll = () => {
-    const next: ToolSettings = {};
-    allTools.forEach((t, i) => {
-      next[t.id] = { visible: true, order: toolSettings[t.id]?.order ?? i };
-    });
-    saveSettings(next);
-  };
-
-  const hideAll = () => {
-    const next: ToolSettings = {};
-    allTools.forEach((t, i) => {
-      next[t.id] = { visible: false, order: toolSettings[t.id]?.order ?? i };
-    });
-    saveSettings(next);
-  };
-
-  const visibleTools = useMemo(
-    () =>
-      allTools
-        .map(tool => ({
-          ...tool,
-          order:
-            toolSettings[tool.id]?.order ??
-            allTools.findIndex(t => t.id === tool.id),
-        }))
-        .filter(tool => toolSettings[tool.id]?.visible !== false)
-        .sort((a, b) => a.order - b.order),
-    [toolSettings]
-  );
-
-  const filteredTools = useMemo(
-    () =>
-      selectedCategory === ALL_CATEGORIES
-        ? visibleTools
-        : visibleTools.filter(t => t.tag === selectedCategory),
-    [visibleTools, selectedCategory]
-  );
-
-  const categoryCount = useMemo(() => {
-    const counts: Record<string, number> = { [ALL_CATEGORIES]: visibleTools.length };
-    visibleTools.forEach(t => {
-      counts[t.tag] = (counts[t.tag] ?? 0) + 1;
-    });
-    return counts;
-  }, [visibleTools]);
-
-  const hiddenCount = allTools.length - visibleTools.length;
+  const tool = allTools[current];
 
   return (
+    <MotionConfig reducedMotion="user">
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -283,134 +135,260 @@ export default function ToolsPage() {
       className="relative min-h-screen"
     >
       <InteractiveParticles quantity={40} />
-      <div className="space-y-8 px-4 md:px-6 relative z-10 pb-16">
-        <BackButton />
 
-        <div className="relative pt-6">
-          <PageHeader
-            eyebrow="Хэрэгслүүд"
-            icon={<Sparkles className="h-3.5 w-3.5" />}
-            title="Бүтээмж · Сурах · AI"
-            description="Англи · Япон хэл, программчлал болон бүтээмжийн хэрэгслүүдийг нэг дороос ашигла."
-          />
+      <div className="relative z-10 flex flex-col min-h-screen px-4 md:px-6 pt-6 pb-16">
+        <PageHeader eyebrow="Хэрэгслүүд" />
 
-          {isEditMode && (
-            <div className="absolute top-2 right-0">
-              <ToolSettingsDialog
-                open={isSettingsOpen}
-                onOpenChange={setIsSettingsOpen}
-                allTools={allTools}
-                toolSettings={toolSettings}
-                visibleCount={visibleTools.length}
-                hiddenCount={hiddenCount}
-                onToggle={toggleTool}
-                onShowAll={showAll}
-                onHideAll={hideAll}
-              />
-            </div>
-          )}
-        </div>
+        <div className="flex-1 flex flex-col items-center justify-center gap-8 mt-6">
 
-        {isEditMode && hiddenCount > 0 && (
-          <p className="text-sm text-muted-foreground mt-2 text-center">
-            {hiddenCount} хэрэгсэл нуугдсан •{' '}
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="text-primary hover:underline"
-            >
-              Тохиргоо
-            </button>
-          </p>
-        )}
-
-        {/* ── Category filter tabs ── */}
-        {!isLoading && visibleTools.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
-            {uniqueCategories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`filter-tab ${selectedCategory === cat ? 'filter-tab-active' : ''}`}
+          {/* ── Carousel card ── */}
+          <div className="relative w-full max-w-lg overflow-hidden">
+            <AnimatePresence initial={false} custom={direction} mode="popLayout">
+              <motion.div
+                key={current}
+                custom={direction}
+                variants={{
+                  enter: (d: number) => ({
+                    opacity: 0,
+                    x: d > 0 ? '60%' : '-60%',
+                    scale: 0.93,
+                  }),
+                  center: { opacity: 1, x: '0%', scale: 1 },
+                  exit: (d: number) => ({
+                    opacity: 0,
+                    x: d > 0 ? '-60%' : '60%',
+                    scale: 0.93,
+                  }),
+                }}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ type: 'spring', stiffness: 280, damping: 28 }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.25}
+                onDragEnd={(_, info) => {
+                  if (info.offset.x < -60) paginate(1);
+                  else if (info.offset.x > 60) paginate(-1);
+                }}
+                className="w-full cursor-grab active:cursor-grabbing select-none"
               >
-                {cat}
-                <span
-                  className="inline-flex items-center justify-center h-4 min-w-4 px-1 rounded-full text-[10px] font-bold ml-0.5"
+                <CarouselCard tool={tool} />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* ── Nav arrows + pill dots ── */}
+          <div className="flex items-center gap-5">
+            <button
+              onClick={() => paginate(-1)}
+              disabled={current === 0}
+              className="h-9 w-9 rounded-full border border-border flex items-center justify-center text-muted-foreground transition-all duration-200 hover:border-foreground/40 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+
+            <div className="flex items-center gap-1.5">
+              {allTools.map((t, i) => (
+                <button
+                  key={t.id}
+                  onClick={() => goTo(i)}
+                  className="rounded-full transition-all duration-300"
+                  style={
+                    i === current
+                      ? { width: 24, height: 8, background: tool.accent }
+                      : { width: 8, height: 8, background: 'rgba(120,120,140,0.35)' }
+                  }
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={() => paginate(1)}
+              disabled={current === allTools.length - 1}
+              className="h-9 w-9 rounded-full border border-border flex items-center justify-center text-muted-foreground transition-all duration-200 hover:border-foreground/40 hover:text-foreground disabled:opacity-30 disabled:pointer-events-none"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* ── Tool chip strip (label + colored border, no icon) ── */}
+          <div className="flex flex-wrap justify-center gap-2.5 max-w-2xl">
+            {allTools.map((t, i) => {
+              const active = i === current;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => goTo(i)}
+                  title={t.title}
+                  className={cn(
+                    'group/chip relative rounded-full px-4 py-2 text-xs font-semibold tracking-wide transition-all duration-300 backdrop-blur-sm',
+                    'border-2 overflow-hidden',
+                    active ? 'scale-105' : 'hover:scale-105 opacity-70 hover:opacity-100'
+                  )}
                   style={{
-                    background: selectedCategory === cat
-                      ? 'hsl(var(--primary) / 0.2)'
-                      : 'hsl(var(--muted))',
-                    color: selectedCategory === cat
-                      ? 'hsl(var(--primary))'
-                      : 'hsl(var(--muted-foreground))',
+                    borderColor: active ? t.accent : `rgba(${t.glow}, 0.35)`,
+                    background: active
+                      ? `linear-gradient(135deg, rgba(${t.glow},0.18), rgba(${t.glow},0.04))`
+                      : 'rgba(255,255,255,0.02)',
+                    color: active ? t.accent : undefined,
+                    boxShadow: active
+                      ? `0 8px 24px -8px rgba(${t.glow}, 0.55), inset 0 0 0 1px rgba(${t.glow}, 0.25)`
+                      : 'none',
                   }}
                 >
-                  {categoryCount[cat] ?? 0}
-                </span>
-              </button>
-            ))}
+                  {/* Animated shine on hover */}
+                  <span
+                    className="pointer-events-none absolute inset-0 -translate-x-full group-hover/chip:translate-x-full transition-transform duration-700 ease-out"
+                    style={{
+                      background: `linear-gradient(90deg, transparent, rgba(${t.glow},0.25), transparent)`,
+                    }}
+                    aria-hidden
+                  />
+                  {/* Active dot */}
+                  {active && (
+                    <span
+                      className="inline-block h-1.5 w-1.5 rounded-full mr-2 align-middle"
+                      style={{
+                        background: t.accent,
+                        boxShadow: `0 0 8px ${t.accent}`,
+                      }}
+                      aria-hidden
+                    />
+                  )}
+                  <span className="relative">{t.title}</span>
+                </button>
+              );
+            })}
           </div>
-        )}
-
-        <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6 pt-2"
-          style={{ perspective: '1500px' }}
-        >
-          {isLoading
-            ? Array.from({ length: 8 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="rounded-2xl min-h-[230px] skeleton"
-                  style={{ animationDelay: `${i * 80}ms` }}
-                />
-              ))
-            : (
-              <AnimatePresence initial={false}>
-                {filteredTools.map((tool, idx) => (
-                  <ToolCard key={tool.id} tool={tool} index={idx} />
-                ))}
-              </AnimatePresence>
-            )}
         </div>
-
-        {filteredTools.length === 0 && !isLoading && visibleTools.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-12"
-          >
-            <p className="text-muted-foreground text-sm">
-              <span className="font-semibold text-foreground">{selectedCategory}</span>{' '}
-              ангилалд хэрэгсэл олдсонгүй.
-            </p>
-            <button
-              onClick={() => setSelectedCategory(ALL_CATEGORIES)}
-              className="mt-3 text-sm text-primary hover:underline"
-            >
-              Бүгдийг харах
-            </button>
-          </motion.div>
-        )}
-
-        {visibleTools.length === 0 && !isLoading && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16"
-          >
-            <EyeOff className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">
-              Бүх хэрэгсэл нуугдсан
-            </h3>
-            <p className="text-muted-foreground mb-4">
-              Тохиргооноос хэрэгслүүдийг харуулна уу.
-            </p>
-            <Button onClick={() => setIsSettingsOpen(true)}>
-              <Settings className="h-4 w-4 mr-2" />
-              Тохиргоо нээх
-            </Button>
-          </motion.div>
-        )}
       </div>
     </motion.div>
+    </MotionConfig>
+  );
+}
+
+/* ─── Big carousel card (no icon, bold colored border) ─── */
+function CarouselCard({ tool }: { tool: Tool }) {
+  return (
+    <Link href={tool.href} className="block group">
+      {/* Outer gradient border ring */}
+      <div
+        className="relative rounded-3xl p-[2px] transition-all duration-500 group-hover:p-[3px]"
+        style={{
+          background: `linear-gradient(135deg, ${tool.accent}, rgba(${tool.glow}, 0.25) 45%, transparent 70%, ${tool.accent})`,
+          boxShadow: `0 18px 48px -22px rgba(${tool.glow}, 0.45)`,
+        }}
+        onMouseEnter={e => {
+          (e.currentTarget as HTMLDivElement).style.boxShadow = `0 32px 70px -20px rgba(${tool.glow}, 0.7), 0 0 0 1px rgba(${tool.glow}, 0.35)`;
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLDivElement).style.boxShadow = `0 18px 48px -22px rgba(${tool.glow}, 0.45)`;
+        }}
+      >
+        <div className="relative rounded-[22px] bg-card overflow-hidden">
+          {/* Soft tinted top wash */}
+          <div
+            className="absolute inset-x-0 top-0 h-44 pointer-events-none"
+            style={{
+              background: `radial-gradient(ellipse at top, rgba(${tool.glow}, 0.22), transparent 70%)`,
+            }}
+            aria-hidden
+          />
+          {/* Subtle grid pattern */}
+          <div
+            className="absolute inset-0 opacity-[0.06] pointer-events-none"
+            style={{
+              backgroundImage:
+                'linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)',
+              backgroundSize: '28px 28px',
+              color: tool.accent,
+            }}
+            aria-hidden
+          />
+          {/* Glow blob */}
+          <div
+            className="absolute -top-20 -right-20 w-60 h-60 rounded-full blur-3xl opacity-40 transition-opacity duration-500 group-hover:opacity-70 pointer-events-none"
+            style={{ background: tool.accent }}
+            aria-hidden
+          />
+
+          {/* ── Content ── */}
+          <div className="relative p-8 md:p-10 min-h-[320px] flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-4">
+              {/* Tag */}
+              <span
+                className="text-[10px] tracking-[0.2em] uppercase font-bold px-3 py-1.5 rounded-full border-2 backdrop-blur-sm"
+                style={{
+                  borderColor: `rgba(${tool.glow}, 0.5)`,
+                  color: tool.accent,
+                  background: `rgba(${tool.glow}, 0.08)`,
+                }}
+              >
+                {tool.tag}
+              </span>
+              {/* Pulse dot */}
+              <span className="relative flex h-2.5 w-2.5">
+                <span
+                  className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60"
+                  style={{ background: tool.accent }}
+                />
+                <span
+                  className="relative inline-flex rounded-full h-2.5 w-2.5"
+                  style={{
+                    background: tool.accent,
+                    boxShadow: `0 0 12px ${tool.accent}`,
+                  }}
+                />
+              </span>
+            </div>
+
+            <div className="mt-10">
+              <h2
+                className="text-4xl md:text-5xl font-extrabold tracking-tight leading-none"
+                style={{
+                  background: `linear-gradient(135deg, hsl(var(--foreground)), ${tool.accent})`,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
+                {tool.title}
+              </h2>
+              <p className="mt-3 text-sm md:text-base text-muted-foreground leading-relaxed max-w-md">
+                {tool.description}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 mt-10">
+              <span
+                className="h-[2px] rounded-full transition-all duration-500"
+                style={{
+                  background: `linear-gradient(90deg, ${tool.accent}, transparent)`,
+                  width: '32px',
+                }}
+                aria-hidden
+              />
+              <span
+                className="text-sm font-bold tracking-wide transition-all duration-300 group-hover:tracking-widest"
+                style={{ color: tool.accent }}
+              >
+                Нээх
+              </span>
+              <span
+                className="ml-auto h-11 w-11 rounded-full border-2 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:translate-x-1"
+                style={{
+                  borderColor: `rgba(${tool.glow}, 0.5)`,
+                  background: `rgba(${tool.glow}, 0.1)`,
+                  color: tool.accent,
+                }}
+              >
+                <ArrowUpRight className="h-5 w-5 transition-transform duration-300 group-hover:rotate-45" />
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }

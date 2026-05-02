@@ -19,7 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useEditMode } from '@/contexts/EditModeContext';
 import { AddGrammarRuleDialog } from '@/components/shared/AddGrammarRuleDialog';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, BookText, Sparkles, Wand2 } from 'lucide-react';
+import { PlusCircle, BookText, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import BackButton from '@/components/shared/BackButton';
 import { initialEnglishRule } from '@/data/english';
@@ -268,9 +268,7 @@ export default function EnglishGrammarPage() {
           >
             <Card className="max-w-md mx-auto bg-card/50 backdrop-blur-xl border-0 rounded-2xl p-8 shadow-lg shadow-blue-500/5">
               <CardContent className="flex flex-col items-center gap-4">
-                <div className="p-4 rounded-full bg-blue-500/10">
-                  <Sparkles className="h-8 w-8 text-blue-400" />
-                </div>
+
                 <p className="text-muted-foreground text-lg">
                   Дүрмийн жагсаалтыг харахын тулд нэвтэрнэ үү.
                 </p>
@@ -290,7 +288,7 @@ export default function EnglishGrammarPage() {
                 <Button
                   key={category}
                   variant={
-                    selectedCategory === category ? 'default' : 'outline-solid'
+                    selectedCategory === category ? 'default' : 'outline'
                   }
                   onClick={() => setSelectedCategory(category)}
                   className={`rounded-full transition-all duration-300 ${

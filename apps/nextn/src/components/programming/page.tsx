@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import LanguageCard from './components/LanguageCard';
 import { AddLanguageDialog } from './components/AddLanguageDialog';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Code, Sparkles } from 'lucide-react';
+import { PlusCircle, Code } from 'lucide-react';
 import InteractiveParticles from '@/components/shared/InteractiveParticles';
 import { AnimatePresence } from 'framer-motion';
 

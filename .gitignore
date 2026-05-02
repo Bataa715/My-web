@@ -71,3 +71,7 @@ __pycache__/
 android/build/
 android/app/build/
 android/.gradle/
+
+.env.local
+.env*.local
+

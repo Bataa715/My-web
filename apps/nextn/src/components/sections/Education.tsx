@@ -255,8 +255,6 @@ export default function Education() {
         <PageHeader
           eyebrow="Боловсрол"
           icon={<GraduationCap className="h-3.5 w-3.5" />}
-          title="Сурсан, судалсан зам"
-          description="Албан болон албан бус боловсролын аяллын товч хураангуй."
         />
         <div className="mb-10" />
 

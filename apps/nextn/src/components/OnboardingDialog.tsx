@@ -20,7 +20,7 @@ import {
   User,
   MapPin,
   Target,
-  Sparkles,
+  
   ChevronRight,
   ChevronLeft,
   Check,
@@ -156,9 +156,7 @@ export default function OnboardingDialog({
             className="space-y-6"
           >
             <div className="text-center space-y-2">
-              <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-8 h-8 text-white" />
-              </div>
+              <div className="w-16 h-16 bg-linear-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4" />
               <h3 className="text-2xl font-bold">
                 Тавтай морил, {userName}! 👋
               </h3>

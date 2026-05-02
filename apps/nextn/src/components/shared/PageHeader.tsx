@@ -5,8 +5,6 @@ import { cn } from '@/lib/utils';
 
 interface PageHeaderProps {
   eyebrow?: string;
-  title: string;
-  description?: string;
   icon?: React.ReactNode;
   className?: string;
   align?: 'left' | 'center';
@@ -15,8 +13,6 @@ interface PageHeaderProps {
 
 export default function PageHeader({
   eyebrow,
-  title,
-  description,
   icon,
   className,
   align = 'center',
@@ -47,32 +43,6 @@ export default function PageHeader({
           {icon}
           <span>{eyebrow}</span>
         </motion.div>
-      )}
-
-      <motion.h1
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-        className={cn(
-          'mt-4 text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight gradient-text-animated leading-[1.15] text-balance',
-          isCenter ? 'mx-auto max-w-3xl' : ''
-        )}
-      >
-        {title}
-      </motion.h1>
-
-      {description && (
-        <motion.p
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-          className={cn(
-            'mt-4 text-base md:text-lg text-muted-foreground leading-relaxed text-balance',
-            isCenter ? 'mx-auto max-w-2xl' : ''
-          )}
-        >
-          {description}
-        </motion.p>
       )}
 
       {children && <div className="mt-6">{children}</div>}

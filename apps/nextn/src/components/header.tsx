@@ -52,7 +52,7 @@ import {
   DialogTrigger,
 } from './ui/dialog';
 import Image from 'next/image';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/components/theme-provider';
 import { themes } from '@/lib/themes';
 import { Input } from './ui/input';
 import { useLanguage } from '@/contexts/I18nContext';
@@ -141,7 +141,7 @@ const Header = () => {
             'mx-3 md:mx-4 mt-3 md:mt-4 grid grid-cols-[1fr_auto_1fr] items-center p-2 px-4 rounded-2xl border transition-all duration-300',
             isScrolled
               ? 'bg-background/75 border-border/50 shadow-lg shadow-primary/5 backdrop-blur-xl'
-              : 'bg-background/20 border-white/8 backdrop-blur-md'
+              : 'bg-transparent border-white/8'
           )}
         >
           <div className="flex justify-self-start items-center gap-2">

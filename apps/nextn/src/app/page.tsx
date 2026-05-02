@@ -21,9 +21,7 @@ import {
   Settings,
   EyeOff,
   GraduationCap,
-  Briefcase,
   FolderKanban,
-  Sparkles,
   ArrowUp,
   ArrowRight,
   Mail,
@@ -55,9 +53,6 @@ const Skills = dynamic(() => import('@/components/sections/skills'), {
   loading: () => <div className="w-full min-h-[400px]" />,
 });
 const Projects = dynamic(() => import('@/components/sections/projects'), {
-  loading: () => <div className="w-full min-h-[400px]" />,
-});
-const Experience = dynamic(() => import('@/components/sections/Experience'), {
   loading: () => <div className="w-full min-h-[400px]" />,
 });
 
@@ -99,7 +94,7 @@ function HomePageInner() {
       {
         id: 'skills',
         title: 'Ур чадвар',
-        icon: <Sparkles className="h-5 w-5" />,
+        icon: null,
         component: (
           <Suspense fallback={<div className="w-full min-h-[400px]" />}>
             <Skills />
@@ -117,17 +112,6 @@ function HomePageInner() {
           </Suspense>
         ),
         gradient: 'from-orange-500 to-amber-400',
-      },
-      {
-        id: 'experience',
-        title: 'Миний туршлага',
-        icon: <Briefcase className="h-5 w-5" />,
-        component: (
-          <Suspense fallback={<div className="w-full min-h-[400px]" />}>
-            <Experience />
-          </Suspense>
-        ),
-        gradient: 'from-green-500 to-emerald-400',
       },
     ],
     []
@@ -239,13 +223,12 @@ function HomePageInner() {
     <HomeShell>
       <ScrollProgressBar />
 
-      {/* HERO — immersive ambient backdrop */}
+      {/* HERO — inherits the global aurora, no separate backdrop */}
       <section
         id="hero"
-        className="relative isolate overflow-hidden"
+        className="relative"
         data-section="hero"
       >
-        <HeroBackdrop />
         <InteractiveParticles quantity={40} />
         <div className="relative z-10 min-h-[80vh]">
           <Suspense
@@ -269,15 +252,6 @@ function HomePageInner() {
           onHideAll={hideAllSections}
         />
       )}
-
-      {/* Floating section navigator (desktop only) */}
-      <SectionDots
-        sections={[
-          { id: 'hero', label: 'Танилцуулга' },
-          ...visibleSections.map(s => ({ id: s.id, label: s.title })),
-          { id: 'cta', label: 'Холбоо барих' },
-        ]}
-      />
 
       {/* DYNAMIC SECTIONS */}
       <div className="relative">
@@ -311,9 +285,6 @@ function HomePageInner() {
         </div>
       )}
 
-      {/* CALL-TO-ACTION */}
-      <CtaSection />
-
       {/* BACK TO TOP */}
       <BackToTop />
     </HomeShell>
@@ -327,14 +298,11 @@ function HomePageInner() {
 function HomeShell({ children }: { children: ReactNode }) {
   return (
     <div className="relative isolate overflow-x-clip">
-      {/* Global aurora — sits behind everything */}
+      {/* Global backdrop — neutral, only a faint dot grid */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
       >
-        <div className="absolute -top-40 -left-32 h-[480px] w-[480px] rounded-full bg-primary/20 blur-[120px]" />
-        <div className="absolute top-1/3 -right-40 h-[520px] w-[520px] rounded-full bg-purple-500/15 blur-[140px]" />
-        <div className="absolute bottom-0 left-1/3 h-[420px] w-[420px] rounded-full bg-cyan-500/10 blur-[120px]" />
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{
@@ -369,19 +337,19 @@ function HeroBackdrop() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute inset-0 -z-10"
+      className="pointer-events-none absolute inset-x-0 bottom-0 top-32 -z-10"
     >
-      {/* Soft conic glow centered behind hero */}
-      <div className="absolute left-1/2 top-1/2 h-[640px] w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-40 [background:conic-gradient(from_180deg_at_50%_50%,hsl(var(--primary)/0.35),transparent_40%,hsl(var(--primary)/0.25)_70%,transparent)] blur-3xl" />
+      {/* Soft conic glow centered below header — matches About page */}
+      <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25 [background:conic-gradient(from_180deg_at_50%_50%,hsl(var(--primary)/0.25),transparent_40%,hsl(var(--primary)/0.18)_70%,transparent)] blur-3xl" />
       {/* Subtle grid mask */}
       <div
-        className="absolute inset-0 opacity-[0.06]"
+        className="absolute inset-0 opacity-[0.05]"
         style={{
           backgroundImage:
             'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
           backgroundSize: '64px 64px',
           maskImage:
-            'radial-gradient(ellipse at center, black 30%, transparent 75%)',
+            'radial-gradient(ellipse at center, black 25%, transparent 75%)',
         }}
       />
     </div>
@@ -460,7 +428,7 @@ function SectionOrnament() {
     >
       <div className="h-px flex-1 bg-linear-to-r from-transparent via-border to-transparent" />
       <div className="mx-4 inline-flex h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-card/60 backdrop-blur-md">
-        <Sparkles className="h-3.5 w-3.5 text-primary" />
+        <span className="h-1.5 w-1.5 rounded-full bg-primary inline-block" />
       </div>
       <div className="h-px flex-1 bg-linear-to-r from-transparent via-border to-transparent" />
     </div>
@@ -532,84 +500,6 @@ function SectionDots({
         );
       })}
     </nav>
-  );
-}
-
-function CtaSection() {
-  const reduce = useReducedMotion();
-  return (
-    <section
-      id="cta"
-      data-section="cta"
-      className="relative scroll-mt-24 py-20 md:py-28"
-    >
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-card/50 backdrop-blur-xl p-8 md:p-14"
-        >
-          {/* Decorative background */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10"
-          >
-            <div className="absolute -top-24 -left-16 h-72 w-72 rounded-full bg-primary/25 blur-3xl" />
-            <div className="absolute -bottom-24 -right-10 h-80 w-80 rounded-full bg-purple-500/20 blur-3xl" />
-            <div
-              className="absolute inset-0 opacity-[0.05]"
-              style={{
-                backgroundImage:
-                  'radial-gradient(currentColor 1px, transparent 1px)',
-                backgroundSize: '22px 22px',
-              }}
-            />
-          </div>
-
-          <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-            <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-3 py-1 text-[11px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
-                <Sparkles className="h-3 w-3 text-primary" />
-                Хамтдаа бүтээцгээе
-              </span>
-              <h2 className="mt-4 text-3xl md:text-5xl font-bold tracking-tight bg-linear-to-br from-foreground via-foreground to-foreground/60 bg-clip-text text-transparent leading-[1.1]">
-                Шинэ төсөл хэрэгтэй юу?
-                <br />
-                Холбоо барина уу.
-              </h2>
-              <p className="mt-4 text-base md:text-lg text-muted-foreground leading-relaxed">
-                Веб, гар утасны апп, AI хэрэгсэл — санаагаа хуваалцвал
-                хэрэгжүүлэхэд бэлэн.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                asChild
-                size="lg"
-                className="group h-12 rounded-xl bg-linear-to-r from-primary to-primary/80 text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all"
-              >
-                <Link href="/about">
-                  <Mail className="h-4 w-4 mr-2" />
-                  Холбоо барих
-                  <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="h-12 rounded-xl border-border/70 bg-background/40 backdrop-blur-md hover:bg-background/70"
-              >
-                <Link href="/tools">Хэрэгслүүд үзэх</Link>
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </section>
   );
 }
 

@@ -14,7 +14,6 @@ import {
   ImagePlus,
   X,
   Loader2,
-  Sparkles,
   BookOpen,
   GraduationCap,
 } from 'lucide-react';
@@ -140,7 +139,7 @@ export default function AIChatPage() {
         {/* Quick Action Chips */}
         <div className="flex flex-wrap gap-2">
           {[
-            { label: 'Анагаах', icon: <Sparkles className="h-3 w-3" /> },
+            { label: 'Анагаах', icon: null },
             { label: 'Биологи', icon: <BookOpen className="h-3 w-3" /> },
             { label: 'Математик', icon: <GraduationCap className="h-3 w-3" /> },
             { label: 'Программчлал', icon: <BookOpen className="h-3 w-3" /> },
