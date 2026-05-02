@@ -53,6 +53,10 @@ const nextConfig: NextConfig = {
   },
   // Skip trailing slash redirect for cleaner URLs
   skipTrailingSlashRedirect: true,
+  // Pin Turbopack root to workspace root (required for Nx monorepo Vercel builds)
+  turbopack: {
+    root: path.join(__dirname, '..', '..'),
+  },
   // Tree-shake heavy barrel imports → faster dev compile + smaller client JS
   // NOTE: do NOT add `firebase`, `firebase/firestore`, `firebase/auth` here —
   // it strips required side-effect registrations and causes runtime errors
