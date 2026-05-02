@@ -10,10 +10,6 @@ import {
 } from '@/components/ui/card';
 import Link from 'next/link';
 import {
-  BookOpen,
-  Ear,
-  Mic,
-  Pencil,
   Brain,
   BookCopy,
   GraduationCap,
@@ -59,42 +55,6 @@ const englishSkillsConfig = [
     icon: <BookCopy className="h-7 w-7" />,
     gradient: 'from-blue-500 to-cyan-400',
     shadowColor: 'rgba(59, 130, 246, 0.5)',
-  },
-  {
-    id: 'reading',
-    title: 'Reading',
-    description: 'Унших чадвараа дээшлүүлэх',
-    href: '/tools/english/reading',
-    icon: <BookOpen className="h-7 w-7" />,
-    gradient: 'from-emerald-500 to-teal-400',
-    shadowColor: 'rgba(16, 185, 129, 0.5)',
-  },
-  {
-    id: 'listening',
-    title: 'Listening',
-    description: 'Сонсох чадвараа сайжруулах',
-    href: '/tools/english/listening',
-    icon: <Ear className="h-7 w-7" />,
-    gradient: 'from-orange-500 to-amber-400',
-    shadowColor: 'rgba(249, 115, 22, 0.5)',
-  },
-  {
-    id: 'speaking',
-    title: 'Speaking',
-    description: 'Ярих чадвараа нэмэгдүүлэх',
-    href: '/tools/english/speaking',
-    icon: <Mic className="h-7 w-7" />,
-    gradient: 'from-rose-500 to-pink-400',
-    shadowColor: 'rgba(244, 63, 94, 0.5)',
-  },
-  {
-    id: 'writing',
-    title: 'Writing',
-    description: 'Бичих чадвараа хөгжүүлэх',
-    href: '/tools/english/writing',
-    icon: <Pencil className="h-7 w-7" />,
-    gradient: 'from-indigo-500 to-blue-400',
-    shadowColor: 'rgba(99, 102, 241, 0.5)',
   },
 ];
 
