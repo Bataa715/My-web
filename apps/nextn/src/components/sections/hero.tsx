@@ -27,7 +27,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useState, useEffect, type FC } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useAnimationFrame } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
@@ -101,9 +101,8 @@ interface OrbitItemProps {
 }
 
 const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick, isEditing }) => {
-  const config = ORBIT_CONFIG[index % ORBIT_CONFIG.length];
-  const isSelected = selectedOrbit?.id === item.id;
   const planet = PLANET_PALETTE[index % PLANET_PALETTE.length];
+  const isSelected = selectedOrbit?.id === item.id;
 
   const [currentRadius, setCurrentRadius] = useState(110);
   useEffect(() => {
@@ -119,67 +118,74 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
     return () => window.removeEventListener('resize', update);
   }, [isEditing]);
 
-  const startFrac = index / Math.max(total, 1);
-  const orbitDelay = `-${startFrac * config.speed}s`;
+  const SPEED_MS = 52000; // ms per full orbit
+  const initialAngle = (index / Math.max(total, 1)) * 2 * Math.PI;
+
+  const sinI = Math.sin(initialAngle);
+  const x = useMotionValue(Math.cos(initialAngle) * currentRadius);
+  const y = useMotionValue(sinI * currentRadius * 0.38);
+  const scale = useMotionValue(0.82 + 0.28 * ((sinI + 1) / 2));
+  const zIndex = useMotionValue(sinI >= 0 ? 30 : -1);
+
+  useAnimationFrame((t) => {
+    const a = initialAngle + (t / SPEED_MS) * 2 * Math.PI;
+    const sinA = Math.sin(a);
+    x.set(Math.cos(a) * currentRadius);
+    y.set(sinA * currentRadius * 0.38);
+    scale.set(0.82 + 0.28 * ((sinA + 1) / 2));
+    zIndex.set(sinA >= 0 ? 30 : -1);
+  });
 
   return (
-    <div style={{ position: 'absolute', inset: 0, transformStyle: 'preserve-3d', transform: `rotateX(${config.tiltX}deg)`, pointerEvents: 'none' }}>
-      <div
-        className="orbit-3d-spin"
-        style={{
-          position: 'absolute',
-          inset: 0,
-          ['--orbit-dur' as string]: `${config.speed}s`,
-          ['--orbit-start' as string]: orbitDelay,
-        }}
-      >
-        <div style={{ position: 'absolute', top: `calc(50% - ${currentRadius + 22}px)`, left: 'calc(50% - 22px)', width: 44, height: 44, transformStyle: 'preserve-3d' }}>
+    <motion.div
+      className="absolute pointer-events-auto"
+      style={{ top: '50%', left: '50%', width: 44, height: 44, x, y, scale, zIndex,
+        translateX: '-50%', translateY: '-50%' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: 0.4 + index * 0.08 }}
+    >
+      <div className="relative group h-full w-full">
+        {/* Atmospheric glow ring */}
+        <div
+          className="absolute -inset-2 rounded-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+          style={{ background: `radial-gradient(circle, ${planet.glow} 0%, transparent 70%)`, filter: 'blur(6px)' }}
+        />
+        {isSelected && (
           <div
-            className="orbit-3d-counter"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              ['--orbit-dur' as string]: `${config.speed}s`,
-              ['--orbit-start' as string]: orbitDelay,
-            }}
-          >
-            <div style={{ transform: `rotateX(-${config.tiltX}deg)`, width: 44, height: 44, position: 'relative', pointerEvents: 'auto' }}>
-              <div className="relative group h-full w-full">
-                <div className="absolute -inset-2 rounded-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-                  style={{ background: `radial-gradient(circle, ${planet.glow} 0%, transparent 70%)`, filter: 'blur(6px)' }}
-                />
-                {isSelected && (
-                  <div className="absolute -inset-2 rounded-full animate-[spin_4s_linear_infinite]"
-                    style={{ background: `conic-gradient(from 0deg, transparent 0deg 270deg, ${planet.ring} 270deg 360deg)`, filter: 'blur(2px)' }}
-                  />
-                )}
-                <button
-                  onClick={() => onItemClick(item)}
-                  className="relative h-full w-full rounded-full transition-all duration-300 overflow-hidden border-2 focus:outline-none"
-                  style={{
-                    background: `radial-gradient(circle at 38% 35%, hsl(0 0% 100% / 0.3), ${planet.from} 45%, ${planet.to})`,
-                    borderColor: isSelected ? planet.from : 'hsl(0 0% 100% / 0.15)',
-                    boxShadow: isSelected
-                      ? `0 0 18px ${planet.glow}, inset 0 1px 0 hsl(0 0% 100% / 0.25)`
-                      : `0 0 8px ${planet.ring}, inset 0 1px 0 hsl(0 0% 100% / 0.12)`,
-                  }}
-                >
-                  <div className="absolute top-0.5 left-1.5 w-3 h-2 rounded-full bg-white/25 blur-[2px]" />
-                  <div className="absolute inset-0 flex items-center justify-center text-white drop-shadow-sm">
-                    {getIcon(item.icon, { className: 'h-4 w-4' })}
-                  </div>
-                  <span className="sr-only">{item.title}</span>
-                </button>
-                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-semibold tracking-wide pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                  style={{ color: planet.from, textShadow: `0 0 8px ${planet.glow}` }}>
-                  {item.title}
-                </div>
-              </div>
-            </div>
+            className="absolute -inset-2 rounded-full animate-[spin_4s_linear_infinite]"
+            style={{ background: `conic-gradient(from 0deg, transparent 0deg 270deg, ${planet.ring} 270deg 360deg)`, filter: 'blur(2px)' }}
+          />
+        )}
+        {/* Planet sphere */}
+        <button
+          onClick={() => onItemClick(item)}
+          className="relative h-full w-full rounded-full transition-all duration-300 overflow-hidden border-2 focus:outline-none hover:brightness-125"
+          style={{
+            background: isSelected
+              ? `radial-gradient(circle at 38% 35%, hsl(0 0% 100% / 0.5), ${planet.from} 40%, ${planet.to})`
+              : `radial-gradient(circle at 38% 35%, hsl(0 0% 100% / 0.3), ${planet.from} 45%, ${planet.to})`,
+            borderColor: isSelected ? planet.from : 'hsl(0 0% 100% / 0.15)',
+            boxShadow: isSelected
+              ? `0 0 18px ${planet.glow}, inset 0 1px 0 hsl(0 0% 100% / 0.25)`
+              : `0 0 8px ${planet.ring}, inset 0 1px 0 hsl(0 0% 100% / 0.12)`,
+          }}
+        >
+          <div className="absolute top-0.5 left-1.5 w-3 h-2 rounded-full bg-white/25 blur-[2px]" />
+          <div className="absolute inset-0 flex items-center justify-center text-white drop-shadow-sm">
+            {getIcon(item.icon, { className: 'h-4 w-4' })}
           </div>
+          <span className="sr-only">{item.title}</span>
+        </button>
+        {/* Tooltip */}
+        <div
+          className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-semibold tracking-wide pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+          style={{ color: planet.from, textShadow: `0 0 8px ${planet.glow}` }}
+        >
+          {item.title}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -985,7 +991,7 @@ export default function Hero({
                     ? 'w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px]'
                     : 'w-40 h-40 sm:w-64 sm:h-64 md:w-80 md:h-80'
                 )}
-                style={{ perspective: '800px', transformStyle: 'preserve-3d' }}
+                style={{ perspective: '800px' }}
               >
                 <AnimatePresence mode="wait">
                   {selectedOrbit ? (
