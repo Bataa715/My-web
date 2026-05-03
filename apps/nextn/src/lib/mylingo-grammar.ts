@@ -7,6 +7,18 @@ export interface GrammarQ {
   e: string;
 }
 
+export interface LessonTable {
+  headers: string[];
+  rows: string[][];
+}
+
+export interface LessonContent {
+  explanation: string;
+  table?: LessonTable;
+  examples: { en: string; mn: string }[];
+  tips?: string[];
+}
+
 export interface GrammarLesson {
   type: 'grammar';
   id: string;
@@ -15,6 +27,7 @@ export interface GrammarLesson {
   gs: GrammarSectionId;
   rule: string;
   example: string;
+  content: LessonContent;
   q: GrammarQ[];
 }
 
@@ -34,6 +47,27 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g1', title: 'To Be (одоо)', emoji: '🔵', gs: 'G_BASIC',
     rule: 'I am / You are / He·She·It is / We·They are',
     example: 'I am happy. She is a doctor. They are friends.',
+    content: {
+      explanation: '"To be" гэдэг нь монгол хэлэнд "байх" гэсэн утгатай англи хэлний хамгийн чухал үйл үгийн нэг. Одоо цагт am / is / are гэсэн гурван хэлбэртэй байна. Нэр үгний дагуу ямар хэлбэрийг хэрэглэхийг сонгоно.',
+      table: {
+        headers: ['Нэр үг', 'To Be', 'Жишээ'],
+        rows: [
+          ['I', 'am', 'I am a student.'],
+          ['He / She / It', 'is', 'She is a doctor.'],
+          ['You / We / They', 'are', 'They are friends.'],
+        ],
+      },
+      examples: [
+        { en: 'I am happy today.', mn: 'Би өнөөдөр баяртай байна.' },
+        { en: 'He is very tall.', mn: 'Тэр маш өндөр.' },
+        { en: 'We are best friends.', mn: 'Бид хамгийн сайн найзууд.' },
+        { en: 'The weather is nice.', mn: 'Цаг агаар сайхан байна.' },
+      ],
+      tips: [
+        "Ярианд богиносгодог: I am → I'm, You are → You're, She is → She's",
+        "Үгүйсгэлд not нэмнэ: I am not tired. / She is not home.",
+      ],
+    },
     q: [
       { s: 'I ___ a student.',              c: ['am','is','are','be'],      a: 'am',  e: 'I → am' },
       { s: 'She ___ very tall.',            c: ['is','am','are','be'],      a: 'is',  e: 'She → is' },
@@ -51,6 +85,26 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g2', title: 'To Be (өнгөрсөн)', emoji: '⚫', gs: 'G_BASIC',
     rule: 'I·He·She·It was / You·We·They were',
     example: 'I was tired. They were late. It was cold.',
+    content: {
+      explanation: '"To be" үйл үгийн өнгөрсөн цагийн хэлбэр нь was болон were хоёр л байна. Одоо цагийн am/is → was, are → were болж өөрчлөгдөнө.',
+      table: {
+        headers: ['Нэр үг', 'Өнгөрсөн цаг', 'Жишээ'],
+        rows: [
+          ['I / He / She / It', 'was', 'She was a nurse.'],
+          ['You / We / They', 'were', 'They were tired.'],
+        ],
+      },
+      examples: [
+        { en: 'I was at school yesterday.', mn: 'Би өчигдөр сургуульд байлаа.' },
+        { en: 'The weather was cold last night.', mn: 'Өчигдөр шөнө цаг агаар хүйтэн байлаа.' },
+        { en: 'We were happy at the party.', mn: 'Бид найр дээр баяртай байлаа.' },
+        { en: 'He was not at home.', mn: 'Тэр гэртээ байгаагүй.' },
+      ],
+      tips: [
+        'am → was, is → was, are → were гэж өөрчлөгдөнө.',
+        "Үгүйсгэлд: was not → wasn't, were not → weren't",
+      ],
+    },
     q: [
       { s: 'I ___ at school yesterday.',       c: ['was','were','am','be'],    a: 'was',  e: 'I → was' },
       { s: 'They ___ very tired.',             c: ['were','was','are','be'],   a: 'were', e: 'They → were' },
@@ -68,6 +122,26 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g3', title: 'Present Simple (+)', emoji: '✅', gs: 'G_BASIC',
     rule: 'I/You/We/They + verb · He/She/It + verb+s/es',
     example: 'I work. She works. They play. He plays.',
+    content: {
+      explanation: 'Present Simple нь өдөр бүр болдог тогтмол үйлдэл, ерөнхий үнэн зэргийг илэрхийлнэ. He/She/It-ийн хувьд үйл үгийн төгсгөлд -s эсвэл -es нэмдэг.',
+      table: {
+        headers: ['Нэр үг', 'Дүрэм', 'Жишээ'],
+        rows: [
+          ['I / You / We / They', 'verb (өөрчлөгдөхгүй)', 'I work. They play.'],
+          ['He / She / It', 'verb + s/es', 'She works. He goes.'],
+        ],
+      },
+      examples: [
+        { en: 'I drink coffee every morning.', mn: 'Би өдөр бүр өглөөнд кофе уудаг.' },
+        { en: 'She speaks three languages.', mn: 'Тэр гурван хэл ярьдаг.' },
+        { en: 'The sun rises in the east.', mn: 'Нар зүүнээс мандана.' },
+        { en: 'They play football on Sundays.', mn: 'Тэд Ням гарагт хөлбөмбөг тоглодог.' },
+      ],
+      tips: [
+        '-s/-es дүрэм: go → goes, watch → watches, study → studies (y→ies)',
+        'Цагийн тэмдэглэгч: every day, usually, always, often, sometimes, never',
+      ],
+    },
     q: [
       { s: 'She ___ to work every day.',      c: ['goes','go','going','went'],         a: 'goes',    e: 'She (he/she/it) → go + es' },
       { s: 'He ___ coffee every morning.',    c: ['drinks','drink','drinking','drank'], a: 'drinks',  e: 'He → drink + s' },
@@ -83,8 +157,28 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
   },
   {
     type: 'grammar', id: 'g4', title: 'Present Simple (−)', emoji: '❌', gs: 'G_BASIC',
-    rule: 'I/You/We/They + don\'t · He/She/It + doesn\'t + base verb',
+    rule: "I/You/We/They + don't · He/She/It + doesn't + base verb",
     example: "I don't know. She doesn't like it.",
+    content: {
+      explanation: "Present Simple-ийн үгүйсгэлд don't эсвэл doesn't ашиглана. He/She/It-ийн хувьд doesn't ашигладаг бөгөөд дараа нь үйл үг заавал base form (үндсэн хэлбэр)-д байна.",
+      table: {
+        headers: ['Нэр үг', 'Үгүйсгэл', 'Жишээ'],
+        rows: [
+          ["I / You / We / They", "don't + verb", "I don't like coffee."],
+          ["He / She / It", "doesn't + verb", "She doesn't speak French."],
+        ],
+      },
+      examples: [
+        { en: "I don't eat meat.", mn: 'Би мах иддэггүй.' },
+        { en: "He doesn't have a car.", mn: 'Түүнд машин байхгүй.' },
+        { en: "They don't live here.", mn: 'Тэд энд амьдардаггүй.' },
+        { en: "She doesn't know my name.", mn: 'Тэр миний нэрийг мэддэггүй.' },
+      ],
+      tips: [
+        "doesn't ашиглахад үйл үг base form-д байна: doesn't goes ❌ → doesn't go ✅",
+        "Асуухад: Do you...? / Does she...?",
+      ],
+    },
     q: [
       { s: 'She ___ like coffee.',            c: ["doesn't","don't","isn't","not"],    a: "doesn't", e: 'She (he/she/it) → doesn\'t' },
       { s: 'They ___ have a car.',            c: ["don't","doesn't","aren't","not"],   a: "don't",   e: 'They → don\'t' },
@@ -102,6 +196,28 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g5', title: 'Present Continuous', emoji: '🔄', gs: 'G_BASIC',
     rule: 'am/is/are + verb+ing = happening right now',
     example: 'I am reading. She is running. They are talking.',
+    content: {
+      explanation: 'Present Continuous нь одоо яг болж байгаа буюу энэ үед үргэлжилж байгаа үйлдлийг илэрхийлнэ. am/is/are + verb-ing гэсэн бүтэцтэй.',
+      table: {
+        headers: ['Нэр үг', 'Дүрэм', 'Жишээ'],
+        rows: [
+          ['I', 'am + verb-ing', 'I am reading.'],
+          ['He / She / It', 'is + verb-ing', 'She is cooking.'],
+          ['You / We / They', 'are + verb-ing', 'They are playing.'],
+        ],
+      },
+      examples: [
+        { en: 'I am studying English right now.', mn: 'Би одоо англи хэл сурч байна.' },
+        { en: 'She is talking on the phone.', mn: 'Тэр утсаар ярьж байна.' },
+        { en: "Look! It's snowing!", mn: 'Харагтун! Цас орож байна!' },
+        { en: 'They are building a new house.', mn: 'Тэд шинэ байшин барьж байна.' },
+      ],
+      tips: [
+        '-ing нэмэх дүрэм: run → running, write → writing, study → studying',
+        'Цагийн тэмдэглэгч: now, right now, at the moment, currently, Look!',
+        'Present Simple (тогтмол) vs Continuous (одоо): I work. / I am working.',
+      ],
+    },
     q: [
       { s: 'She ___ a book right now.',        c: ['is reading','are reading','reads','read'],         a: 'is reading',   e: 'She → is + verb+ing' },
       { s: 'They ___ in the park.',            c: ['are running','is running','run','runs'],           a: 'are running',  e: 'They → are + verb+ing' },
@@ -121,6 +237,29 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g6', title: 'Past Simple (тогтмол)', emoji: '📅', gs: 'G_PAST',
     rule: 'verb + -ed (regular verbs)',
     example: 'I walked. She cooked. They played.',
+    content: {
+      explanation: 'Өнгөрсөн цагт дуусгасан үйлдлийг илэрхийлнэ. Тогтмол (regular) үйл үгс нь -ed нэмэх замаар өнгөрсөн цагийг үүсгэнэ. Бүх нэр үгийн хувьд хэлбэр адилхан байна.',
+      table: {
+        headers: ['Одоо цаг', 'Өнгөрсөн цаг', 'Дүрэм'],
+        rows: [
+          ['walk', 'walked', '+ed'],
+          ['play', 'played', '+ed'],
+          ['study', 'studied', 'y → ied'],
+          ['stop', 'stopped', 'p хоёрдуулна'],
+          ['cook', 'cooked', '+ed'],
+        ],
+      },
+      examples: [
+        { en: 'I walked to school yesterday.', mn: 'Би өчигдөр сургуульд алхан явлаа.' },
+        { en: 'She cooked dinner for us.', mn: 'Тэр бидэнд оройн хоол хийлгэлэн.' },
+        { en: 'They played football last Sunday.', mn: 'Тэд өнгөрсөн Ням гарагт хөлбөмбөг тоглосон.' },
+        { en: 'He studied hard for the exam.', mn: 'Тэр шалгалтанд зориулан шаргуу хичээллэсэн.' },
+      ],
+      tips: [
+        'Цагийн тэмдэглэгч: yesterday, last week, last year, ago, in 2020',
+        'Бүх нэр үгийн хувьд хэлбэр адил: I walked, She walked, They walked',
+      ],
+    },
     q: [
       { s: 'She ___ to work yesterday.',      c: ['walked','walk','walking','walks'],       a: 'walked',   e: 'walk → walked (+ed)' },
       { s: 'They ___ a great time.',          c: ['enjoyed','enjoy','enjoying','enjoys'],   a: 'enjoyed',  e: 'enjoy → enjoyed (+ed)' },
@@ -138,6 +277,34 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g7', title: 'Past Simple (дүрмийн бус)', emoji: '⚡', gs: 'G_PAST',
     rule: 'Irregular: go→went, see→saw, eat→ate, give→gave...',
     example: 'She went. I saw. He ate. They gave.',
+    content: {
+      explanation: 'Дүрмийн бус (irregular) үйл үгс нь өнгөрсөн цагт -ed нэмдэггүй. Өөрийн гэсэн тусгай хэлбэртэй байдаг тул цээжлэх хэрэгтэй. Эдгээр нь хамгийн өргөн хэрэглэгддэг үйл үгс юм.',
+      table: {
+        headers: ['Одоо цаг', 'Өнгөрсөн цаг', 'Утга'],
+        rows: [
+          ['go', 'went', 'явах'],
+          ['see', 'saw', 'харах'],
+          ['eat', 'ate', 'идэх'],
+          ['give', 'gave', 'өгөх'],
+          ['take', 'took', 'авах'],
+          ['make', 'made', 'хийх'],
+          ['buy', 'bought', 'худалдаж авах'],
+          ['have', 'had', 'байх / эзэмших'],
+          ['come', 'came', 'ирэх'],
+          ['build', 'built', 'барих'],
+        ],
+      },
+      examples: [
+        { en: 'She went to Paris last summer.', mn: 'Тэр өнгөрсөн зун Парис явлаа.' },
+        { en: 'I saw him at the party.', mn: 'Би түүнийг найр дээр харлаа.' },
+        { en: 'We ate pizza for dinner.', mn: 'Бид оройн хоолонд пицца идлээ.' },
+        { en: 'He bought a new phone.', mn: 'Тэр шинэ утас авлаа.' },
+      ],
+      tips: [
+        'Үгүйсгэлд: didn\'t + BASE verb (went биш go): I didn\'t go. ✅',
+        'Хамгийн нийтлэг дүрмийн бус үйл үгсийг цээжлэх нь чухал!',
+      ],
+    },
     q: [
       { s: 'She ___ to Paris last summer.',    c: ['went','go','gone','goes'],        a: 'went',    e: 'go → went' },
       { s: 'I ___ him at the party.',          c: ['saw','see','seen','sees'],        a: 'saw',     e: 'see → saw' },
@@ -155,6 +322,27 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g8', title: 'Past Continuous', emoji: '⏳', gs: 'G_PAST',
     rule: 'was/were + verb+ing = happening at a moment in the past',
     example: 'She was reading when I called.',
+    content: {
+      explanation: 'Past Continuous нь өнгөрсөн цагт тодорхой нэгэн үед болж байсан буюу үргэлжилж байсан үйлдлийг илэрхийлнэ. was/were + verb-ing гэсэн бүтэцтэй. Ихэвчлэн Past Simple-тэй хамт ашиглагдана.',
+      table: {
+        headers: ['Нэр үг', 'Дүрэм', 'Жишээ'],
+        rows: [
+          ['I / He / She / It', 'was + verb-ing', 'I was reading.'],
+          ['You / We / They', 'were + verb-ing', 'They were talking.'],
+        ],
+      },
+      examples: [
+        { en: 'She was reading when I called.', mn: 'Би залгахад тэр уншиж байлаа.' },
+        { en: 'They were sleeping at midnight.', mn: 'Шөнө дундад тэд унтаж байлаа.' },
+        { en: 'He was driving when it happened.', mn: 'Тэр явдал болохад жолоо барьж байлаа.' },
+        { en: 'What were you doing at 9 PM?', mn: 'Чи 9 цагт юу хийж байсан бэ?' },
+      ],
+      tips: [
+        'when + Past Simple: богино дуусч буй үйл = "I called"',
+        'while + Past Continuous: урт үргэлжлэх үйл = "while she was reading"',
+        'She was reading WHEN I called. (was reading = урт, called = богино)',
+      ],
+    },
     q: [
       { s: 'She ___ when I called.',               c: ['was reading','were reading','is reading','read'],     a: 'was reading',    e: 'She → was + verb+ing' },
       { s: 'They ___ when it started raining.',    c: ['were playing','was playing','are playing','played'],  a: 'were playing',   e: 'They → were + verb+ing' },
@@ -174,6 +362,26 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g9', title: 'Present Perfect', emoji: '🏆', gs: 'G_FUTURE',
     rule: 'have/has + past participle (үйлдэл одоотой холбоотой)',
     example: 'I have seen it. She has finished.',
+    content: {
+      explanation: 'Present Perfect нь өнгөрсөнд болсон боловч одоотой холбоотой үйлдлийг илэрхийлнэ. Үйлдэл хэзээ болсон нь чухал биш, үр дүн нь одоо ч хамааралтай байна. have/has + past participle (3-р хэлбэр) гэсэн бүтэцтэй.',
+      table: {
+        headers: ['Нэр үг', 'Дүрэм', 'Жишээ'],
+        rows: [
+          ['I / You / We / They', 'have + PP', 'I have finished.'],
+          ['He / She / It', 'has + PP', 'She has left.'],
+        ],
+      },
+      examples: [
+        { en: 'I have visited Japan.', mn: 'Би Японд очсон (туршлагатай).' },
+        { en: 'She has already eaten.', mn: 'Тэр аль хэдийн идсэн.' },
+        { en: 'I have never seen snow.', mn: 'Би хэзээ ч цас харж байгаагүй.' },
+        { en: 'He has lived here since 2015.', mn: 'Тэр 2015-аас хойш энд амьдарч байна.' },
+      ],
+      tips: [
+        'already (аль хэдийн), just (саяхан), yet (одоо хүртэл), never (хэзээ ч...гүй), ever (хэзээ нэгэн цагт), since/for',
+        'Past Simple vs Perfect: "I ate pizza." (хэзээ мэдэгдэж байна) / "I have eaten pizza." (туршлага)',
+      ],
+    },
     q: [
       { s: 'She ___ to Japan twice.',         c: ['has been','have been','was','went'],      a: 'has been',    e: 'She → has + PP' },
       { s: 'I ___ never eaten sushi.',        c: ['have','has','had','am'],                  a: 'have',        e: 'I → have + PP' },
@@ -191,6 +399,27 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g10', title: 'Future: Will', emoji: '🔮', gs: 'G_FUTURE',
     rule: 'will + base verb (тухайн үед шийдсэн ирээдүй)',
     example: "I'll help you. She will be great.",
+    content: {
+      explanation: 'Will нь тухайн мөчид шийдсэн, урьдчилан таамаглах буюу амлалт өгөхөд ашиглагдах ирээдүйн хэлбэр юм. Бүх нэр үгийн хувьд will хэвээрээ байна — хэлбэр өөрчлөгдөхгүй.',
+      table: {
+        headers: ['Хэлбэр', 'Дүрэм', 'Жишээ'],
+        rows: [
+          ['Эерэг', 'Subject + will + verb', "I will help you."],
+          ['Үгүйсгэл', "Subject + won't + verb", "She won't come."],
+          ['Асуулт', 'Will + subject + verb?', 'Will you be there?'],
+        ],
+      },
+      examples: [
+        { en: 'I will call you tomorrow.', mn: 'Би маргааш чамд залгана.' },
+        { en: "Don't worry, it will be okay.", mn: 'Санаа бүү зов, бүх зүйл сайн болно.' },
+        { en: "She won't come to the party.", mn: 'Тэр найрт ирэхгүй.' },
+        { en: 'Will you help me?', mn: 'Чи надад туслах уу?' },
+      ],
+      tips: [
+        "Ярианд богиносгодог: I will → I'll, He will → He'll, will not → won't",
+        "Will vs Going To: Will = тухайн мөчийн шийдвэр / Going To = урьдаас төлөвлөсөн",
+      ],
+    },
     q: [
       { s: 'I ___ help you tomorrow.',            c: ['will','am','going to','would'],   a: 'will',    e: 'will + base verb' },
       { s: 'She ___ be a great doctor.',          c: ['will','would','is','going to'],   a: 'will',    e: 'will + base verb' },
@@ -208,6 +437,27 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g11', title: 'Future: Going To', emoji: '🗓️', gs: 'G_FUTURE',
     rule: 'am/is/are + going to + base verb (урьдчилан төлөвлөсөн ирээдүй)',
     example: "I'm going to study. She's going to travel.",
+    content: {
+      explanation: 'Going to нь урьдчилан төлөвлөсөн буюу тодорхой нотолгоо (харагдаж байгаа зүйл) дээр үндэслэсэн ирээдүйг илэрхийлнэ. am/is/are + going to + base verb гэсэн бүтэцтэй.',
+      table: {
+        headers: ['Нэр үг', 'Дүрэм', 'Жишээ'],
+        rows: [
+          ['I', 'am going to + verb', "I'm going to study."],
+          ['He / She / It', 'is going to + verb', "She's going to travel."],
+          ['You / We / They', 'are going to + verb', "They're going to move."],
+        ],
+      },
+      examples: [
+        { en: "I'm going to visit my grandma this weekend.", mn: 'Би энэ амралтын өдрүүдэд эмээгийнхээ дэргэд очно.' },
+        { en: "Look at those clouds — it's going to rain!", mn: 'Тэдгээр үүлийг хара — бороо орохоор байна!' },
+        { en: "She's going to study medicine.", mn: 'Тэр анагаах ухаан судлахаар байна.' },
+        { en: "Are you going to come?", mn: 'Чи ирэх үү?' },
+      ],
+      tips: [
+        "Will = тухайн мөчийн шийдвэр / Going To = урьдаас тогтоосон төлөвлөгөө",
+        "Нотолгоо харагдаж байвал: Look! It's going to rain. (бороо ирж байгааг харж байна)",
+      ],
+    },
     q: [
       { s: 'I ___ visit my grandma this weekend.',   c: ['am going to','will','am go','going to'],        a: 'am going to',  e: 'I → am going to' },
       { s: 'She ___ study medicine next year.',      c: ['is going to','will','goes to','going to'],      a: 'is going to',  e: 'She → is going to' },
@@ -224,9 +474,31 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
 
   // ── G_MODAL ──────────────────────────────────────────────────────────────
   {
-    type: 'grammar', id: 'g12', title: 'Can / Can\'t', emoji: '💪', gs: 'G_MODAL',
-    rule: 'can + base verb (чадах) · can\'t = cannot',
+    type: 'grammar', id: 'g12', title: "Can / Can't", emoji: '💪', gs: 'G_MODAL',
+    rule: "can + base verb (чадах) · can't = cannot",
     example: "I can swim. She can't drive.",
+    content: {
+      explanation: 'Can нь чадвар эсвэл зөвшөөрлийг илэрхийлнэ. Бүх нэр үгийн хувьд can хэвээрээ байна — -s/-es нэмдэггүй. Дараа нь үргэлж base verb хэрэглэнэ.',
+      table: {
+        headers: ['Хэлбэр', 'Дүрэм', 'Жишээ'],
+        rows: [
+          ['Эерэг', 'Subject + can + verb', 'She can swim.'],
+          ["Үгүйсгэл", "Subject + can't + verb", "I can't drive."],
+          ['Асуулт', 'Can + subject + verb?', 'Can you help me?'],
+        ],
+      },
+      examples: [
+        { en: 'She can speak three languages.', mn: 'Тэр гурван хэл ярьж чадна.' },
+        { en: "I can't understand this problem.", mn: 'Би энэ асуудлыг ойлгож чадахгүй байна.' },
+        { en: 'Can you play the guitar?', mn: 'Чи гитар тоглож чаддаг уу?' },
+        { en: 'We can see the mountains from here.', mn: 'Бид эндээс уулсыг харж чадна.' },
+      ],
+      tips: [
+        "can-ийн дараа ЗААВАЛ base verb: can goes ❌ → can go ✅",
+        "can't = cannot (богиносгосон хэлбэр) — чаддаггүй, боломжгүй",
+        "Зөвшөөрлийн хэрэглээ: Can I sit here? — Энд суух боломжтой юу?",
+      ],
+    },
     q: [
       { s: 'She ___ swim very well.',             c: ['can','could','is able','cans'],           a: 'can',    e: 'can + base verb' },
       { s: 'I ___ understand this problem.',      c: ["can't",'could not','don\'t','am not'],    a: "can't",  e: "can't + base verb" },
@@ -241,9 +513,29 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     ],
   },
   {
-    type: 'grammar', id: 'g13', title: 'Must / Mustn\'t', emoji: '⚠️', gs: 'G_MODAL',
-    rule: 'must = шаардлагатай · mustn\'t = хориотой',
-    example: 'You must wear a seatbelt. You mustn\'t smoke here.',
+    type: 'grammar', id: 'g13', title: "Must / Mustn't", emoji: '⚠️', gs: 'G_MODAL',
+    rule: "must = шаардлагатай · mustn't = хориотой",
+    example: "You must wear a seatbelt. You mustn't smoke here.",
+    content: {
+      explanation: "Must нь заавал хийх ёстой шаардлага буюу хүчтэй үүргийг илэрхийлнэ. Mustn't (must not) нь бол хориглол буюу хэзээ ч болохгүй гэсэн утгатай. Эдгээр хоёрыг сайн ялгаж сурах хэрэгтэй!",
+      table: {
+        headers: ['Хэлбэр', 'Утга', 'Жишээ'],
+        rows: [
+          ['must', 'заавал хийх ёстой', 'You must wear a helmet.'],
+          ["mustn't", 'хэзээ ч болохгүй', "You mustn't run here."],
+        ],
+      },
+      examples: [
+        { en: 'You must wear a seatbelt in a car.', mn: 'Машинд суухдаа заавал бүс тайлах ёстой.' },
+        { en: "You mustn't smoke inside the hospital.", mn: 'Эмнэлэгт дотор тамхи татаж болохгүй.' },
+        { en: 'Students must bring ID to the exam.', mn: 'Оюутнууд шалгалтанд үнэмлэх авчрах ёстой.' },
+        { en: "Children mustn't cross the road alone.", mn: 'Хүүхдүүд ганцаараа зам гаталж болохгүй.' },
+      ],
+      tips: [
+        "must ≠ mustn't: must = хийх ёстой / mustn't = хийж болохгүй",
+        "must vs have to: must = өөрийн дотоод үүрэг / have to = гаднаас тавигдсан дүрэм",
+      ],
+    },
     q: [
       { s: 'You ___ wear a seatbelt in a car.',    c: ['must',"mustn't",'should','have to'],       a: 'must',     e: 'must = үүрэг/шаардлага' },
       { s: 'Students ___ bring ID to the exam.',   c: ['must',"mustn't",'should','might'],          a: 'must',     e: 'must = шаардлагатай' },
@@ -258,9 +550,29 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     ],
   },
   {
-    type: 'grammar', id: 'g14', title: 'Should / Shouldn\'t', emoji: '💡', gs: 'G_MODAL',
-    rule: 'should = зөвлөгөө өгөх · shouldn\'t = зөвлөхгүй',
+    type: 'grammar', id: 'g14', title: "Should / Shouldn't", emoji: '💡', gs: 'G_MODAL',
+    rule: "should = зөвлөгөө өгөх · shouldn't = зөвлөхгүй",
     example: "You should sleep early. You shouldn't eat junk food.",
+    content: {
+      explanation: "Should нь зөвлөгөө өгөх буюу зүйтэй гэж санагдаж байгаа зүйлийг хэлэхэд хэрэглэгдэнэ. Must-аас зөөлөн, шаардлага биш харин зөвлөгөө. Shouldn't нь тийм зүйл хийхгүй байхыг зөвлөхөд хэрэглэнэ.",
+      table: {
+        headers: ['Хэлбэр', 'Утга', 'Жишээ'],
+        rows: [
+          ['should', 'зөвлөгөө (хийх нь зүйтэй)', 'You should sleep early.'],
+          ["shouldn't", 'зөвлөхгүй (хийхгүй нь дээр)', "You shouldn't eat junk food."],
+        ],
+      },
+      examples: [
+        { en: 'You should drink more water.', mn: 'Чи илүү их ус уух хэрэгтэй.' },
+        { en: "You shouldn't stay up so late.", mn: 'Чи хэт орой унтах хэрэггүй.' },
+        { en: 'I think you should see a doctor.', mn: 'Чи эмчид үзүүлэх хэрэгтэй гэж бодож байна.' },
+        { en: "Students shouldn't use phones in class.", mn: 'Оюутнууд хичээлийн цагт утас ашиглах ёсгүй.' },
+      ],
+      tips: [
+        "should (зөвлөгөө) < must (шаардлага): should = зүйтэй, must = заавал",
+        "I think you should... / You really should... гэж зөвлөгөө өгнө",
+      ],
+    },
     q: [
       { s: 'You ___ drink more water.',            c: ['should',"shouldn't",'must','would'],        a: 'should',    e: 'should = зөвлөгөө' },
       { s: 'She ___ eat so much sugar.',           c: ["shouldn't",'should','mustn\'t','wouldn\'t'], a: "shouldn't", e: "shouldn't = зөвлөхгүй" },
@@ -278,6 +590,29 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g15', title: 'Would', emoji: '🎩', gs: 'G_MODAL',
     rule: 'would = эелдэг хүсэлт / нөхцөлт / өнгөрсөн дадал',
     example: "Would you like tea? I would love to travel.",
+    content: {
+      explanation: 'Would нь хэд хэдэн нөхцөлд хэрэглэгдэнэ: (1) эелдэг хүсэлт/санал өгөхөд, (2) нөхцөлт цагт (if + would), (3) өнгөрсөн дахин давтагдах дадлыг илэрхийлэхэд. Бүх нэр үгийн хувьд would хэвээрээ байна.',
+      table: {
+        headers: ['Хэрэглэх нөхцөл', 'Жишээ', 'Утга'],
+        rows: [
+          ['Эелдэг хүсэлт/санал', "Would you like coffee?", 'Кофе уух уу?'],
+          ['Эелдэг хүсэлт (өөрийн)', "I'd like a coffee.", 'Кофе уумаар байна.'],
+          ['Нөхцөлт цаг', "If I had time, I'd travel.", 'Цаг байсан бол аялах байсан.'],
+          ['Өнгөрсөн дадал', 'She would read every night.', 'Тэр шөнө бүр уншдаг байлаа.'],
+        ],
+      },
+      examples: [
+        { en: 'Would you like some tea?', mn: 'Цай уух уу?' },
+        { en: "I'd love to visit Japan someday.", mn: 'Нэгэн өдөр Японд очих байсан.' },
+        { en: "If I were rich, I'd travel the world.", mn: 'Баян байсан бол дэлхийг тойрон аялах байсан.' },
+        { en: 'She would always sing in the morning.', mn: 'Тэр өглөө бүр дуулдаг байлаа.' },
+      ],
+      tips: [
+        "I would → I'd, He would → He'd, They would → They'd",
+        "Would you like...? = Do you want...?-аас илүү эелдэг",
+        "would rather: I'd rather stay home. = Гэртээ байхыг илүүд үзнэ.",
+      ],
+    },
     q: [
       { s: '___ you like some tea?',               c: ['Would','Will','Do','Shall'],                a: 'Would',   e: 'Would you like...? = эелдэг санал' },
       { s: 'I ___ love to visit Japan.',           c: ['would','will','am','do'],                   a: 'would',   e: 'would love = их хүсэх' },
@@ -297,6 +632,28 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g16', title: 'Articles (a / an / the)', emoji: '📌', gs: 'G_STRUCT',
     rule: 'a (эгшиг биш) · an (эгшиг) · the (тодорхой зүйл)',
     example: 'a cat, an apple, the moon.',
+    content: {
+      explanation: 'Англи хэлэнд a, an, the гэсэн гурван нийтлэг үг байна. a/an нь тодорхойгүй буюу анхлан дурдаж байгаа зүйлд хэрэглэнэ. the нь хоёулаа мэддэг буюу тодорхой зүйлд хэрэглэнэ.',
+      table: {
+        headers: ['Нийтлэг үг', 'Хэзээ хэрэглэх', 'Жишээ'],
+        rows: [
+          ['a', 'гийгүүлэгч дуунаас эхлэх үг', 'a dog, a book, a car'],
+          ['an', 'эгшиг дуунаас эхлэх үг', 'an apple, an hour, an idea'],
+          ['the', 'тодорхой / хоёулаа мэдэх зүйл', 'the sun, the door, the Nile'],
+        ],
+      },
+      examples: [
+        { en: 'I saw a dog in the park.', mn: 'Би цэцэрлэгт нохой харлаа (ямар ч нохой).' },
+        { en: 'The dog was very friendly.', mn: 'Тэр нохой маш найрсаг байлаа (дахин дурдаж байгаа).' },
+        { en: 'She is an engineer.', mn: 'Тэр инженер (эгшгээс эхэлнэ).' },
+        { en: 'The Nile is the longest river.', mn: 'Нил нь хамгийн урт гол (цорын ганц).' },
+      ],
+      tips: [
+        "ДУУН-г харна: a university (ю-дуун), an hour (h дуугүй → эгшиг мэт)",
+        "Нэр үг анх гарах: a cat → дараагийн удаа: the cat",
+        "Цорын ганц зүйл (нар, сар): the sun, the moon, the sky",
+      ],
+    },
     q: [
       { s: 'I saw ___ dog in the park.',          c: ['a','an','the','—'],    a: 'a',   e: 'a + consonant sound: a dog' },
       { s: 'She is ___ engineer.',                c: ['an','a','the','—'],    a: 'an',  e: 'an + vowel sound: an engineer' },
@@ -314,6 +671,30 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g17', title: 'Байршлын урьдал үгс', emoji: '📍', gs: 'G_STRUCT',
     rule: 'in (дотор) · on (дээр) · at (газар/цэг)',
     example: 'in the box, on the table, at the station.',
+    content: {
+      explanation: 'Байршлыг илэрхийлэх гурван гол урьдал үг: in (хаалттай орчин дотор), on (гадаргуу дээр, хана дээр гэх мэт), at (тодорхой цэг, байршил).',
+      table: {
+        headers: ['Урьдал үг', 'Хэрэглэх үе', 'Жишээ'],
+        rows: [
+          ['in', 'хаалттай орчин, хот/улс', 'in the box, in Paris, in Mongolia'],
+          ['on', 'гадаргуу дээр, хананд', 'on the table, on the wall, on the floor'],
+          ['at', 'тодорхой цэг/байршил', 'at the airport, at school, at home'],
+          ['under', 'доор', 'under the bed, under the table'],
+          ['near', 'ойр', 'near the school, near the river'],
+        ],
+      },
+      examples: [
+        { en: 'The book is on the table.', mn: 'Ном ширээн дээр байна.' },
+        { en: 'She lives in Ulaanbaatar.', mn: 'Тэр Улаанбаатарт амьдардаг.' },
+        { en: "I'll meet you at the airport.", mn: 'Нисэх буудал дээр уулзъя.' },
+        { en: 'The cat is under the sofa.', mn: 'Муур диваны доор байна.' },
+      ],
+      tips: [
+        "in = хаалттай орчин (in the room, in the bag)",
+        "on = гадаргуутай хүрэлцсэн (on the desk, on the wall, on the bus)",
+        "at = нарийн цэг (at the door, at the bus stop, at work)",
+      ],
+    },
     q: [
       { s: 'The book is ___ the table.',       c: ['on','in','at','by'],     a: 'on',    e: 'on = гадаргуу дээр' },
       { s: 'She lives ___ Paris.',             c: ['in','on','at','by'],     a: 'in',    e: 'in = хот/орон нутагт' },
@@ -329,8 +710,30 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
   },
   {
     type: 'grammar', id: 'g18', title: 'Цагийн урьдал үгс', emoji: '🕐', gs: 'G_STRUCT',
-    rule: 'in (сар/жил/улирал) · on (өдөр/огноо) · at (цаг)',
-    example: 'in January, on Monday, at 7 o\'clock.',
+    rule: "in (сар/жил/улирал) · on (өдөр/огноо) · at (цаг)",
+    example: "in January, on Monday, at 7 o'clock.",
+    content: {
+      explanation: 'Цагийн урьдал үгс нь байршлын нэгэн адил in/on/at гурвыг ашигладаг. Цаг, он, сар, өдөр, улирлаас хамааран аль нэгийг сонгоно.',
+      table: {
+        headers: ['Урьдал үг', 'Хэрэглэх үе', 'Жишээ'],
+        rows: [
+          ['in', 'он, сар, улирал', 'in 2024, in January, in winter'],
+          ['on', 'гаригийн өдөр, тодорхой огноо', 'on Monday, on June 5th, on my birthday'],
+          ['at', 'тодорхой цаг, тусгай илэрхийлэл', "at 7 AM, at midnight, at night"],
+        ],
+      },
+      examples: [
+        { en: 'I was born in 2001.', mn: 'Би 2001 онд төрсөн.' },
+        { en: 'We have class on Monday.', mn: 'Бид Даваа гарагт хичээлтэй.' },
+        { en: 'The train leaves at 9 AM.', mn: 'Галт тэрэг 9 цагт хөдөлнө.' },
+        { en: 'It always snows in winter.', mn: 'Өвөл үргэлж цас ордог.' },
+      ],
+      tips: [
+        "in: жил/сар/улирал — in 2024, in July, in summer",
+        "on: өдөр/огноо — on Friday, on March 8th, on New Year's Day",
+        "at: тодорхой цаг — at 6 PM, at noon, at midnight, at night",
+      ],
+    },
     q: [
       { s: 'I was born ___ 1998.',               c: ['in','on','at','by'],   a: 'in',  e: 'in + year/month/season' },
       { s: 'She wakes up ___ 7 o\'clock.',       c: ['at','in','on','by'],   a: 'at',  e: 'at + specific time' },
@@ -348,6 +751,29 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g19', title: 'Харьцуулах хэлбэр', emoji: '⚖️', gs: 'G_STRUCT',
     rule: 'short adj + -er / more + long adj + than',
     example: 'taller than, more interesting than.',
+    content: {
+      explanation: 'Харьцуулах хэлбэр (Comparative) нь хоёр зүйлийг харьцуулахад хэрэглэнэ. Богино үгт -er нэмж than ашигладаг; урт үгт more + adj + than хэрэглэнэ.',
+      table: {
+        headers: ['Үгийн төрөл', 'Дүрэм', 'Жишээ'],
+        rows: [
+          ['1-2 үет богино', 'adj + -er + than', 'tall → taller than'],
+          ['3+ үет урт', 'more + adj + than', 'beautiful → more beautiful than'],
+          ['Тусгай дүрэм', 'irregular', 'good → better, bad → worse, far → farther'],
+          ['y-ээр төгссөн', 'y → ier + than', 'happy → happier, funny → funnier'],
+        ],
+      },
+      examples: [
+        { en: 'She is taller than her sister.', mn: 'Тэр дүүгийнхээ дүүтэй харьцуулбал өндөр.' },
+        { en: 'This book is more interesting than that one.', mn: 'Энэ ном тэрнийхээс илүү сонирхолтой.' },
+        { en: 'He runs faster than me.', mn: 'Тэр намайс хурдан гүйдэг.' },
+        { en: 'Today is colder than yesterday.', mn: 'Өнөөдөр өчигдрөөс хүйтэн.' },
+      ],
+      tips: [
+        "Богино үг = 1-2 үет: cold → colder, big → bigger (хоёрдуулна)",
+        "Урт үг = 3+ үет: interesting → more interesting, expensive → more expensive",
+        "Тусгай: good → better, bad → worse, many/much → more",
+      ],
+    },
     q: [
       { s: 'She is ___ than her sister. (tall)',       c: ['taller','more tall','tallest','as tall'],               a: 'taller',          e: 'tall → taller (+er)' },
       { s: 'This is ___ than that. (interesting)',     c: ['more interesting','interestinger','most interesting','interesting as'], a: 'more interesting', e: 'long adj → more + adj' },
@@ -365,6 +791,29 @@ export const GRAMMAR_LESSONS: GrammarLesson[] = [
     type: 'grammar', id: 'g20', title: 'Дээд зэрэглэл', emoji: '🥇', gs: 'G_STRUCT',
     rule: 'the + short adj + -est / the most + long adj',
     example: 'the tallest, the most beautiful.',
+    content: {
+      explanation: 'Дээд зэрэглэл (Superlative) нь гурав ба түүнээс дээш зүйлийн дотроос хамгийн ... гэдгийг илэрхийлнэ. Заавал the-тэй хэрэглэнэ.',
+      table: {
+        headers: ['Үгийн төрөл', 'Дүрэм', 'Жишээ'],
+        rows: [
+          ['1-2 үет богино', 'the + adj + -est', 'tall → the tallest'],
+          ['3+ үет урт', 'the most + adj', 'beautiful → the most beautiful'],
+          ['Тусгай дүрэм', 'irregular', 'good → the best, bad → the worst'],
+          ['y-ээр төгссөн', 'the + adj(y→i) + est', 'funny → the funniest'],
+        ],
+      },
+      examples: [
+        { en: 'She is the tallest student in the class.', mn: 'Тэр ангийнхаа хамгийн өндөр оюутан.' },
+        { en: 'This is the most expensive restaurant.', mn: 'Энэ хамгийн үнэтэй ресторан.' },
+        { en: 'Mount Everest is the highest mountain.', mn: 'Эверест бол хамгийн өндөр уул.' },
+        { en: 'That was the worst day of my life.', mn: 'Тэр миний амьдралын хамгийн муу өдөр байлаа.' },
+      ],
+      tips: [
+        "Comparative vs Superlative: She is taller than me. / She is THE tallest.",
+        "Заавал the хэрэглэнэ: ❌ She is tallest. → ✅ She is THE tallest.",
+        "Тусгай: good → the best, bad → the worst, many/much → the most",
+      ],
+    },
     q: [
       { s: 'She is ___ student in the class. (tall)',       c: ['the tallest','the most tall','taller','tallest'],                 a: 'the tallest',       e: 'the + tall + est' },
       { s: 'This is ___ movie I\'ve ever seen. (good)',     c: ['the best','the most good','the better','best'],                   a: 'the best',          e: 'good → the best (irregular)' },

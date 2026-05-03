@@ -1,0 +1,22 @@
+Vercel CLI 50.1.3
+Retrieving projectΓÇª
+Deploying bataas-projects/my-web
+Uploading [--------------------] (0.0B/3.1MB)
+Uploading [=====---------------] (800.1KB/3.1MB)
+Uploading [==========----------] (1.6MB/3.1MB)
+Uploading [===============-----] (2.3MB/3.1MB)
+Uploading [====================] (3.1MB/3.1MB)
+Inspect: https://vercel.com/bataas-projects/my-web/iqep8N7aYp2fvM57WcFWLEZtJ13b [6s]
+Production: https://my-hr1t4m2kq-bataas-projects.vercel.app [6s]
+Building...
+Building: Running build in Washington, D.C., USA (East) ΓÇô iad1
+Building: Build machine configuration: 2 cores, 8 GB
+Building: Retrieving list of deployment files...
+Building: Previous build caches not available.
+Building: Downloading 231 deployment files...
+Building: Warning: "vercel" found in project dependencies and will be ignored.
+Building: Running "vercel build"
+Building: Running "vercel build"
+Building: Vercel CLI 51.6.1
+Building: Running "install" command: `npm install --legacy-peer-deps`...
+Building: npm warn deprecated whatwg-encoding@2.0.0: Use @exodus/bytes instead for a more spec-conformant and faster implementation

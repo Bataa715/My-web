@@ -56,6 +56,18 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import IconPicker from '../shared/IconPicker';
 import { Skeleton } from '../ui/skeleton';
 
+// ── Planet color palette — one per orbit node (index-based) ──────────────────
+const PLANET_PALETTE = [
+  { from: 'hsl(25 95% 55%)',  to: 'hsl(15 90% 35%)', glow: 'hsl(25 95% 53% / 0.8)',  ring: 'hsl(25 95% 53% / 0.4)'  }, // orange
+  { from: 'hsl(189 94% 50%)', to: 'hsl(199 80% 30%)', glow: 'hsl(189 94% 43% / 0.8)', ring: 'hsl(189 94% 43% / 0.4)' }, // cyan
+  { from: 'hsl(271 81% 62%)', to: 'hsl(265 72% 38%)', glow: 'hsl(271 81% 56% / 0.8)', ring: 'hsl(271 81% 56% / 0.4)' }, // violet
+  { from: 'hsl(142 72% 50%)', to: 'hsl(148 68% 28%)', glow: 'hsl(142 76% 36% / 0.8)', ring: 'hsl(142 76% 36% / 0.4)' }, // emerald
+  { from: 'hsl(0 84% 65%)',   to: 'hsl(5 80% 38%)',   glow: 'hsl(0 84% 60% / 0.8)',   ring: 'hsl(0 84% 60% / 0.4)'   }, // red
+  { from: 'hsl(45 93% 60%)',  to: 'hsl(38 88% 34%)',  glow: 'hsl(45 93% 47% / 0.8)',  ring: 'hsl(45 93% 47% / 0.4)'  }, // amber
+  { from: 'hsl(217 91% 65%)', to: 'hsl(220 82% 38%)', glow: 'hsl(217 91% 60% / 0.8)', ring: 'hsl(217 91% 60% / 0.4)' }, // blue
+  { from: 'hsl(330 81% 65%)', to: 'hsl(330 74% 38%)', glow: 'hsl(330 81% 60% / 0.8)', ring: 'hsl(330 81% 60% / 0.4)' }, // pink
+];
+
 const getIcon = (iconName: string, props = {}) => {
   // Add BrainCircuit as a special case if the user had 'brain'
   if (iconName === 'brain' || iconName === 'Brain')
@@ -116,84 +128,88 @@ const OrbitItem: FC<OrbitItemProps> = ({
     return () => window.removeEventListener('resize', updateRadius);
   }, [isEditing]);
 
+  // Elliptical orbit: y-axis compressed to simulate 3D orbital plane tilt
   const xPos = Math.cos(angle) * currentRadius;
-  const yPos = Math.sin(angle) * currentRadius;
+  const yPos = Math.sin(angle) * currentRadius * 0.38;
+
+  // z-depth: planets at the "bottom" of ellipse are closer → higher z-index
+  const depthZ = Math.sin(angle) > 0 ? 40 : 20;
+  const depthScale = 0.88 + 0.22 * ((Math.sin(angle) + 1) / 2);
+
+  const planet = PLANET_PALETTE[index % PLANET_PALETTE.length];
+  const isSelected = selectedOrbit?.id === item.id;
 
   return (
     <motion.div
       key={item.id}
-      className="absolute h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 pointer-events-auto"
+      className="absolute pointer-events-auto"
       style={{
         top: '50%',
         left: '50%',
-        zIndex: 30,
+        zIndex: depthZ,
+        width: '44px',
+        height: '44px',
       }}
       initial={{ opacity: 0, scale: 0, x: '-50%', y: '-50%' }}
       animate={{
         opacity: 1,
-        scale: 1,
+        scale: depthScale,
         x: `calc(-50% + ${xPos}px)`,
         y: `calc(-50% + ${yPos}px)`,
       }}
       transition={{
         opacity: { duration: 0.5, delay: 0.5 + index * 0.1 },
-        scale: {
-          duration: 0.6,
-          delay: 0.5 + index * 0.1,
-          type: 'spring',
-          stiffness: 140,
-          damping: 16,
-        },
-        x: {
-          duration: 0.6,
-          delay: 0.5 + index * 0.1,
-          type: 'spring',
-          stiffness: 140,
-          damping: 18,
-        },
-        y: {
-          duration: 0.6,
-          delay: 0.5 + index * 0.1,
-          type: 'spring',
-          stiffness: 140,
-          damping: 18,
-        },
+        scale: { duration: 0.6, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 140, damping: 16 },
+        x: { duration: 0.6, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 140, damping: 18 },
+        y: { duration: 0.6, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 140, damping: 18 },
       }}
-      whileHover={{ scale: 1.18 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: depthScale * 1.2 }}
+      whileTap={{ scale: depthScale * 0.92 }}
     >
-      {/* Counter-rotate so the icon always stays upright. Pure CSS = no stutter. */}
-      <div
-        className="orbit-counter relative group h-full w-full"
-        style={{ ['--orbit-duration' as string]: '60s' }}
-      >
-        {/* Glowing ring on hover */}
+      <div className="relative group h-full w-full">
+        {/* Atmospheric glow ring */}
         <div
-          className={cn(
-            'absolute -inset-1 rounded-full bg-linear-to-r from-primary via-purple-500 to-primary opacity-0 blur-xs transition-opacity duration-300',
-            'group-hover:opacity-70',
-            selectedOrbit?.id === item.id &&
-              'opacity-70 animate-[spin_3s_linear_infinite]'
-          )}
+          className="absolute -inset-2 rounded-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+          style={{ background: `radial-gradient(circle, ${planet.glow} 0%, transparent 70%)`, filter: 'blur(6px)' }}
         />
+        {isSelected && (
+          <div
+            className="absolute -inset-2 rounded-full animate-[spin_4s_linear_infinite]"
+            style={{
+              background: `conic-gradient(from 0deg, transparent 0deg 270deg, ${planet.ring} 270deg 360deg)`,
+              filter: 'blur(2px)',
+            }}
+          />
+        )}
 
-        <Button
-          variant="outline"
-          size="icon"
-          className={cn(
-            'relative rounded-full h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 border border-primary/30 bg-background/80 backdrop-blur-md transition-all duration-300',
-            'hover:bg-primary/20 hover:text-primary hover:border-primary/60',
-            'group-hover:shadow-lg group-hover:shadow-primary/20',
-            selectedOrbit?.id === item.id &&
-              'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/40'
-          )}
+        {/* Planet sphere */}
+        <button
           onClick={() => onItemClick(item)}
+          className="relative h-full w-full rounded-full transition-all duration-300 overflow-hidden border-2 focus:outline-none"
+          style={{
+            background: isSelected
+              ? `radial-gradient(circle at 38% 35%, hsl(0 0% 100% / 0.5), ${planet.from} 40%, ${planet.to})`
+              : `radial-gradient(circle at 38% 35%, hsl(0 0% 100% / 0.3), ${planet.from} 45%, ${planet.to})`,
+            borderColor: isSelected ? planet.from : 'hsl(0 0% 100% / 0.15)',
+            boxShadow: isSelected
+              ? `0 0 18px ${planet.glow}, inset 0 1px 0 hsl(0 0% 100% / 0.25)`
+              : `0 0 8px ${planet.ring}, inset 0 1px 0 hsl(0 0% 100% / 0.12)`,
+          }}
         >
-          {getIcon(item.icon, {
-            className: 'h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5',
-          })}
+          {/* Highlight shimmer */}
+          <div className="absolute top-0.5 left-1.5 w-3 h-2 rounded-full bg-white/25 blur-[2px]" />
+          {/* Icon */}
+          <div className="absolute inset-0 flex items-center justify-center text-white drop-shadow-sm">
+            {getIcon(item.icon, { className: 'h-4 w-4 sm:h-4.5 sm:w-4.5' })}
+          </div>
           <span className="sr-only">{item.title}</span>
-        </Button>
+        </button>
+
+        {/* Tooltip label */}
+        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-semibold tracking-wide pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+          style={{ color: planet.from, textShadow: `0 0 8px ${planet.glow}` }}>
+          {item.title}
+        </div>
       </div>
     </motion.div>
   );
@@ -888,133 +904,108 @@ export default function Hero({
           <div className="flex flex-col justify-center space-y-4 sm:space-y-6 lg:order-2">
             <div className="relative flex items-center justify-center w-full max-w-[260px] sm:max-w-[400px] md:max-w-[500px] aspect-square mx-auto">
               {/* ═══════════════════════════════════════════════════
-                  PORTAL RING SYSTEM — smooth compass / gate aesthetic
-                  All rings are pure-CSS GPU animations (orbit-rotate /
-                  orbit-rotate-reverse keyframes in globals.css).
+                  SOLAR SYSTEM — 3D orbital plane structure
+                  Tilted elliptical ring guides + solar corona sun.
+                  Planets orbit on compressed ellipses = 3D depth.
                   ═══════════════════════════════════════════════════ */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
 
-                {/* 0 ── Ambient pulse aura behind everything */}
-                <div
-                  className="orbit-aura absolute rounded-full"
+                {/* Deep-space nebula background glow */}
+                <div className="absolute w-full h-full rounded-full"
                   style={{
-                    width: '80%',
-                    height: '80%',
-                    background:
-                      'radial-gradient(circle, hsl(var(--primary)/0.20) 0%, transparent 70%)',
-                    filter: 'blur(28px)',
+                    background: 'radial-gradient(ellipse 80% 60% at 50% 50%, hsl(var(--primary)/0.13) 0%, hsl(260 80% 45%/0.07) 50%, transparent 75%)',
+                    filter: 'blur(22px)',
                   }}
                 />
 
-                {/* 1 ── Outer portal arc ring — fast CW (13s)
-                      Three bright arc sections give the compass-needle look */}
-                <div
-                  className="orbit-rotate absolute w-[258px] h-[258px] sm:w-[392px] sm:h-[392px] md:w-[494px] md:h-[494px] rounded-full"
+                {/* Solar corona warm outer glow */}
+                <div className="absolute rounded-full"
                   style={{
-                    background:
-                      'conic-gradient(from 0deg,' +
-                      '  hsl(var(--primary))        0deg  10deg,' +
-                      '  hsl(var(--primary)/0.25)  10deg  55deg,' +
-                      '  transparent               55deg 168deg,' +
-                      '  hsl(var(--primary)/0.85) 168deg 178deg,' +
-                      '  transparent              178deg 295deg,' +
-                      '  hsl(var(--primary)/0.55) 295deg 305deg,' +
-                      '  transparent              305deg 352deg,' +
-                      '  hsl(var(--primary))       352deg 360deg)',
-                    WebkitMaskImage:
-                      'radial-gradient(closest-side, transparent calc(100% - 3px), black calc(100% - 3px))',
-                    maskImage:
-                      'radial-gradient(closest-side, transparent calc(100% - 3px), black calc(100% - 3px))',
-                    filter: 'drop-shadow(0 0 7px hsl(var(--primary)/0.65))',
-                    ['--orbit-duration' as string]: '13s',
+                    width: '44%', height: '44%',
+                    background: 'radial-gradient(circle, hsl(45 100% 62%/0.3) 0%, hsl(var(--primary)/0.28) 52%, transparent 80%)',
+                    filter: 'blur(14px)',
                   }}
                 />
 
-                {/* 2 ── Dashed compass ring — medium CCW (37s) */}
-                <div
-                  className="orbit-rotate-reverse absolute w-[228px] h-[228px] sm:w-[352px] sm:h-[352px] md:w-[444px] md:h-[444px] rounded-full"
-                  style={{
-                    border: '1.5px dashed hsl(var(--primary)/0.28)',
-                    ['--orbit-duration' as string]: '37s',
-                  }}
-                />
-
-                {/* 3 ── Inner accent arc ring — medium CW (21s)
-                      Four short accent arcs at diagonal positions */}
-                <div
-                  className="orbit-rotate absolute w-[196px] h-[196px] sm:w-[300px] sm:h-[300px] md:w-[378px] md:h-[378px] rounded-full"
-                  style={{
-                    background:
-                      'conic-gradient(from 45deg,' +
-                      '  transparent             0deg  76deg,' +
-                      '  hsl(var(--accent)/0.9)  76deg  84deg,' +
-                      '  transparent             84deg 166deg,' +
-                      '  hsl(var(--primary)/0.6) 166deg 174deg,' +
-                      '  transparent            174deg 256deg,' +
-                      '  hsl(var(--accent)/0.8) 256deg 264deg,' +
-                      '  transparent            264deg 346deg,' +
-                      '  hsl(var(--primary)/0.5) 346deg 360deg)',
-                    WebkitMaskImage:
-                      'radial-gradient(closest-side, transparent calc(100% - 2.5px), black calc(100% - 2.5px))',
-                    maskImage:
-                      'radial-gradient(closest-side, transparent calc(100% - 2.5px), black calc(100% - 2.5px))',
-                    filter: 'drop-shadow(0 0 4px hsl(var(--accent)/0.45))',
-                    ['--orbit-duration' as string]: '21s',
-                  }}
-                />
-
-                {/* 4 ── Cardinal glow dots — fastest CW (8s)
-                      Four jewels that blaze around the dashed ring */}
-                <div
-                  className="orbit-rotate absolute w-[228px] h-[228px] sm:w-[352px] sm:h-[352px] md:w-[444px] md:h-[444px]"
-                  style={{ ['--orbit-duration' as string]: '8s' }}
+                {/* Solar pulse — animated breathing corona */}
+                <motion.div
+                  className="absolute rounded-full"
+                  style={{ width: '40%', height: '40%' }}
+                  animate={{ scale: [1, 1.12, 1], opacity: [0.4, 0.8, 0.4] }}
+                  transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
                 >
-                  {/* North — largest/brightest */}
-                  <div
-                    className="absolute top-[-5px] left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary"
-                    style={{
-                      boxShadow:
-                        '0 0 10px 3px hsl(var(--primary)/0.8), 0 0 22px 6px hsl(var(--primary)/0.35)',
-                    }}
+                  <div className="w-full h-full rounded-full"
+                    style={{ boxShadow: '0 0 22px 6px hsl(45 100% 58%/0.38), 0 0 44px 16px hsl(var(--primary)/0.2)' }}
                   />
-                  {/* South */}
-                  <div
-                    className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary/80"
-                    style={{ boxShadow: '0 0 7px 2px hsl(var(--primary)/0.6)' }}
-                  />
-                  {/* East */}
-                  <div
-                    className="absolute right-[-4px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full"
-                    style={{
-                      background: 'hsl(var(--accent))',
-                      boxShadow: '0 0 8px 2px hsl(var(--accent)/0.65)',
-                    }}
-                  />
-                  {/* West */}
-                  <div
-                    className="absolute left-[-3px] top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full"
-                    style={{
-                      background: 'hsl(var(--accent)/0.75)',
-                      boxShadow: '0 0 5px 2px hsl(var(--accent)/0.4)',
-                    }}
-                  />
-                </div>
+                </motion.div>
 
-                {/* 5 ── Slow outer boundary — very slow CW (110s) */}
-                <div
-                  className="orbit-rotate absolute w-[280px] h-[280px] sm:w-[428px] sm:h-[428px] md:w-[536px] md:h-[536px] rounded-full"
+                {/* Secondary solar pulse — offset phase */}
+                <motion.div
+                  className="absolute rounded-full"
+                  style={{ width: '44%', height: '44%' }}
+                  animate={{ scale: [1.05, 1, 1.05], opacity: [0.2, 0.5, 0.2] }}
+                  transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut', delay: 1.7 }}
+                >
+                  <div className="w-full h-full rounded-full"
+                    style={{ boxShadow: '0 0 32px 10px hsl(var(--primary)/0.25)' }}
+                  />
+                </motion.div>
+
+                {/* ── ORBITAL RING 1 — primary plane (main orbit) */}
+                <div className="absolute w-[220px] h-[220px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] rounded-full"
                   style={{
-                    border: '1px solid hsl(var(--primary)/0.08)',
-                    ['--orbit-duration' as string]: '110s',
+                    border: '1.5px solid hsl(var(--primary)/0.55)',
+                    filter: 'drop-shadow(0 0 5px hsl(var(--primary)/0.4))',
+                    transform: 'scaleY(0.38)',
+                  }}
+                />
+                {/* Ring 1 gradient highlight — bright on sides, fading top/bottom */}
+                <div className="absolute w-[220px] h-[220px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] rounded-full"
+                  style={{
+                    background: 'conic-gradient(from 0deg, hsl(var(--primary)/0.6) 0deg 8deg, transparent 8deg 172deg, hsl(var(--primary)/0.6) 172deg 188deg, transparent 188deg 360deg)',
+                    WebkitMaskImage: 'radial-gradient(closest-side, transparent calc(100% - 2px), black calc(100% - 2px))',
+                    maskImage: 'radial-gradient(closest-side, transparent calc(100% - 2px), black calc(100% - 2px))',
+                    transform: 'scaleY(0.38)',
+                    filter: 'drop-shadow(0 0 8px hsl(var(--primary)/0.7))',
                   }}
                 />
 
-                {/* 6 ── Second faint reverse boundary — very slow CCW (85s) */}
-                <div
-                  className="orbit-rotate-reverse absolute w-[262px] h-[262px] sm:w-[402px] sm:h-[402px] md:w-[504px] md:h-[504px] rounded-full"
+                {/* ── ORBITAL RING 2 — inclined 32° (different plane) */}
+                <div className="absolute w-[220px] h-[220px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] rounded-full"
                   style={{
-                    border: '1px solid hsl(var(--primary)/0.06)',
-                    ['--orbit-duration' as string]: '85s',
+                    border: '1px solid hsl(var(--accent)/0.4)',
+                    filter: 'drop-shadow(0 0 3px hsl(var(--accent)/0.3))',
+                    transform: 'rotateZ(32deg) scaleY(0.38)',
+                  }}
+                />
+
+                {/* ── ORBITAL RING 3 — outer ring, inclined -18° */}
+                <div className="absolute w-[258px] h-[258px] sm:w-[348px] sm:h-[348px] md:w-[464px] md:h-[464px] rounded-full"
+                  style={{
+                    border: '1px solid hsl(var(--primary)/0.18)',
+                    transform: 'rotateZ(-18deg) scaleY(0.38)',
+                  }}
+                />
+
+                {/* ── ASTEROID BELT — faint dashed outer dust ring */}
+                <div className="absolute w-[272px] h-[272px] sm:w-[365px] sm:h-[365px] md:w-[486px] md:h-[486px] rounded-full"
+                  style={{
+                    border: '1px dashed hsl(var(--primary)/0.12)',
+                    transform: 'scaleY(0.38)',
+                  }}
+                />
+
+                {/* ── Outermost boundary — very faint reference circle */}
+                <div className="absolute w-[290px] h-[290px] sm:w-[392px] sm:h-[392px] md:w-[522px] md:h-[522px] rounded-full"
+                  style={{ border: '1px solid hsl(var(--primary)/0.07)' }}
+                />
+
+                {/* ── Solar flare arcs — static decorative halos */}
+                <div className="absolute w-[160px] h-[160px] sm:w-[220px] sm:h-[220px] md:w-[290px] md:h-[290px] rounded-full"
+                  style={{
+                    background: 'conic-gradient(from 15deg, transparent 0deg 60deg, hsl(45 100% 58%/0.12) 60deg 90deg, transparent 90deg 240deg, hsl(var(--primary)/0.1) 240deg 265deg, transparent 265deg 360deg)',
+                    WebkitMaskImage: 'radial-gradient(closest-side, transparent calc(100% - 3px), black calc(100% - 3px))',
+                    maskImage: 'radial-gradient(closest-side, transparent calc(100% - 3px), black calc(100% - 3px))',
                   }}
                 />
               </div>
@@ -1228,8 +1219,30 @@ export default function Hero({
                       }}
                       className="relative w-full h-full group transform-3d"
                     >
-                      <div className="avatar-glow-wrapper w-full h-full rounded-full overflow-hidden">
-                        <Avatar className="w-full h-full border-4 border-background/80 shadow-2xl shadow-primary/20">
+                      {/* Solar surface — layered glow rings around avatar */}
+                      <div className="absolute inset-0 pointer-events-none">
+                        {/* Outer atmosphere halo */}
+                        <div className="absolute -inset-3 sm:-inset-4 rounded-full"
+                          style={{
+                            background: 'radial-gradient(circle, transparent 60%, hsl(45 100% 60%/0.18) 72%, hsl(var(--primary)/0.25) 82%, transparent 95%)',
+                            filter: 'blur(4px)',
+                          }}
+                        />
+                        {/* Inner corona ring */}
+                        <div className="absolute -inset-1.5 sm:-inset-2 rounded-full"
+                          style={{
+                            boxShadow: '0 0 0 1.5px hsl(45 100% 65%/0.3), 0 0 16px 4px hsl(45 100% 60%/0.2), 0 0 30px 8px hsl(var(--primary)/0.15)',
+                          }}
+                        />
+                      </div>
+
+                      <div className="avatar-glow-wrapper w-full h-full rounded-full overflow-hidden relative z-10">
+                        <Avatar className="w-full h-full border-4 shadow-2xl"
+                          style={{
+                            borderColor: 'hsl(45 100% 62%/0.4)',
+                            boxShadow: '0 0 0 1px hsl(var(--primary)/0.3), 0 0 24px 6px hsl(45 100% 55%/0.2), 0 0 48px 16px hsl(var(--primary)/0.12)',
+                          }}
+                        >
                           <AvatarImage
                             src={profileImage}
                             alt={name}

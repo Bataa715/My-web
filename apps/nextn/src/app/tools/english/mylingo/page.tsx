@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Flame, Star, Zap, Lock, CheckCircle2, XCircle,
-  RotateCcw, BookOpen, Loader2, ChevronLeft, Trophy,
+  RotateCcw, BookOpen, Loader2, ChevronLeft, Trophy, ChevronRight, Lightbulb,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -104,7 +104,7 @@ interface LessonRecord { stars: number }
 interface UserData { xp: number; streak: number; lastPlayed: string; lessons: Record<string, LessonRecord> }
 
 type MapTab = 'vocab' | 'grammar';
-type View = 'map' | 'quiz' | 'result';
+type View = 'map' | 'lesson' | 'quiz' | 'result';
 
 const XP_CORRECT = 10;
 const XP_PERFECT_BONUS = 50;
@@ -158,6 +158,103 @@ function buildGrammarQuiz(ref: GrammarLessonRef): QuizQuestion[] {
     correct: q.a,
     explain: q.e,
   }));
+}
+
+// ── LessonView ────────────────────────────────────────────────────────────────
+
+function LessonView({ entry, onStart, onBack }: { entry: GrammarLessonRef; onStart: () => void; onBack: () => void }) {
+  const full = GRAMMAR_LESSONS.find(l => l.id === entry.id);
+  if (!full) return null;
+  const { content } = full;
+  const style = GRAMMAR_STYLES[entry.gs];
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+      className="max-w-xl mx-auto pt-2 pb-10 space-y-5"
+    >
+      <div className="flex items-center gap-3">
+        <button onClick={onBack} className="p-2 rounded-xl hover:bg-muted/60 transition-colors">
+          <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+        </button>
+        <div className="flex-1">
+          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Хичээл</p>
+          <h2 className="text-lg font-black text-foreground leading-tight">{entry.title}</h2>
+        </div>
+        <div className={cn('w-12 h-12 rounded-2xl flex items-center justify-center text-2xl bg-linear-to-br', style.bg)}>
+          {entry.emoji}
+        </div>
+      </div>
+
+      <div className={cn('rounded-xl px-4 py-2.5 bg-linear-to-r text-white text-sm font-bold', style.bg)}>
+        {full.rule}
+      </div>
+
+      <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <Lightbulb className="h-4 w-4 text-amber-400" />
+          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Тайлбар</p>
+        </div>
+        <p className="text-sm text-foreground/80 leading-relaxed">{content.explanation}</p>
+      </div>
+
+      {content.table && (
+        <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className={cn('bg-linear-to-r text-white', style.bg)}>
+                {content.table.headers.map((h, i) => (
+                  <th key={i} className="px-4 py-2.5 text-left font-bold text-xs uppercase tracking-wider opacity-90">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {content.table.rows.map((row, ri) => (
+                <tr key={ri} className={ri % 2 === 0 ? 'bg-muted/20' : ''}>
+                  {row.map((cell, ci) => (
+                    <td key={ci} className={cn('px-4 py-2.5 text-xs leading-snug', ci === 0 ? 'font-semibold text-foreground/80' : ci === 1 ? 'font-black text-foreground font-mono' : 'text-muted-foreground')}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-5 space-y-3">
+        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Жишээнүүд</p>
+        <div className="space-y-3">
+          {content.examples.map((ex, i) => (
+            <div key={i} className="border-l-2 border-primary/30 pl-3 space-y-0.5">
+              <p className="text-sm font-semibold text-foreground">{ex.en}</p>
+              <p className="text-xs text-muted-foreground">{ex.mn}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {content.tips && content.tips.length > 0 && (
+        <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 p-5 space-y-2">
+          <div className="flex items-center gap-2">
+            <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
+            <p className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">Санамж</p>
+          </div>
+          <ul className="space-y-1.5">
+            {content.tips.map((tip, i) => (
+              <li key={i} className="text-sm text-foreground/80 flex gap-2">
+                <span className="text-amber-400 shrink-0">•</span>
+                {tip}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <Button onClick={onStart} className="w-full bg-primary text-primary-foreground border-0 gap-2 h-14 text-base font-black shadow-[0_0_24px_hsl(var(--primary)/0.4)]">
+        <ChevronRight className="h-5 w-5" />
+        Тест эхлэх
+      </Button>
+    </motion.div>
+  );
 }
 
 // ── StarRow ───────────────────────────────────────────────────────────────────
@@ -343,14 +440,26 @@ export default function MyLingoPage() {
   const grammarCurrentIdx = GRAMMAR_LESSON_REFS.findIndex((_, i) => isGrammarUnlocked(i, userData.lessons) && (userData.lessons[GRAMMAR_LESSON_REFS[i].id]?.stars ?? 0) === 0);
 
   const startLesson = useCallback((entry: LessonEntry, idx: number) => {
-    const qs = entry.kind === 'vocab' ? buildVocabQuiz(entry) : buildGrammarQuiz(entry);
     setActiveEntry(entry);
     setActiveIdx(idx);
+    setQIdx(0); setSelected(null); setShowFeedback(false); setSessionCorrect([]); setXpEarned(0);
+    lock.current = false;
+    if (entry.kind === 'grammar') {
+      setView('lesson');
+    } else {
+      setQuestions(buildVocabQuiz(entry));
+      setView('quiz');
+    }
+  }, []);
+
+  const goToQuiz = useCallback(() => {
+    if (!activeEntry) return;
+    const qs = activeEntry.kind === 'vocab' ? buildVocabQuiz(activeEntry) : buildGrammarQuiz(activeEntry as GrammarLessonRef);
     setQuestions(qs);
     setQIdx(0); setSelected(null); setShowFeedback(false); setSessionCorrect([]); setXpEarned(0);
     lock.current = false;
     setView('quiz');
-  }, []);
+  }, [activeEntry]);
 
   const handleAnswer = useCallback((choice: string) => {
     if (lock.current || showFeedback || !questions[qIdx]) return;
@@ -559,6 +668,11 @@ export default function MyLingoPage() {
           </motion.div>
         )}
 
+        {/* ── LESSON ── */}
+        {view === 'lesson' && activeEntry && activeEntry.kind === 'grammar' && (
+          <LessonView key="lesson" entry={activeEntry} onStart={goToQuiz} onBack={goToMap} />
+        )}
+
         {/* ── QUIZ ── */}
         {view === 'quiz' && questions[qIdx] && (
           <motion.div key="quiz" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
@@ -575,11 +689,6 @@ export default function MyLingoPage() {
             {activeEntry && (
               <p className="text-xs font-semibold text-muted-foreground/60 uppercase tracking-widest px-1">
                 {activeEntry.emoji} {activeEntry.title}
-                {activeEntry.kind === 'grammar' && (
-                  <span className="ml-2 text-primary normal-case tracking-normal">
-                    · {GRAMMAR_LESSONS.find(l => l.id === activeEntry.id)?.rule}
-                  </span>
-                )}
               </p>
             )}
 
@@ -701,7 +810,7 @@ export default function MyLingoPage() {
             </div>
 
             <div className="flex gap-3">
-              <Button onClick={() => activeEntry && startLesson(activeEntry, activeIdx)} className="flex-1 bg-primary text-primary-foreground border-0 gap-2">
+              <Button onClick={goToQuiz} className="flex-1 bg-primary text-primary-foreground border-0 gap-2">
                 <RotateCcw className="h-4 w-4" /> Дахин
               </Button>
               <Button onClick={goToMap} variant="outline" className="flex-1 gap-2">
