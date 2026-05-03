@@ -22,7 +22,6 @@ import {
   MapPin,
   BrainCircuit,
   PlayCircle,
-  Download,
   Facebook,
   Code2,
   Trash2,
@@ -68,6 +67,17 @@ const PLANET_PALETTE = [
   { from: 'hsl(330 81% 65%)', to: 'hsl(330 74% 38%)', glow: 'hsl(330 81% 60% / 0.8)', ring: 'hsl(330 81% 60% / 0.4)' }, // pink
 ];
 
+const ORBIT_CONFIG = [
+  { tiltX: 72, speed: 22 },
+  { tiltX: 68, speed: 28 },
+  { tiltX: 75, speed: 20 },
+  { tiltX: 70, speed: 32 },
+  { tiltX: 65, speed: 26 },
+  { tiltX: 73, speed: 24 },
+  { tiltX: 78, speed: 30 },
+  { tiltX: 67, speed: 18 },
+];
+
 const getIcon = (iconName: string, props = {}) => {
   // Add BrainCircuit as a special case if the user had 'brain'
   if (iconName === 'brain' || iconName === 'Brain')
@@ -90,128 +100,86 @@ interface OrbitItemProps {
   isEditing: boolean;
 }
 
-const OrbitItem: FC<OrbitItemProps> = ({
-  item,
-  index,
-  total,
-  selectedOrbit,
-  onItemClick,
-  isEditing,
-}) => {
-  const angle = (index / total) * 2 * Math.PI;
+const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onItemClick, isEditing }) => {
+  const config = ORBIT_CONFIG[index % ORBIT_CONFIG.length];
+  const isSelected = selectedOrbit?.id === item.id;
+  const planet = PLANET_PALETTE[index % PLANET_PALETTE.length];
 
-  const baseRadius = 110; // Mobile radius
-  const smBaseRadius = 150; // Small tablet
-  const mdBaseRadius = 200; // Desktop
-  const editingRadius = 130; // Mobile editing
-  const smEditingRadius = 170; // Small tablet editing
-  const mdEditingRadius = 230; // Desktop editing
-
-  const [currentRadius, setCurrentRadius] = useState(baseRadius);
-
+  const [currentRadius, setCurrentRadius] = useState(110);
   useEffect(() => {
-    const updateRadius = () => {
-      const isMd = window.innerWidth >= 768;
-      const isSm = window.innerWidth >= 640;
-      if (isEditing) {
-        setCurrentRadius(
-          isMd ? mdEditingRadius : isSm ? smEditingRadius : editingRadius
-        );
-      } else {
-        setCurrentRadius(
-          isMd ? mdBaseRadius : isSm ? smBaseRadius : baseRadius
-        );
-      }
+    const update = () => {
+      const isMd = window.innerWidth >= 768, isSm = window.innerWidth >= 640;
+      setCurrentRadius(isEditing
+        ? (isMd ? 230 : isSm ? 170 : 130)
+        : (isMd ? 200 : isSm ? 150 : 110)
+      );
     };
-    window.addEventListener('resize', updateRadius);
-    updateRadius();
-    return () => window.removeEventListener('resize', updateRadius);
+    window.addEventListener('resize', update);
+    update();
+    return () => window.removeEventListener('resize', update);
   }, [isEditing]);
 
-  // Elliptical orbit: y-axis compressed to simulate 3D orbital plane tilt
-  const xPos = Math.cos(angle) * currentRadius;
-  const yPos = Math.sin(angle) * currentRadius * 0.38;
-
-  // z-depth: planets at the "bottom" of ellipse are closer → higher z-index
-  const depthZ = Math.sin(angle) > 0 ? 40 : 20;
-  const depthScale = 0.88 + 0.22 * ((Math.sin(angle) + 1) / 2);
-
-  const planet = PLANET_PALETTE[index % PLANET_PALETTE.length];
-  const isSelected = selectedOrbit?.id === item.id;
+  const startFrac = index / Math.max(total, 1);
+  const orbitDelay = `-${startFrac * config.speed}s`;
 
   return (
-    <motion.div
-      key={item.id}
-      className="absolute pointer-events-auto"
-      style={{
-        top: '50%',
-        left: '50%',
-        zIndex: depthZ,
-        width: '44px',
-        height: '44px',
-      }}
-      initial={{ opacity: 0, scale: 0, x: '-50%', y: '-50%' }}
-      animate={{
-        opacity: 1,
-        scale: depthScale,
-        x: `calc(-50% + ${xPos}px)`,
-        y: `calc(-50% + ${yPos}px)`,
-      }}
-      transition={{
-        opacity: { duration: 0.5, delay: 0.5 + index * 0.1 },
-        scale: { duration: 0.6, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 140, damping: 16 },
-        x: { duration: 0.6, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 140, damping: 18 },
-        y: { duration: 0.6, delay: 0.5 + index * 0.1, type: 'spring', stiffness: 140, damping: 18 },
-      }}
-      whileHover={{ scale: depthScale * 1.2 }}
-      whileTap={{ scale: depthScale * 0.92 }}
-    >
-      <div className="relative group h-full w-full">
-        {/* Atmospheric glow ring */}
-        <div
-          className="absolute -inset-2 rounded-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
-          style={{ background: `radial-gradient(circle, ${planet.glow} 0%, transparent 70%)`, filter: 'blur(6px)' }}
-        />
-        {isSelected && (
+    <div style={{ position: 'absolute', inset: 0, transformStyle: 'preserve-3d', transform: `rotateX(${config.tiltX}deg)`, pointerEvents: 'none' }}>
+      <div
+        className="orbit-3d-spin"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          ['--orbit-dur' as string]: `${config.speed}s`,
+          ['--orbit-start' as string]: orbitDelay,
+        }}
+      >
+        <div style={{ position: 'absolute', top: `calc(50% - ${currentRadius + 22}px)`, left: 'calc(50% - 22px)', width: 44, height: 44, transformStyle: 'preserve-3d' }}>
           <div
-            className="absolute -inset-2 rounded-full animate-[spin_4s_linear_infinite]"
+            className="orbit-3d-counter"
             style={{
-              background: `conic-gradient(from 0deg, transparent 0deg 270deg, ${planet.ring} 270deg 360deg)`,
-              filter: 'blur(2px)',
+              position: 'absolute',
+              inset: 0,
+              ['--orbit-dur' as string]: `${config.speed}s`,
+              ['--orbit-start' as string]: orbitDelay,
             }}
-          />
-        )}
-
-        {/* Planet sphere */}
-        <button
-          onClick={() => onItemClick(item)}
-          className="relative h-full w-full rounded-full transition-all duration-300 overflow-hidden border-2 focus:outline-none"
-          style={{
-            background: isSelected
-              ? `radial-gradient(circle at 38% 35%, hsl(0 0% 100% / 0.5), ${planet.from} 40%, ${planet.to})`
-              : `radial-gradient(circle at 38% 35%, hsl(0 0% 100% / 0.3), ${planet.from} 45%, ${planet.to})`,
-            borderColor: isSelected ? planet.from : 'hsl(0 0% 100% / 0.15)',
-            boxShadow: isSelected
-              ? `0 0 18px ${planet.glow}, inset 0 1px 0 hsl(0 0% 100% / 0.25)`
-              : `0 0 8px ${planet.ring}, inset 0 1px 0 hsl(0 0% 100% / 0.12)`,
-          }}
-        >
-          {/* Highlight shimmer */}
-          <div className="absolute top-0.5 left-1.5 w-3 h-2 rounded-full bg-white/25 blur-[2px]" />
-          {/* Icon */}
-          <div className="absolute inset-0 flex items-center justify-center text-white drop-shadow-sm">
-            {getIcon(item.icon, { className: 'h-4 w-4 sm:h-4.5 sm:w-4.5' })}
+          >
+            <div style={{ transform: `rotateX(-${config.tiltX}deg)`, width: 44, height: 44, position: 'relative', pointerEvents: 'auto' }}>
+              <div className="relative group h-full w-full">
+                <div className="absolute -inset-2 rounded-full transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                  style={{ background: `radial-gradient(circle, ${planet.glow} 0%, transparent 70%)`, filter: 'blur(6px)' }}
+                />
+                {isSelected && (
+                  <div className="absolute -inset-2 rounded-full animate-[spin_4s_linear_infinite]"
+                    style={{ background: `conic-gradient(from 0deg, transparent 0deg 270deg, ${planet.ring} 270deg 360deg)`, filter: 'blur(2px)' }}
+                  />
+                )}
+                <button
+                  onClick={() => onItemClick(item)}
+                  className="relative h-full w-full rounded-full transition-all duration-300 overflow-hidden border-2 focus:outline-none"
+                  style={{
+                    background: `radial-gradient(circle at 38% 35%, hsl(0 0% 100% / 0.3), ${planet.from} 45%, ${planet.to})`,
+                    borderColor: isSelected ? planet.from : 'hsl(0 0% 100% / 0.15)',
+                    boxShadow: isSelected
+                      ? `0 0 18px ${planet.glow}, inset 0 1px 0 hsl(0 0% 100% / 0.25)`
+                      : `0 0 8px ${planet.ring}, inset 0 1px 0 hsl(0 0% 100% / 0.12)`,
+                  }}
+                >
+                  <div className="absolute top-0.5 left-1.5 w-3 h-2 rounded-full bg-white/25 blur-[2px]" />
+                  <div className="absolute inset-0 flex items-center justify-center text-white drop-shadow-sm">
+                    {getIcon(item.icon, { className: 'h-4 w-4' })}
+                  </div>
+                  <span className="sr-only">{item.title}</span>
+                </button>
+                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-semibold tracking-wide pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                  style={{ color: planet.from, textShadow: `0 0 8px ${planet.glow}` }}>
+                  {item.title}
+                </div>
+              </div>
+            </div>
           </div>
-          <span className="sr-only">{item.title}</span>
-        </button>
-
-        {/* Tooltip label */}
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-semibold tracking-wide pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-          style={{ color: planet.from, textShadow: `0 0 8px ${planet.glow}` }}>
-          {item.title}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -1012,21 +980,23 @@ export default function Hero({
 
               <div
                 className={cn(
-                  'relative transition-all duration-500 transform-3d z-20',
+                  'relative transition-all duration-500 z-20',
                   isEditingOrbit
                     ? 'w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px]'
                     : 'w-40 h-40 sm:w-64 sm:h-64 md:w-80 md:h-80'
                 )}
+                style={{ perspective: '800px', transformStyle: 'preserve-3d' }}
               >
                 <AnimatePresence mode="wait">
                   {selectedOrbit ? (
                     <motion.div
                       key={`orbit-content-${selectedOrbit.id}`}
-                      initial={{ rotateY: -180, opacity: 0, scale: 0.8 }}
-                      animate={{ rotateY: 0, opacity: 1, scale: 1 }}
-                      exit={{ rotateY: 180, opacity: 0, scale: 0.8 }}
-                      transition={{ duration: 0.5, ease: 'easeInOut' }}
-                      className="absolute inset-0 flex flex-col items-center justify-center rounded-full text-center overflow-visible transform-3d"
+                      initial={{ rotateY: -90 }}
+                      animate={{ rotateY: 0 }}
+                      exit={{ rotateY: 90 }}
+                      transition={{ duration: 0.18, ease: [0.4, 0, 0.6, 1] }}
+                      style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
+                      className="absolute inset-0 flex flex-col items-center justify-center rounded-full text-center overflow-visible"
                     >
                       {/* Inner content container */}
                       <div
@@ -1206,18 +1176,12 @@ export default function Hero({
                   ) : (
                     <motion.div
                       key="avatar"
-                      initial={{ rotateY: 180, opacity: 0, scale: 0.8 }}
-                      animate={{
-                        rotateY: 0,
-                        opacity: 1,
-                        scale: 1,
-                      }}
-                      exit={{ rotateY: -180, opacity: 0, scale: 0.8 }}
-                      transition={{
-                        duration: 0.5,
-                        ease: 'easeInOut',
-                      }}
-                      className="relative w-full h-full group transform-3d"
+                      initial={{ rotateY: 90 }}
+                      animate={{ rotateY: 0 }}
+                      exit={{ rotateY: -90 }}
+                      transition={{ duration: 0.18, ease: [0.4, 0, 0.6, 1] }}
+                      style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
+                      className="relative w-full h-full group"
                     >
                       {/* Solar surface — layered glow rings around avatar */}
                       <div className="absolute inset-0 pointer-events-none">
@@ -1304,23 +1268,18 @@ export default function Hero({
                   </>
                 )}
 
-                {/* Orbiting items container — pure CSS rotation, GPU-driven, never stutters */}
-                <div
-                  className="orbit-rotate absolute inset-0 z-10 pointer-events-none"
-                  style={{ ['--orbit-duration' as string]: '60s' }}
-                >
-                  {orbitInfo.map((item, index) => (
-                    <OrbitItem
-                      key={item.id}
-                      item={item}
-                      index={index}
-                      total={orbitInfo.length}
-                      selectedOrbit={selectedOrbit}
-                      onItemClick={handleOrbitItemClick}
-                      isEditing={!!selectedOrbit && isEditingOrbit}
-                    />
-                  ))}
-                </div>
+                {/* Orbiting planets — each on its own CSS 3D tilted ring, depth-sorted by browser */}
+                {orbitInfo.map((item, index) => (
+                  <OrbitItem
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    total={orbitInfo.length}
+                    selectedOrbit={selectedOrbit}
+                    onItemClick={handleOrbitItemClick}
+                    isEditing={!!selectedOrbit && isEditingOrbit}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -1436,10 +1395,11 @@ export default function Hero({
                       }}
                     >
                       <motion.span
-                        className="text-sm sm:text-lg md:text-xl lg:text-2xl font-medium text-muted-foreground flex items-center gap-1.5 sm:gap-2"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
+                        className="text-base sm:text-lg md:text-xl font-light tracking-[0.08em] flex items-center gap-1.5 sm:gap-2"
+                        style={{ color: 'hsl(var(--foreground) / 0.55)' }}
+                        initial={{ opacity: 0, x: -12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3, duration: 0.5 }}
                       >
                         {isEditingGreeting ? (
                           <div className="flex items-center gap-2">
@@ -1492,16 +1452,19 @@ export default function Hero({
                       </motion.span>
                       <div className="flex items-center gap-3">
                         <motion.h1
-                          className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.05]"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{
-                            delay: 0.4,
-                            type: 'spring',
-                            stiffness: 100,
-                          }}
+                          className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.02] relative"
+                          initial={{ opacity: 0, y: 16 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                         >
-                          <span className="bg-linear-to-br from-foreground via-foreground to-foreground/60 bg-clip-text text-transparent drop-shadow-sm">
+                          {/* Ambient glow behind name */}
+                          <span
+                            aria-hidden
+                            className="absolute inset-0 blur-2xl opacity-30 select-none pointer-events-none"
+                            style={{ background: 'linear-gradient(135deg, hsl(var(--primary)/0.6), transparent 60%)' }}
+                          />
+                          <span className="relative bg-clip-text text-transparent"
+                            style={{ backgroundImage: 'linear-gradient(135deg, hsl(var(--foreground)) 30%, hsl(var(--foreground)/0.75) 60%, hsl(var(--primary)/0.85) 100%)' }}>
                             {name}
                           </span>
                         </motion.h1>
@@ -1557,11 +1520,12 @@ export default function Hero({
                   ) : (
                     <motion.div
                       className="flex items-start gap-2"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.4, delay: 0.4 }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: 0.5 }}
                     >
-                      <div className="max-w-[90vw] sm:max-w-[650px] text-muted-foreground text-sm sm:text-base md:text-[17px] leading-relaxed text-balance">
+                      <div className="max-w-[90vw] sm:max-w-[600px] text-sm sm:text-base leading-relaxed text-balance"
+                        style={{ color: 'hsl(var(--foreground) / 0.58)' }}>
                         <span>
                           {bio ||
                             'Өөрийнхөө тухай товч танилцуулга энд бичнэ үү.'}
@@ -1724,26 +1688,6 @@ export default function Hero({
                 </div>
               ) : (
                 <div className="flex flex-wrap items-center gap-2 lg:gap-4">
-                  {socialLinks.cvUrl && (
-                    <motion.div
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                    >
-                      <Button
-                        asChild
-                        className="group h-11 rounded-xl bg-linear-to-r from-primary to-primary/80 text-primary-foreground font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 transition-all duration-300"
-                      >
-                        <Link
-                          href={socialLinks.cvUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <Download className="mr-2 h-4 w-4 group-hover:animate-bounce" />
-                          CV татах
-                        </Link>
-                      </Button>
-                    </motion.div>
-                  )}
                   <Dialog>
                     <div className="flex items-center gap-2 rounded-2xl border border-border/60 bg-card/40 backdrop-blur-md px-2 py-1.5">
                       {socialButtons.map((social, index) => (
