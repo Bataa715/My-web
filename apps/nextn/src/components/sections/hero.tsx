@@ -160,19 +160,29 @@ const OrbitItem: FC<OrbitItemProps> = ({ item, index, total, selectedOrbit, onIt
         {/* Planet sphere */}
         <button
           onClick={() => onItemClick(item)}
-          className="relative h-full w-full rounded-full transition-all duration-300 overflow-hidden border-2 focus:outline-none hover:brightness-125"
+          className="relative h-full w-full rounded-full transition-all duration-300 overflow-hidden border-2 focus:outline-none"
           style={{
             background: isSelected
-              ? `radial-gradient(circle at 38% 35%, hsl(0 0% 100% / 0.5), ${planet.from} 40%, ${planet.to})`
-              : `radial-gradient(circle at 38% 35%, hsl(0 0% 100% / 0.3), ${planet.from} 45%, ${planet.to})`,
-            borderColor: isSelected ? planet.from : 'hsl(0 0% 100% / 0.15)',
+              ? `radial-gradient(circle at 35% 30%, hsl(0 0% 100% / 0.55) 0%, ${planet.from} 38%, ${planet.to} 75%, hsl(220 60% 5% / 0.5) 100%)`
+              : `radial-gradient(circle at 35% 30%, hsl(0 0% 100% / 0.32) 0%, ${planet.from} 42%, ${planet.to} 78%, hsl(220 60% 5% / 0.45) 100%)`,
+            borderColor: isSelected ? planet.from : 'hsl(0 0% 100% / 0.18)',
             boxShadow: isSelected
-              ? `0 0 18px ${planet.glow}, inset 0 1px 0 hsl(0 0% 100% / 0.25)`
-              : `0 0 8px ${planet.ring}, inset 0 1px 0 hsl(0 0% 100% / 0.12)`,
+              ? `0 0 22px ${planet.glow}, 0 0 8px ${planet.ring}, inset 0 1px 0 hsl(0 0% 100% / 0.3), inset 0 -2px 6px hsl(220 60% 5% / 0.4)`
+              : `0 0 10px ${planet.ring}, inset 0 1px 0 hsl(0 0% 100% / 0.15), inset 0 -2px 5px hsl(220 60% 5% / 0.35)`,
           }}
         >
-          <div className="absolute top-0.5 left-1.5 w-3 h-2 rounded-full bg-white/25 blur-[2px]" />
-          <div className="absolute inset-0 flex items-center justify-center text-white drop-shadow-sm">
+          {/* Specular highlight */}
+          <div className="absolute rounded-full bg-white/40 blur-[2px]"
+            style={{ top: '10%', left: '18%', width: '32%', height: '22%' }} />
+          {/* Micro glint */}
+          <div className="absolute rounded-full bg-white/60"
+            style={{ top: '14%', left: '22%', width: '10%', height: '8%', filter: 'blur(1px)' }} />
+          {/* Shadow bottom */}
+          <div className="absolute inset-0 rounded-full"
+            style={{ background: 'radial-gradient(circle at 65% 72%, hsl(220 60% 4% / 0.45) 0%, transparent 60%)' }} />
+          {/* Icon */}
+          <div className="absolute inset-0 flex items-center justify-center text-white"
+            style={{ textShadow: '0 1px 4px hsl(0 0% 0% / 0.6)', filter: 'drop-shadow(0 1px 2px hsl(0 0% 0% / 0.5))' }}>
             {getIcon(item.icon, { className: 'h-4 w-4' })}
           </div>
           <span className="sr-only">{item.title}</span>
@@ -1006,7 +1016,13 @@ export default function Hero({
                     >
                       {/* Inner content container */}
                       <div
-                        className="absolute inset-0 rounded-full bg-linear-to-br from-card via-card/98 to-muted backdrop-blur-xs overflow-hidden border-4 border-background/80 shadow-2xl shadow-primary/20"
+                        className="absolute inset-0 rounded-full overflow-hidden border-[3px]"
+                        style={{
+                          background: 'radial-gradient(ellipse at 38% 35%, hsl(var(--card)/0.92) 0%, hsl(var(--card)) 55%, hsl(var(--muted)/0.98) 100%)',
+                          borderColor: 'hsl(var(--primary)/0.25)',
+                          boxShadow: '0 0 0 1px hsl(var(--primary)/0.1), 0 8px 40px hsl(var(--primary)/0.22), inset 0 1px 0 hsl(0 0% 100% / 0.08)',
+                          backdropFilter: 'blur(12px)',
+                        }}
                         onClick={handleContentClick}
                       >
                         {selectedOrbit.backgroundImage && !isEditingOrbit && (
@@ -1016,13 +1032,25 @@ export default function Hero({
                               alt={selectedOrbit.title}
                               fill
                               sizes="(max-width: 768px) 100vw, 600px"
-                              className="object-cover rounded-full z-0 opacity-30"
+                              className="object-cover rounded-full z-0 opacity-50"
                               unoptimized={/\.gif(\?|$)/i.test(selectedOrbit.backgroundImage)}
                             />
-                            {/* Dark overlay for better text visibility */}
-                            <div className="absolute inset-0 z-10 bg-linear-to-b from-background/70 via-background/50 to-background/70" />
+                            {/* Sphere-shaped overlay — dark vignette + gradient mask */}
+                            <div className="absolute inset-0 z-10" style={{
+                              background: 'radial-gradient(ellipse 80% 80% at 50% 50%, hsl(var(--background)/0.35) 0%, hsl(var(--background)/0.72) 65%, hsl(var(--background)/0.88) 100%)',
+                            }} />
                           </>
                         )}
+                        {/* Sphere highlight on card */}
+                        <div className="absolute inset-0 pointer-events-none z-20" style={{
+                          background: 'radial-gradient(ellipse 70% 60% at 30% 22%, hsl(0 0% 100% / 0.10) 0%, transparent 60%), radial-gradient(ellipse 50% 45% at 70% 78%, hsl(220 60% 4% / 0.38) 0%, transparent 60%)',
+                        }} />
+                        {/* Specular glint */}
+                        <div className="absolute pointer-events-none z-20" style={{
+                          top: '12%', left: '18%', width: '22%', height: '15%',
+                          background: 'radial-gradient(ellipse, hsl(0 0% 100% / 0.28) 0%, transparent 100%)',
+                          filter: 'blur(4px)', borderRadius: '50%',
+                        }} />
 
                         <AnimatePresence mode="wait">
                           {isEditingOrbit ? (
@@ -1145,17 +1173,32 @@ export default function Hero({
                               exit={{ opacity: 0, scale: 0.9 }}
                               className="absolute inset-0 z-30 p-6 flex flex-col items-center justify-center text-center"
                             >
-                              <div className="w-16 h-1 rounded-full bg-primary mb-4" />
+                              {/* Decorative top line */}
+                              <div className="w-12 h-0.5 rounded-full mb-4"
+                                style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary)), transparent)' }}
+                              />
 
-                              <h3 className="text-xl md:text-2xl font-bold mb-2 text-primary">
+                              <h3 className="text-xl md:text-2xl font-bold mb-2.5 leading-tight"
+                                style={{
+                                  color: 'hsl(var(--foreground))',
+                                  textShadow: '0 0 20px hsl(var(--primary)/0.5), 0 1px 3px hsl(0 0% 0% / 0.5)',
+                                }}
+                              >
                                 {selectedOrbit.title}
                               </h3>
 
-                              <p className="text-sm md:text-base text-muted-foreground max-w-[80%] leading-relaxed">
+                              <p className="text-sm md:text-[15px] max-w-[82%] leading-relaxed"
+                                style={{
+                                  color: 'hsl(var(--foreground) / 0.82)',
+                                  textShadow: '0 1px 4px hsl(0 0% 0% / 0.6)',
+                                }}
+                              >
                                 {selectedOrbit.content}
                               </p>
 
-                              <div className="w-10 h-1 rounded-full bg-primary/50 mt-4" />
+                              <div className="w-8 h-0.5 rounded-full mt-4"
+                                style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary)/0.6), transparent)' }}
+                              />
 
                               {selectedOrbit.type === 'audio' &&
                                 selectedOrbit.youtubeVideoId && (
@@ -1209,19 +1252,41 @@ export default function Hero({
                       <div className="avatar-glow-wrapper w-full h-full rounded-full overflow-hidden relative z-10">
                         <Avatar className="w-full h-full border-4 shadow-2xl"
                           style={{
-                            borderColor: 'hsl(45 100% 62%/0.4)',
-                            boxShadow: '0 0 0 1px hsl(var(--primary)/0.3), 0 0 24px 6px hsl(45 100% 55%/0.2), 0 0 48px 16px hsl(var(--primary)/0.12)',
+                            borderColor: 'hsl(45 100% 62%/0.45)',
+                            boxShadow: '0 0 0 2px hsl(45 100% 62%/0.25), 0 0 0 4px hsl(var(--primary)/0.15), 0 0 28px 8px hsl(45 100% 55%/0.22), 0 0 56px 18px hsl(var(--primary)/0.14)',
                           }}
                         >
-                          <AvatarImage
-                            src={profileImage}
-                            alt={name}
-                            className="object-cover"
-                          />
+                          <AvatarImage src={profileImage} alt={name} className="object-cover" />
                           <AvatarFallback className="text-6xl font-bold bg-linear-to-br from-primary/20 to-purple-500/20">
                             {name?.charAt(0) || 'K'}
                           </AvatarFallback>
                         </Avatar>
+
+                        {/* ── 3D SPHERE LIGHTING OVERLAYS ── */}
+                        {/* Main diffuse highlight — upper-left lit zone */}
+                        <div className="absolute inset-0 pointer-events-none" style={{
+                          background: 'radial-gradient(ellipse 75% 65% at 30% 22%, hsl(0 0% 100% / 0.17) 0%, hsl(0 0% 100% / 0.04) 45%, transparent 65%)',
+                        }} />
+                        {/* Depth shadow — lower-right dark zone */}
+                        <div className="absolute inset-0 pointer-events-none" style={{
+                          background: 'radial-gradient(ellipse 65% 60% at 72% 80%, hsl(220 70% 3% / 0.65) 0%, hsl(220 50% 8% / 0.28) 48%, transparent 68%)',
+                        }} />
+                        {/* Specular highlight — small bright glint top-left */}
+                        <div className="absolute pointer-events-none" style={{
+                          top: '11%', left: '16%', width: '26%', height: '19%',
+                          background: 'radial-gradient(ellipse, hsl(0 0% 100% / 0.62) 0%, hsl(0 0% 100% / 0.18) 52%, transparent 100%)',
+                          filter: 'blur(5px)', borderRadius: '50%',
+                        }} />
+                        {/* Secondary micro-glint */}
+                        <div className="absolute pointer-events-none" style={{
+                          top: '22%', left: '30%', width: '10%', height: '7%',
+                          background: 'radial-gradient(ellipse, hsl(0 0% 100% / 0.45) 0%, transparent 100%)',
+                          filter: 'blur(2px)', borderRadius: '50%',
+                        }} />
+                        {/* Inset rim — subtle border shading for depth */}
+                        <div className="absolute inset-0 rounded-full pointer-events-none" style={{
+                          boxShadow: 'inset 0 0 0 1px hsl(0 0% 100% / 0.08), inset 3px 3px 14px hsl(0 0% 100% / 0.05), inset -5px -6px 22px hsl(220 70% 6% / 0.4)',
+                        }} />
                       </div>
                     </motion.div>
                   )}
