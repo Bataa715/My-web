@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowUpRight,
+  Wallet,
 } from 'lucide-react';
 import Link from 'next/link';
 import PageHeader from '@/components/shared/PageHeader';
@@ -109,6 +110,18 @@ const allTools: Tool[] = [
     glow: '99, 102, 241',
     accent: '#6366f1',
     tag: 'AI',
+  },
+  {
+    id: 'finance',
+    title: 'Санхүүгийн Бүртгэл',
+    description: 'Орлого · Зарлага · Хадгаламж',
+    href: '/tools/finance',
+    icon: <Wallet className="h-7 w-7" />,
+    gradient: 'from-emerald-500 to-green-400',
+    shadowColor: 'rgba(16, 185, 129, 0.5)',
+    glow: '16, 185, 129',
+    accent: '#10b981',
+    tag: 'Санхүү',
   },
 ];
 
