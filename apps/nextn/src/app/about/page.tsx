@@ -69,6 +69,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import InteractiveParticles from '@/components/shared/InteractiveParticles';
 import PageHeader from '@/components/shared/PageHeader';
+import { cn } from '@/lib/utils';
 
 // Icon map for personal info icons
 const iconMap: Record<string, React.ReactNode> = {
@@ -334,7 +335,14 @@ function AboutPageInner() {
   const [editedOutroText, setEditedOutroText] = useState('');
 
   const greetings = useMemo(
-    () => ['Сайн уу', 'こんにちは', 'Hello', '안녕하세요', 'Привет', 'Hallo'],
+    () => [
+      { text: 'Сайн уу',    lang: 'Монгол',  flag: '🇲🇳' },
+      { text: 'こんにちは', lang: '日本語',  flag: '🇯🇵' },
+      { text: 'Hello',       lang: 'English',  flag: '🇺🇸' },
+      { text: '안녕하세요',  lang: '한국어',  flag: '🇰🇷' },
+      { text: 'Привет',      lang: 'Русский',  flag: '🇷🇺' },
+      { text: 'Hallo',       lang: 'Deutsch',  flag: '🇩🇪' },
+    ],
     []
   );
   const [greetingIndex, setGreetingIndex] = useState(0);
@@ -623,25 +631,66 @@ function AboutPageInner() {
         
                 </motion.div>
 
-                {/* Animated greeting (in different languages) */}
-                <div className="relative mt-6 mb-3 h-[3.5rem] sm:h-[5rem] md:h-[6.5rem] flex items-center gap-3">
-                  {/* Vertical accent bar */}
-                  <span
-                    aria-hidden
-                    className="hidden sm:block self-stretch w-[3px] rounded-full bg-linear-to-b from-primary via-accent/60 to-transparent"
-                  />
-                  <AnimatePresence mode="wait">
-                    <motion.h1
-                      key={greetingIndex}
-                      initial={{ opacity: 0, y: 18, filter: 'blur(8px)' }}
-                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                      exit={{ opacity: 0, y: -18, filter: 'blur(8px)' }}
-                      transition={{ duration: 0.5, ease: 'easeInOut' }}
-                      className="font-mono text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight bg-linear-to-br from-foreground via-primary/90 to-foreground/50 bg-clip-text text-transparent leading-[1.05]"
-                    >
-                      {greetings[greetingIndex]}
-                    </motion.h1>
-                  </AnimatePresence>
+                {/* Multilingual greeting — redesigned */}
+                <div className="relative mt-6 mb-5">
+                  {/* Main greeting row */}
+                  <div className="flex items-start gap-3 mb-3">
+                    <span
+                      aria-hidden
+                      className="hidden sm:block mt-3 shrink-0 w-[3px] self-stretch rounded-full bg-linear-to-b from-primary via-accent/60 to-transparent"
+                    />
+                    <div className="flex flex-col">
+                      {/* Animated text */}
+                      <div className="h-[3rem] sm:h-[4.5rem] md:h-[5.5rem] flex items-center overflow-hidden">
+                        <AnimatePresence mode="wait">
+                          <motion.h1
+                            key={greetingIndex}
+                            initial={{ opacity: 0, y: 22, filter: 'blur(10px)', scale: 0.96 }}
+                            animate={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
+                            exit={{ opacity: 0, y: -22, filter: 'blur(10px)', scale: 0.96 }}
+                            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                            className="font-mono text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight bg-linear-to-br from-foreground via-primary/90 to-foreground/50 bg-clip-text text-transparent leading-[1.05]"
+                          >
+                            {greetings[greetingIndex].text}
+                          </motion.h1>
+                        </AnimatePresence>
+                      </div>
+                      {/* Language label */}
+                      <AnimatePresence mode="wait">
+                        <motion.p
+                          key={`lang-${greetingIndex}`}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 8 }}
+                          transition={{ duration: 0.3, delay: 0.1 }}
+                          className="text-[11px] font-mono text-muted-foreground tracking-[0.22em] uppercase"
+                        >
+                          {greetings[greetingIndex].flag}{' '}{greetings[greetingIndex].lang}
+                        </motion.p>
+                      </AnimatePresence>
+                    </div>
+                  </div>
+
+                  {/* Language selector pills */}
+                  <div className="flex flex-wrap gap-2">
+                    {greetings.map((g, i) => (
+                      <motion.button
+                        key={i}
+                        onClick={() => setGreetingIndex(i)}
+                        whileHover={{ scale: 1.06, y: -1 }}
+                        whileTap={{ scale: 0.96 }}
+                        className={cn(
+                          'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-mono border transition-all duration-300',
+                          i === greetingIndex
+                            ? 'bg-primary/15 text-primary border-primary/50 shadow-[0_0_14px_-4px_hsl(var(--primary)/0.6)]'
+                            : 'bg-muted/30 text-muted-foreground border-transparent hover:border-border/60 hover:text-foreground hover:bg-muted/60'
+                        )}
+                      >
+                        <span>{g.flag}</span>
+                        <span className="tracking-[0.12em] uppercase">{g.lang}</span>
+                      </motion.button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Intro - Name - Outro */}
