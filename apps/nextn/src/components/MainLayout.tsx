@@ -310,7 +310,7 @@ export default function MainLayout({
       <IntroOverlay />
       <div className="min-h-screen p-0 sm:p-3 md:p-4 lg:p-6 bg-background">
         <div className="animated-border-wrapper">
-          <div className="relative z-10 flex min-h-screen sm:min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] flex-col rounded-none sm:rounded-[1.6rem] bg-background [overflow:clip] shadow-2xl shadow-primary/5">
+          <div className="relative z-10 min-h-screen sm:min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] rounded-none sm:rounded-[1.6rem] bg-background shadow-2xl shadow-primary/5">
             {heroImage && (
               <div className="absolute top-[88px] md:top-[100px] left-0 w-full h-[50vh] -z-10">
                 <Image
@@ -401,7 +401,7 @@ export default function MainLayout({
             <div className="relative z-50">
               <Header />
             </div>
-            <main className="relative z-10 grow pb-28 sm:pb-4">
+            <main className="relative z-10 pb-28 sm:pb-4">
               <AnimatePresence mode="wait" initial={false}>
                 {children}
               </AnimatePresence>

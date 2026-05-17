@@ -489,7 +489,7 @@ function SectionDots({
   return (
     <nav
       aria-label="Хэсгийн жагсаалт"
-      className="hidden xl:flex fixed right-6 top-1/2 z-40 -translate-y-1/2 flex-col gap-3"
+      className="hidden 2xl:flex fixed right-6 top-1/2 z-40 -translate-y-1/2 flex-col gap-3"
     >
       {sections.map(s => {
         const isActive = active === s.id;
