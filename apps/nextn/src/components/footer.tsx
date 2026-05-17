@@ -93,7 +93,12 @@ const Footer = () => {
             </div>
           )}
         </div>
-      </div>
+        {/* Copyright */}
+        <div className="mt-6 flex items-center justify-center">
+          <p className="text-[11px] font-mono tracking-[0.12em] text-muted-foreground/40">
+            © {new Date().getFullYear()} · Built with passion
+          </p>
+        </div>      </div>
     </footer>
   );
 };

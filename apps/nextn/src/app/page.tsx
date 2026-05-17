@@ -287,6 +287,13 @@ function HomePageInner() {
 
       {/* BACK TO TOP */}
       <BackToTop />
+
+      <SectionDots
+        sections={[
+          { id: 'hero', label: 'Нүүр' },
+          ...visibleSections.map(s => ({ id: s.id, label: s.title })),
+        ]}
+      />
     </HomeShell>
   );
 }
@@ -325,11 +332,19 @@ function ScrollProgressBar() {
     mass: 0.4,
   });
   return (
-    <motion.div
-      style={{ scaleX }}
-      className="fixed top-0 left-0 right-0 z-[60] h-[2px] origin-left bg-linear-to-r from-primary via-purple-500 to-primary"
-      aria-hidden
-    />
+    <>
+      <motion.div
+        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 z-[60] h-[3px] origin-left bg-linear-to-r from-primary via-accent to-primary"
+        aria-hidden
+      />
+      {/* Glow underneath the bar */}
+      <motion.div
+        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 z-[59] h-[6px] origin-left blur-sm opacity-60 bg-linear-to-r from-primary via-accent to-primary"
+        aria-hidden
+      />
+    </>
   );
 }
 
@@ -409,10 +424,10 @@ function SectionFrame({
       </div>
 
       <motion.div
-        initial={reduce ? false : { opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.15 }}
-        transition={{ duration: 0.55, ease: 'easeOut' }}
+        initial={reduce ? false : { opacity: 0, y: 24, scale: 0.99 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, amount: 0.12 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       >
         {children}
       </motion.div>
@@ -423,14 +438,18 @@ function SectionFrame({
 function SectionOrnament() {
   return (
     <div
-      className="relative my-2 md:my-4 flex items-center justify-center"
+      className="relative my-4 md:my-6 flex items-center justify-center"
       aria-hidden
     >
-      <div className="h-px flex-1 bg-linear-to-r from-transparent via-border to-transparent" />
-      <div className="mx-4 inline-flex h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-card/60 backdrop-blur-md">
-        <span className="h-1.5 w-1.5 rounded-full bg-primary inline-block" />
+      <div className="h-px flex-1 bg-linear-to-r from-transparent via-border/80 to-transparent" />
+      <div className="mx-4 flex items-center gap-1.5">
+        <span className="h-1 w-1 rounded-full bg-border/50" />
+        <div className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-primary/40 bg-primary/8 backdrop-blur-md shadow-[0_0_12px_-4px_hsl(var(--primary)/0.6)]">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary inline-block" />
+        </div>
+        <span className="h-1 w-1 rounded-full bg-border/50" />
       </div>
-      <div className="h-px flex-1 bg-linear-to-r from-transparent via-border to-transparent" />
+      <div className="h-px flex-1 bg-linear-to-r from-transparent via-border/80 to-transparent" />
     </div>
   );
 }
@@ -518,14 +537,14 @@ function BackToTop() {
       }
       aria-label="Дээш буцах"
       className={cn(
-        'fixed bottom-6 right-6 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full border border-border/60 bg-card/70 backdrop-blur-xl text-foreground/80 shadow-lg transition-all duration-300',
-        'hover:scale-110 hover:text-primary hover:border-primary/60',
+        'fixed bottom-24 sm:bottom-6 right-6 z-40 group inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/30 bg-primary/15 backdrop-blur-xl text-primary shadow-lg shadow-primary/20 transition-all duration-300',
+        'hover:bg-primary hover:text-primary-foreground hover:scale-110 hover:shadow-xl hover:shadow-primary/30 hover:border-primary',
         show
           ? 'opacity-100 translate-y-0 pointer-events-auto'
           : 'opacity-0 translate-y-4 pointer-events-none'
       )}
     >
-      <ArrowUp className="h-5 w-5" />
+      <ArrowUp className="h-5 w-5 transition-transform duration-300 group-hover:-translate-y-0.5" />
     </button>
   );
 }

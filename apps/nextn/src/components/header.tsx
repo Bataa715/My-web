@@ -205,7 +205,7 @@ const Header = () => {
                   >
                     {link.label}
                     {isActive && (
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-[2px] rounded-full bg-primary shadow-[0_0_6px_hsl(var(--primary)/0.8)]" />
+                      <span className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full bg-linear-to-r from-transparent via-primary to-transparent shadow-[0_0_8px_hsl(var(--primary)/0.7)]" />
                     )}
                   </Link>
                 );
