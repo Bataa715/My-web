@@ -384,6 +384,8 @@ function AboutPageInner() {
 
   // 3D Carousel State
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const touchStartX = useRef<number | null>(null);
   const totalItems = displayItems.length > 0 ? displayItems.length : 1;
   const anglePerItem = 360 / totalItems;
   const CIRCLE_RADIUS_DESKTOP = 400; // Controls the circle's radius
@@ -422,12 +424,22 @@ function AboutPageInner() {
     });
   };
 
-  // Auto-rotate continuously; stops only in edit mode
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 40) dx > 0 ? scrollPrev() : scrollNext();
+    touchStartX.current = null;
+  };
+
+  // Auto-rotate; pauses on hover/touch interaction, stops in edit mode
   useEffect(() => {
-    if (displayItems.length < 2 || isEditMode) return;
-    const id = setInterval(() => setActiveIndex(prev => prev + 1), 5000);
+    if (displayItems.length < 2 || isEditMode || isPaused) return;
+    const id = setInterval(() => setActiveIndex(prev => prev + 1), 3500);
     return () => clearInterval(id);
-  }, [displayItems.length, isEditMode]);
+  }, [displayItems.length, isEditMode, isPaused]);
 
   useEffect(() => {
     if (isUserLoading || !user || !firestore) return;
@@ -832,7 +844,32 @@ function AboutPageInner() {
               </div>
             ) : (
               <>
-              <div className="relative flex items-center justify-center h-[350px]">
+              <div
+                className="relative flex items-center justify-center h-[350px]"
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+              >
+                {/* Prev / Next arrow buttons */}
+                {displayItems.length > 1 && !isEditMode && (
+                  <>
+                    <button
+                      onClick={scrollPrev}
+                      className="absolute left-0 sm:left-2 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-background/80 backdrop-blur-sm text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/10 transition-all duration-200"
+                      aria-label="Өмнөх"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={scrollNext}
+                      className="absolute right-0 sm:right-2 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-background/80 backdrop-blur-sm text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/10 transition-all duration-200"
+                      aria-label="Дараах"
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
                 {displayItems.length === 0 && !isEditMode ? (
                   <div className="text-center">
                     <p className="text-muted-foreground">Хобби олдсонгүй.</p>
@@ -1037,7 +1074,7 @@ function AboutPageInner() {
             height: 100%;
             position: absolute;
             transform-style: preserve-3d;
-            transition: transform 2.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+            transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: transform;
             backface-visibility: hidden;
           }
@@ -1049,9 +1086,9 @@ function AboutPageInner() {
             left: 0;
             background: transparent;
             transition:
-              opacity 2.4s cubic-bezier(0.22, 0.61, 0.36, 1),
-              transform 2.4s cubic-bezier(0.22, 0.61, 0.36, 1),
-              filter 2.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+              opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.75s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: pointer;
             will-change: transform, opacity, filter;
             backface-visibility: hidden;
