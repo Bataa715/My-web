@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { ProjectProvider } from '@/contexts/ProjectContext';
 import { SkillsProvider } from '@/contexts/SkillsContext';
 import { EducationProvider } from '@/contexts/EducationContext';
+import { ExperienceProvider } from '@/contexts/ExperienceContext';
 import { HobbyProvider } from '@/contexts/HobbyContext';
 
 /**
@@ -14,11 +15,13 @@ import { HobbyProvider } from '@/contexts/HobbyContext';
 export default function HomeProviders({ children }: { children: ReactNode }) {
   return (
     <EducationProvider>
-      <ProjectProvider>
-        <SkillsProvider>
-          <HobbyProvider>{children}</HobbyProvider>
-        </SkillsProvider>
-      </ProjectProvider>
+      <ExperienceProvider>
+        <ProjectProvider>
+          <SkillsProvider>
+            <HobbyProvider>{children}</HobbyProvider>
+          </SkillsProvider>
+        </ProjectProvider>
+      </ExperienceProvider>
     </EducationProvider>
   );
 }

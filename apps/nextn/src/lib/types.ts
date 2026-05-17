@@ -107,6 +107,17 @@ export type Education = {
   createdAt?: Date | Timestamp;
 };
 
+export type Experience = {
+  id?: string;
+  title: string;
+  company: string;
+  startDate: Date | Timestamp;
+  endDate: Date | Timestamp | null;
+  current: boolean;
+  description?: string;
+  createdAt?: Date | Timestamp;
+};
+
 export type Hobby = {
   id?: string;
   title: string;
