@@ -401,7 +401,7 @@ export default function MainLayout({
             <div className="relative z-50">
               <Header />
             </div>
-            <main className="relative z-10 flex-1 pb-28 sm:pb-4">
+            <main className="relative z-10 grow pb-28 sm:pb-4">
               <AnimatePresence mode="wait" initial={false}>
                 {children}
               </AnimatePresence>
