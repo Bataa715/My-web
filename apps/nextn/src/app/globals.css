@@ -899,7 +899,7 @@
   html {
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
-    overflow-x: hidden;
+    overflow-x: clip;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
@@ -909,12 +909,10 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overscroll-behavior-y: none;
   }
 
   body {
-    overflow-x: hidden;
-    touch-action: manipulation;
+    overflow-x: clip;
   }
 
   /* Selection color */

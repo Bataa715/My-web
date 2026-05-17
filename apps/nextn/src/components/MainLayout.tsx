@@ -308,9 +308,9 @@ export default function MainLayout({
   return (
     <>
       <IntroOverlay />
-      <div className="min-h-screen p-0 sm:p-3 md:p-4 lg:p-6 bg-background">
+      <div className="min-h-screen p-0 sm:p-1.5 md:p-2 bg-background">
         <div className="animated-border-wrapper">
-          <div className="relative z-10 min-h-screen sm:min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] rounded-none sm:rounded-[1.6rem] bg-background shadow-2xl shadow-primary/5">
+          <div className="relative z-10 min-h-screen sm:min-h-[calc(100vh-0.75rem)] md:min-h-[calc(100vh-1rem)] rounded-none sm:rounded-[1.4rem] bg-background shadow-2xl shadow-primary/5">
             {heroImage && (
               <div className="absolute top-[88px] md:top-[100px] left-0 w-full h-[50vh] -z-10">
                 <Image
