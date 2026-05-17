@@ -216,12 +216,34 @@ function buildGrammarQuiz(ref: GrammarLessonRef): QuizQuestion[] {
   return qs.sort(rand);
 }
 
+// ── QuestionTypeBadge ─────────────────────────────────────────────────────────
+
+const Q_TYPE_META: Record<QuizQuestion['type'], { icon: string; label: string; cls: string }> = {
+  vocab:          { icon: '🎯', label: 'Монгол утга',      cls: 'bg-emerald-500/12 text-emerald-500 border-emerald-500/25' },
+  vocab_reverse:  { icon: '🔄', label: 'Англи үг',         cls: 'bg-sky-500/12 text-sky-500 border-sky-500/25' },
+  typing:         { icon: '✏️', label: 'Бичих',             cls: 'bg-violet-500/12 text-violet-500 border-violet-500/25' },
+  sentence_build: { icon: '🔀', label: 'Өгүүлбэр үүсгэх', cls: 'bg-orange-500/12 text-orange-500 border-orange-500/25' },
+  grammar:        { icon: '📖', label: 'Дүрэм — сонгох',   cls: 'bg-yellow-500/12 text-yellow-500 border-yellow-500/25' },
+  grammar_typing: { icon: '✏️', label: 'Дүрэм — бичих',    cls: 'bg-rose-500/12 text-rose-500 border-rose-500/25' },
+  grammar_build:  { icon: '🔀', label: 'Дүрэм — үүсгэх',   cls: 'bg-teal-500/12 text-teal-500 border-teal-500/25' },
+};
+
+function QuestionTypeBadge({ q }: { q: QuizQuestion }) {
+  const m = Q_TYPE_META[q.type];
+  return (
+    <div className={cn('inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold', m.cls)}>
+      <span>{m.icon}</span><span>{m.label}</span>
+    </div>
+  );
+}
+
 // ── TypingAnswer ──────────────────────────────────────────────────────────────
 
-function TypingAnswer({ questionType, onSubmit, disabled }: {
+function TypingAnswer({ questionType, onSubmit, disabled, isCorrect }: {
   questionType: 'typing' | 'grammar_typing';
   onSubmit: (v: string) => void;
   disabled: boolean;
+  isCorrect?: boolean;
 }) {
   const [input, setInput] = useState('');
   const handleSubmit = () => { const v = input.trim(); if (v && !disabled) onSubmit(v); };
@@ -236,14 +258,21 @@ function TypingAnswer({ questionType, onSubmit, disabled }: {
           disabled={disabled}
           placeholder={questionType === 'typing' ? 'Англи үгийг бич...' : 'Зөв хэлбэрийг бич...'}
           className={cn(
-            'w-full rounded-xl border px-5 py-4 pr-14 text-sm font-semibold transition-all duration-200 focus:outline-none',
-            disabled
-              ? 'bg-muted/20 border-border/30 text-muted-foreground'
-              : 'bg-card/60 border-border/40 focus:border-primary/50 focus:bg-primary/5',
+            'w-full rounded-xl border px-4 py-3.5 pr-12 sm:px-5 sm:py-4 sm:pr-14 text-sm font-semibold transition-all duration-200 focus:outline-none',
+            !disabled && 'bg-card/60 border-border/40 focus:border-primary/50 focus:bg-primary/5',
+            disabled && isCorrect === true  && 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400',
+            disabled && isCorrect === false && 'bg-destructive/10 border-destructive text-destructive',
+            disabled && isCorrect === undefined && 'bg-muted/20 border-border/30 text-muted-foreground',
           )}
           autoFocus
         />
-        {!disabled && (
+        {disabled && isCorrect !== undefined ? (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+            {isCorrect
+              ? <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              : <XCircle className="h-4 w-4 text-destructive" />}
+          </div>
+        ) : !disabled ? (
           <button
             onClick={handleSubmit}
             disabled={!input.trim()}
@@ -251,7 +280,7 @@ function TypingAnswer({ questionType, onSubmit, disabled }: {
           >
             <Send className="h-3.5 w-3.5" />
           </button>
-        )}
+        ) : null}
       </div>
       {!disabled && (
         <p className="text-xs text-center text-muted-foreground">Enter товч дарж илгээнэ үү</p>
@@ -262,10 +291,12 @@ function TypingAnswer({ questionType, onSubmit, disabled }: {
 
 // ── SentenceBuildAnswer ───────────────────────────────────────────────────────
 
-function SentenceBuildAnswer({ initialWords, onSubmit, disabled }: {
+function SentenceBuildAnswer({ initialWords, onSubmit, disabled, isCorrect, correctSentence }: {
   initialWords: string[];
   onSubmit: (v: string) => void;
   disabled: boolean;
+  isCorrect?: boolean;
+  correctSentence?: string;
 }) {
   const [chosen, setChosen] = useState<string[]>([]);
   const [available, setAvailable] = useState<string[]>([...initialWords]);
@@ -283,7 +314,12 @@ function SentenceBuildAnswer({ initialWords, onSubmit, disabled }: {
 
   return (
     <div className="space-y-3">
-      <div className="min-h-[56px] flex flex-wrap gap-2 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-3">
+      <div className={cn(
+        'min-h-[48px] sm:min-h-[56px] flex flex-wrap gap-2 rounded-xl border-2 border-dashed p-3 transition-colors duration-300',
+        disabled && isCorrect === true  ? 'border-emerald-500/60 bg-emerald-500/5' :
+        disabled && isCorrect === false ? 'border-destructive/40 bg-destructive/5' :
+        'border-primary/30 bg-primary/5',
+      )}>
         {chosen.length === 0
           ? <p className="text-xs text-muted-foreground self-center">Үгүүдийг дарж өгүүлбэр үүсгэнэ үү...</p>
           : chosen.map((w, i) => (
@@ -291,7 +327,12 @@ function SentenceBuildAnswer({ initialWords, onSubmit, disabled }: {
                 key={`c-${i}`}
                 initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
                 onClick={() => removeWord(i)} disabled={disabled}
-                className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/80 transition-colors disabled:cursor-default"
+                className={cn(
+                  'px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors disabled:cursor-default',
+                  disabled && isCorrect === true  ? 'bg-emerald-500 text-white' :
+                  disabled && isCorrect === false ? 'bg-destructive/80 text-white' :
+                  'bg-primary text-primary-foreground hover:bg-primary/80',
+                )}
               >{w}</motion.button>
             ))
         }
@@ -309,10 +350,19 @@ function SentenceBuildAnswer({ initialWords, onSubmit, disabled }: {
       <Button
         onClick={() => onSubmit(chosen.join(' '))}
         disabled={disabled || chosen.length === 0}
-        className="w-full h-12 text-sm font-bold bg-primary text-primary-foreground border-0 shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
+        className="w-full h-11 sm:h-12 text-sm font-bold bg-primary text-primary-foreground border-0 shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
       >
         Шалгах
       </Button>
+      {disabled && isCorrect === false && correctSentence && (
+        <motion.div
+          initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/25 px-4 py-2.5"
+        >
+          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+          <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{correctSentence}</span>
+        </motion.div>
+      )}
     </div>
   );
 }
@@ -327,10 +377,10 @@ function LessonView({ entry, onStart, onBack }: { entry: GrammarLessonRef; onSta
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-      className="max-w-xl mx-auto pt-2 pb-10 space-y-5"
+      className="max-w-xl mx-auto pt-2 pb-8 sm:pb-10 space-y-4 sm:space-y-5"
     >
       <div className="flex items-center gap-3">
-        <button onClick={onBack} className="p-2 rounded-xl hover:bg-muted/60 transition-colors">
+        <button onClick={onBack} className="p-2.5 rounded-xl hover:bg-muted/60 transition-colors shrink-0">
           <ChevronLeft className="h-5 w-5 text-muted-foreground" />
         </button>
         <div className="flex-1">
@@ -346,7 +396,7 @@ function LessonView({ entry, onStart, onBack }: { entry: GrammarLessonRef; onSta
         {full.rule}
       </div>
 
-      <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-5 space-y-3">
+      <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-4 sm:p-5 space-y-3">
         <div className="flex items-center gap-2">
           <Lightbulb className="h-4 w-4 text-amber-400" />
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Тайлбар</p>
@@ -356,7 +406,8 @@ function LessonView({ entry, onStart, onBack }: { entry: GrammarLessonRef; onSta
 
       {content.table && (
         <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 overflow-hidden">
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[320px]">
             <thead>
               <tr className={cn('bg-linear-to-r text-white', style.bg)}>
                 {content.table.headers.map((h, i) => (
@@ -374,10 +425,11 @@ function LessonView({ entry, onStart, onBack }: { entry: GrammarLessonRef; onSta
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
 
-      <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-5 space-y-3">
+      <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-4 sm:p-5 space-y-3">
         <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Жишээнүүд</p>
         <div className="space-y-3">
           {content.examples.map((ex, i) => (
@@ -390,7 +442,7 @@ function LessonView({ entry, onStart, onBack }: { entry: GrammarLessonRef; onSta
       </div>
 
       {content.tips && content.tips.length > 0 && (
-        <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 p-5 space-y-2">
+        <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 p-4 sm:p-5 space-y-2">
           <div className="flex items-center gap-2">
             <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
             <p className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">Санамж</p>
@@ -536,7 +588,7 @@ function ChoiceButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'w-full text-left rounded-xl border px-5 py-4 text-sm font-semibold transition-all duration-200',
+        'w-full text-left rounded-xl border px-4 py-3 sm:px-5 sm:py-4 text-sm font-semibold transition-all duration-200',
         state === 'idle'    && 'bg-card/60 border-border/40 hover:border-primary/50 hover:bg-primary/5 hover:text-primary',
         state === 'correct' && 'bg-emerald-500/15 border-emerald-500 text-emerald-500',
         state === 'wrong'   && 'bg-destructive/15 border-destructive text-destructive',
@@ -571,7 +623,6 @@ export default function MyLingoPage() {
   const [view, setView] = useState<View>('map');
   const [mapTab, setMapTab] = useState<MapTab>('vocab');
   const [activeEntry, setActiveEntry] = useState<LessonEntry | null>(null);
-  const [activeIdx, setActiveIdx] = useState<number>(0);
 
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [qIdx, setQIdx] = useState(0);
@@ -580,7 +631,15 @@ export default function MyLingoPage() {
   const [sessionCorrect, setSessionCorrect] = useState<boolean[]>([]);
   const [xpEarned, setXpEarned] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [combo, setCombo] = useState(0);
+  const [showXpPop, setShowXpPop] = useState(false);
   const lock = useRef(false);
+  const quizTopRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to top of quiz card on every question change
+  useEffect(() => {
+    quizTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [qIdx]);
 
   useEffect(() => {
     if (!user || !firestore) { setLoading(false); return; }
@@ -598,8 +657,8 @@ export default function MyLingoPage() {
 
   const startLesson = useCallback((entry: LessonEntry, idx: number) => {
     setActiveEntry(entry);
-    setActiveIdx(idx);
-    setQIdx(0); setSelected(null); setShowFeedback(false); setSessionCorrect([]); setXpEarned(0);
+    void idx; // unused, kept for API compatibility
+    setQIdx(0); setSelected(null); setShowFeedback(false); setSessionCorrect([]); setXpEarned(0); setCombo(0);
     lock.current = false;
     if (entry.kind === 'grammar') {
       setView('lesson');
@@ -613,7 +672,7 @@ export default function MyLingoPage() {
     if (!activeEntry) return;
     const qs = activeEntry.kind === 'vocab' ? buildVocabQuiz(activeEntry) : buildGrammarQuiz(activeEntry as GrammarLessonRef);
     setQuestions(qs);
-    setQIdx(0); setSelected(null); setShowFeedback(false); setSessionCorrect([]); setXpEarned(0);
+    setQIdx(0); setSelected(null); setShowFeedback(false); setSessionCorrect([]); setXpEarned(0); setCombo(0);
     lock.current = false;
     setView('quiz');
   }, [activeEntry]);
@@ -623,8 +682,11 @@ export default function MyLingoPage() {
     lock.current = true;
     const isCorrect = normalizeAnswer(choice) === normalizeAnswer(getCorrectAnswer(questions[qIdx]));
     const newCorrect = [...sessionCorrect, isCorrect];
-    const newXP = isCorrect ? xpEarned + XP_CORRECT : xpEarned;
-    setSelected(choice); setShowFeedback(true); setSessionCorrect(newCorrect); setXpEarned(newXP);
+    const newCombo = isCorrect ? combo + 1 : 0;
+    const comboBonus = isCorrect && newCombo >= 3 ? 5 : isCorrect && newCombo >= 2 ? 2 : 0;
+    const newXP = isCorrect ? xpEarned + XP_CORRECT + comboBonus : xpEarned;
+    if (isCorrect) { setShowXpPop(true); setTimeout(() => setShowXpPop(false), 900); }
+    setSelected(choice); setShowFeedback(true); setSessionCorrect(newCorrect); setXpEarned(newXP); setCombo(newCombo);
     setTimeout(() => {
       if (qIdx + 1 >= questions.length) {
         finishLesson(newCorrect, newXP);
@@ -632,8 +694,8 @@ export default function MyLingoPage() {
         setQIdx(p => p + 1); setSelected(null); setShowFeedback(false);
         lock.current = false;
       }
-    }, 1300);
-  }, [showFeedback, questions, qIdx, sessionCorrect, xpEarned]); // eslint-disable-line
+    }, isCorrect ? 1100 : 1900);
+  }, [showFeedback, questions, qIdx, sessionCorrect, xpEarned, combo]); // eslint-disable-line
 
   const finishLesson = async (correct: boolean[], xp: number) => {
     if (!activeEntry) return;
@@ -714,7 +776,7 @@ export default function MyLingoPage() {
   // ── Quiz card ──────────────────────────────────────────────────────────────
 
   function renderQuizCard(q: QuizQuestion) {
-    const cardCls = 'rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-8 text-center space-y-3';
+    const cardCls = 'rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-5 sm:p-8 text-center space-y-3';
     const anim = { initial: { opacity: 0, scale: 0.96 }, animate: { opacity: 1, scale: 1 } };
 
     if (q.type === 'vocab') return (
@@ -722,7 +784,7 @@ export default function MyLingoPage() {
         <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
           {q.word.level} · Монгол утгыг сонгоно уу
         </p>
-        <h2 className="text-4xl font-black tracking-tight text-foreground">{q.word.word}</h2>
+        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">{q.word.word}</h2>
         <p className="text-sm text-muted-foreground italic">&ldquo;{q.word.example}&rdquo;</p>
       </motion.div>
     );
@@ -732,7 +794,7 @@ export default function MyLingoPage() {
         <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
           {q.word.level} · Англи үгийг сонгоно уу
         </p>
-        <h2 className="text-4xl font-black tracking-tight text-foreground">{q.word.mn}</h2>
+        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">{q.word.mn}</h2>
         <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
           <ArrowLeftRight className="h-3 w-3" />
           <span>Англиар ямар вэ?</span>
@@ -745,16 +807,16 @@ export default function MyLingoPage() {
         <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
           {q.word.level} · Англиар бич
         </p>
-        <h2 className="text-4xl font-black tracking-tight text-foreground">{q.word.mn}</h2>
+        <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">{q.word.mn}</h2>
         <p className="text-sm text-muted-foreground italic">&ldquo;{q.word.example}&rdquo;</p>
       </motion.div>
     );
 
     if (q.type === 'sentence_build') return (
-      <motion.div key={qIdx} {...anim} className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-6 text-center space-y-2">
+      <motion.div key={qIdx} {...anim} className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-5 sm:p-6 text-center space-y-2">
         <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Өгүүлбэр үүсгэх</p>
         <div className="flex items-center justify-center gap-2 flex-wrap">
-          <span className="text-2xl font-black text-foreground">{q.word.word}</span>
+          <span className="text-xl sm:text-2xl font-black text-foreground">{q.word.word}</span>
           <span className="text-muted-foreground">·</span>
           <span className="text-base text-muted-foreground">{q.word.mn}</span>
         </div>
@@ -767,7 +829,7 @@ export default function MyLingoPage() {
       return (
         <motion.div key={qIdx} {...anim} className={cardCls}>
           <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Зөв хэлбэрийг сонгоно уу</p>
-          <p className="text-2xl font-bold text-foreground leading-relaxed">
+          <p className="text-lg sm:text-2xl font-bold text-foreground leading-relaxed">
             {parts[0]}
             <span className="inline-block px-3 py-0.5 mx-1 rounded-lg bg-primary/15 border border-primary/30 text-primary font-black min-w-[60px] text-center">
               {selected && showFeedback ? selected : '___'}
@@ -783,7 +845,7 @@ export default function MyLingoPage() {
       return (
         <motion.div key={qIdx} {...anim} className={cardCls}>
           <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Зөв хэлбэрийг бич</p>
-          <p className="text-2xl font-bold text-foreground leading-relaxed">
+          <p className="text-lg sm:text-2xl font-bold text-foreground leading-relaxed">
             {parts[0]}
             <span className="inline-block px-3 py-0.5 mx-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-500 font-black min-w-[60px] text-center">
               {selected && showFeedback ? selected : '___'}
@@ -795,7 +857,7 @@ export default function MyLingoPage() {
     }
 
     if (q.type === 'grammar_build') return (
-      <motion.div key={qIdx} {...anim} className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-6 text-center space-y-2">
+      <motion.div key={qIdx} {...anim} className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-5 sm:p-6 text-center space-y-2">
         <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Өгүүлбэр үүсгэх</p>
         <p className="text-xs text-muted-foreground">Үгүүдийг зөв дарааллаар байрлуул</p>
         <p className="text-xs text-primary/70 font-mono bg-primary/5 rounded-lg px-3 py-1.5">{q.explain}</p>
@@ -826,26 +888,26 @@ export default function MyLingoPage() {
         {/* ── MAP ── */}
         {view === 'map' && (
           <motion.div key="map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="flex flex-col gap-0 pt-2 max-w-sm mx-auto"
+            className="flex flex-col gap-0 pt-2 w-full max-w-sm mx-auto"
           >
             {/* Stats bar */}
-            <div className="sticky top-0 z-20 flex items-center justify-between gap-3 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/40 px-5 py-3 mb-4">
+            <div className="sticky top-0 z-20 flex items-center justify-between gap-2 sm:gap-3 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/40 px-4 py-2.5 sm:px-5 sm:py-3 mb-4">
               {loading ? <Loader2 className="h-5 w-5 animate-spin text-primary mx-auto" /> : (
                 <>
                   <div className="flex items-center gap-1.5">
                     <Zap className="h-4 w-4 text-primary" />
-                    <span className="font-black text-base text-foreground">{userData.xp.toLocaleString()}</span>
+                    <span className="font-black text-sm sm:text-base text-foreground">{userData.xp.toLocaleString()}</span>
                     <span className="text-xs text-muted-foreground">XP</span>
                   </div>
                   <div className="h-4 w-px bg-border/50" />
                   <div className="flex items-center gap-1.5">
                     <Flame className="h-4 w-4 text-orange-500" />
-                    <span className="font-black text-base text-foreground">{userData.streak}</span>
+                    <span className="font-black text-sm sm:text-base text-foreground">{userData.streak}</span>
                   </div>
                   <div className="h-4 w-px bg-border/50" />
                   <div className="flex items-center gap-1.5">
                     <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
-                    <span className="font-black text-base text-foreground">{completedCount}</span>
+                    <span className="font-black text-sm sm:text-base text-foreground">{completedCount}</span>
                     <span className="text-xs text-muted-foreground">/{totalLessons}</span>
                   </div>
                 </>
@@ -890,82 +952,170 @@ export default function MyLingoPage() {
         )}
 
         {/* ── QUIZ ── */}
-        {view === 'quiz' && questions[qIdx] && (
+        {view === 'quiz' && (
           <motion.div key="quiz" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-            className="max-w-xl mx-auto pt-2 space-y-5"
+            className="max-w-xl mx-auto pt-2 space-y-3 sm:space-y-4"
           >
-            <div className="flex items-center gap-3">
-              <button onClick={goToMap} className="p-2 rounded-xl hover:bg-muted/60 transition-colors">
+            {/* ── Header ── */}
+            <div ref={quizTopRef} className="flex items-center gap-3">
+              <button onClick={goToMap} className="p-2.5 rounded-xl hover:bg-muted/60 transition-colors shrink-0">
                 <ChevronLeft className="h-5 w-5 text-muted-foreground" />
               </button>
-              <Progress value={(qIdx / questions.length) * 100} className="flex-1 h-2.5" />
-              <span className="text-xs text-muted-foreground font-mono shrink-0">{qIdx + 1}/{questions.length}</span>
+              <div className="flex-1 space-y-1.5">
+                <Progress value={(qIdx / questions.length) * 100} className="h-2" />
+                <div className="flex justify-between items-center">
+                  {activeEntry && (
+                    <p className="text-[10px] font-semibold text-muted-foreground/50 uppercase tracking-widest">
+                      {activeEntry.emoji} {activeEntry.title}
+                    </p>
+                  )}
+                  <span className="text-[10px] text-muted-foreground/50 font-mono ml-auto">{qIdx + 1} / {questions.length}</span>
+                </div>
+              </div>
+              {/* Combo badge */}
+              <AnimatePresence>
+                {combo >= 2 && (
+                  <motion.div
+                    key={combo}
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-orange-500/15 border border-orange-500/30"
+                  >
+                    <Flame className="h-3 w-3 text-orange-500" />
+                    <span className="text-xs font-black text-orange-500">{combo}x</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {activeEntry && (
-              <p className="text-xs font-semibold text-muted-foreground/60 uppercase tracking-widest px-1">
-                {activeEntry.emoji} {activeEntry.title}
-              </p>
-            )}
-
-            {renderQuizCard(questions[qIdx])}
-
-            {/* ── Input area (routes by question type) ── */}
-            {(() => {
-              const q = questions[qIdx];
-              if (q.type === 'vocab' || q.type === 'vocab_reverse' || q.type === 'grammar') {
-                const correctAns = getCorrectAnswer(q);
-                return (
-                  <div className="grid grid-cols-1 gap-3">
-                    {q.choices.map((choice, i) => {
-                      const isSelected = selected === choice;
-                      const isCorrect = choice === correctAns;
-                      let state: 'idle' | 'correct' | 'wrong' | 'reveal' = 'idle';
-                      if (showFeedback) {
-                        if (isSelected && isCorrect) state = 'correct';
-                        else if (isSelected && !isCorrect) state = 'wrong';
-                        else if (!isSelected && isCorrect) state = 'reveal';
-                      }
-                      return <ChoiceButton key={choice} choice={choice} index={i} state={state} onClick={() => handleAnswer(choice)} disabled={showFeedback} />;
-                    })}
-                  </div>
-                );
-              }
-              if (q.type === 'typing' || q.type === 'grammar_typing') {
-                return <TypingAnswer key={qIdx} questionType={q.type} onSubmit={handleAnswer} disabled={showFeedback} />;
-              }
-              if (q.type === 'sentence_build' || q.type === 'grammar_build') {
-                return <SentenceBuildAnswer key={qIdx} initialWords={q.words} onSubmit={handleAnswer} disabled={showFeedback} />;
-              }
-              return null;
-            })()}
-
-            <AnimatePresence>
-              {showFeedback && (() => {
-                const q = questions[qIdx];
-                const correctAns = getCorrectAnswer(q);
-                const isRight = selected !== null && normalizeAnswer(selected) === normalizeAnswer(correctAns);
-                const explain = (q.type === 'grammar' || q.type === 'grammar_typing' || q.type === 'grammar_build') ? q.explain : null;
-                return (
-                  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                    className={cn('rounded-xl px-5 py-3 text-sm font-semibold flex items-center gap-2 flex-wrap',
-                      isRight ? 'bg-emerald-500/15 text-emerald-500' : 'bg-destructive/15 text-destructive'
-                    )}
+            {/* ── Animated question card + input ── */}
+            <div className="relative">
+              {/* XP popup */}
+              <AnimatePresence>
+                {showXpPop && (
+                  <motion.div
+                    initial={{ opacity: 1, y: 0 }} animate={{ opacity: 0, y: -32 }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                    className="absolute -top-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 text-sm font-black text-emerald-500 pointer-events-none"
                   >
-                    {isRight ? (
-                      <><CheckCircle2 className="h-4 w-4 shrink-0" /> Зөв! +{XP_CORRECT} XP
-                        {explain && <span className="opacity-70 font-normal">· {explain}</span>}
-                      </>
-                    ) : (
-                      <><XCircle className="h-4 w-4 shrink-0" />
-                        <span>Зөв хариулт: <strong>{correctAns}</strong></span>
-                        {explain && <span className="opacity-70 font-normal">· {explain}</span>}
-                      </>
-                    )}
+                    <Zap className="h-3.5 w-3.5" />
+                    +{combo >= 3 ? XP_CORRECT * 2 : XP_CORRECT} XP
+                    {combo >= 3 && <span className="text-orange-500 ml-0.5">🔥</span>}
                   </motion.div>
-                );
-              })()}
-            </AnimatePresence>
+                )}
+              </AnimatePresence>
+
+              <AnimatePresence mode="wait" initial={false}>
+                {questions[qIdx] && (() => {
+                  const q = questions[qIdx];
+                  return (
+                  <motion.div
+                    key={qIdx}
+                    initial={{ opacity: 0, x: 60 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -60 }}
+                    transition={{ duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className="space-y-4"
+                  >
+                    {/* Type badge */}
+                    <div><QuestionTypeBadge q={q} /></div>
+
+                    {/* Question prompt card */}
+                    {renderQuizCard(q)}
+
+                    {/* Input area */}
+                    {(() => {
+                      if (q.type === 'vocab' || q.type === 'vocab_reverse') {
+                        const correctAns = getCorrectAnswer(q);
+                        return (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {q.choices.map((choice, i) => {
+                              const isSelected = selected === choice;
+                              const isChoiceCorrect = choice === correctAns;
+                              let state: 'idle' | 'correct' | 'wrong' | 'reveal' = 'idle';
+                              if (showFeedback) {
+                                if (isSelected && isChoiceCorrect) state = 'correct';
+                                else if (isSelected && !isChoiceCorrect) state = 'wrong';
+                                else if (!isSelected && isChoiceCorrect) state = 'reveal';
+                              }
+                              return <ChoiceButton key={choice} choice={choice} index={i} state={state} onClick={() => handleAnswer(choice)} disabled={showFeedback} />;
+                            })}
+                          </div>
+                        );
+                      }
+                      if (q.type === 'grammar') {
+                        const correctAns = getCorrectAnswer(q);
+                        return (
+                          <div className="grid grid-cols-1 gap-3">
+                            {q.choices.map((choice, i) => {
+                              const isSelected = selected === choice;
+                              const isChoiceCorrect = choice === correctAns;
+                              let state: 'idle' | 'correct' | 'wrong' | 'reveal' = 'idle';
+                              if (showFeedback) {
+                                if (isSelected && isChoiceCorrect) state = 'correct';
+                                else if (isSelected && !isChoiceCorrect) state = 'wrong';
+                                else if (!isSelected && isChoiceCorrect) state = 'reveal';
+                              }
+                              return <ChoiceButton key={choice} choice={choice} index={i} state={state} onClick={() => handleAnswer(choice)} disabled={showFeedback} />;
+                            })}
+                          </div>
+                        );
+                      }
+                      if (q.type === 'typing' || q.type === 'grammar_typing') {
+                        const isCorrect = showFeedback
+                          ? normalizeAnswer(selected ?? '') === normalizeAnswer(q.answer)
+                          : undefined;
+                        return <TypingAnswer questionType={q.type} onSubmit={handleAnswer} disabled={showFeedback} isCorrect={isCorrect} />;
+                      }
+                      if (q.type === 'sentence_build' || q.type === 'grammar_build') {
+                        const isCorrect = showFeedback
+                          ? normalizeAnswer(selected ?? '') === normalizeAnswer(q.correct)
+                          : undefined;
+                        return <SentenceBuildAnswer initialWords={q.words} onSubmit={handleAnswer} disabled={showFeedback} isCorrect={isCorrect} correctSentence={q.correct} />;
+                      }
+                      return null;
+                    })()}
+
+                    {/* Feedback toast */}
+                    <AnimatePresence>
+                      {showFeedback && (() => {
+                        const correctAns = getCorrectAnswer(q);
+                        const isRight = selected !== null && normalizeAnswer(selected) === normalizeAnswer(correctAns);
+                        const explain = (q.type === 'grammar' || q.type === 'grammar_typing' || q.type === 'grammar_build') ? q.explain : null;
+                        return (
+                          <motion.div
+                            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 4 }}
+                            transition={{ duration: 0.18 }}
+                            className={cn(
+                              'rounded-xl px-5 py-3.5 text-sm font-semibold flex items-start gap-2.5 border',
+                              isRight
+                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500'
+                                : 'bg-destructive/10 border-destructive/30 text-destructive',
+                            )}
+                          >
+                            {isRight ? (
+                              <CheckCircle2 className="h-4 w-4 shrink-0 mt-0.5" />
+                            ) : (
+                              <XCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                            )}
+                            <div className="space-y-0.5">
+                              {isRight ? (
+                                <p>Зөв!{combo >= 3 ? ` 🔥 ${combo}x Combo!` : ''}</p>
+                              ) : (
+                                <p>Зөв хариулт: <strong>{correctAns}</strong></p>
+                              )}
+                              {explain && <p className="text-xs opacity-70 font-normal">{explain}</p>}
+                            </div>
+                          </motion.div>
+                        );
+                      })()}
+                    </AnimatePresence>
+                  </motion.div>
+                  );
+                })()}
+              </AnimatePresence>
+            </div>
 
             {saving && <div className="flex justify-center pt-2"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>}
           </motion.div>
@@ -974,22 +1124,32 @@ export default function MyLingoPage() {
         {/* ── RESULT ── */}
         {view === 'result' && activeEntry && (
           <motion.div key="result" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
-            className="max-w-md mx-auto pt-2 space-y-6 text-center"
+            className="max-w-md mx-auto pt-2 space-y-4 sm:space-y-6 text-center"
           >
             <motion.div initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 220, damping: 14, delay: 0.1 }}
               className="flex justify-center"
             >
-              <div className="w-24 h-24 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-5xl">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center text-4xl sm:text-5xl">
                 {activeEntry.emoji}
               </div>
             </motion.div>
 
             <div>
-              <h2 className="text-2xl font-black text-foreground">
-                {sessionCorrect.filter(Boolean).length === sessionCorrect.length ? '🎉 Гайхалтай!' : `${sessionCorrect.filter(Boolean).length}/${sessionCorrect.length} зөв`}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">{activeEntry.title} — хичээл дууслаа</p>
+              {(() => {
+                const correct = sessionCorrect.filter(Boolean).length;
+                const total = sessionCorrect.length;
+                const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+                const pctCls = pct >= 90 ? 'text-emerald-500' : pct >= 70 ? 'text-sky-500' : pct >= 50 ? 'text-orange-500' : 'text-destructive';
+                const msg = correct === total ? '🎉 Гайхалтай!' : pct >= 70 ? '👍 Сайн!' : '💪 Дахин туршаарай!';
+                return (
+                  <>
+                    <h2 className="text-xl sm:text-2xl font-black text-foreground">{msg}</h2>
+                    <p className={cn('text-5xl font-black mt-2 mb-1 tabular-nums', pctCls)}>{pct}%</p>
+                    <p className="text-xs text-muted-foreground">{correct}/{total} зөв · {activeEntry.title}</p>
+                  </>
+                );
+              })()}
             </div>
 
             <motion.div initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
@@ -1002,26 +1162,26 @@ export default function MyLingoPage() {
                   <motion.div key={n} initial={{ scale: 0, rotate: -30 }} animate={{ scale: 1, rotate: 0 }}
                     transition={{ delay: 0.4 + n * 0.12, type: 'spring', stiffness: 300 }}
                   >
-                    <Star className={cn('h-10 w-10', n <= earned ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/20 fill-muted-foreground/10')} />
+                    <Star className={cn('h-8 w-8 sm:h-10 sm:w-10', n <= earned ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/20 fill-muted-foreground/10')} />
                   </motion.div>
                 );
               })}
             </motion.div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div className="rounded-2xl bg-card/60 border border-border/40 p-4 space-y-1">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="rounded-2xl bg-card/60 border border-border/40 p-3 sm:p-4 space-y-1">
                 <Zap className="h-5 w-5 text-primary mx-auto" />
-                <p className="text-2xl font-black text-primary">+{xpEarned}</p>
+                <p className="text-xl sm:text-2xl font-black text-primary">+{xpEarned}</p>
                 <p className="text-xs text-muted-foreground">XP олов</p>
               </div>
-              <div className="rounded-2xl bg-card/60 border border-border/40 p-4 space-y-1">
+              <div className="rounded-2xl bg-card/60 border border-border/40 p-3 sm:p-4 space-y-1">
                 <Trophy className="h-5 w-5 text-amber-400 mx-auto" />
-                <p className="text-2xl font-black">{sessionCorrect.filter(Boolean).length}</p>
+                <p className="text-xl sm:text-2xl font-black">{sessionCorrect.filter(Boolean).length}</p>
                 <p className="text-xs text-muted-foreground">Зөв хариулт</p>
               </div>
-              <div className="rounded-2xl bg-card/60 border border-border/40 p-4 space-y-1">
+              <div className="rounded-2xl bg-card/60 border border-border/40 p-3 sm:p-4 space-y-1">
                 <Flame className="h-5 w-5 text-orange-500 mx-auto" />
-                <p className="text-2xl font-black">{userData.streak}</p>
+                <p className="text-xl sm:text-2xl font-black">{userData.streak}</p>
                 <p className="text-xs text-muted-foreground">Streak</p>
               </div>
             </div>

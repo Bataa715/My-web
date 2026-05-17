@@ -134,7 +134,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 left-0 w-full z-50 min-h-[60px] md:min-h-[72px]">
+    <header className="sticky top-0 left-0 w-full z-50 min-h-[60px] md:min-h-[72px] pt-[env(safe-area-inset-top,0px)]">
       <div className="relative">
         <div
           className={cn(

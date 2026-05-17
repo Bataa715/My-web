@@ -89,7 +89,7 @@ export default function ToolPageShell({
       </div>
 
       {/* ── Main content ── */}
-      <div className={cn('relative z-10 px-4 md:px-6 pb-20', className)}>
+      <div className={cn('relative z-10 px-4 md:px-6 pb-28 sm:pb-20', className)}>
         <div className="pt-10 pb-2">
           <PageHeader
             eyebrow={eyebrow}

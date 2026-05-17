@@ -106,7 +106,7 @@ const FloatingNav = () => {
         transition={{
           duration: 0.2,
         }}
-        className="fixed bottom-6 inset-x-0 max-w-xs mx-auto z-50 flex items-center justify-center"
+        className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] inset-x-0 max-w-xs mx-auto z-50 flex items-center justify-center"
       >
         <nav
           aria-label="Үндсэн навигац"
@@ -308,9 +308,9 @@ export default function MainLayout({
   return (
     <>
       <IntroOverlay />
-      <div className="min-h-screen p-3 md:p-4 lg:p-6 bg-background">
+      <div className="min-h-screen p-0 sm:p-3 md:p-4 lg:p-6 bg-background">
         <div className="animated-border-wrapper">
-          <div className="relative z-10 flex min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] flex-col rounded-[1.6rem] bg-background overflow-hidden shadow-2xl shadow-primary/5">
+          <div className="relative z-10 flex min-h-screen sm:min-h-[calc(100vh-1.5rem)] md:min-h-[calc(100vh-2rem)] lg:min-h-[calc(100vh-3rem)] flex-col rounded-none sm:rounded-[1.6rem] bg-background overflow-hidden shadow-2xl shadow-primary/5">
             {heroImage && (
               <div className="absolute top-[88px] md:top-[100px] left-0 w-full h-[50vh] -z-10">
                 <Image
@@ -401,7 +401,7 @@ export default function MainLayout({
             <div className="relative z-50">
               <Header />
             </div>
-            <main className="relative z-10 flex-1">
+            <main className="relative z-10 flex-1 pb-28 sm:pb-4">
               <AnimatePresence mode="wait" initial={false}>
                 {children}
               </AnimatePresence>
