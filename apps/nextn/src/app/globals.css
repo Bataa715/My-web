@@ -833,7 +833,10 @@
 
   /* Rotating border animation for layout */
   .animated-border-wrapper {
-    @apply relative overflow-hidden rounded-[1.75rem] p-[3px];
+    position: relative;
+    border-radius: 1.75rem;
+    padding: 3px;
+    overflow: clip; /* clip ≠ hidden: visually clips but does NOT create a scroll container, so sticky + page scroll work */
   }
 
   @media (max-width: 639px) {
