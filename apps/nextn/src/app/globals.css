@@ -6,12 +6,20 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  /* Body — Exo 2: futuristic sans, full Cyrillic coverage */
   --font-body:
-    var(--font-jetbrainsMono), ui-monospace, SFMono-Regular, monospace;
+    var(--font-exo), ui-sans-serif, system-ui, sans-serif;
   --font-sans:
-    var(--font-jetbrainsMono), ui-monospace, SFMono-Regular, monospace;
+    var(--font-exo), ui-sans-serif, system-ui, sans-serif;
+  /* `font-mono` utility now maps to the sans too — dozens of UI labels use
+     it as an accent class; real code (<pre>/<code>) keeps JetBrains via the
+     explicit element rule in the base layer below. */
   --font-mono:
-    var(--font-jetbrainsMono), ui-monospace, SFMono-Regular, monospace;
+    var(--font-exo), ui-sans-serif, system-ui, sans-serif;
+  /* Display face for big cosmic headlines (hero, section titles) */
+  --font-display:
+    var(--font-spaceGrotesk), var(--font-exo), ui-sans-serif,
+    system-ui, sans-serif;
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -280,12 +288,7 @@
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>");
 }
-@utility glass-panel {
-  background: hsl(var(--card) / 0.55);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  backdrop-filter: blur(14px) saturate(160%);
-  border: 1px solid hsl(var(--border) / 0.6);
-}
+/* glass-panel now lives in the COSMOS utilities block at the end of file */
 @utility glow-border {
   box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3), 0 0 20px -8px hsl(var(--primary) / 0.5);
 }
@@ -352,32 +355,37 @@
 }
 
 @layer base {
+  /* ── COSMOS default theme — deep space #05050a, electric blue / violet /
+     magenta accents. All other named themes below are left untouched. ── */
   :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 251 78% 79%;
-    --primary-foreground: 251 78% 15%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 182 100% 74%;
-    --accent-foreground: 182 100% 20%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 240 33% 3%;
+    --foreground: 228 40% 97%;
+    --card: 236 30% 7%;
+    --card-foreground: 228 40% 97%;
+    --popover: 238 32% 5%;
+    --popover-foreground: 228 40% 97%;
+    --primary: 217 100% 68%;
+    --primary-foreground: 222 60% 8%;
+    --secondary: 240 26% 13%;
+    --secondary-foreground: 228 40% 97%;
+    --muted: 240 22% 14%;
+    --muted-foreground: 232 16% 68%;
+    --accent: 271 91% 71%;
+    --accent-foreground: 271 91% 12%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 251 78% 79%;
+    --border: 238 24% 17%;
+    --input: 238 24% 17%;
+    --ring: 217 100% 68%;
     --radius: 0.8rem;
-    --chart-1: 80 90% 70%;
-    --chart-2: 130 85% 70%;
-    --chart-3: 180 80% 70%;
-    --chart-4: 265 89% 78%;
-    --chart-5: 330 89% 78%;
+    --chart-1: 217 100% 68%;
+    --chart-2: 271 91% 71%;
+    --chart-3: 322 90% 68%;
+    --chart-4: 189 94% 60%;
+    --chart-5: 45 93% 60%;
+    /* Cosmic extras used by custom utilities */
+    --cosmic-magenta: 322 90% 68%;
+    --cosmic-cyan: 189 94% 60%;
   }
 
   html[class='dracula'] {
@@ -519,19 +527,63 @@
   }
   html,
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     font-family:
-      var(--font-jetbrainsMono), ui-monospace, SFMono-Regular, Menlo, Consolas,
-      'Liberation Mono', monospace, 'Apple Color Emoji', 'Segoe UI Emoji',
-      'Segoe UI Symbol', 'Noto Color Emoji';
+      var(--font-exo), ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+      sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+      'Noto Color Emoji';
     font-feature-settings: 'liga' 1, 'calt' 1;
   }
+  /* Background lives on <html> only: <body> stays transparent so the fixed
+     cosmos canvas (z-index −10) is visible behind all page content. */
+  html {
+    @apply bg-background;
+  }
+  body {
+    background: transparent;
+  }
 
-  /* Force JetBrains Mono on all native elements (inputs, buttons, etc.) */
+  /* ── Mobile / PWA hardening ── */
+  /* Never allow sideways scroll from decorative overflow (auras, orbits) */
+  html,
+  body {
+    overflow-x: clip;
+  }
+  /* Installed as an app (Add to Home Screen): respect the notch/status bar */
+  @media (display-mode: standalone) {
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+  }
+  /* Comfortable touch targets & no iOS tap highlight flash */
+  @media (pointer: coarse) {
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* iOS auto-zooms any focused input with font-size < 16px — prevent it */
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+  /* iOS momentum scrolling for horizontal scrollers */
+  .hide-scrollbar {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Native form elements inherit the body sans */
   button,
   input,
   select,
-  textarea,
+  textarea {
+    font-family:
+      var(--font-exo), ui-sans-serif, system-ui, sans-serif;
+  }
+  /* Real code contexts keep the mono face */
   pre,
   code,
   kbd,
@@ -1263,25 +1315,177 @@
   transform-style: preserve-3d;
 }
 
-/* Skill marquee — infinite horizontal scroll */
-@keyframes marquee-ltr {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-@keyframes marquee-rtl {
-  from { transform: translateX(-50%); }
-  to   { transform: translateX(0); }
-}
-.marquee-track {
-  animation: marquee-ltr var(--marquee-dur, 35s) linear infinite;
-  display: flex;
-  gap: 12px;
-  will-change: transform;
-}
-.marquee-track-rev {
-  animation: marquee-rtl var(--marquee-dur, 35s) linear infinite;
-  display: flex;
-  gap: 12px;
-  will-change: transform;
+/* ═══════════════════════════════════════════════════════════════════════
+   COSMOS — persistent 3D space backdrop + CSS fallback + cosmic utilities
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Fixed full-screen layer behind everything (body is transparent). */
+.cosmos-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  background: #05050a;
+  overflow: hidden;
 }
 
+.cosmos-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.cosmos-canvas--ready {
+  opacity: 1;
+}
+
+/* ── CSS fallback: instant paint, also the permanent backdrop when WebGL
+      is unavailable or the user prefers reduced motion. ── */
+.cosmos-fallback {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  transition: opacity 1.4s ease;
+  background:
+    radial-gradient(ellipse 55% 42% at 18% 22%, hsl(262 80% 22% / 0.35), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 82% 65%, hsl(217 90% 25% / 0.3), transparent 70%),
+    radial-gradient(ellipse 42% 34% at 55% 95%, hsl(322 75% 24% / 0.25), transparent 70%),
+    linear-gradient(180deg, #05050a 0%, #070713 55%, #05050a 100%);
+}
+.cosmos-fallback--hidden {
+  opacity: 0;
+}
+
+/* Three tiled star layers at different densities/sizes → cheap parallax
+   feel via different drift durations. Pure gradients, no images. */
+.cosmos-fallback__stars {
+  position: absolute;
+  inset: -50%;
+  background-repeat: repeat;
+}
+.cosmos-fallback__stars--1 {
+  background-image:
+    radial-gradient(1px 1px at 25px 35px, rgb(255 255 255 / 0.9), transparent 40%),
+    radial-gradient(1px 1px at 125px 90px, rgb(200 220 255 / 0.8), transparent 40%),
+    radial-gradient(1.5px 1.5px at 75px 160px, rgb(255 255 255 / 0.7), transparent 40%),
+    radial-gradient(1px 1px at 180px 45px, rgb(190 180 255 / 0.75), transparent 40%);
+  background-size: 220px 220px;
+  animation: cosmos-drift 240s linear infinite;
+}
+.cosmos-fallback__stars--2 {
+  background-image:
+    radial-gradient(1px 1px at 60px 20px, rgb(255 255 255 / 0.55), transparent 40%),
+    radial-gradient(1px 1px at 150px 140px, rgb(160 200 255 / 0.5), transparent 40%),
+    radial-gradient(1px 1px at 30px 110px, rgb(255 230 200 / 0.45), transparent 40%);
+  background-size: 300px 300px;
+  animation: cosmos-drift 360s linear infinite reverse;
+}
+.cosmos-fallback__stars--3 {
+  background-image:
+    radial-gradient(2px 2px at 95px 65px, rgb(255 255 255 / 0.85), transparent 45%),
+    radial-gradient(2px 2px at 210px 190px, rgb(150 190 255 / 0.7), transparent 45%);
+  background-size: 420px 420px;
+  animation: cosmos-twinkle 5s ease-in-out infinite alternate;
+}
+@keyframes cosmos-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-220px, -220px, 0); }
+}
+@keyframes cosmos-twinkle {
+  from { opacity: 0.5; }
+  to   { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cosmos-fallback__stars {
+    animation: none;
+  }
+}
+
+/* ── Glassmorphism panel — translucent border, backdrop blur, soft glow ── */
+@utility glass-panel {
+  border-radius: calc(var(--radius) + 0.6rem);
+  border: 1px solid hsl(var(--foreground) / 0.09);
+  background:
+    linear-gradient(155deg, hsl(var(--card) / 0.72), hsl(var(--card) / 0.38));
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  box-shadow:
+    inset 0 1px 0 hsl(var(--foreground) / 0.08),
+    0 0 0 1px hsl(var(--primary) / 0.06),
+    0 18px 50px -18px hsl(240 60% 2% / 0.9),
+    0 0 46px -18px hsl(var(--primary) / 0.35);
+}
+
+/* ── Cosmic glow text for hero/section headlines ── */
+@utility glow-text {
+  text-shadow:
+    0 0 18px hsl(var(--primary) / 0.5),
+    0 0 52px hsl(var(--primary) / 0.25),
+    0 0 92px hsl(var(--accent) / 0.18);
+}
+
+/* ── Glowing pill CTA ── */
+@utility cta-glow {
+  position: relative;
+  border-radius: 999px;
+  background: linear-gradient(
+    118deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--accent)) 55%,
+    hsl(var(--cosmic-magenta, 322 90% 68%)) 110%
+  );
+  background-size: 180% 180%;
+  color: hsl(var(--primary-foreground));
+  box-shadow:
+    0 0 22px -4px hsl(var(--primary) / 0.65),
+    0 0 60px -12px hsl(var(--accent) / 0.5),
+    inset 0 1px 0 hsl(0 0% 100% / 0.28);
+  transition: box-shadow 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: cta-gradient 6s ease infinite;
+}
+.cta-glow:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow:
+    0 0 34px -2px hsl(var(--primary) / 0.85),
+    0 0 90px -10px hsl(var(--accent) / 0.7),
+    inset 0 1px 0 hsl(0 0% 100% / 0.35);
+}
+@keyframes cta-gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* ── Aurora light sweep — slow diagonal band behind key sections ── */
+@utility aurora-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.aurora-sweep::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      115deg,
+      transparent 30%,
+      hsl(var(--primary) / 0.07) 42%,
+      hsl(var(--accent) / 0.09) 50%,
+      hsl(var(--cosmic-magenta, 322 90% 68%) / 0.06) 58%,
+      transparent 70%
+    );
+  filter: blur(30px);
+  animation: aurora-pan 16s ease-in-out infinite alternate;
+}
+@keyframes aurora-pan {
+  from { transform: translateX(-12%) rotate(0.001deg); }
+  to   { transform: translateX(12%) rotate(0.001deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-sweep::before,
+  .cta-glow {
+    animation: none;
+  }
+}

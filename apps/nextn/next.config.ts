@@ -34,6 +34,8 @@ loadEnvFile(path.join(workspaceRoot, '.env.local'));
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Monorepo: trace deps from workspace root (must match Vercel's outputFileTracingRoot).
+  outputFileTracingRoot: workspaceRoot,
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,

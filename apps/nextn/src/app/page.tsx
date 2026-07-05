@@ -41,10 +41,10 @@ const Hero = dynamic(() => import('@/components/sections/hero'), {
   loading: () => <div className="w-full min-h-[calc(100vh-120px)]" />,
 });
 
-const InteractiveParticles = dynamic(
-  () => import('@/components/shared/InteractiveParticles'),
-  { ssr: false }
-);
+// Interactive tools showcase — a mini solar system of clickable planets
+const ToolsGalaxy = dynamic(() => import('@/components/home/ToolsGalaxy'), {
+  loading: () => <div className="w-full min-h-[500px]" />,
+});
 
 const Education = dynamic(() => import('@/components/sections/Education'), {
   loading: () => <div className="w-full min-h-[400px]" />,
@@ -223,13 +223,12 @@ function HomePageInner() {
     <HomeShell>
       <ScrollProgressBar />
 
-      {/* HERO — inherits the global aurora, no separate backdrop */}
+      {/* HERO — floats directly over the 3D cosmos, planet horizon below */}
       <section
         id="hero"
         className="relative"
         data-section="hero"
       >
-        <InteractiveParticles quantity={40} />
         <div className="relative z-10 min-h-[80vh]">
           <Suspense
             fallback={<div className="w-full min-h-[80vh] bg-transparent" />}
@@ -285,6 +284,14 @@ function HomePageInner() {
         </div>
       )}
 
+      {/* INTERACTIVE SHOWCASE — tools as a clickable mini solar system */}
+      <div data-section="galaxy" id="galaxy" className="relative scroll-mt-24 aurora-sweep">
+        <div className="container mx-auto px-4">
+          <SectionOrnament />
+        </div>
+        <ToolsGalaxy />
+      </div>
+
       {/* BACK TO TOP */}
       <BackToTop />
 
@@ -292,6 +299,7 @@ function HomePageInner() {
         sections={[
           { id: 'hero', label: 'Нүүр' },
           ...visibleSections.map(s => ({ id: s.id, label: s.title })),
+          { id: 'galaxy', label: 'Хэрэгслүүд' },
         ]}
       />
     </HomeShell>
@@ -305,20 +313,12 @@ function HomePageInner() {
 function HomeShell({ children }: { children: ReactNode }) {
   return (
     <div className="relative isolate overflow-x-clip">
-      {/* Global backdrop — neutral, only a faint dot grid */}
+      {/* The 3D cosmos canvas (global, z −10) is the real backdrop.
+          Here we only add a soft aurora light sweep above it. */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-      >
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '28px 28px',
-          }}
-        />
-      </div>
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden aurora-sweep"
+      />
       {children}
     </div>
   );
@@ -387,6 +387,7 @@ function SectionFrame({
   const reduce = useReducedMotion();
   return (
     <div
+      id={id}
       data-section={id}
       className="relative scroll-mt-24"
     >

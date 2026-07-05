@@ -1,8 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
-import dynamic from 'next/dynamic';
-import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
+/**
+ * Tools page — cosmic galaxy navigation.
+ * Tools orbit a glowing core star on a compressed ellipse (fake-3D depth).
+ * Selecting a planet reveals its glassmorphism detail card below; the card
+ * itself is the link into the tool. Chips remain for quick/mobile access.
+ */
+import React, { useEffect, useState } from 'react';
+import {
+  motion,
+  AnimatePresence,
+  MotionConfig,
+  useMotionValue,
+  useAnimationFrame,
+  useReducedMotion,
+} from 'framer-motion';
 import {
   Timer,
   Code as CodeIcon,
@@ -19,12 +31,6 @@ import Link from 'next/link';
 import PageHeader from '@/components/shared/PageHeader';
 import { type Tool } from '@/components/tools/ToolCard';
 import { cn } from '@/lib/utils';
-
-// Lazy: heavy canvas — render after first paint
-const InteractiveParticles = dynamic(
-  () => import('@/components/shared/InteractiveParticles'),
-  { ssr: false }
-);
 
 const allTools: Tool[] = [
   {
@@ -125,8 +131,124 @@ const allTools: Tool[] = [
   },
 ];
 
+/* ─── One orbiting tool-planet (compressed-ellipse fake 3D) ─── */
+function OrbitPlanet({
+  tool,
+  index,
+  total,
+  active,
+  onSelect,
+}: {
+  tool: Tool;
+  index: number;
+  total: number;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  const reduce = useReducedMotion();
+  const [radius, setRadius] = useState(150);
+  useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth;
+      setRadius(w >= 1024 ? 235 : w >= 640 ? 180 : 125);
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  const SPEED_MS = 70000;
+  const initialAngle = (index / Math.max(total, 1)) * 2 * Math.PI;
+  const x = useMotionValue(Math.cos(initialAngle) * radius);
+  const y = useMotionValue(Math.sin(initialAngle) * radius * 0.34);
+  const scale = useMotionValue(1);
+  const zIndex = useMotionValue(30);
+
+  useAnimationFrame(t => {
+    const a = reduce ? initialAngle : initialAngle + (t / SPEED_MS) * 2 * Math.PI;
+    const sinA = Math.sin(a);
+    x.set(Math.cos(a) * radius);
+    y.set(sinA * radius * 0.34);
+    scale.set(0.8 + 0.3 * ((sinA + 1) / 2));
+    zIndex.set(sinA >= 0 ? 30 : 5);
+  });
+
+  return (
+    <motion.div
+      className="absolute pointer-events-auto"
+      style={{
+        top: '50%',
+        left: '50%',
+        width: 48,
+        height: 48,
+        x,
+        y,
+        scale,
+        zIndex,
+        translateX: '-50%',
+        translateY: '-50%',
+      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: 0.15 + index * 0.06 }}
+    >
+      <div className="relative group h-full w-full">
+        <div
+          className={cn(
+            'absolute -inset-3 rounded-full transition-opacity duration-300',
+            active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          )}
+          style={{
+            background: `radial-gradient(circle, rgba(${tool.glow}, 0.7) 0%, transparent 70%)`,
+            filter: 'blur(8px)',
+          }}
+        />
+        {active && (
+          <div
+            className="absolute -inset-2 rounded-full animate-[spin_5s_linear_infinite]"
+            style={{
+              background: `conic-gradient(from 0deg, transparent 0deg 264deg, rgba(${tool.glow}, 0.8) 264deg 360deg)`,
+              filter: 'blur(1.5px)',
+            }}
+          />
+        )}
+        <button
+          onClick={onSelect}
+          aria-label={tool.title}
+          className="relative h-full w-full rounded-full overflow-hidden border-2 transition-transform duration-300 group-hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          style={{
+            background: `radial-gradient(circle at 34% 28%, rgba(255,255,255,0.4) 0%, ${tool.accent} 40%, rgba(${tool.glow}, 0.45) 78%, rgba(5,5,15,0.55) 100%)`,
+            borderColor: active ? tool.accent : 'rgba(255,255,255,0.16)',
+            boxShadow: active
+              ? `0 0 26px rgba(${tool.glow}, 0.75), inset 0 1px 0 rgba(255,255,255,0.3)`
+              : `0 0 12px rgba(${tool.glow}, 0.35), inset 0 1px 0 rgba(255,255,255,0.16)`,
+          }}
+        >
+          <span
+            className="absolute rounded-full bg-white/40 blur-[2px]"
+            style={{ top: '10%', left: '18%', width: '30%', height: '20%' }}
+          />
+          <span className="absolute inset-0 flex items-center justify-center text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] [&_svg]:h-5 [&_svg]:w-5">
+            {tool.icon}
+          </span>
+        </button>
+        <div
+          className={cn(
+            'absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-semibold tracking-wide pointer-events-none transition-opacity duration-200',
+            active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+          )}
+          style={{ color: tool.accent, textShadow: `0 0 10px rgba(${tool.glow}, 0.8)` }}
+        >
+          {tool.title}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function ToolsPage() {
   const [[current, direction], setPage] = useState([0, 0]);
+  const reduce = useReducedMotion();
 
   const paginate = (dir: number) => {
     const next = current + dir;
@@ -145,16 +267,63 @@ export default function ToolsPage() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.5, ease: 'easeInOut' }}
-      className="relative min-h-screen"
+      className="relative min-h-screen aurora-sweep"
     >
-      <InteractiveParticles quantity={40} />
-
       <div className="relative z-10 flex flex-col min-h-screen px-4 md:px-6 pt-6 pb-16">
         <PageHeader eyebrow="Хэрэгслүүд" />
 
-        <div className="flex-1 flex flex-col items-center justify-center gap-8 mt-6">
+        <div className="flex-1 flex flex-col items-center justify-center gap-6 mt-2">
 
-          {/* ── Carousel card ── */}
+          {/* ── GALAXY ORBIT — tools circle a glowing core star ── */}
+          <div className="relative w-full max-w-[620px] h-[240px] sm:h-[320px] lg:h-[380px]">
+            {/* Ring guides */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div
+                className="absolute w-[250px] h-[250px] sm:w-[360px] sm:h-[360px] lg:w-[470px] lg:h-[470px] rounded-full"
+                style={{
+                  border: `1.5px solid rgba(${tool.glow}, 0.4)`,
+                  transform: 'scaleY(0.34)',
+                  filter: `drop-shadow(0 0 6px rgba(${tool.glow}, 0.35))`,
+                  transition: 'border-color 0.6s ease, filter 0.6s ease',
+                }}
+              />
+              <div
+                className="absolute w-[285px] h-[285px] sm:w-[400px] sm:h-[400px] lg:w-[516px] lg:h-[516px] rounded-full"
+                style={{
+                  border: '1px dashed hsl(var(--accent)/0.2)',
+                  transform: 'scaleY(0.34) rotate(12deg)',
+                }}
+              />
+              {/* Core star — tinted by the selected tool */}
+              <motion.div
+                className="absolute rounded-full"
+                style={{ width: 72, height: 72 }}
+                animate={reduce ? undefined : { scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
+                transition={{ duration: 3.4, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <div
+                  className="w-full h-full rounded-full transition-all duration-700"
+                  style={{
+                    background: `radial-gradient(circle at 38% 32%, rgba(255,255,255,0.92) 0%, ${tool.accent} 40%, rgba(${tool.glow}, 0.5) 75%, transparent 100%)`,
+                    boxShadow: `0 0 32px 10px rgba(${tool.glow}, 0.45), 0 0 84px 28px rgba(${tool.glow}, 0.18)`,
+                  }}
+                />
+              </motion.div>
+            </div>
+
+            {allTools.map((t, i) => (
+              <OrbitPlanet
+                key={t.id}
+                tool={t}
+                index={i}
+                total={allTools.length}
+                active={i === current}
+                onSelect={() => goTo(i)}
+              />
+            ))}
+          </div>
+
+          {/* ── Detail glass card (swipe / drag also works) ── */}
           <div className="relative w-full max-w-lg overflow-hidden">
             <AnimatePresence initial={false} custom={direction} mode="popLayout">
               <motion.div
@@ -225,7 +394,7 @@ export default function ToolsPage() {
             </button>
           </div>
 
-          {/* ── Tool chip strip (label + colored border, no icon) ── */}
+          {/* ── Tool chip strip (quick access / mobile friendly) ── */}
           <div className="flex flex-wrap justify-center gap-2.5 max-w-2xl">
             {allTools.map((t, i) => {
               const active = i === current;
@@ -281,7 +450,7 @@ export default function ToolsPage() {
   );
 }
 
-/* ─── Big carousel card (no icon, bold colored border) ─── */
+/* ─── Detail card — glassmorphism over the starfield ─── */
 function CarouselCard({ tool }: { tool: Tool }) {
   return (
     <Link href={tool.href} className="block group">
@@ -299,7 +468,7 @@ function CarouselCard({ tool }: { tool: Tool }) {
           (e.currentTarget as HTMLDivElement).style.boxShadow = `0 18px 48px -22px rgba(${tool.glow}, 0.45)`;
         }}
       >
-        <div className="relative rounded-[22px] bg-card overflow-hidden">
+        <div className="relative rounded-[22px] bg-card/60 backdrop-blur-xl overflow-hidden">
           {/* Soft tinted top wash */}
           <div
             className="absolute inset-x-0 top-0 h-44 pointer-events-none"
@@ -327,7 +496,7 @@ function CarouselCard({ tool }: { tool: Tool }) {
           />
 
           {/* ── Content ── */}
-          <div className="relative p-8 md:p-10 min-h-[320px] flex flex-col justify-between">
+          <div className="relative p-8 md:p-10 min-h-[280px] flex flex-col justify-between">
             <div className="flex items-start justify-between gap-4">
               {/* Tag */}
               <span
@@ -356,9 +525,9 @@ function CarouselCard({ tool }: { tool: Tool }) {
               </span>
             </div>
 
-            <div className="mt-10">
+            <div className="mt-8">
               <h2
-                className="text-4xl md:text-5xl font-extrabold tracking-tight leading-none"
+                className="font-display text-4xl md:text-5xl font-extrabold tracking-tight leading-none"
                 style={{
                   background: `linear-gradient(135deg, hsl(var(--foreground)), ${tool.accent})`,
                   WebkitBackgroundClip: 'text',
@@ -373,7 +542,7 @@ function CarouselCard({ tool }: { tool: Tool }) {
               </p>
             </div>
 
-            <div className="flex items-center gap-3 mt-10">
+            <div className="flex items-center gap-3 mt-8">
               <span
                 className="h-[2px] rounded-full transition-all duration-500"
                 style={{

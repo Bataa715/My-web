@@ -6,11 +6,6 @@ import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import PageHeader from './PageHeader';
-import dynamic from 'next/dynamic';
-
-const InteractiveParticles = dynamic(() => import('./InteractiveParticles'), {
-  ssr: false,
-});
 
 export interface Breadcrumb {
   label: string;
@@ -51,13 +46,25 @@ export default function ToolPageShell({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 14 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className="relative min-h-screen"
+      className="relative min-h-screen aurora-sweep"
     >
-      {particles && <InteractiveParticles quantity={40} />}
+      {/* The global 3D starfield shows through; aurora adds atmosphere.
+          A faint nebula tint anchors the header area. */}
+      {particles && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-[420px] -z-10"
+          style={{
+            background:
+              'radial-gradient(ellipse 60% 55% at 50% 0%, hsl(var(--primary)/0.10) 0%, hsl(var(--accent)/0.05) 45%, transparent 75%)',
+          }}
+        />
+      )}
 
-      {/* ── Sticky sub-header: back + breadcrumbs ── */}
-      <div className="sticky top-[58px] md:top-[70px] z-40 px-3 md:px-4 pt-2">
-        <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-xl border border-border/50 bg-background/80 backdrop-blur-xl shadow-sm w-full overflow-x-auto hide-scrollbar">
+      {/* ── Sub-header: back + breadcrumbs — scrolls away with the page
+            (was sticky and covered content; now inline + width-fit) ── */}
+      <div className="relative z-20 px-3 md:px-4 pt-2">
+        <div className="inline-flex max-w-full items-center gap-1.5 px-2 py-1.5 rounded-full border border-border/50 bg-card/40 backdrop-blur-xl shadow-sm overflow-x-auto hide-scrollbar">
           {/* Back button */}
           <button
             onClick={() => router.back()}

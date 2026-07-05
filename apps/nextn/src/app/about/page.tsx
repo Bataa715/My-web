@@ -67,7 +67,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import InteractiveParticles from '@/components/shared/InteractiveParticles';
 import PageHeader from '@/components/shared/PageHeader';
 import { cn } from '@/lib/utils';
 
@@ -146,7 +145,7 @@ const InfoCard = ({
           (e.currentTarget as HTMLDivElement).style.boxShadow = `0 12px 32px -20px rgba(${glow}, 0.5)`;
         }}
       >
-        <div className="relative h-full rounded-[14px] bg-card overflow-hidden p-3 sm:p-4">
+        <div className="relative h-full rounded-[14px] bg-card/75 backdrop-blur-xl overflow-hidden p-3 sm:p-4">
           {/* Tinted top wash */}
           <div
             className="absolute inset-x-0 top-0 h-24 pointer-events-none"
@@ -557,22 +556,12 @@ function AboutPageInner() {
 
   return (
     <>
-      <InteractiveParticles className="fixed inset-0 z-0 pointer-events-none" />
-
-      {/* Global backdrop — neutral, only a faint dot grid */}
+      {/* The global 3D cosmos canvas is the backdrop — add only an aurora
+          light sweep so the About page gets its own atmosphere. */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
-      >
-        <div
-          className="absolute inset-0 opacity-[0.04]"
-          style={{
-            backgroundImage:
-              'radial-gradient(currentColor 1px, transparent 1px)',
-            backgroundSize: '28px 28px',
-          }}
-        />
-      </div>
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden aurora-sweep"
+      />
 
       <div className="relative z-10 min-h-screen">
         {/* Hero Section */}
@@ -595,6 +584,18 @@ function AboutPageInner() {
             <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
               {/* Personal Info Cards */}
               <div className="w-full order-2 lg:order-1">
+                {(personalInfo.length > 0 || isEditMode) && (
+                  <div className="mb-5 flex items-center gap-3">
+                    <span
+                      className="inline-flex h-2 w-2 rounded-full bg-accent shadow-[0_0_10px_hsl(var(--accent))]"
+                      aria-hidden
+                    />
+                    <h3 className="font-display text-sm uppercase tracking-[0.24em] text-muted-foreground">
+                      Миний мэдээлэл
+                    </h3>
+                    <div className="h-px flex-1 bg-linear-to-r from-accent/40 to-transparent" aria-hidden />
+                  </div>
+                )}
                 {(personalInfo.length > 0 || isEditMode) && (
                   <InfoCardArrowLayout
                     infos={personalInfo}
@@ -649,7 +650,7 @@ function AboutPageInner() {
                             animate={{ opacity: 1, y: 0, filter: 'blur(0px)', scale: 1 }}
                             exit={{ opacity: 0, y: -22, filter: 'blur(10px)', scale: 0.96 }}
                             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                            className="font-mono text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight bg-linear-to-br from-foreground via-primary/90 to-foreground/50 bg-clip-text text-transparent leading-[1.05]"
+                            className="font-display text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight bg-linear-to-br from-foreground via-primary/90 to-foreground/50 bg-clip-text text-transparent leading-[1.05]"
                           >
                             {greetings[greetingIndex].text}
                           </motion.h1>
@@ -761,7 +762,29 @@ function AboutPageInner() {
                         aria-hidden
                         className="pointer-events-none absolute inset-x-0 -inset-y-2 bg-linear-to-r from-primary/0 via-primary/15 to-primary/0 blur-3xl opacity-60"
                       />
-                      <p className="relative spotlight-text font-mono text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-black tracking-tighter leading-[0.95]">
+                      {/* Orbital ring decoration — galaxy accent behind the name */}
+                      <div
+                        aria-hidden
+                        className="pointer-events-none absolute -inset-x-12 -inset-y-8 flex items-center justify-center"
+                      >
+                        <div
+                          className="w-[440px] max-w-full h-[170px] rounded-[50%] border border-primary/20"
+                          style={{ transform: 'rotate(-8deg)', filter: 'drop-shadow(0 0 6px hsl(var(--primary)/0.25))' }}
+                        />
+                        <div
+                          className="absolute w-[350px] max-w-[92%] h-[126px] rounded-[50%] border border-dashed border-accent/15"
+                          style={{ transform: 'rotate(7deg)' }}
+                        />
+                        <span
+                          className="absolute h-2 w-2 rounded-full bg-primary shadow-[0_0_14px_hsl(var(--primary))] animate-pulse-glow"
+                          style={{ top: '16%', right: '20%' }}
+                        />
+                        <span
+                          className="absolute h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_10px_hsl(var(--accent))] animate-pulse-glow"
+                          style={{ bottom: '12%', left: '16%', animationDelay: '1.4s' }}
+                        />
+                      </div>
+                      <p className="relative spotlight-text font-display text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-black tracking-tighter leading-[0.95]">
                         {name}
                       </p>
                       {/* Animated underline */}
@@ -884,7 +907,14 @@ function AboutPageInner() {
             <PageHeader
               eyebrow="Сонирхол"
               icon={<Heart className="h-3.5 w-3.5" />}
-            />
+            >
+              <h2 className="font-display glow-text text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
+                Миний сонирхлууд
+              </h2>
+              <p className="mt-3 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
+                Гараг шиг эргэлдэх картуудаас сонирхлуудтай минь танилцаарай.
+              </p>
+            </PageHeader>
             <div className="mb-10" />
 
             {hobbiesLoading ? (

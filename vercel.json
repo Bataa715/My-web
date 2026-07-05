@@ -1,8 +1,7 @@
 {
-  "buildCommand": "npx nx build nextn",
+  "buildCommand": "cd apps/nextn && npx next build --webpack",
   "devCommand": "nx serve nextn",
   "installCommand": "npm install --legacy-peer-deps",
-  "framework": "nextjs",
   "outputDirectory": "apps/nextn/.next",
   "ignoreCommand": "git diff --quiet HEAD^ HEAD ./apps/nextn"
 }

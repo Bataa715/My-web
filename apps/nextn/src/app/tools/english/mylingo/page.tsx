@@ -516,14 +516,28 @@ function LessonNode({ entry, localIdx, stars, unlocked, isCurrent, onTap }: Node
         onClick={unlocked ? onTap : undefined}
         disabled={!unlocked}
         className={cn(
-          'relative w-[72px] h-[72px] rounded-full flex items-center justify-center text-2xl transition-all duration-300 border-4',
-          unlocked && !completed && `bg-linear-to-br ${style.bg} border-white/20 text-white hover:scale-110 active:scale-95`,
+          'relative w-[72px] h-[72px] rounded-full flex items-center justify-center text-2xl transition-all duration-300 border-2',
+          unlocked && !completed && `bg-linear-to-br ${style.bg} border-white/25 text-white hover:scale-110 active:scale-95`,
           unlocked && !completed && isCurrent && style.glow,
           completed && `bg-linear-to-br ${style.bg} border-amber-400/60 text-white hover:scale-105 active:scale-95 shadow-[0_0_20px_hsl(45_93%_47%/0.4)]`,
           !unlocked && 'bg-card/40 border-border/30 text-muted-foreground/40 cursor-not-allowed',
         )}
       >
-        {!unlocked ? <Lock className="h-6 w-6" /> : entry.emoji}
+        {/* Planet shading — specular highlight + dark limb turn the disc
+            into a little 3D sphere floating in the galaxy map */}
+        {unlocked && (
+          <span
+            aria-hidden
+            className="absolute inset-0 rounded-full pointer-events-none"
+            style={{
+              background:
+                'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.1) 30%, transparent 48%), radial-gradient(circle at 68% 80%, rgba(3,3,12,0.5) 0%, transparent 55%)',
+            }}
+          />
+        )}
+        <span className="relative z-10">
+          {!unlocked ? <Lock className="h-6 w-6" /> : entry.emoji}
+        </span>
         {completed && (
           <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center">
             <CheckCircle2 className="h-3 w-3 text-white" />
@@ -890,8 +904,8 @@ export default function MyLingoPage() {
           <motion.div key="map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="flex flex-col gap-0 pt-2 w-full max-w-sm mx-auto"
           >
-            {/* Stats bar */}
-            <div className="sticky top-0 z-20 flex items-center justify-between gap-2 sm:gap-3 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/40 px-4 py-2.5 sm:px-5 sm:py-3 mb-4">
+            {/* Stats bar — cosmic glass capsule (no longer sticky) */}
+            <div className="relative z-20 flex items-center justify-between gap-2 sm:gap-3 rounded-full glass-panel px-5 py-2.5 sm:px-6 sm:py-3 mb-4 shadow-[0_0_30px_-12px_hsl(var(--primary)/0.5)]">
               {loading ? <Loader2 className="h-5 w-5 animate-spin text-primary mx-auto" /> : (
                 <>
                   <div className="flex items-center gap-1.5">

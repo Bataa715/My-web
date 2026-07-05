@@ -5,35 +5,7 @@ import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { useFirebase } from '@/firebase';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Loader2,
-  ImageIcon,
-  Save,
-  Home,
-  User,
-  Wrench,
-  Pencil,
-  Edit,
-} from 'lucide-react';
-import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import type { UserProfile } from '@/lib/types';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from './ui/dialog';
-import { Button } from './ui/button';
-import { Label } from './ui/label';
-import { Input } from './ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { useEditMode } from '@/contexts/EditModeContext';
+import { Home, User, Wrench } from 'lucide-react';
 import {
   AnimatePresence,
   motion,
@@ -70,7 +42,6 @@ const FloatingNav = () => {
   });
 
   const pathname = usePathname();
-  const { isEditMode, setIsEditMode } = useEditMode();
   const navItems = [
     {
       name: 'Нүүр',
@@ -160,14 +131,7 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isUserLoading, firestore } = useFirebase();
-  const { isEditMode } = useEditMode();
-  const { toast } = useToast();
-
-  const [heroImage, setHeroImage] = useState<string | null>(null);
-  const [isImageEditingOpen, setIsImageEditingOpen] = useState(false);
-  const [editedImageUrl, setEditedImageUrl] = useState('');
-  const [saving, setSaving] = useState(false);
+  const { user, isUserLoading } = useFirebase();
 
   const isPublicPath = useMemo(() => {
     return (
@@ -188,13 +152,6 @@ export default function MainLayout({
 
   const stillWaitingForAuth = isUserLoading && !authTimedOut;
 
-  const userImageProp = useMemo((): keyof UserProfile | undefined => {
-    if (pathname === '/tools') return 'toolsHeroImage';
-    if (pathname === '/') return 'homeHeroImage';
-    // About page no longer uses background image
-    return undefined;
-  }, [pathname]);
-
   useEffect(() => {
     if (stillWaitingForAuth) return;
 
@@ -209,90 +166,9 @@ export default function MainLayout({
     }
   }, [stillWaitingForAuth, user, isPublicPath, router, pathname]);
 
-  useEffect(() => {
-    if (isUserLoading || !firestore) return;
-
-    const fetchHeroImage = async () => {
-      let imageUrl: string | undefined;
-      let placeholderId: string;
-
-      switch (pathname) {
-        case '/tools':
-          placeholderId = 'tools-hero-background';
-          break;
-        default:
-          placeholderId = 'home-hero-background';
-      }
-
-      if (user && userImageProp) {
-        try {
-          const userDocRef = doc(firestore, 'users', user.uid);
-          const docSnap = await getDoc(userDocRef);
-          if (docSnap.exists()) {
-            const data = docSnap.data() as UserProfile;
-            const candidate = data[userImageProp];
-            if (typeof candidate === 'string') {
-              imageUrl = candidate;
-            }
-          }
-        } catch (error) {
-          console.error("Error fetching user's hero image:", error);
-        }
-      }
-
-      if (!imageUrl) {
-        const placeholder = PlaceHolderImages.find(p => p.id === placeholderId);
-        imageUrl = placeholder?.imageUrl;
-      }
-
-      if (userImageProp) {
-        setHeroImage(imageUrl ?? null);
-        setEditedImageUrl(imageUrl ?? '');
-      } else {
-        setHeroImage(null);
-        setEditedImageUrl('');
-      }
-    };
-
-    fetchHeroImage();
-  }, [user, isUserLoading, firestore, pathname, userImageProp]);
-
-  const handleSaveImage = async () => {
-    if (!user || !firestore || !userImageProp) {
-      toast({
-        title: 'Алдаа',
-        description: 'Нэвтэрч орно уу.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const userDocRef = doc(firestore, 'users', user.uid);
-      await updateDoc(userDocRef, { [userImageProp]: editedImageUrl });
-
-      setSaving(false);
-      setIsImageEditingOpen(false);
-      toast({
-        title: 'Амжилттай',
-        description: 'Арын зураг шинэчлэгдлээ.',
-      });
-      setHeroImage(editedImageUrl);
-    } catch (error) {
-      console.error('Error saving hero image:', error);
-      setSaving(false);
-      toast({
-        title: 'Алдаа',
-        description: 'Арын зураг хадгалахад алдаа гарлаа.',
-        variant: 'destructive',
-      });
-    }
-  };
-
   if ((stillWaitingForAuth || !user) && !isPublicPath) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="flex items-center justify-center min-h-screen">
         <div
           className="h-8 w-8 rounded-full border-2 border-muted-foreground/20 border-t-primary animate-spin"
           aria-label="Loading"
@@ -305,111 +181,33 @@ export default function MainLayout({
     return <>{children}</>;
   }
 
+  /* The page shell is fully transparent — the fixed CosmosBackground canvas
+     (z −10) provides the backdrop. Content floats above it in glass layers. */
   return (
     <>
       <IntroOverlay />
-      <div className="min-h-screen p-0 sm:p-1.5 md:p-2 bg-background">
-        <div className="animated-border-wrapper">
-          <div className="relative z-10 min-h-screen sm:min-h-[calc(100vh-0.75rem)] md:min-h-[calc(100vh-1rem)] rounded-none sm:rounded-[1.4rem] bg-background shadow-2xl shadow-primary/5">
-            {heroImage && (
-              <div className="absolute top-[88px] md:top-[100px] left-0 w-full h-[50vh] -z-10">
-                <Image
-                  src={heroImage}
-                  alt="Background"
-                  fill
-                  sizes="100vw"
-                  className="object-cover"
-                  priority
-                  unoptimized={/\.gif(\?|$)/i.test(heroImage)}
-                />
-                {/* Soft top fade so image emerges from page background */}
-                <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-background to-transparent pointer-events-none" />
-                {/* Soft bottom fade — mirrors the top edge */}
-                <div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-background to-transparent pointer-events-none" />
-              </div>
-            )}
-
-            {isEditMode && userImageProp && (
-              <Dialog
-                open={isImageEditingOpen}
-                onOpenChange={setIsImageEditingOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute top-28 right-4 z-50"
-                  >
-                    <ImageIcon className="h-4 w-4" />
-                    <span className="sr-only">Арын зураг солих</span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Арын зургийн холбоос</DialogTitle>
-                    <DialogDescription>
-                      Шинэ зургийнхаа URL хаягийг энд буулгана уу.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="image-url" className="text-right">
-                        URL
-                      </Label>
-                      <Input
-                        id="image-url"
-                        value={editedImageUrl}
-                        onChange={e => setEditedImageUrl(e.target.value)}
-                        className="col-span-3"
-                        placeholder="https://example.com/image.png"
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button type="button" variant="secondary">
-                        Цуцлах
-                      </Button>
-                    </DialogClose>
-                    <Button
-                      type="button"
-                      onClick={handleSaveImage}
-                      disabled={saving}
-                    >
-                      {saving ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Save className="mr-2 h-4 w-4" />
-                      )}{' '}
-                      Хадгалах
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            )}
-
-            <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-3xl">
-              <div
-                className="absolute inset-0 opacity-[0.02]"
-                style={{
-                  backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-                  backgroundSize: '50px 50px',
-                }}
-              />
-            </div>
-
-            <div className="relative z-50">
-              <Header />
-            </div>
-            <main className="relative z-10 pb-28 sm:pb-4">
-              <AnimatePresence mode="wait" initial={false}>
-                {children}
-              </AnimatePresence>
-            </main>
-            <Footer />
-            <FloatingNav />
-          </div>
+      <div className="relative min-h-screen">
+        {/* Barely-there grid overlay for structure over the starfield */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <div
+            className="absolute inset-0 opacity-[0.02]"
+            style={{
+              backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+              backgroundSize: '50px 50px',
+            }}
+          />
         </div>
+
+        <div className="relative z-50">
+          <Header />
+        </div>
+        <main className="relative z-10 pb-28 sm:pb-4">
+          <AnimatePresence mode="wait" initial={false}>
+            {children}
+          </AnimatePresence>
+        </main>
+        <Footer />
+        <FloatingNav />
       </div>
     </>
   );

@@ -8,11 +8,29 @@ import MainLayout from '@/components/MainLayout';
 import PageTransition from '@/components/PageTransition';
 import { I18nProvider } from '@/contexts/I18nContext';
 import MotionProvider from '@/app/providers/MotionProvider';
-import { JetBrains_Mono } from 'next/font/google';
+import CosmosBackground from '@/components/cosmos/CosmosBackground';
+import { JetBrains_Mono, Space_Grotesk, Exo_2 } from 'next/font/google';
 
+// Code / numeric contexts only (kept for pre, code, kbd, samp)
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin', 'cyrillic'],
   variable: '--font-jetbrainsMono',
+  display: 'swap',
+  preload: false,
+});
+
+// Main body font — futuristic sans with full Cyrillic support (Mongolian!)
+const exo2 = Exo_2({
+  subsets: ['latin', 'cyrillic'],
+  variable: '--font-exo',
+  display: 'swap',
+  preload: true,
+});
+
+// Display face for cosmic headlines (latin); Exo 2 covers Cyrillic fallback
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-spaceGrotesk',
   display: 'swap',
   preload: true,
 });
@@ -34,6 +52,14 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: '/favicon.ico',
+    apple: '/icons/apple-touch-icon.png',
+  },
+  manifest: '/manifest.webmanifest',
+  // iPhone: Safari → Share → "Add to Home Screen" installs this as an app
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'PersonalWeb',
   },
   metadataBase: new URL('https://personalweb.com'),
   openGraph: {
@@ -61,8 +87,8 @@ export const viewport = {
   maximumScale: 5,
   viewportFit: 'cover',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a0f' },
+    { media: '(prefers-color-scheme: light)', color: '#05050a' },
+    { media: '(prefers-color-scheme: dark)', color: '#05050a' },
   ],
 };
 
@@ -75,7 +101,7 @@ export default function RootLayout({
     <html
       lang="mn"
       suppressHydrationWarning
-      className={jetbrainsMono.variable}
+      className={`${exo2.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable}`}
     >
       <head>
         {/* Preconnect to critical external resources */}
@@ -85,9 +111,9 @@ export default function RootLayout({
           href="https://firebasestorage.googleapis.com"
         />
       </head>
-      <body
-        className={`min-h-screen bg-background font-mono antialiased`}
-      >
+      <body className={`min-h-screen font-sans antialiased`}>
+        {/* Persistent 3D deep-space backdrop — lives behind every page */}
+        <CosmosBackground />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

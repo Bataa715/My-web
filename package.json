@@ -5,7 +5,7 @@
   "nx": {},
   "scripts": {
     "dev": "nx serve nextn",
-    "build": "nx build nextn",
+    "build": "nx build nextn --webpack",
     "build:static": "STATIC_EXPORT=true nx build nextn",
     "start": "nx serve nextn --prod",
     "format": "prettier --write \"apps/**/*.{ts,tsx,js,jsx,json,css}\"",
@@ -69,6 +69,7 @@
     "remark-gfm": "^4.0.0",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.185.0",
     "zod": "^4.4.1"
   },
   "devDependencies": {
@@ -79,6 +80,7 @@
     "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.1",
+    "@types/three": "^0.185.0",
     "@types/react-dom": "^19.2.1",
     "genkit-cli": "^1.20.0",
     "nx": "^22.7.1",

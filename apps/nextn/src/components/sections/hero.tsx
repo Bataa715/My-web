@@ -25,6 +25,9 @@ import {
   Facebook,
   Code2,
   Trash2,
+  ArrowRight,
+  ChevronDown,
+  Rocket,
 } from 'lucide-react';
 import { useState, useEffect, type FC } from 'react';
 import { motion, AnimatePresence, useMotionValue, useAnimationFrame } from 'framer-motion';
@@ -516,6 +519,19 @@ export default function Hero({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isUserLoading, firestore, portfolioUserId]);
 
+  /* Preload every orbit background image the moment the profile arrives, so
+     clicking a planet reveals its picture instantly (no on-click fetch). */
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    orbitInfo.forEach(item => {
+      if (item.backgroundImage) {
+        const img = new window.Image();
+        img.decoding = 'async';
+        img.src = item.backgroundImage;
+      }
+    });
+  }, [orbitInfo]);
+
   // PDF Upload handler
   const handleCvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -1003,15 +1019,14 @@ export default function Hero({
                 )}
                 style={{ perspective: '800px' }}
               >
-                <AnimatePresence mode="wait">
+                <AnimatePresence initial={false} mode="popLayout">
                   {selectedOrbit ? (
                     <motion.div
                       key={`orbit-content-${selectedOrbit.id}`}
-                      initial={{ rotateY: -90 }}
-                      animate={{ rotateY: 0 }}
-                      exit={{ rotateY: 90 }}
-                      transition={{ duration: 0.18, ease: [0.4, 0, 0.6, 1] }}
-                      style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
+                      initial={{ opacity: 0, scale: 0.86, filter: 'blur(10px)' }}
+                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                      exit={{ opacity: 0, scale: 1.05, filter: 'blur(8px)' }}
+                      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
                       className="absolute inset-0 flex flex-col items-center justify-center rounded-full text-center overflow-visible"
                     >
                       {/* Inner content container */}
@@ -1027,13 +1042,15 @@ export default function Hero({
                       >
                         {selectedOrbit.backgroundImage && !isEditingOrbit && (
                           <>
+                            {/* unoptimized: the raw URL is what we preload,
+                                so cached bytes render instantly on click */}
                             <Image
                               src={selectedOrbit.backgroundImage}
                               alt={selectedOrbit.title}
                               fill
                               sizes="(max-width: 768px) 100vw, 600px"
                               className="object-cover rounded-full z-0 opacity-50"
-                              unoptimized={/\.gif(\?|$)/i.test(selectedOrbit.backgroundImage)}
+                              unoptimized
                             />
                             {/* Sphere-shaped overlay — dark vignette + gradient mask */}
                             <div className="absolute inset-0 z-10" style={{
@@ -1225,11 +1242,10 @@ export default function Hero({
                   ) : (
                     <motion.div
                       key="avatar"
-                      initial={{ rotateY: 90 }}
-                      animate={{ rotateY: 0 }}
-                      exit={{ rotateY: -90 }}
-                      transition={{ duration: 0.18, ease: [0.4, 0, 0.6, 1] }}
-                      style={{ backfaceVisibility: 'hidden', transformStyle: 'preserve-3d' }}
+                      initial={{ opacity: 0, scale: 0.86, filter: 'blur(10px)' }}
+                      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+                      exit={{ opacity: 0, scale: 1.05, filter: 'blur(8px)' }}
+                      transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
                       className="relative w-full h-full group"
                     >
                       {/* Solar surface — layered glow rings around avatar */}
@@ -1523,7 +1539,7 @@ export default function Hero({
                       </motion.span>
                       <div className="flex items-center gap-3">
                         <motion.h1
-                          className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.02] relative"
+                          className="font-display text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.02] relative"
                           initial={{ opacity: 0, y: 16 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.35, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
@@ -1854,9 +1870,49 @@ export default function Hero({
                 </div>
               )}
             </div>
+
+            {/* ── Glowing CTA row — pill buttons with cosmic gradient ── */}
+            <motion.div
+              className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-4"
+              initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ delay: 0.65, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Link
+                href="/tools"
+                className="cta-glow inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold"
+              >
+                <Rocket className="h-4 w-4" />
+                Хэрэгслүүд рүү нисэх
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <a
+                href="#projects"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium text-foreground/80 border border-border/70 bg-card/30 backdrop-blur-md transition-all duration-300 hover:border-primary/50 hover:text-foreground hover:shadow-[0_0_24px_-8px_hsl(var(--primary)/0.6)]"
+              >
+                Төслүүд үзэх
+              </a>
+            </motion.div>
           </div>
         </div>
       </div>
+
+      {/* ── Scroll indicator — invites the cosmic scroll journey ── */}
+      <motion.div
+        aria-hidden
+        className="absolute bottom-2 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-1 text-muted-foreground/60"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.4, duration: 0.8 }}
+      >
+        <span className="text-[10px] font-mono uppercase tracking-[0.3em]">Аялал эхэлнэ</span>
+        <motion.span
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <ChevronDown className="h-4 w-4" />
+        </motion.span>
+      </motion.div>
 
       <Dialog open={isEditingImage} onOpenChange={setIsEditingImage}>
         <DialogContent>

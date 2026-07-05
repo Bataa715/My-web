@@ -57,7 +57,7 @@ export default function SubToolCard({
             (e.currentTarget as HTMLDivElement).style.boxShadow = `0 14px 36px -22px rgba(${glow}, 0.45)`;
           }}
         >
-          <div className="relative h-full rounded-[14px] bg-card overflow-hidden">
+          <div className="relative h-full rounded-[14px] bg-card/65 backdrop-blur-xl overflow-hidden">
             {/* Tinted top wash */}
             <div
               className="absolute inset-x-0 top-0 h-32 pointer-events-none"
