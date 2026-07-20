@@ -406,7 +406,10 @@ function AboutPageInner() {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
-        setCarouselRadius(CIRCLE_RADIUS_MOBILE);
+        // Orbit half-width clamped so side planets never leave the screen
+        setCarouselRadius(
+          Math.max(110, Math.min(CIRCLE_RADIUS_MOBILE, Math.round(window.innerWidth * 0.34)))
+        );
         setItemWidth(ITEM_WIDTH_MOBILE);
       } else {
         setCarouselRadius(CIRCLE_RADIUS_DESKTOP);
@@ -556,30 +559,11 @@ function AboutPageInner() {
 
   return (
     <>
-      {/* The global 3D cosmos canvas is the backdrop — add only an aurora
-          light sweep so the About page gets its own atmosphere. */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden aurora-sweep"
-      />
-
+      {/* No page-level backdrop layers at all — the About page floats
+          directly on the site's global 3D cosmos (planet + starfield). */}
       <div className="relative z-10 min-h-screen">
         {/* Hero Section */}
         <section className="relative min-h-[calc(100vh-100px)] flex items-center justify-center px-4 sm:px-6 md:px-8 pt-12 sm:pt-16 md:pt-20 pb-10">
-          {/* Subtle grid mask only — no colored spotlight */}
-          <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 top-32 -z-0">
-            <div
-              className="absolute inset-0 opacity-[0.05]"
-              style={{
-                backgroundImage:
-                  'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)',
-                backgroundSize: '64px 64px',
-                maskImage:
-                  'radial-gradient(ellipse at center, black 25%, transparent 75%)',
-              }}
-            />
-          </div>
-
           <div className="max-w-7xl mx-auto w-full relative">
             <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
               {/* Personal Info Cards */}
@@ -930,6 +914,51 @@ function AboutPageInner() {
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
               >
+                {/* ── Cosmic stage: nebula glow behind + orbital platform
+                      beneath the 3D carousel ── */}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(96%,720px)] h-[300px] rounded-full blur-3xl opacity-40"
+                  style={{
+                    background:
+                      'radial-gradient(ellipse, hsl(var(--primary)/0.30) 0%, hsl(var(--accent)/0.16) 50%, transparent 75%)',
+                  }}
+                />
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute bottom-0 left-1/2 -translate-x-1/2 w-[min(92%,660px)] h-28"
+                >
+                  {/* Elliptical orbit ring — the carousel "floats" above it */}
+                  <div
+                    className="absolute inset-0 rounded-[50%] border border-primary/30"
+                    style={{
+                      transform: 'scaleY(0.4)',
+                      filter: 'drop-shadow(0 0 10px hsl(var(--primary)/0.45))',
+                    }}
+                  />
+                  <div
+                    className="absolute inset-x-6 inset-y-2 rounded-[50%] border border-dashed border-accent/20"
+                    style={{ transform: 'scaleY(0.4) rotate(3deg)' }}
+                  />
+                  {/* Soft landing-light pool */}
+                  <div
+                    className="absolute inset-x-10 inset-y-4 rounded-[50%] blur-2xl opacity-60"
+                    style={{
+                      background:
+                        'radial-gradient(ellipse, hsl(var(--primary)/0.35), hsl(var(--accent)/0.14) 60%, transparent 82%)',
+                      transform: 'scaleY(0.5)',
+                    }}
+                  />
+                  {/* Tiny orbiting sparks */}
+                  <span
+                    className="absolute h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_10px_hsl(var(--primary))] animate-pulse-glow"
+                    style={{ left: '12%', top: '38%' }}
+                  />
+                  <span
+                    className="absolute h-1 w-1 rounded-full bg-accent shadow-[0_0_8px_hsl(var(--accent))] animate-pulse-glow"
+                    style={{ right: '10%', top: '52%', animationDelay: '1.2s' }}
+                  />
+                </div>
                 {/* Prev / Next arrow buttons */}
                 {displayItems.length > 1 && !isEditMode && (
                   <>
@@ -959,33 +988,38 @@ function AboutPageInner() {
                     )}
                   </div>
                 ) : (
-                  <div
-                    className="carousel-container"
-                    style={{ width: `${itemWidth}px` }}
-                  >
-                    <div
-                      className="carousel"
-                      style={{
-                        transform: `rotateY(${-activeIndex * anglePerItem}deg)`,
-                      }}
-                    >
+                  /* ── PLANETARY ORBIT CAROUSEL ──
+                     Cards circle a compressed ellipse like planets: front
+                     card large & bright, rear cards shrink, dim and blur
+                     as they swing behind. Auto-rotates. */
+                  <div className="carousel-stage">
                       <AnimatePresence>
                         {displayItems.map((hobby, index) => {
-                          const angle = index * anglePerItem;
+                          /* Elliptical orbit math — same trick as the planet
+                             components: x = sin·R, depth = cos.
+                             rel = 0 → card is front-center of the orbit. */
+                          const rel =
+                            (((index - activeIndex) * anglePerItem * Math.PI) /
+                              180);
+                          const depth = Math.cos(rel); // 1 front … −1 back
+                          const k = (depth + 1) / 2; // 0 back … 1 front
+                          const x = Math.sin(rel) * carouselRadius;
+                          const y = 26 * k - 14; // front sits slightly lower
+                          const scale = 0.5 + 0.5 * k;
                           const activeMod =
                             ((activeIndex % totalItems) + totalItems) %
                             totalItems;
                           let diff = Math.abs(index - activeMod);
                           if (diff > totalItems / 2) diff = totalItems - diff;
                           const isFront = diff === 0;
-                          // Smooth opacity & blur falloff for natural depth
-                          const opacity = Math.max(0.15, 1 - diff * 0.32);
-                          const blurAmount = Math.min(diff * 1.2, 4);
+                          const opacity = 0.18 + 0.82 * Math.pow(k, 1.5);
+                          const blurAmount = (1 - k) * 5;
                           const isInteractive = diff <= 1;
                           const style: CSSProperties = {
-                            transform: `rotateY(${angle}deg) translateZ(${carouselRadius}px)`,
+                            transform: `translate(-50%, -50%) translate(${x}px, ${y}px) scale(${scale})`,
                             opacity,
                             filter: isFront ? 'none' : `blur(${blurAmount}px)`,
+                            zIndex: 10 + Math.round(depth * 10),
                             pointerEvents: isInteractive ? 'auto' : 'none',
                           };
                           if (hobby.id === 'add-new-hobby') {
@@ -1022,7 +1056,14 @@ function AboutPageInner() {
                               style={style}
                               onClick={() => goToIndex(index)}
                             >
-                              <div className="relative h-full w-full rounded-2xl p-[2px] bg-linear-to-br from-primary via-accent/60 to-primary/70 shadow-[0_0_30px_hsl(var(--primary)/0.3)] group-hover:shadow-[0_0_50px_hsl(var(--primary)/0.5)] transition-all duration-500">
+                              <div
+                                className={cn(
+                                  'relative h-full w-full rounded-2xl p-[2px] bg-linear-to-br from-primary via-accent/60 to-primary/70 transition-all duration-700',
+                                  isFront
+                                    ? 'shadow-[0_0_48px_hsl(var(--primary)/0.55),0_18px_60px_-20px_hsl(var(--accent)/0.5)]'
+                                    : 'shadow-[0_0_22px_hsl(var(--primary)/0.22)]'
+                                )}
+                              >
                                 <Card className="relative bg-card/90 backdrop-blur-xs h-full w-full overflow-hidden rounded-2xl transition-all duration-500 group-hover:-translate-y-1">
                                   {isEditMode && (
                                     <div className="absolute top-3 right-3 flex gap-2 z-20">
@@ -1113,7 +1154,6 @@ function AboutPageInner() {
                           );
                         })}
                       </AnimatePresence>
-                    </div>
                   </div>
                 )}
               </div>
@@ -1143,35 +1183,24 @@ function AboutPageInner() {
         </section>
 
         <style jsx>{`
-          .carousel-container {
-            perspective: 2000px;
-            height: 350px;
-            position: relative;
-          }
-          .carousel {
-            width: 100%;
-            height: 100%;
+          .carousel-stage {
             position: absolute;
-            transform-style: preserve-3d;
-            transition: transform 0.95s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: transform;
-            backface-visibility: hidden;
+            inset: 0;
           }
           .carousel-item {
             position: absolute;
             width: ${itemWidth}px;
             height: 320px;
-            top: 15px;
-            left: 0;
+            top: 50%;
+            left: 50%;
             background: transparent;
             transition:
-              opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
-              filter 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+              opacity 1.05s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 1.05s cubic-bezier(0.22, 1, 0.36, 1),
+              filter 1.05s cubic-bezier(0.22, 1, 0.36, 1),
+              z-index 0s;
             cursor: pointer;
             will-change: transform, opacity, filter;
-            backface-visibility: hidden;
-            transform-style: preserve-3d;
           }
         `}</style>
       </div>

@@ -16,7 +16,6 @@ import {
   Eye,
   Settings,
   LogOut,
-  Palette,
   Check,
   Home,
   User,
@@ -39,9 +38,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
@@ -52,8 +48,6 @@ import {
   DialogTrigger,
 } from './ui/dialog';
 import Image from 'next/image';
-import { useTheme } from '@/components/theme-provider';
-import { themes } from '@/lib/themes';
 import { Input } from './ui/input';
 import { useLanguage } from '@/contexts/I18nContext';
 import { useTranslation } from 'react-i18next';
@@ -83,8 +77,6 @@ const Header = () => {
 
   const { user, isUserLoading, auth, firestore } = useFirebase();
   const [appName, setAppName] = useState('');
-
-  const { theme, setTheme } = useTheme();
 
   const portfolioUrl =
     typeof window !== 'undefined' && user
@@ -126,12 +118,6 @@ const Header = () => {
     }
   };
 
-  const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme);
-    if (typeof window !== 'undefined') {
-      window.location.reload();
-    }
-  };
 
   return (
     <header className="sticky top-0 left-0 w-full z-50 min-h-[60px] md:min-h-[72px] pt-[env(safe-area-inset-top,0px)]">
@@ -290,44 +276,8 @@ const Header = () => {
                       {isEditMode ? t('common.view') : t('common.edit')}
                     </span>
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuSub>
-                    <DropdownMenuSubTrigger>
-                      <Palette className="mr-2 h-4 w-4" />
-                      <span>{t('common.theme')}</span>
-                    </DropdownMenuSubTrigger>
-                    <DropdownMenuSubContent className="p-2 min-w-[180px]">
-                      <div className="grid gap-1">
-                        {themes.map(themeOption => (
-                          <DropdownMenuItem
-                            key={themeOption.name}
-                            onClick={() => handleThemeChange(themeOption.name)}
-                            className={cn(
-                              'flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-200',
-                              theme === themeOption.name
-                                ? 'bg-primary/15 border border-primary/30'
-                                : 'hover:bg-white/5'
-                            )}
-                          >
-                            <div
-                              className="w-4 h-4 rounded-full ring-2 ring-white/20 shadow-lg"
-                              style={{
-                                backgroundColor: `hsl(${themeOption.primary})`,
-                                boxShadow: `0 0 12px hsl(${themeOption.primary} / 0.5)`,
-                              }}
-                            />
-                            <span className="flex-1 font-medium">
-                              {themeOption.name.charAt(0).toUpperCase() +
-                                themeOption.name.slice(1).replace('-', ' ')}
-                            </span>
-                            {theme === themeOption.name && (
-                              <Check className="h-4 w-4 text-primary" />
-                            )}
-                          </DropdownMenuItem>
-                        ))}
-                      </div>
-                    </DropdownMenuSubContent>
-                  </DropdownMenuSub>
+                  {/* Theme switcher removed — the site now has a single
+                      unified cosmos theme */}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />

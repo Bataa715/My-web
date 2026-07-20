@@ -32,6 +32,8 @@ export interface CosmosQuality {
   comets: number;
   dprCap: number;
   planetDetail: number;
+  /** prefers-reduced-motion: keep the scene but slow all autonomous motion */
+  calm?: boolean;
 }
 
 export const QUALITY_HIGH: CosmosQuality = {
@@ -235,15 +237,16 @@ void main(){
   float clouds = fbm(p * 1.7 + vec3(uTime * 0.012, 0.0, uTime * 0.006));
   col = mix(col, uCloud, smoothstep(0.32, 0.85, clouds) * 0.5);
 
-  /* Fixed key light from upper-left → day/night terminator. */
+  /* Fixed key light from upper-left → day/night terminator.
+     Ambient floor raised so the night side still reads on dim displays. */
   vec3 lightDir = normalize(vec3(-0.55, 0.55, 0.62));
   float diff = clamp(dot(vNormal, lightDir), 0.0, 1.0);
-  col *= 0.16 + diff * 1.05;
+  col *= 0.28 + diff * 1.15;
 
   /* Fresnel rim: pow() sharpens the falloff so only grazing angles glow.
      Values > 1.0 here are intentional — the bloom pass picks them up. */
   float fres = pow(1.0 - clamp(dot(vView, vNormal), 0.0, 1.0), 2.6);
-  col += uRim * fres * 1.9;
+  col += uRim * fres * 2.3;
 
   gl_FragColor = vec4(col, 1.0);
 }
@@ -494,10 +497,10 @@ export class CosmosEngine {
       fragmentShader: PLANET_FRAG,
       uniforms: {
         uTime: { value: 0 },
-        uDeep: { value: new THREE.Color('#0a1238') },
-        uBand: { value: new THREE.Color('#4b2fd6') },
-        uCloud: { value: new THREE.Color('#a8c4ff') },
-        uRim: { value: new THREE.Color('#4f8fff') },
+        uDeep: { value: new THREE.Color('#101c52') },
+        uBand: { value: new THREE.Color('#5a3cf0') },
+        uCloud: { value: new THREE.Color('#b8d0ff') },
+        uRim: { value: new THREE.Color('#5f9bff') },
       },
     });
     const surface = new THREE.Mesh(new THREE.SphereGeometry(R, det, det / 2), surfMat);
@@ -616,11 +619,13 @@ export class CosmosEngine {
   /** UnrealBloomPass — imported on demand so the low tier never pays for it */
   private async initBloom() {
     try {
-      const [{ EffectComposer }, { RenderPass }, { UnrealBloomPass }] = await Promise.all([
-        import('three/examples/jsm/postprocessing/EffectComposer.js'),
-        import('three/examples/jsm/postprocessing/RenderPass.js'),
-        import('three/examples/jsm/postprocessing/UnrealBloomPass.js'),
-      ]);
+      const [{ EffectComposer }, { RenderPass }, { UnrealBloomPass }, { OutputPass }] =
+        await Promise.all([
+          import('three/examples/jsm/postprocessing/EffectComposer.js'),
+          import('three/examples/jsm/postprocessing/RenderPass.js'),
+          import('three/examples/jsm/postprocessing/UnrealBloomPass.js'),
+          import('three/examples/jsm/postprocessing/OutputPass.js'),
+        ]);
       if (this.disposed) return;
       const composer = new EffectComposer(this.renderer);
       composer.addPass(new RenderPass(this.scene, this.camera));
@@ -632,9 +637,13 @@ export class CosmosEngine {
         0.82 // threshold — only genuinely bright pixels bloom
       );
       composer.addPass(bloom);
+      // OutputPass performs the final linear→sRGB conversion — without it
+      // the composed frame renders noticeably darker than intended.
+      composer.addPass(new OutputPass());
       this.composer = composer;
-    } catch {
-      this.composer = null; // fall back to plain rendering silently
+    } catch (err) {
+      console.warn('[cosmos] bloom unavailable — plain rendering', err);
+      this.composer = null;
     }
   }
 
@@ -752,7 +761,9 @@ export class CosmosEngine {
     this.raf = requestAnimationFrame(this.loop);
 
     const dt = Math.min(this.clock.getDelta(), 0.05);
-    const t = this.clock.elapsedTime;
+    // Calm mode (prefers-reduced-motion): scene stays, motion slows 8×.
+    const speed = this.quality.calm ? 0.125 : 1;
+    const t = this.clock.elapsedTime * speed;
 
     // Exponential smoothing: frame-rate independent, silky interpolation.
     const ease = 1 - Math.exp(-dt * 4.2);
@@ -784,16 +795,27 @@ export class CosmosEngine {
     this.stars.rotation.y = t * 0.004;
 
     this.starMat.uniforms.uTime.value = t;
-    for (const m of this.nebulaMats) m.uniforms.uTime.value += dt;
+    for (const m of this.nebulaMats) m.uniforms.uTime.value += dt * speed;
     this.planetMats[0].uniforms.uTime.value = t;
     this.planetGroup.rotation.y = t * 0.015;
     if (this.asteroids) this.asteroids.rotation.y = Math.sin(t * 0.02) * 0.3;
 
-    this.updateComets(dt, t);
+    if (!this.quality.calm) this.updateComets(dt, t);
     this.adaptQuality(dt);
 
-    if (this.composer) this.composer.render();
-    else this.renderer.render(this.scene, this.camera);
+    if (this.composer) {
+      // If post-processing ever fails at runtime (driver quirks, context
+      // hiccups), drop it and keep the scene visible with plain rendering.
+      try {
+        this.composer.render();
+      } catch (err) {
+        console.warn('[cosmos] composer failed — switching to plain render', err);
+        this.composer = null;
+        this.renderer.render(this.scene, this.camera);
+      }
+    } else {
+      this.renderer.render(this.scene, this.camera);
+    }
   };
 }
 

@@ -1,4 +1,5 @@
 'use client';
+import { useMemo, useState } from 'react';
 import { useSkills } from '@/contexts/SkillsContext';
 import { Skeleton } from '../ui/skeleton';
 import { useEditMode } from '@/contexts/EditModeContext';
@@ -21,66 +22,93 @@ import {
 import { motion } from 'framer-motion';
 import type { Skill } from '@/lib/types';
 import TechIcon from '@/components/shared/TechIcon';
+import { cn } from '@/lib/utils';
 
 // Color palette indexed by skill-group order
 const CHIP_COLORS = [
-  { text: 'hsl(221 91% 68%)', border: 'hsl(221 91% 60% / 0.35)', glow: 'hsl(221 91% 60% / 0.12)', dot: '#6096f8' },
-  { text: 'hsl(271 81% 72%)', border: 'hsl(271 81% 62% / 0.35)', glow: 'hsl(271 81% 62% / 0.12)', dot: '#b07ef8' },
-  { text: 'hsl(142 72% 55%)', border: 'hsl(142 72% 50% / 0.35)', glow: 'hsl(142 72% 50% / 0.12)', dot: '#4ade80' },
-  { text: 'hsl(25 95% 62%)',  border: 'hsl(25 95% 55% / 0.35)',  glow: 'hsl(25 95% 55% / 0.12)',  dot: '#fb923c' },
-  { text: 'hsl(330 81% 70%)', border: 'hsl(330 81% 65% / 0.35)', glow: 'hsl(330 81% 65% / 0.12)', dot: '#f472b6' },
-  { text: 'hsl(45 93% 62%)',  border: 'hsl(45 93% 60% / 0.35)',  glow: 'hsl(45 93% 60% / 0.12)',  dot: '#fbbf24' },
-  { text: 'hsl(189 94% 55%)', border: 'hsl(189 94% 50% / 0.35)', glow: 'hsl(189 94% 50% / 0.12)', dot: '#22d3ee' },
-  { text: 'hsl(0 84% 68%)',   border: 'hsl(0 84% 65% / 0.35)',   glow: 'hsl(0 84% 65% / 0.12)',   dot: '#f87171' },
+  { text: 'hsl(221 91% 68%)', border: 'hsl(221 91% 60% / 0.4)', glow: 'hsl(221 91% 60% / 0.55)', dot: '#6096f8' },
+  { text: 'hsl(271 81% 72%)', border: 'hsl(271 81% 62% / 0.4)', glow: 'hsl(271 81% 62% / 0.55)', dot: '#b07ef8' },
+  { text: 'hsl(142 72% 55%)', border: 'hsl(142 72% 50% / 0.4)', glow: 'hsl(142 72% 50% / 0.55)', dot: '#4ade80' },
+  { text: 'hsl(25 95% 62%)',  border: 'hsl(25 95% 55% / 0.4)',  glow: 'hsl(25 95% 55% / 0.55)',  dot: '#fb923c' },
+  { text: 'hsl(330 81% 70%)', border: 'hsl(330 81% 65% / 0.4)', glow: 'hsl(330 81% 65% / 0.55)', dot: '#f472b6' },
+  { text: 'hsl(45 93% 62%)',  border: 'hsl(45 93% 60% / 0.4)',  glow: 'hsl(45 93% 60% / 0.55)',  dot: '#fbbf24' },
+  { text: 'hsl(189 94% 55%)', border: 'hsl(189 94% 50% / 0.4)', glow: 'hsl(189 94% 50% / 0.55)', dot: '#22d3ee' },
+  { text: 'hsl(0 84% 68%)',   border: 'hsl(0 84% 65% / 0.4)',   glow: 'hsl(0 84% 65% / 0.55)',   dot: '#f87171' },
 ];
 
-interface FlatSkill {
+interface StarSkill {
   name: string;
   colorIdx: number;
+  x: number; // % position inside the sky
+  y: number;
 }
 
-interface SkillRowProps {
-  skills: FlatSkill[];
-  duration: number;
-  reverse?: boolean;
-}
-
-function SkillChip({ skill }: { skill: FlatSkill }) {
-  const color = CHIP_COLORS[skill.colorIdx % CHIP_COLORS.length];
+/* ── One skill star: glowing orb + logo; the name appears on hover/tap ── */
+function SkillStar({ star, index }: { star: StarSkill; index: number }) {
+  const color = CHIP_COLORS[star.colorIdx % CHIP_COLORS.length];
+  const [open, setOpen] = useState(false); // touch fallback for hover
   return (
     <div
-      className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-full border backdrop-blur-sm shrink-0 transition-all duration-300 hover:scale-105 cursor-default"
-      style={{
-        borderColor: color.border,
-        boxShadow: `0 0 14px ${color.glow}, inset 0 1px 0 hsl(0 0% 100% / 0.06)`,
-        background: 'hsl(var(--card) / 0.7)',
-      }}
+      className="group absolute -translate-x-1/2 -translate-y-1/2"
+      style={{ left: `${star.x}%`, top: `${star.y}%`, zIndex: open ? 40 : undefined }}
     >
-      <div className="w-4 h-4 shrink-0">
-        <TechIcon techName={skill.name} className="w-4 h-4" />
-      </div>
-      <span className="text-sm font-medium whitespace-nowrap" style={{ color: color.text }}>
-        {skill.name}
-      </span>
-      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color.dot, boxShadow: `0 0 6px ${color.dot}` }} />
-    </div>
-  );
-}
-
-function SkillRow({ skills, duration, reverse = false }: SkillRowProps) {
-  if (skills.length === 0) return null;
-  // Duplicate for seamless loop
-  const doubled = [...skills, ...skills];
-  return (
-    <div className="overflow-hidden">
-      <div
-        className={reverse ? 'marquee-track-rev' : 'marquee-track'}
-        style={{ ['--marquee-dur' as string]: `${duration}s` }}
+      {/* 4-point light rays — the "star" sparkle */}
+      <span
+        aria-hidden
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-14 opacity-35 group-hover:opacity-90 transition-opacity duration-300 animate-pulse-glow"
+        style={{
+          background: `linear-gradient(to bottom, transparent, ${color.dot}, transparent)`,
+          animationDelay: `${(index % 7) * 0.45}s`,
+        }}
+      />
+      <span
+        aria-hidden
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-px w-14 opacity-35 group-hover:opacity-90 transition-opacity duration-300 animate-pulse-glow"
+        style={{
+          background: `linear-gradient(to right, transparent, ${color.dot}, transparent)`,
+          animationDelay: `${(index % 7) * 0.45}s`,
+        }}
+      />
+      {/* Halo */}
+      <span
+        aria-hidden
+        className="absolute -inset-2 rounded-full blur-md opacity-40 group-hover:opacity-90 transition-opacity duration-300"
+        style={{ background: `radial-gradient(circle, ${color.glow}, transparent 70%)` }}
+      />
+      {/* Star core with the tech logo */}
+      <button
+        type="button"
+        aria-label={star.name}
+        onClick={() => setOpen(v => !v)}
+        onBlur={() => setOpen(false)}
+        className="relative flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full border backdrop-blur-md transition-transform duration-300 group-hover:scale-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        style={{
+          background:
+            'radial-gradient(circle at 34% 28%, rgba(255,255,255,0.22) 0%, hsl(var(--card) / 0.92) 55%, hsl(var(--card) / 0.75) 100%)',
+          borderColor: color.border,
+          boxShadow: `0 0 16px ${color.glow}, inset 0 1px 0 rgba(255,255,255,0.1)`,
+        }}
       >
-        {doubled.map((skill, i) => (
-          <SkillChip key={i} skill={skill} />
-        ))}
-      </div>
+        <TechIcon techName={star.name} className="w-5 h-5 sm:w-6 sm:h-6" />
+      </button>
+      {/* Name label — hidden until hover / tap */}
+      <span
+        className={cn(
+          'absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap rounded-full border px-3 py-1 text-[11px] font-semibold tracking-wide backdrop-blur-xl transition-all duration-300 pointer-events-none',
+          open
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0'
+        )}
+        style={{
+          color: color.text,
+          borderColor: color.border,
+          background: 'hsl(var(--background) / 0.85)',
+          boxShadow: `0 0 14px ${color.glow}`,
+          textShadow: `0 0 8px ${color.glow}`,
+        }}
+      >
+        {star.name}
+      </span>
     </div>
   );
 }
@@ -94,7 +122,7 @@ function EditGroupCard({ skillGroup, index, onDelete }: { skillGroup: Skill; ind
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.06 }}
       className="relative rounded-2xl border border-border/50 bg-card/60 backdrop-blur-md p-4 sm:p-5"
-      style={{ boxShadow: `0 0 20px ${color.glow}` }}
+      style={{ boxShadow: `0 0 20px ${color.glow.replace('0.55', '0.15')}` }}
     >
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-2.5">
@@ -149,65 +177,93 @@ const Skills = () => {
   const { skills, loading, deleteSkillGroup } = useSkills();
   const { isEditMode } = useEditMode();
 
-  // Flatten all skill items with their color index
-  const allSkills: FlatSkill[] = skills.flatMap((group, gi) =>
-    group.items.map(item => ({ name: item, colorIdx: gi }))
-  );
-
-  // Distribute into 4 rows round-robin for even spread
-  const rows = [0, 1, 2, 3].map(r => allSkills.filter((_, i) => i % 4 === r));
-  const durations = [42, 58, 48, 65];
+  /* ── CONSTELLATION LAYOUT ──
+     Every skill becomes a star scattered across the "sky" with a
+     golden-ratio low-discrepancy sequence (deterministic → no hydration
+     mismatch, naturally even spread) plus a tiny sine jitter so the grid
+     never reads as a grid. Stars of the same group share a colour and are
+     linked with faint constellation lines. */
+  const starSkills: StarSkill[] = useMemo(() => {
+    const all = skills.flatMap((group, gi) =>
+      group.items.map(item => ({ name: item, colorIdx: gi }))
+    );
+    return all.map((s, i) => {
+      const fx = (i * 0.618033) % 1;
+      const fy = (i * 0.381966 + 0.17) % 1;
+      const jx = Math.sin(i * 12.9898) * 0.045;
+      const jy = Math.cos(i * 78.233) * 0.05;
+      return {
+        ...s,
+        x: 6 + (((fx + jx) % 1) + 1) % 1 * 88,
+        y: 10 + (((fy + jy) % 1) + 1) % 1 * 72,
+      };
+    });
+  }, [skills]);
 
   return (
     <section id="skills" className="py-12 sm:py-16 md:py-24 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 md:px-8">
-        <PageHeader eyebrow="Ур чадвар" />
-        <div className="mb-10 sm:mb-14" />
+        <PageHeader eyebrow="Ур чадвар">
+          <h2 className="font-display glow-text text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
+            Ур чадварын одод
+          </h2>
+          <p className="mt-3 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
+            Од бүр — нэг технологи. Хулганаа аваачиж нэрийг нь хараарай.
+          </p>
+        </PageHeader>
+        <div className="mb-6 sm:mb-10" />
       </div>
 
       {loading ? (
-        <div className="flex flex-col gap-4 px-4">
-          {[42, 58, 48, 65].map((dur, i) => (
-            <div key={i} className="flex gap-3 overflow-hidden">
-              {Array.from({ length: 6 }).map((_, j) => (
-                <Skeleton key={j} className="h-10 w-28 rounded-full shrink-0" />
-              ))}
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="relative">
-          {/* 3D perspective tilt container */}
-          <div
-            className="flex flex-col gap-3 sm:gap-4 py-2"
-            style={{
-              perspective: '1200px',
-              transform: 'perspective(1200px) rotateX(6deg)',
-              transformOrigin: 'center top',
-            }}
-          >
-            {rows.map((rowSkills, i) => (
-              <SkillRow
+        <div className="container mx-auto px-4">
+          <div className="relative mx-auto max-w-5xl h-[380px]">
+            {Array.from({ length: 14 }).map((_, i) => (
+              <Skeleton
                 key={i}
-                skills={rowSkills}
-                duration={durations[i]}
-                reverse={i % 2 === 1}
+                className="absolute h-10 w-10 rounded-full"
+                style={{
+                  left: `${6 + ((i * 0.618033) % 1) * 88}%`,
+                  top: `${10 + ((i * 0.381966 + 0.17) % 1) * 72}%`,
+                }}
               />
             ))}
           </div>
+        </div>
+      ) : (
+        <div className="container mx-auto px-4">
+          <div className="relative mx-auto max-w-5xl h-[400px] sm:h-[480px]">
+            {/* Constellation lines — link stars of the same group */}
+            <svg
+              aria-hidden
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+            >
+              {skills.map((_, gi) => {
+                const pts = starSkills.filter(s => s.colorIdx === gi);
+                if (pts.length < 2) return null;
+                const d = pts
+                  .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`)
+                  .join(' ');
+                return (
+                  <path
+                    key={gi}
+                    d={d}
+                    fill="none"
+                    stroke={CHIP_COLORS[gi % CHIP_COLORS.length].dot}
+                    strokeWidth="1"
+                    strokeDasharray="2 5"
+                    opacity="0.18"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                );
+              })}
+            </svg>
 
-          {/* Left/right fade masks */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-20 sm:w-36 z-10"
-            style={{ background: 'linear-gradient(to right, hsl(var(--background)), transparent)' }}
-          />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-20 sm:w-36 z-10"
-            style={{ background: 'linear-gradient(to left, hsl(var(--background)), transparent)' }}
-          />
-
-          {/* Top/bottom depth fade */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 z-10"
-            style={{ background: 'linear-gradient(to bottom, transparent, hsl(var(--background) / 0.6))' }}
-          />
+            {starSkills.map((star, i) => (
+              <SkillStar key={`${star.name}-${i}`} star={star} index={i} />
+            ))}
+          </div>
         </div>
       )}
 

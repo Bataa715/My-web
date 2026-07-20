@@ -3,5 +3,7 @@ export default function AboutLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <div className="relative min-h-screen bg-background">{children}</div>;
+  /* Transparent — the About page floats directly on the global 3D cosmos
+     backdrop. (The old opaque bg-background here was hiding the canvas.) */
+  return <div className="relative min-h-screen">{children}</div>;
 }

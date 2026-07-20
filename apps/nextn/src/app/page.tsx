@@ -41,10 +41,6 @@ const Hero = dynamic(() => import('@/components/sections/hero'), {
   loading: () => <div className="w-full min-h-[calc(100vh-120px)]" />,
 });
 
-// Interactive tools showcase — a mini solar system of clickable planets
-const ToolsGalaxy = dynamic(() => import('@/components/home/ToolsGalaxy'), {
-  loading: () => <div className="w-full min-h-[500px]" />,
-});
 
 const Education = dynamic(() => import('@/components/sections/Education'), {
   loading: () => <div className="w-full min-h-[400px]" />,
@@ -284,14 +280,6 @@ function HomePageInner() {
         </div>
       )}
 
-      {/* INTERACTIVE SHOWCASE — tools as a clickable mini solar system */}
-      <div data-section="galaxy" id="galaxy" className="relative scroll-mt-24 aurora-sweep">
-        <div className="container mx-auto px-4">
-          <SectionOrnament />
-        </div>
-        <ToolsGalaxy />
-      </div>
-
       {/* BACK TO TOP */}
       <BackToTop />
 
@@ -299,7 +287,6 @@ function HomePageInner() {
         sections={[
           { id: 'hero', label: 'Нүүр' },
           ...visibleSections.map(s => ({ id: s.id, label: s.title })),
-          { id: 'galaxy', label: 'Хэрэгслүүд' },
         ]}
       />
     </HomeShell>

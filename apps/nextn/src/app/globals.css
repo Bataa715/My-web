@@ -16,10 +16,10 @@
      explicit element rule in the base layer below. */
   --font-mono:
     var(--font-exo), ui-sans-serif, system-ui, sans-serif;
-  /* Display face for big cosmic headlines (hero, section titles) */
+  /* Display face for big cosmic headlines — same Exo 2 family (bold weights)
+     so Cyrillic headings match the rest of the site instead of falling back */
   --font-display:
-    var(--font-spaceGrotesk), var(--font-exo), ui-sans-serif,
-    system-ui, sans-serif;
+    var(--font-exo), ui-sans-serif, system-ui, sans-serif;
 
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -388,137 +388,6 @@
     --cosmic-cyan: 189 94% 60%;
   }
 
-  html[class='dracula'] {
-    --background: 231 15% 18%;
-    --foreground: 60 30% 96%;
-    --card: 231 15% 22%;
-    --card-foreground: 60 30% 96%;
-    --popover: 231 15% 18%;
-    --popover-foreground: 60 30% 96%;
-    --primary: 265 89% 78%;
-    --primary-foreground: 231 15% 10%;
-    --secondary: 231 15% 30%;
-    --secondary-foreground: 60 30% 96%;
-    --muted: 231 15% 30%;
-    --muted-foreground: 231 10% 70%;
-    --accent: 326 100% 74%;
-    --accent-foreground: 326 100% 10%;
-    --destructive: 0 100% 67%;
-    --destructive-foreground: 231 15% 18%;
-    --border: 231 15% 35%;
-    --input: 231 15% 35%;
-    --ring: 265 89% 78%;
-  }
-
-  html[class='neo'] {
-    --background: 160 10% 4%;
-    --foreground: 160 10% 98%;
-    --card: 160 10% 7%;
-    --card-foreground: 160 10% 98%;
-    --popover: 160 10% 4%;
-    --popover-foreground: 160 10% 98%;
-    --primary: 142 76% 56%;
-    --primary-foreground: 160 10% 5%;
-    --secondary: 160 5% 15%;
-    --secondary-foreground: 160 10% 98%;
-    --muted: 160 5% 15%;
-    --muted-foreground: 160 5% 60%;
-    --accent: 142 76% 56%;
-    --accent-foreground: 160 10% 5%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 160 10% 98%;
-    --border: 160 5% 20%;
-    --input: 160 5% 20%;
-    --ring: 142 76% 56%;
-  }
-
-  html[class='tokyo-night'] {
-    --background: 222 47% 11%;
-    --foreground: 214 33% 91%;
-    --card: 222 47% 14%;
-    --card-foreground: 214 33% 91%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 214 33% 91%;
-    --primary: 195 100% 75%;
-    --primary-foreground: 222 47% 5%;
-    --secondary: 222 47% 20%;
-    --secondary-foreground: 214 33% 91%;
-    --muted: 222 47% 20%;
-    --muted-foreground: 220 15% 60%;
-    --accent: 195 100% 75%;
-    --accent-foreground: 222 47% 5%;
-    --destructive: 354 70% 54%;
-    --destructive-foreground: 214 33% 91%;
-    --border: 222 47% 25%;
-    --input: 222 47% 25%;
-    --ring: 195 100% 75%;
-  }
-
-  html[class='rose-pine'] {
-    --background: 248 25% 12%;
-    --foreground: 245 50% 91%;
-    --card: 248 25% 15%;
-    --card-foreground: 245 50% 91%;
-    --popover: 248 25% 12%;
-    --popover-foreground: 245 50% 91%;
-    --primary: 343 35% 72%;
-    --primary-foreground: 248 25% 5%;
-    --secondary: 248 25% 20%;
-    --secondary-foreground: 245 50% 91%;
-    --muted: 248 25% 20%;
-    --muted-foreground: 249 10% 60%;
-    --accent: 197 24% 74%;
-    --accent-foreground: 248 25% 5%;
-    --destructive: 2 55% 63%;
-    --destructive-foreground: 245 50% 91%;
-    --border: 248 25% 25%;
-    --input: 248 25% 25%;
-    --ring: 343 35% 72%;
-  }
-
-  html[class='light'] {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 262 83% 58%; /* Indigo */
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 262 83% 58%;
-  }
-
-  html[class='emerald'] {
-    --background: 220 17% 12%;
-    --foreground: 160 5% 96%;
-    --card: 220 17% 15%;
-    --card-foreground: 160 5% 96%;
-    --popover: 220 17% 12%;
-    --popover-foreground: 160 5% 96%;
-    --primary: 160 84% 39%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 220 17% 20%;
-    --secondary-foreground: 160 5% 96%;
-    --muted: 220 17% 20%;
-    --muted-foreground: 220 10% 60%;
-    --accent: 160 60% 45%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 17% 25%;
-    --input: 220 17% 25%;
-    --ring: 160 84% 39%;
-  }
 }
 
 @layer base {
@@ -1348,11 +1217,14 @@
   inset: 0;
   opacity: 1;
   transition: opacity 1.4s ease;
+  /* Rich enough to stand on its own when WebGL is unavailable:
+     violet/blue/magenta nebulae + a glowing planet-horizon at the bottom */
   background:
-    radial-gradient(ellipse 55% 42% at 18% 22%, hsl(262 80% 22% / 0.35), transparent 70%),
-    radial-gradient(ellipse 50% 40% at 82% 65%, hsl(217 90% 25% / 0.3), transparent 70%),
-    radial-gradient(ellipse 42% 34% at 55% 95%, hsl(322 75% 24% / 0.25), transparent 70%),
-    linear-gradient(180deg, #05050a 0%, #070713 55%, #05050a 100%);
+    radial-gradient(ellipse 60% 46% at 18% 20%, hsl(262 85% 30% / 0.55), transparent 70%),
+    radial-gradient(ellipse 55% 44% at 84% 60%, hsl(217 95% 34% / 0.5), transparent 70%),
+    radial-gradient(ellipse 46% 38% at 55% 92%, hsl(322 80% 32% / 0.4), transparent 72%),
+    radial-gradient(ellipse 120% 42% at 50% 118%, hsl(230 90% 40% / 0.55), hsl(255 80% 30% / 0.25) 55%, transparent 78%),
+    linear-gradient(180deg, #05050a 0%, #0a0a1a 55%, #070714 100%);
 }
 .cosmos-fallback--hidden {
   opacity: 0;
@@ -1367,26 +1239,29 @@
 }
 .cosmos-fallback__stars--1 {
   background-image:
-    radial-gradient(1px 1px at 25px 35px, rgb(255 255 255 / 0.9), transparent 40%),
-    radial-gradient(1px 1px at 125px 90px, rgb(200 220 255 / 0.8), transparent 40%),
-    radial-gradient(1.5px 1.5px at 75px 160px, rgb(255 255 255 / 0.7), transparent 40%),
-    radial-gradient(1px 1px at 180px 45px, rgb(190 180 255 / 0.75), transparent 40%);
-  background-size: 220px 220px;
+    radial-gradient(1.5px 1.5px at 25px 35px, rgb(255 255 255 / 1), transparent 45%),
+    radial-gradient(1px 1px at 125px 90px, rgb(200 220 255 / 0.95), transparent 45%),
+    radial-gradient(2px 2px at 75px 160px, rgb(255 255 255 / 0.9), transparent 45%),
+    radial-gradient(1.5px 1.5px at 180px 45px, rgb(190 180 255 / 0.9), transparent 45%),
+    radial-gradient(1px 1px at 45px 195px, rgb(255 255 255 / 0.8), transparent 45%);
+  background-size: 210px 210px;
   animation: cosmos-drift 240s linear infinite;
 }
 .cosmos-fallback__stars--2 {
   background-image:
-    radial-gradient(1px 1px at 60px 20px, rgb(255 255 255 / 0.55), transparent 40%),
-    radial-gradient(1px 1px at 150px 140px, rgb(160 200 255 / 0.5), transparent 40%),
-    radial-gradient(1px 1px at 30px 110px, rgb(255 230 200 / 0.45), transparent 40%);
-  background-size: 300px 300px;
+    radial-gradient(1.5px 1.5px at 60px 20px, rgb(255 255 255 / 0.8), transparent 45%),
+    radial-gradient(1px 1px at 150px 140px, rgb(160 200 255 / 0.75), transparent 45%),
+    radial-gradient(1px 1px at 30px 110px, rgb(255 230 200 / 0.7), transparent 45%),
+    radial-gradient(1.5px 1.5px at 220px 200px, rgb(220 190 255 / 0.7), transparent 45%);
+  background-size: 280px 280px;
   animation: cosmos-drift 360s linear infinite reverse;
 }
 .cosmos-fallback__stars--3 {
   background-image:
-    radial-gradient(2px 2px at 95px 65px, rgb(255 255 255 / 0.85), transparent 45%),
-    radial-gradient(2px 2px at 210px 190px, rgb(150 190 255 / 0.7), transparent 45%);
-  background-size: 420px 420px;
+    radial-gradient(2.5px 2.5px at 95px 65px, rgb(255 255 255 / 1), transparent 50%),
+    radial-gradient(2px 2px at 210px 190px, rgb(150 190 255 / 0.9), transparent 50%),
+    radial-gradient(3px 3px at 320px 120px, rgb(255 255 255 / 0.85), transparent 50%);
+  background-size: 380px 380px;
   animation: cosmos-twinkle 5s ease-in-out infinite alternate;
 }
 @keyframes cosmos-drift {
@@ -1457,9 +1332,10 @@
   50%      { background-position: 100% 50%; }
 }
 
-/* ── Aurora light sweep — slow diagonal band behind key sections ── */
+/* ── Aurora light sweep — slow diagonal band behind key sections.
+      NOTE: no `position` here — it must not override `fixed`/`relative`
+      already set on the element; hosts are always positioned themselves. ── */
 @utility aurora-sweep {
-  position: relative;
   overflow: hidden;
 }
 .aurora-sweep::before {

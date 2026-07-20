@@ -35,15 +35,29 @@ export default function CosmosBackground() {
   // Boot the engine once, after mount.
   useEffect(() => {
     let cancelled = false;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced || !webglSupported()) return; // CSS fallback stays forever
+    if (!webglSupported()) {
+      console.warn('[cosmos] WebGL unavailable — keeping CSS starfield fallback');
+      return;
+    }
+    // OS-level "reduce motion" (e.g. Windows: Animation effects OFF) must NOT
+    // kill the 3D backdrop — we run it in a calm, slowed-down mode instead.
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     (async () => {
-      const { CosmosEngine, detectQuality } = await import('./cosmos-engine');
-      if (cancelled || !canvasRef.current) return;
-      engineRef.current = new CosmosEngine(canvasRef.current, detectQuality());
-      // Give the engine two frames to render before revealing the canvas.
-      requestAnimationFrame(() => requestAnimationFrame(() => !cancelled && setReady(true)));
+      try {
+        const { CosmosEngine, detectQuality } = await import('./cosmos-engine');
+        if (cancelled || !canvasRef.current) return;
+        engineRef.current = new CosmosEngine(canvasRef.current, {
+          ...detectQuality(),
+          calm,
+        });
+        // Give the engine two frames to render before revealing the canvas.
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => !cancelled && setReady(true))
+        );
+      } catch (err) {
+        console.error('[cosmos] engine failed to start — CSS fallback stays', err);
+      }
     })();
 
     return () => {

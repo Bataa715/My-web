@@ -1,13 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   GraduationCap,
   Briefcase,
@@ -43,10 +36,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import type {
-  Education as EducationType,
-  Experience as ExperienceType,
-} from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 const formatDate = (date: any) => {
@@ -59,319 +48,124 @@ const formatDate = (date: any) => {
   }
 };
 
-const accents = [
-  { gradient: 'from-primary to-primary/60' },
-  { gradient: 'from-accent to-accent/60' },
-  { gradient: 'from-primary to-accent' },
-  { gradient: 'from-accent to-primary/60' },
-  { gradient: 'from-primary/80 via-accent/70 to-primary/60' },
+/* Accent colors cycled along the journey */
+const ACCENTS = [
+  { c: 'hsl(217 91% 65%)', glow: 'hsl(217 91% 60% / 0.5)' },
+  { c: 'hsl(271 81% 66%)', glow: 'hsl(271 81% 60% / 0.5)' },
+  { c: 'hsl(189 94% 55%)', glow: 'hsl(189 94% 50% / 0.5)' },
+  { c: 'hsl(322 85% 64%)', glow: 'hsl(322 85% 60% / 0.5)' },
+  { c: 'hsl(45 93% 58%)',  glow: 'hsl(45 93% 55% / 0.5)' },
 ];
 
-// 3D Card component with tilt effect
-function EducationCard({
-  edu,
+/* ── One node on the cosmic timeline: a glowing star on the journey line,
+     content floating in open space beside it — no card box. ── */
+function TimelineEntry({
   index,
-  isEditMode,
-  onDelete,
+  icon,
+  editControls,
+  children,
 }: {
-  edu: EducationType;
   index: number;
-  isEditMode: boolean;
-  onDelete: (id: string) => void;
+  icon: React.ReactNode;
+  editControls?: React.ReactNode;
+  children: React.ReactNode;
 }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), {
-    stiffness: 300,
-    damping: 30,
-  });
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), {
-    stiffness: 300,
-    damping: 30,
-  });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
-    mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-    setIsHovered(false);
-  };
-
-  const accent = accents[index % accents.length];
+  const accent = ACCENTS[index % ACCENTS.length];
+  const flip = index % 2 === 1;
 
   return (
     <motion.div
-      ref={cardRef}
-      layout
-      initial={{ opacity: 0, y: 80 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.8 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      style={{
-        rotateX,
-        rotateY,
-        transformStyle: 'preserve-3d',
-      }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      className="relative group cursor-pointer"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="relative group/entry"
     >
-      {/* Glow effect */}
-      <motion.div
-        className={cn(
-          'absolute -inset-1 rounded-2xl bg-linear-to-r opacity-0 blur-xl transition-opacity duration-500',
-          accent.gradient
-        )}
-        animate={{ opacity: isHovered ? 0.4 : 0 }}
-      />
-
-      {/* Card */}
-      <div className="relative h-full rounded-2xl border border-border/60 bg-card/60 backdrop-blur-md overflow-hidden">
-        {/* Top gradient accent */}
-        <div
-          className={cn(
-            'absolute top-0 left-0 right-0 h-1 bg-linear-to-r',
-            accent.gradient
-          )}
+      {/* Star node on the journey line */}
+      <div className="absolute left-5 md:left-1/2 top-0 md:top-1/2 -translate-x-1/2 md:-translate-y-1/2 z-10">
+        {/* Light rays */}
+        <span
+          aria-hidden
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-px h-16 opacity-40 animate-pulse-glow"
+          style={{
+            background: `linear-gradient(to bottom, transparent, ${accent.c}, transparent)`,
+            animationDelay: `${(index % 5) * 0.5}s`,
+          }}
         />
-
-        {/* Spotlight effect */}
-        <div
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-2xl"
-          style={{ background: 'radial-gradient(circle at 50% 30%, hsl(var(--primary) / 0.07), transparent 60%)' }}
+        <span
+          aria-hidden
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-px w-16 opacity-40 animate-pulse-glow"
+          style={{
+            background: `linear-gradient(to right, transparent, ${accent.c}, transparent)`,
+            animationDelay: `${(index % 5) * 0.5}s`,
+          }}
         />
-
-        {/* Edit buttons */}
-        {isEditMode && (
-          <div className="absolute top-3 right-3 flex gap-1.5 z-20">
-            <EditEducationDialog education={edu}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 bg-card/80 hover:bg-card text-muted-foreground hover:text-foreground rounded-lg backdrop-blur-xs"
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-            </EditEducationDialog>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 bg-card/80 hover:bg-destructive/20 text-muted-foreground hover:text-destructive rounded-lg backdrop-blur-xs"
-                  aria-label="Delete education"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Устгахдаа итгэлтэй байна уу?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    "{edu.degree}"-г устгах гэж байна. Энэ үйлдэл буцаагдахгүй.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => edu.id && onDelete(edu.id)}>
-                    Устгах
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        )}
-
-        {/* Content */}
+        {/* Halo */}
+        <span
+          aria-hidden
+          className="absolute -inset-3 rounded-full blur-lg opacity-50 group-hover/entry:opacity-90 transition-opacity duration-500"
+          style={{ background: `radial-gradient(circle, ${accent.glow}, transparent 70%)` }}
+        />
+        {/* Orb */}
         <div
-          className="relative p-6 pt-8"
-          style={{ transform: 'translateZ(50px)' }}
+          className="relative w-11 h-11 rounded-full border-2 flex items-center justify-center backdrop-blur-md transition-transform duration-500 group-hover/entry:scale-110"
+          style={{
+            background: `radial-gradient(circle at 34% 28%, rgba(255,255,255,0.4) 0%, ${accent.c} 45%, hsl(240 45% 12%) 100%)`,
+            borderColor: 'rgba(255,255,255,0.2)',
+            boxShadow: `0 0 18px ${accent.glow}, inset 0 1px 0 rgba(255,255,255,0.25)`,
+          }}
         >
-          {/* Icon */}
+          <span className="text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] [&_svg]:w-5 [&_svg]:h-5">
+            {icon}
+          </span>
+        </div>
+      </div>
+
+      {/* Content — open space, alternating sides on desktop */}
+      <div
+        className={cn(
+          'relative pl-14 md:pl-0 md:w-1/2',
+          flip
+            ? 'md:ml-auto md:pl-16 md:text-left'
+            : 'md:pr-16 md:text-right'
+        )}
+      >
+        {editControls && (
           <div
             className={cn(
-              'w-14 h-14 rounded-xl flex items-center justify-center mb-5 bg-linear-to-br',
-              accent.gradient
+              'absolute top-0 z-20 flex gap-1.5',
+              flip ? 'right-0' : 'right-0 md:left-0 md:right-auto'
             )}
           >
-            <GraduationCap className="w-7 h-7 text-primary-foreground" />
+            {editControls}
           </div>
-
-          {/* Degree title */}
-          <h3 className="text-xl font-bold text-foreground mb-3 line-clamp-2">
-            {edu.degree}
-          </h3>
-
-          {/* School */}
-          <div className="flex items-center gap-2 text-muted-foreground mb-3">
-            <Building2 className="w-4 h-4 shrink-0" />
-            <span className="text-sm line-clamp-1">{edu.school}</span>
-          </div>
-
-          {/* Date */}
-          <div className="flex items-center gap-2 text-muted-foreground/70 mb-4">
-            <Calendar className="w-4 h-4 shrink-0" />
-            <span className="text-sm">
-              {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
-            </span>
-          </div>
-
-          {/* Score badge */}
-          {edu.score && (
-            <div
-              className={cn(
-                'inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold bg-linear-to-r',
-                accent.gradient
-              )}
-            >
-              <Award className="w-4 h-4 text-primary-foreground" />
-              <span className="text-primary-foreground">{edu.score}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Bottom decorative element */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-linear-to-t from-background/50 to-transparent pointer-events-none" />
+        )}
+        {children}
       </div>
     </motion.div>
   );
 }
 
-// ───── Experience Card ────────────────────────────────────────────────────────
-
-function ExperienceCard({
-  exp,
-  index,
-  isEditMode,
-  onDelete,
+function DatePill({
+  accent,
+  children,
 }: {
-  exp: ExperienceType;
-  index: number;
-  isEditMode: boolean;
-  onDelete: (id: string) => void;
+  accent: (typeof ACCENTS)[number];
+  children: React.ReactNode;
 }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), {
-    stiffness: 300,
-    damping: 30,
-  });
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), {
-    stiffness: 300,
-    damping: 30,
-  });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
-    mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-    setIsHovered(false);
-  };
-
-  const accent = accents[index % accents.length];
-
   return (
-    <motion.div
-      ref={cardRef}
-      layout
-      initial={{ opacity: 0, y: 80 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.8 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      className="relative group cursor-pointer"
+    <span
+      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono tracking-wider border backdrop-blur-md"
+      style={{
+        color: accent.c,
+        borderColor: accent.c.replace(')', ' / 0.35)'),
+        background: 'hsl(var(--background) / 0.6)',
+        boxShadow: `0 0 12px -4px ${accent.glow}`,
+      }}
     >
-      <motion.div
-        className={cn(
-          'absolute -inset-1 rounded-2xl bg-linear-to-r opacity-0 blur-xl transition-opacity duration-500',
-          accent.gradient
-        )}
-        animate={{ opacity: isHovered ? 0.4 : 0 }}
-      />
-      <div className="relative h-full rounded-2xl border border-border/60 bg-card/60 backdrop-blur-md overflow-hidden">
-        <div className={cn('absolute top-0 left-0 right-0 h-1 bg-linear-to-r', accent.gradient)} />
-        <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-2xl" style={{ background: 'radial-gradient(circle at 50% 30%, hsl(var(--primary) / 0.07), transparent 60%)' }} />
-
-        {isEditMode && (
-          <div className="absolute top-3 right-3 flex gap-1.5 z-20">
-            <EditExperienceDialog experience={exp}>
-              <Button variant="ghost" size="icon" className="h-8 w-8 bg-card/80 hover:bg-card text-muted-foreground hover:text-foreground rounded-lg backdrop-blur-xs">
-                <Edit className="h-4 w-4" />
-              </Button>
-            </EditExperienceDialog>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 bg-card/80 hover:bg-destructive/20 text-muted-foreground hover:text-destructive rounded-lg backdrop-blur-xs" aria-label="Устгах">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
-                  <AlertDialogDescription>"{exp.title}"-г устгах гэж байна. Энэ үйлдэл буцаагдахгүй.</AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Цуцлах</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => exp.id && onDelete(exp.id)}>Устгах</AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        )}
-
-        <div className="relative p-6 pt-8" style={{ transform: 'translateZ(50px)' }}>
-          <div className={cn('w-14 h-14 rounded-xl flex items-center justify-center mb-5 bg-linear-to-br', accent.gradient)}>
-            <Briefcase className="w-7 h-7 text-primary-foreground" />
-          </div>
-          <h3 className="text-xl font-bold text-foreground mb-3 line-clamp-2">{exp.title}</h3>
-          <div className="flex items-center gap-2 text-muted-foreground mb-3">
-            <Building2 className="w-4 h-4 shrink-0" />
-            <span className="text-sm line-clamp-1">{exp.company}</span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground/70 mb-3">
-            <Calendar className="w-4 h-4 shrink-0" />
-            <span className="text-sm">
-              {formatDate(exp.startDate)} – {exp.current ? 'Одоо' : formatDate(exp.endDate)}
-            </span>
-          </div>
-          {exp.current && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-500 mb-3">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Одоо ажиллаж байна
-            </div>
-          )}
-          {exp.description && (
-            <p className="text-sm text-muted-foreground/80 line-clamp-3 mt-2">{exp.description}</p>
-          )}
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-linear-to-t from-background/50 to-transparent pointer-events-none" />
-      </div>
-    </motion.div>
+      <Calendar className="w-3 h-3" />
+      {children}
+    </span>
   );
 }
 
@@ -381,6 +175,18 @@ export default function Education() {
   const { isEditMode } = useEditMode();
   const loading = eduLoading || expLoading;
 
+  const journeyLine = (
+    <div
+      aria-hidden
+      className="absolute left-5 md:left-1/2 top-0 bottom-0 w-px -translate-x-1/2"
+      style={{
+        background:
+          'linear-gradient(to bottom, transparent, hsl(var(--primary)/0.35) 10%, hsl(var(--accent)/0.35) 90%, transparent)',
+        boxShadow: '0 0 8px hsl(var(--primary)/0.25)',
+      }}
+    />
+  );
+
   return (
     <section
       id="education"
@@ -388,21 +194,28 @@ export default function Education() {
     >
       <div className="container mx-auto px-4 sm:px-6 md:px-8 relative">
         <PageHeader
-          eyebrow="Боловсрол & Ажилын Түүх"
+          eyebrow="Боловсрол & Ажлын Түүх"
           icon={<GraduationCap className="h-3.5 w-3.5" />}
-        />
-        <div className="mb-8" />
+        >
+          <h2 className="font-display glow-text text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
+            Миний аялсан зам
+          </h2>
+          <p className="mt-3 text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
+            Од бүр — нэг үе шат. Гэрэлт замын дагуу аялаарай.
+          </p>
+        </PageHeader>
+        <div className="mb-10" />
 
         <Tabs defaultValue="education" className="w-full">
-          <div className="flex justify-center mb-8">
-            <TabsList className="h-11 px-1 gap-1">
-              <TabsTrigger value="education" className="gap-2 px-5">
+          <div className="flex justify-center mb-10">
+            <TabsList className="h-11 px-1 gap-1 rounded-full border border-border/60 bg-card/40 backdrop-blur-xl">
+              <TabsTrigger value="education" className="gap-2 px-5 rounded-full">
                 <GraduationCap className="h-4 w-4" />
                 Боловсрол
               </TabsTrigger>
-              <TabsTrigger value="experience" className="gap-2 px-5">
+              <TabsTrigger value="experience" className="gap-2 px-5 rounded-full">
                 <Briefcase className="h-4 w-4" />
-                Ажилын Түүх
+                Ажлын Түүх
               </TabsTrigger>
             </TabsList>
           </div>
@@ -414,41 +227,112 @@ export default function Education() {
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
               </div>
             ) : (
-              <motion.div
-                layout
-                className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto"
-                style={{ perspective: '1000px' }}
-              >
-                <AnimatePresence>
-                  {education.map((edu, index) => (
-                    <EducationCard
-                      key={edu.id}
-                      edu={edu}
-                      index={index}
-                      isEditMode={isEditMode}
-                      onDelete={deleteEducation}
-                    />
-                  ))}
+              <div className="relative max-w-4xl mx-auto">
+                {journeyLine}
+                <div className="flex flex-col gap-14 md:gap-20 py-4">
+                  {education.map((edu, index) => {
+                    const accent = ACCENTS[index % ACCENTS.length];
+                    return (
+                      <TimelineEntry
+                        key={edu.id}
+                        index={index}
+                        icon={<GraduationCap />}
+                        editControls={
+                          isEditMode ? (
+                            <>
+                              <EditEducationDialog education={edu}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 bg-card/80 hover:bg-card text-muted-foreground hover:text-foreground rounded-full backdrop-blur-xs"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </EditEducationDialog>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 bg-card/80 hover:bg-destructive/20 text-muted-foreground hover:text-destructive rounded-full backdrop-blur-xs"
+                                    aria-label="Delete education"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Устгахдаа итгэлтэй байна уу?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      "{edu.degree}"-г устгах гэж байна. Энэ
+                                      үйлдэл буцаагдахгүй.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() =>
+                                        edu.id && deleteEducation(edu.id)
+                                      }
+                                    >
+                                      Устгах
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </>
+                          ) : undefined
+                        }
+                      >
+                        <DatePill accent={accent}>
+                          {formatDate(edu.startDate)} – {formatDate(edu.endDate)}
+                        </DatePill>
+                        <h3
+                          className="font-display text-xl sm:text-2xl font-bold tracking-tight mt-3 mb-2"
+                          style={{ textShadow: `0 0 20px ${accent.glow}` }}
+                        >
+                          {edu.degree}
+                        </h3>
+                        <div
+                          className={cn(
+                            'flex items-center gap-2 text-muted-foreground justify-start',
+                            index % 2 === 0 && 'md:justify-end'
+                          )}
+                        >
+                          <Building2 className="w-4 h-4 shrink-0" />
+                          <span className="text-sm">{edu.school}</span>
+                        </div>
+                        {edu.score && (
+                          <span
+                            className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full text-xs font-bold text-white"
+                            style={{
+                              background: `linear-gradient(120deg, ${accent.c}, hsl(var(--accent)))`,
+                              boxShadow: `0 0 16px -4px ${accent.glow}`,
+                            }}
+                          >
+                            <Award className="w-3.5 h-3.5" />
+                            {edu.score}
+                          </span>
+                        )}
+                      </TimelineEntry>
+                    );
+                  })}
                   {isEditMode && (
-                    <motion.div
-                      layout
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3, delay: education.length * 0.1 }}
-                    >
+                    <div className="flex justify-center">
                       <AddEducationDialog>
-                        <button className="flex h-full min-h-[280px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/60 bg-card/30 backdrop-blur-md text-muted-foreground transition-all duration-300 hover:border-primary hover:bg-primary/5 hover:text-primary group">
-                          <div className="w-16 h-16 rounded-2xl bg-muted group-hover:bg-primary/20 flex items-center justify-center mb-4 transition-colors duration-300">
-                            <PlusCircle className="w-8 h-8" />
-                          </div>
-                          <span className="font-semibold text-lg">Боловсрол нэмэх</span>
-                          <span className="text-sm text-muted-foreground/60 mt-1">Шинэ мэдээлэл нэмэх</span>
+                        <button className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border-2 border-dashed border-border/60 bg-card/20 text-muted-foreground transition-all duration-300 hover:border-primary/60 hover:bg-primary/5 hover:text-primary">
+                          <PlusCircle className="w-5 h-5" />
+                          <span className="font-semibold text-sm">
+                            Боловсрол нэмэх
+                          </span>
                         </button>
                       </AddEducationDialog>
-                    </motion.div>
+                    </div>
                   )}
-                </AnimatePresence>
-              </motion.div>
+                </div>
+              </div>
             )}
           </TabsContent>
 
@@ -459,41 +343,119 @@ export default function Education() {
                 <Loader2 className="h-12 w-12 animate-spin text-primary" />
               </div>
             ) : (
-              <motion.div
-                layout
-                className="grid gap-4 sm:gap-5 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto"
-                style={{ perspective: '1000px' }}
-              >
-                <AnimatePresence>
-                  {experiences.map((exp, index) => (
-                    <ExperienceCard
-                      key={exp.id}
-                      exp={exp}
-                      index={index}
-                      isEditMode={isEditMode}
-                      onDelete={deleteExperience}
-                    />
-                  ))}
+              <div className="relative max-w-4xl mx-auto">
+                {journeyLine}
+                <div className="flex flex-col gap-14 md:gap-20 py-4">
+                  {experiences.map((exp, index) => {
+                    const accent = ACCENTS[index % ACCENTS.length];
+                    return (
+                      <TimelineEntry
+                        key={exp.id}
+                        index={index}
+                        icon={<Briefcase />}
+                        editControls={
+                          isEditMode ? (
+                            <>
+                              <EditExperienceDialog experience={exp}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 bg-card/80 hover:bg-card text-muted-foreground hover:text-foreground rounded-full backdrop-blur-xs"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </EditExperienceDialog>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 bg-card/80 hover:bg-destructive/20 text-muted-foreground hover:text-destructive rounded-full backdrop-blur-xs"
+                                    aria-label="Устгах"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      Устгахдаа итгэлтэй байна уу?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      "{exp.title}"-г устгах гэж байна. Энэ
+                                      үйлдэл буцаагдахгүй.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Цуцлах</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() =>
+                                        exp.id && deleteExperience(exp.id)
+                                      }
+                                    >
+                                      Устгах
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </>
+                          ) : undefined
+                        }
+                      >
+                        <div
+                          className={cn(
+                            'flex items-center gap-2 flex-wrap justify-start',
+                            index % 2 === 0 && 'md:justify-end'
+                          )}
+                        >
+                          <DatePill accent={accent}>
+                            {formatDate(exp.startDate)} –{' '}
+                            {exp.current ? 'Одоо' : formatDate(exp.endDate)}
+                          </DatePill>
+                          {exp.current && (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              Одоо ажиллаж байна
+                            </span>
+                          )}
+                        </div>
+                        <h3
+                          className="font-display text-xl sm:text-2xl font-bold tracking-tight mt-3 mb-2"
+                          style={{ textShadow: `0 0 20px ${accent.glow}` }}
+                        >
+                          {exp.title}
+                        </h3>
+                        <div
+                          className={cn(
+                            'flex items-center gap-2 text-muted-foreground justify-start',
+                            index % 2 === 0 && 'md:justify-end'
+                          )}
+                        >
+                          <Building2 className="w-4 h-4 shrink-0" />
+                          <span className="text-sm">{exp.company}</span>
+                        </div>
+                        {exp.description && (
+                          <p className="text-sm text-muted-foreground/80 leading-relaxed mt-3 max-w-md md:inline-block">
+                            {exp.description}
+                          </p>
+                        )}
+                      </TimelineEntry>
+                    );
+                  })}
                   {isEditMode && (
-                    <motion.div
-                      layout
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.3, delay: experiences.length * 0.1 }}
-                    >
+                    <div className="flex justify-center">
                       <AddExperienceDialog>
-                        <button className="flex h-full min-h-[280px] w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border/60 bg-card/30 backdrop-blur-md text-muted-foreground transition-all duration-300 hover:border-primary hover:bg-primary/5 hover:text-primary group">
-                          <div className="w-16 h-16 rounded-2xl bg-muted group-hover:bg-primary/20 flex items-center justify-center mb-4 transition-colors duration-300">
-                            <PlusCircle className="w-8 h-8" />
-                          </div>
-                          <span className="font-semibold text-lg">Туршлага нэмэх</span>
-                          <span className="text-sm text-muted-foreground/60 mt-1">Шинэ ажлын туршлага нэмэх</span>
+                        <button className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border-2 border-dashed border-border/60 bg-card/20 text-muted-foreground transition-all duration-300 hover:border-primary/60 hover:bg-primary/5 hover:text-primary">
+                          <PlusCircle className="w-5 h-5" />
+                          <span className="font-semibold text-sm">
+                            Туршлага нэмэх
+                          </span>
                         </button>
                       </AddExperienceDialog>
-                    </motion.div>
+                    </div>
                   )}
-                </AnimatePresence>
-              </motion.div>
+                </div>
+              </div>
             )}
           </TabsContent>
         </Tabs>

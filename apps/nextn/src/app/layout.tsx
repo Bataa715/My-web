@@ -9,7 +9,7 @@ import PageTransition from '@/components/PageTransition';
 import { I18nProvider } from '@/contexts/I18nContext';
 import MotionProvider from '@/app/providers/MotionProvider';
 import CosmosBackground from '@/components/cosmos/CosmosBackground';
-import { JetBrains_Mono, Space_Grotesk, Exo_2 } from 'next/font/google';
+import { JetBrains_Mono, Exo_2 } from 'next/font/google';
 
 // Code / numeric contexts only (kept for pre, code, kbd, samp)
 const jetbrainsMono = JetBrains_Mono({
@@ -27,13 +27,9 @@ const exo2 = Exo_2({
   preload: true,
 });
 
-// Display face for cosmic headlines (latin); Exo 2 covers Cyrillic fallback
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-spaceGrotesk',
-  display: 'swap',
-  preload: true,
-});
+// Display headlines use Exo 2 as well (bold weights) — a separate latin-only
+// display face made Mongolian Cyrillic headings fall back to Arial and look
+// like a completely different font.
 
 export const metadata: Metadata = {
   title: {
@@ -101,7 +97,7 @@ export default function RootLayout({
     <html
       lang="mn"
       suppressHydrationWarning
-      className={`${exo2.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable}`}
+      className={`${exo2.variable} ${jetbrainsMono.variable}`}
     >
       <head>
         {/* Preconnect to critical external resources */}
