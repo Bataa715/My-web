@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, FormEvent } from 'react';
-import { useFirebase, useMemoFirebase } from '@/firebase';
+import { useSupabase, useMemoSupabase } from '@/supabase';
 import {
   collection,
   query,
@@ -13,7 +13,7 @@ import {
   updateDoc,
   serverTimestamp,
   Timestamp,
-} from 'firebase/firestore';
+} from '@/supabase/db';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -31,7 +31,7 @@ import {
   TrendingUp,
   Zap,
 } from 'lucide-react';
-import ToolPageShell from '@/components/shared/ToolPageShell';
+import ToolPageShell from '@/features/tools/ToolPageShell';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
@@ -117,7 +117,7 @@ const StatCard = ({
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="bg-card/50 backdrop-blur-xs rounded-2xl p-4 border border-border/30"
+    className="border border-[#111] p-4"
   >
     <div className="flex items-center gap-3">
       <div className={cn('p-2.5 rounded-xl', color)}>
@@ -154,10 +154,10 @@ const TodoItem = ({
       exit="exit"
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
       className={cn(
-        'group relative flex items-start gap-4 p-4 rounded-2xl border transition-all duration-300',
+        'group relative flex items-start gap-4 border p-4 transition-colors',
         todo.completed
-          ? 'bg-muted/30 border-border/20'
-          : cn('bg-card/50 backdrop-blur-xs hover:bg-card/70', priority.border),
+          ? 'border-[#111]/15 bg-[#111]/5'
+          : cn('border-[#111]/25 hover:border-[#111]', priority.border),
         isOverdue && !todo.completed && 'border-red-500/50 bg-red-500/5'
       )}
     >
@@ -225,7 +225,7 @@ const TodoItem = ({
         variant="ghost"
         size="icon"
         onClick={onDelete}
-        className="opacity-0 group-hover:opacity-100 h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-xl transition-all"
+        className="opacity-0 group-hover:opacity-100 touch-visible h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-xl transition-all"
       >
         <Trash2 className="h-4 w-4" />
       </Button>
@@ -234,7 +234,7 @@ const TodoItem = ({
 };
 
 export default function TodoPage() {
-  const { firestore, user } = useFirebase();
+  const { firestore, user } = useSupabase();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -246,7 +246,7 @@ export default function TodoPage() {
   const [dueDate, setDueDate] = useState('');
   const [category, setCategory] = useState('');
 
-  const todosRef = useMemoFirebase(
+  const todosRef = useMemoSupabase(
     () =>
       user && firestore
         ? collection(firestore, `users/${user.uid}/todos`)
@@ -346,7 +346,7 @@ export default function TodoPage() {
       description="Өдрийн ажлаа төлөвлөж, бүтээмжээ нэмэгдүүлээрэй"
       icon={<ListTodo className="h-8 w-8" />}
       breadcrumbs={[
-        { label: 'Хэрэгслүүд', href: '/tools' },
+        { label: 'Хэрэгслүүд', href: '/#tools' },
         { label: 'Todo' },
       ]}
     >
@@ -374,7 +374,7 @@ export default function TodoPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-3xl shadow-xl overflow-hidden">
+            <Card className="overflow-hidden rounded-none border border-[#111] bg-transparent shadow-none">
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                   <Tabs
@@ -382,15 +382,15 @@ export default function TodoPage() {
                     onValueChange={v => setFilter(v as any)}
                     className="w-full sm:w-auto"
                   >
-                    <TabsList className="bg-muted/50 rounded-xl p-1">
-                      <TabsTrigger value="all" className="rounded-lg data-[state=active]:bg-card">Бүгд</TabsTrigger>
-                      <TabsTrigger value="active" className="rounded-lg data-[state=active]:bg-card">Идэвхтэй</TabsTrigger>
-                      <TabsTrigger value="completed" className="rounded-lg data-[state=active]:bg-card">Дууссан</TabsTrigger>
+                    <TabsList className="rounded-none border border-[#111] bg-transparent p-1">
+                      <TabsTrigger value="all" className="rounded-none data-[state=active]:bg-[#c41212] data-[state=active]:text-white">Бүгд</TabsTrigger>
+                      <TabsTrigger value="active" className="rounded-none data-[state=active]:bg-[#c41212] data-[state=active]:text-white">Идэвхтэй</TabsTrigger>
+                      <TabsTrigger value="completed" className="rounded-none data-[state=active]:bg-[#c41212] data-[state=active]:text-white">Дууссан</TabsTrigger>
                     </TabsList>
                   </Tabs>
                   <Button
                     onClick={() => setDialogOpen(true)}
-                    className="bg-primary text-primary-foreground rounded-xl gap-2 shadow-lg"
+                    className="gap-2 rounded-none bg-[#c41212] text-white"
                   >
                     <Plus className="h-4 w-4" />
                     Шинэ
@@ -462,7 +462,7 @@ export default function TodoPage() {
       )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-card/95 backdrop-blur-xl border-0 rounded-2xl max-w-md">
+        <DialogContent className="max-w-md rounded-none border border-[#111] bg-[#f3f1ee]">
           <DialogHeader>
             <DialogTitle className="text-xl flex items-center gap-2">
               <Plus className="h-5 w-5 text-primary" />

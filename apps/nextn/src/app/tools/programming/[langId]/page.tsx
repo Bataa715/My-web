@@ -13,11 +13,10 @@ import {
   updateDoc,
   deleteDoc,
   serverTimestamp,
-} from 'firebase/firestore';
-import { useFirebase } from '@/firebase';
-import BackButton from '@/components/shared/BackButton';
-import InteractiveParticles from '@/components/shared/InteractiveParticles';
-import TechIcon from '@/components/shared/TechIcon';
+} from '@/supabase/db';
+import { useSupabase } from '@/supabase';
+import TechIcon from '@/components/common/TechIcon';
+import ToolPageShell from '@/features/tools/ToolPageShell';
 import type {
   Language,
   Chapter,
@@ -125,12 +124,12 @@ const CodeSnippet = ({
   return (
     <motion.div
       variants={itemVariants}
-      className="group relative bg-card/50 backdrop-blur-xs rounded-2xl border border-border/50 overflow-hidden cursor-pointer hover:border-primary/30 transition-colors"
+      className="group relative cursor-pointer overflow-hidden border border-[#111]/30 hover:border-[#c41212]"
       onClick={() => shouldCollapse && setIsExpanded(!isExpanded)}
     >
       <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b border-border/50">
         <div className="flex items-center gap-2">
-          <Terminal className="h-4 w-4 text-green-400" />
+          <Terminal className="h-4 w-4 text-[#c41212]" />
           <span className="font-medium text-sm">{title}</span>
           {shouldCollapse && (
             <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
@@ -165,7 +164,7 @@ const CodeSnippet = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="h-7 w-7 opacity-0 group-hover:opacity-100 touch-visible transition-opacity"
             onClick={handleCopy}
           >
             {copied ? (
@@ -177,7 +176,7 @@ const CodeSnippet = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="h-7 w-7 opacity-0 group-hover:opacity-100 touch-visible transition-opacity"
             onClick={e => {
               e.stopPropagation();
               onEdit();
@@ -190,7 +189,7 @@ const CodeSnippet = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
+                className="h-7 w-7 opacity-0 group-hover:opacity-100 touch-visible transition-opacity text-destructive hover:text-destructive"
                 onClick={e => e.stopPropagation()}
               >
                 <Trash2 className="h-3.5 w-3.5" />
@@ -269,7 +268,7 @@ const ItemDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card/95 backdrop-blur-xl border-0 max-w-lg rounded-2xl">
+      <DialogContent className="max-w-lg rounded-none border border-[#111] bg-[#f3f1ee]">
         <DialogHeader>
           <DialogTitle className="text-xl">
             {item ? `${title} засах` : `Шинэ ${title} нэмэх`}
@@ -312,7 +311,7 @@ const ItemDialog = ({
             </DialogClose>
             <Button
               type="submit"
-              className="rounded-xl bg-linear-to-r from-orange-500 to-amber-500 text-white"
+              className="rounded-none bg-[#c41212] text-white"
             >
               Хадгалах
             </Button>
@@ -329,7 +328,7 @@ export default function LanguageDojoPage({
   params: Promise<{ langId: string }>;
 }) {
   const { langId } = use(params);
-  const { firestore, user } = useFirebase();
+  const { firestore, user } = useSupabase();
   const { toast } = useToast();
 
   const [language, setLanguage] = useState<Language | null>(null);
@@ -486,55 +485,55 @@ export default function LanguageDojoPage({
     setDialogOpen(type);
   };
 
-  const accentColor = language?.primaryColor || '249, 115, 22';
-
   if (loading) {
     return (
-      <div className="min-h-screen relative">
-        <InteractiveParticles quantity={30} />
-        <div className="p-4 md:p-8 space-y-6 relative z-10">
-          <Skeleton className="h-10 w-24 rounded-xl" />
-          <div className="flex flex-col lg:flex-row gap-8">
-            <Skeleton className="h-64 w-full lg:w-80 rounded-2xl" />
+      <ToolPageShell
+        title="Workspace"
+        breadcrumbs={[
+          { label: 'Хэрэгслүүд', href: '/#tools' },
+          { label: 'Програмчлал', href: '/tools/programming' },
+          { label: '...' },
+        ]}
+      >
+        <div className="space-y-6">
+          <div className="flex flex-col gap-8 lg:flex-row">
+            <Skeleton className="h-64 w-full lg:w-80" />
             <div className="flex-1 space-y-6">
-              <Skeleton className="h-12 w-full rounded-xl" />
-              <Skeleton className="h-64 w-full rounded-2xl" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-64 w-full" />
             </div>
           </div>
         </div>
-      </div>
+      </ToolPageShell>
     );
   }
 
   if (!language) {
     return (
-      <div className="min-h-screen relative">
-        <InteractiveParticles quantity={30} />
-        <div className="p-4 md:p-8 relative z-10">
-          <BackButton />
-          <div className="flex flex-col justify-center items-center h-[60vh]">
-            <div className="p-4 rounded-full bg-muted/50 mb-4">
-              <Code2 className="h-12 w-12 text-muted-foreground" />
-            </div>
-            <p className="text-muted-foreground text-lg">Хэл олдсонгүй.</p>
-          </div>
-        </div>
-      </div>
+      <ToolPageShell
+        title="Workspace"
+        breadcrumbs={[
+          { label: 'Хэрэгслүүд', href: '/#tools' },
+          { label: 'Програмчлал', href: '/tools/programming' },
+          { label: 'Олдсонгүй' },
+        ]}
+      >
+        <p className="py-16 text-center text-sm text-[#111]/45">Хэл олдсонгүй.</p>
+      </ToolPageShell>
     );
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="min-h-screen relative"
+    <ToolPageShell
+      title={language.name}
+      description="Workspace"
+      breadcrumbs={[
+        { label: 'Хэрэгслүүд', href: '/#tools' },
+        { label: 'Програмчлал', href: '/tools/programming' },
+        { label: language.name },
+      ]}
     >
-      <InteractiveParticles quantity={40} />
-
-      <div className="relative z-10 p-4 md:p-8 pt-4">
-        <BackButton />
-
-        <div className="flex flex-col lg:flex-row gap-8 mt-6">
+        <div className="flex flex-col gap-8 lg:flex-row">
           {/* Sidebar */}
           <motion.aside
             initial={{ opacity: 0, x: -30 }}
@@ -543,20 +542,11 @@ export default function LanguageDojoPage({
             className="w-full lg:w-80 shrink-0 space-y-6"
           >
             {/* Language Info Card */}
-            <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden">
-              <div
-                className="h-24 relative"
-                style={{
-                  background: `linear-gradient(135deg, rgba(${accentColor}, 0.3), rgba(${accentColor}, 0.1))`,
-                }}
-              >
+            <Card className="rounded-none border border-[#111] bg-transparent shadow-none overflow-hidden">
+              <div className="relative h-16 border-b border-[#111]/15 bg-[#111]/5">
                 <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
                   <div
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center bg-card border-4 border-background"
-                    style={{
-                      color: `rgb(${accentColor})`,
-                      boxShadow: `0 0 20px rgba(${accentColor}, 0.3)`,
-                    }}
+                    className="flex h-16 w-16 items-center justify-center border border-[#111] bg-[#f3f1ee] text-[#c41212]"
                   >
                     <TechIcon techName={language.iconUrl} className="w-8 h-8" />
                   </div>
@@ -570,8 +560,7 @@ export default function LanguageDojoPage({
                 <div className="grid grid-cols-3 gap-2 mb-4">
                   <div className="p-2 rounded-xl bg-muted/30">
                     <p
-                      className="text-lg font-bold"
-                      style={{ color: `rgb(${accentColor})` }}
+                      className="text-lg font-bold text-[#c41212]"
                     >
                       {chapters.length}
                     </p>
@@ -579,8 +568,7 @@ export default function LanguageDojoPage({
                   </div>
                   <div className="p-2 rounded-xl bg-muted/30">
                     <p
-                      className="text-lg font-bold"
-                      style={{ color: `rgb(${accentColor})` }}
+                      className="text-lg font-bold text-[#c41212]"
                     >
                       {notes.length}
                     </p>
@@ -588,8 +576,7 @@ export default function LanguageDojoPage({
                   </div>
                   <div className="p-2 rounded-xl bg-muted/30">
                     <p
-                      className="text-lg font-bold"
-                      style={{ color: `rgb(${accentColor})` }}
+                      className="text-lg font-bold text-[#c41212]"
                     >
                       {snippets.length}
                     </p>
@@ -630,8 +617,7 @@ export default function LanguageDojoPage({
                       initial={{ width: 0 }}
                       animate={{ width: `${language.progress}%` }}
                       transition={{ duration: 0.3, ease: 'easeOut' }}
-                      className="h-full rounded-full"
-                      style={{ background: `rgb(${accentColor})` }}
+                      className="h-full bg-[#c41212]"
                     />
                   </div>
                 </div>
@@ -639,12 +625,11 @@ export default function LanguageDojoPage({
             </Card>
 
             {/* Concepts Card - Always visible in sidebar */}
-            <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl">
+            <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex items-center gap-2">
                   <Lightbulb
-                    className="h-4 w-4"
-                    style={{ color: `rgb(${accentColor})` }}
+                    className="h-4 w-4 text-[#c41212]"
                   />
                   <CardTitle className="text-base font-medium">
                     Гол ойлголтууд
@@ -699,17 +684,17 @@ export default function LanguageDojoPage({
             className="flex-1 min-w-0"
           >
             <Tabs defaultValue="notes" className="w-full">
-              <TabsList className="bg-card/50 backdrop-blur-xl border-0 rounded-xl p-1 mb-6 w-full sm:w-auto">
+              <TabsList className="mb-6 w-full rounded-none border border-[#111] bg-transparent p-1 sm:w-auto">
                 <TabsTrigger
                   value="notes"
-                  className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2"
+                  className="gap-2 rounded-none data-[state=active]:bg-[#c41212] data-[state=active]:text-white"
                 >
                   <StickyNote className="h-4 w-4" />
                   <span className="hidden sm:inline">Тэмдэглэл</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="snippets"
-                  className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2"
+                  className="gap-2 rounded-none data-[state=active]:bg-[#c41212] data-[state=active]:text-white"
                 >
                   <Code2 className="h-4 w-4" />
                   <span className="hidden sm:inline">Snippets</span>
@@ -741,8 +726,7 @@ export default function LanguageDojoPage({
                           <div>
                             <div className="flex items-center gap-2">
                               <FolderOpen
-                                className="h-5 w-5"
-                                style={{ color: `rgb(${accentColor})` }}
+                                className="h-5 w-5 text-[#c41212]"
                               />
                               <h3 className="text-xl font-bold">
                                 {selectedChapter.title}
@@ -755,7 +739,7 @@ export default function LanguageDojoPage({
                         </div>
                         <Button
                           onClick={() => openDialog('notes')}
-                          className="rounded-xl gap-2 bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
+                          className="gap-2 rounded-none bg-[#c41212] text-white hover:bg-[#a10f0f]"
                         >
                           <PlusCircle className="h-4 w-4" />
                           <span className="hidden sm:inline">Шинэ</span>
@@ -781,22 +765,14 @@ export default function LanguageDojoPage({
                               className="group relative cursor-pointer"
                               onClick={() => setViewingNote(note)}
                             >
-                              <div
-                                className="h-48 bg-card/50 backdrop-blur-xs border-0 rounded-2xl overflow-hidden hover:bg-card/70 transition-all hover:scale-[1.02] hover:shadow-lg p-4 flex flex-col relative"
-                                style={{
-                                  boxShadow: `0 4px 20px rgba(${accentColor}, 0.1)`,
-                                }}
-                              >
-                                <div
-                                  className="absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl"
-                                  style={{ background: `rgb(${accentColor})` }}
-                                />
+                              <div className="relative flex h-48 flex-col overflow-hidden border border-[#111]/25 p-4 hover:border-[#111]">
+                                <div className="absolute bottom-0 left-0 top-0 w-1 bg-[#c41212]" />
                                 <div className="flex items-start justify-between mb-2">
                                   <h4 className="font-semibold text-base line-clamp-1 flex-1 pr-2">
                                     {note.title}
                                   </h4>
                                   <div
-                                    className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="flex items-center gap-1 opacity-0 group-hover:opacity-100 touch-visible transition-opacity"
                                     onClick={e => e.stopPropagation()}
                                   >
                                     <Button
@@ -817,7 +793,7 @@ export default function LanguageDojoPage({
                                           <Trash2 className="h-3.5 w-3.5" />
                                         </Button>
                                       </AlertDialogTrigger>
-                                      <AlertDialogContent className="bg-card/95 backdrop-blur-xl border-0 rounded-2xl">
+                                      <AlertDialogContent className="rounded-none border border-[#111] bg-[#f3f1ee]">
                                         <AlertDialogHeader>
                                           <AlertDialogTitle>
                                             Устгахдаа итгэлтэй байна уу?
@@ -855,7 +831,7 @@ export default function LanguageDojoPage({
                                       : 'Огноо байхгүй'}
                                   </span>
                                 </div>
-                                <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 touch-visible transition-opacity">
                                   <div className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-lg">
                                     Дарж унших
                                   </div>
@@ -897,8 +873,7 @@ export default function LanguageDojoPage({
                           <div>
                             <h3 className="text-xl font-bold flex items-center gap-2">
                               <BookMarked
-                                className="h-5 w-5"
-                                style={{ color: `rgb(${accentColor})` }}
+                                className="h-5 w-5 text-[#c41212]"
                               />
                               Бүлгүүд
                             </h3>
@@ -908,7 +883,7 @@ export default function LanguageDojoPage({
                           </div>
                           <Button
                             onClick={() => openDialog('chapters')}
-                            className="rounded-xl gap-2 bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
+                            className="gap-2 rounded-none bg-[#c41212] text-white hover:bg-[#a10f0f]"
                           >
                             <PlusCircle className="h-4 w-4" />
                             <span className="hidden sm:inline">Шинэ бүлэг</span>
@@ -933,20 +908,9 @@ export default function LanguageDojoPage({
                                 className="group cursor-pointer"
                                 onClick={() => setSelectedChapter(chapter)}
                               >
-                                <div
-                                  className="bg-card/50 backdrop-blur-xs rounded-2xl p-5 hover:bg-card/70 transition-all hover:scale-[1.02]"
-                                  style={{
-                                    boxShadow: `0 4px 20px rgba(${accentColor}, 0.1)`,
-                                  }}
-                                >
+                                <div className="border border-[#111]/25 p-5 hover:border-[#111]">
                                   <div className="flex items-center gap-4">
-                                    <div
-                                      className="w-14 h-14 rounded-xl flex items-center justify-center"
-                                      style={{
-                                        backgroundColor: `rgba(${accentColor}, 0.15)`,
-                                        color: `rgb(${accentColor})`,
-                                      }}
-                                    >
+                                    <div className="flex h-14 w-14 items-center justify-center border border-[#111] text-[#c41212]">
                                       <FolderOpen className="h-7 w-7" />
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -966,7 +930,7 @@ export default function LanguageDojoPage({
                                     </div>
                                     <div className="flex items-center gap-2">
                                       <div
-                                        className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
+                                        className="opacity-0 group-hover:opacity-100 touch-visible transition-opacity flex items-center gap-1"
                                         onClick={e => e.stopPropagation()}
                                       >
                                         <Button
@@ -989,7 +953,7 @@ export default function LanguageDojoPage({
                                               <Trash2 className="h-4 w-4" />
                                             </Button>
                                           </AlertDialogTrigger>
-                                          <AlertDialogContent className="bg-card/95 backdrop-blur-xl border-0 rounded-2xl">
+                                          <AlertDialogContent className="rounded-none border border-[#111] bg-[#f3f1ee]">
                                             <AlertDialogHeader>
                                               <AlertDialogTitle>
                                                 Бүлэг устгах уу?
@@ -1047,8 +1011,7 @@ export default function LanguageDojoPage({
                             <div>
                               <h3 className="text-xl font-bold flex items-center gap-2">
                                 <Lightbulb
-                                  className="h-5 w-5"
-                                  style={{ color: `rgb(${accentColor})` }}
+                                  className="h-5 w-5 text-[#c41212]"
                                 />
                                 Гол ойлголтууд
                               </h3>
@@ -1083,12 +1046,7 @@ export default function LanguageDojoPage({
                                   transition={{ delay: index * 0.05 }}
                                   className="group"
                                 >
-                                  <div
-                                    className="bg-card/50 backdrop-blur-xs rounded-2xl p-4 hover:bg-card/70 transition-all cursor-pointer"
-                                    style={{
-                                      boxShadow: `0 4px 20px rgba(${accentColor}, 0.1)`,
-                                    }}
-                                  >
+                                  <div className="cursor-pointer border border-[#111]/25 p-4 hover:border-[#111]">
                                     <div className="flex items-start gap-3">
                                       <span className="text-2xl">
                                         {concept.emoji || '💡'}
@@ -1098,7 +1056,7 @@ export default function LanguageDojoPage({
                                           <h4 className="font-semibold text-base">
                                             {concept.title}
                                           </h4>
-                                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 touch-visible transition-opacity">
                                             <Button
                                               variant="ghost"
                                               size="icon"
@@ -1119,7 +1077,7 @@ export default function LanguageDojoPage({
                                                   <Trash2 className="h-3.5 w-3.5" />
                                                 </Button>
                                               </AlertDialogTrigger>
-                                              <AlertDialogContent className="bg-card/95 backdrop-blur-xl border-0 rounded-2xl">
+                                              <AlertDialogContent className="rounded-none border border-[#111] bg-[#f3f1ee]">
                                                 <AlertDialogHeader>
                                                   <AlertDialogTitle>
                                                     Устгахдаа итгэлтэй байна уу?
@@ -1166,7 +1124,7 @@ export default function LanguageDojoPage({
                   open={!!viewingNote}
                   onOpenChange={open => !open && setViewingNote(null)}
                 >
-                  <DialogContent className="bg-card/95 backdrop-blur-xl border-0 max-w-3xl max-h-[85vh] rounded-2xl overflow-hidden">
+                  <DialogContent className="max-h-[85vh] max-w-3xl overflow-hidden rounded-none border border-[#111] bg-[#f3f1ee]">
                     {viewingNote && (
                       <>
                         <DialogHeader className="pb-4 border-b border-border/30">
@@ -1209,7 +1167,7 @@ export default function LanguageDojoPage({
                               setViewingNote(null);
                               openDialog('notes', viewingNote);
                             }}
-                            className="rounded-xl bg-linear-to-r from-orange-500 to-amber-500 text-white gap-2"
+                            className="gap-2 rounded-none bg-[#c41212] text-white"
                           >
                             <Edit className="h-4 w-4" />
                             Засах
@@ -1232,7 +1190,7 @@ export default function LanguageDojoPage({
                   </div>
                   <Button
                     onClick={() => openDialog('snippets')}
-                    className="rounded-xl gap-2 bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white"
+                    className="gap-2 rounded-none bg-[#c41212] text-white hover:bg-[#a10f0f]"
                   >
                     <PlusCircle className="h-4 w-4" />
                     <span className="hidden sm:inline">Шинэ</span>
@@ -1277,7 +1235,6 @@ export default function LanguageDojoPage({
             </Tabs>
           </motion.main>
         </div>
-      </div>
 
       {/* Dialogs */}
       <ItemDialog
@@ -1342,6 +1299,6 @@ export default function LanguageDojoPage({
           },
         ]}
       />
-    </motion.div>
+    </ToolPageShell>
   );
 }

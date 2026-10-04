@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useSyncedState } from '@/hooks/use-synced-state';
 
 const defaultTimeSettings = {
   pomodoro: 25,
@@ -40,26 +41,20 @@ const modeConfig = {
   pomodoro: {
     label: 'Төвлөрөл',
     icon: Brain,
-    color: 'from-rose-500 to-red-600',
-    bgColor: 'bg-rose-500',
-    textColor: 'text-rose-500',
-    glowColor: 'shadow-rose-500/50',
+    stroke: '#c41212',
+    textColor: 'text-[#c41212]',
   },
   shortBreak: {
     label: 'Богино амралт',
     icon: Coffee,
-    color: 'from-emerald-500 to-green-600',
-    bgColor: 'bg-emerald-500',
-    textColor: 'text-emerald-500',
-    glowColor: 'shadow-emerald-500/50',
+    stroke: '#111111',
+    textColor: 'text-[#111]',
   },
   longBreak: {
     label: 'Урт амралт',
     icon: Zap,
-    color: 'from-blue-500 to-indigo-600',
-    bgColor: 'bg-blue-500',
-    textColor: 'text-blue-500',
-    glowColor: 'shadow-blue-500/50',
+    stroke: '#111111',
+    textColor: 'text-[#111]',
   },
 };
 
@@ -99,10 +94,10 @@ const CircularProgress = ({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="url(#gradient)"
+          stroke={color}
           strokeWidth={strokeWidth}
           fill="none"
-          strokeLinecap="round"
+          strokeLinecap="square"
           style={{
             strokeDasharray: circumference,
             strokeDashoffset: offset,
@@ -111,33 +106,6 @@ const CircularProgress = ({
           animate={{ strokeDashoffset: offset }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
         />
-        {/* Gradient definition */}
-        <defs>
-          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop
-              offset="0%"
-              className={cn(
-                'stop-current',
-                color.includes('rose')
-                  ? 'text-rose-400'
-                  : color.includes('emerald')
-                    ? 'text-emerald-400'
-                    : 'text-blue-400'
-              )}
-            />
-            <stop
-              offset="100%"
-              className={cn(
-                'stop-current',
-                color.includes('rose')
-                  ? 'text-red-600'
-                  : color.includes('emerald')
-                    ? 'text-green-600'
-                    : 'text-indigo-600'
-              )}
-            />
-          </linearGradient>
-        </defs>
       </svg>
       {/* Center content */}
       <div className="absolute inset-0 flex items-center justify-center">
@@ -148,7 +116,16 @@ const CircularProgress = ({
 };
 
 export default function Timer() {
-  const [settings, setSettings] = useState(defaultTimeSettings);
+  // Settings + today's stats are saved to Supabase (localStorage cache).
+  const [settings, setSettings] = useSyncedState(
+    'pomodoro-settings',
+    defaultTimeSettings
+  );
+  const [savedStats, setSavedStats, statsLoaded] = useSyncedState(
+    'pomodoro-stats',
+    { date: '', completed: 0, minutes: 0 }
+  );
+  const [statsHydrated, setStatsHydrated] = useState(false);
   const [mode, setMode] = useState<Mode>('pomodoro');
   const [time, setTime] = useState(settings.pomodoro * 60);
   const [isActive, setIsActive] = useState(false);
@@ -156,6 +133,40 @@ export default function Timer() {
   const [tempSettings, setTempSettings] = useState(settings);
   const [completedPomodoros, setCompletedPomodoros] = useState(0);
   const [todayMinutes, setTodayMinutes] = useState(0);
+
+  useEffect(() => {
+    setTempSettings(settings);
+  }, [settings]);
+
+  // Restore today's stats once they have loaded.
+  useEffect(() => {
+    if (!statsLoaded || statsHydrated) return;
+    const today = new Date().toDateString();
+    if (savedStats.date === today) {
+      setCompletedPomodoros(savedStats.completed);
+      setTodayMinutes(savedStats.minutes);
+    }
+    setStatsHydrated(true);
+  }, [statsLoaded, statsHydrated, savedStats]);
+
+  // Persist whenever a pomodoro completes or a full minute is added.
+  const wholeMinutes = Math.floor(todayMinutes);
+  useEffect(() => {
+    if (!statsHydrated) return;
+    const today = new Date().toDateString();
+    if (
+      savedStats.date === today &&
+      savedStats.completed === completedPomodoros &&
+      savedStats.minutes === wholeMinutes
+    )
+      return;
+    setSavedStats({
+      date: today,
+      completed: completedPomodoros,
+      minutes: wholeMinutes,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [statsHydrated, completedPomodoros, wholeMinutes]);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const currentConfig = modeConfig[mode];
@@ -239,7 +250,7 @@ export default function Timer() {
   return (
     <div className="flex flex-col items-center gap-8">
       {/* Mode Selector */}
-      <div className="flex gap-2 p-1.5 bg-card/50 backdrop-blur-xs rounded-2xl border border-border/30">
+      <div className="flex gap-2 border border-[#111] p-1">
         {(Object.keys(modeConfig) as Mode[]).map(m => {
           const config = modeConfig[m];
           const ModeIcon = config.icon;
@@ -248,14 +259,10 @@ export default function Timer() {
               key={m}
               onClick={() => switchMode(m)}
               className={cn(
-                'flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all',
+                'flex items-center gap-2 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] transition-colors',
                 mode === m
-                  ? cn(
-                      'bg-linear-to-r text-white shadow-lg',
-                      config.color,
-                      config.glowColor
-                    )
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  ? 'bg-[#c41212] text-white'
+                  : 'text-[#111]/50 hover:text-[#111]'
               )}
             >
               <ModeIcon className="h-4 w-4" />
@@ -265,76 +272,43 @@ export default function Timer() {
         })}
       </div>
 
-      {/* Main Timer Circle */}
       <motion.div
         key={mode}
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         className="relative"
       >
-        {/* Pulsing glow effect when active */}
-        {isActive && (
-          <motion.div
-            className={cn(
-              'absolute inset-0 rounded-full blur-3xl opacity-30',
-              currentConfig.bgColor
-            )}
-            animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        )}
-
         <CircularProgress
           progress={progress}
           size={320}
-          strokeWidth={12}
-          color={currentConfig.color}
+          strokeWidth={8}
+          color={currentConfig.stroke}
         >
           <div className="flex flex-col items-center gap-2">
-            <motion.div
-              animate={isActive ? { scale: [1, 1.1, 1] } : {}}
-              transition={{ duration: 1, repeat: Infinity }}
-              className={cn(
-                'p-3 rounded-2xl bg-linear-to-br',
-                currentConfig.color
-              )}
-            >
-              <Icon className="h-8 w-8 text-white" />
-            </motion.div>
-            <span className="text-6xl sm:text-7xl font-bold font-mono tracking-tight">
+            <Icon className={cn('h-7 w-7', currentConfig.textColor)} />
+            <span className="font-mono text-6xl tracking-tight sm:text-7xl">
               {formatTime(time)}
             </span>
-            <span
-              className={cn('text-sm font-medium', currentConfig.textColor)}
-            >
+            <span className={cn('text-[11px] font-semibold uppercase tracking-[0.16em]', currentConfig.textColor)}>
               {currentConfig.label}
             </span>
           </div>
         </CircularProgress>
       </motion.div>
 
-      {/* Control Buttons */}
       <div className="flex items-center gap-3">
         <Button
           onClick={resetTimer}
           variant="outline"
           size="icon"
-          className="h-14 w-14 rounded-2xl border-border/50 bg-card/50 backdrop-blur-xs hover:bg-card"
+          className="h-14 w-14 rounded-none border-[#111]/30 bg-transparent"
         >
           <RotateCw className="h-5 w-5" />
         </Button>
 
-        <motion.button
+        <button
           onClick={toggleTimer}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className={cn(
-            'flex items-center justify-center gap-3 h-16 px-10 rounded-2xl text-white font-semibold text-lg shadow-xl transition-all',
-            'bg-linear-to-r',
-            currentConfig.color,
-            currentConfig.glowColor
-          )}
+          className="flex h-16 items-center justify-center gap-3 bg-[#c41212] px-10 text-lg font-semibold text-white"
         >
           <AnimatePresence mode="wait">
             {isActive ? (
@@ -361,13 +335,13 @@ export default function Timer() {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.button>
+        </button>
 
         <Button
           onClick={skipToNext}
           variant="outline"
           size="icon"
-          className="h-14 w-14 rounded-2xl border-border/50 bg-card/50 backdrop-blur-xs hover:bg-card"
+          className="h-14 w-14 rounded-none border-[#111] bg-transparent"
         >
           <SkipForward className="h-5 w-5" />
         </Button>
@@ -376,48 +350,36 @@ export default function Timer() {
           onClick={() => setIsSettingsOpen(true)}
           variant="outline"
           size="icon"
-          className="h-14 w-14 rounded-2xl border-border/50 bg-card/50 backdrop-blur-xs hover:bg-card"
+          className="h-14 w-14 rounded-none border-[#111] bg-transparent"
         >
           <Settings className="h-5 w-5" />
         </Button>
       </div>
 
-      {/* Stats */}
-      <div className="flex gap-4 mt-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="flex items-center gap-3 px-5 py-3 bg-card/50 backdrop-blur-xs rounded-2xl border border-border/30"
-        >
-          <div className="p-2 rounded-xl bg-rose-500/10">
-            <Flame className="h-5 w-5 text-rose-500" />
-          </div>
+      <div className="mt-4 flex gap-4">
+        <div className="flex items-center gap-3 border border-[#111] px-5 py-3">
+          <Flame className="h-5 w-5 text-[#c41212]" />
           <div>
-            <p className="text-2xl font-bold">{completedPomodoros}</p>
-            <p className="text-xs text-muted-foreground">Pomodoro</p>
+            <p className="text-2xl">{completedPomodoros}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111]/45">
+              Pomodoro
+            </p>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="flex items-center gap-3 px-5 py-3 bg-card/50 backdrop-blur-xs rounded-2xl border border-border/30"
-        >
-          <div className="p-2 rounded-xl bg-amber-500/10">
-            <Target className="h-5 w-5 text-amber-500" />
-          </div>
+        <div className="flex items-center gap-3 border border-[#111] px-5 py-3">
+          <Target className="h-5 w-5 text-[#c41212]" />
           <div>
-            <p className="text-2xl font-bold">{Math.round(todayMinutes)}</p>
-            <p className="text-xs text-muted-foreground">Минут</p>
+            <p className="text-2xl">{Math.round(todayMinutes)}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111]/45">
+              Минут
+            </p>
           </div>
-        </motion.div>
+        </div>
       </div>
 
-      {/* Settings Dialog */}
       <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
-        <DialogContent className="bg-card/95 backdrop-blur-xl border-0 rounded-2xl max-w-sm">
+        <DialogContent className="max-w-sm rounded-none border border-[#111] bg-[#f3f1ee]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Settings className="h-5 w-5 text-muted-foreground" />
@@ -428,7 +390,7 @@ export default function Timer() {
           <div className="grid gap-4 py-4">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 w-32">
-                <Brain className="h-4 w-4 text-rose-500" />
+                <Brain className="h-4 w-4 text-[#c41212]" />
                 <Label htmlFor="pomodoro-time">Төвлөрөл</Label>
               </div>
               <Input
@@ -441,12 +403,12 @@ export default function Timer() {
                     pomodoro: Number(e.target.value),
                   })
                 }
-                className="bg-background/50 border-border/50 rounded-xl"
+                className="rounded-none border-[#111]/30 bg-transparent"
               />
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 w-32">
-                <Coffee className="h-4 w-4 text-emerald-500" />
+                <Coffee className="h-4 w-4 text-[#111]" />
                 <Label htmlFor="short-break-time">Богино</Label>
               </div>
               <Input
@@ -459,12 +421,12 @@ export default function Timer() {
                     shortBreak: Number(e.target.value),
                   })
                 }
-                className="bg-background/50 border-border/50 rounded-xl"
+                className="rounded-none border-[#111]/30 bg-transparent"
               />
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 w-32">
-                <Zap className="h-4 w-4 text-blue-500" />
+                <Zap className="h-4 w-4 text-[#111]" />
                 <Label htmlFor="long-break-time">Урт</Label>
               </div>
               <Input
@@ -477,22 +439,19 @@ export default function Timer() {
                     longBreak: Number(e.target.value),
                   })
                 }
-                className="bg-background/50 border-border/50 rounded-xl"
+                className="rounded-none border-[#111]/30 bg-transparent"
               />
             </div>
           </div>
           <DialogFooter className="gap-2">
             <DialogClose asChild>
-              <Button variant="ghost" className="rounded-xl">
+              <Button variant="ghost" className="rounded-none">
                 Цуцлах
               </Button>
             </DialogClose>
             <Button
               onClick={handleSettingsSave}
-              className={cn(
-                'bg-linear-to-r text-white rounded-xl',
-                currentConfig.color
-              )}
+              className="rounded-none bg-[#c41212] text-white"
             >
               Хадгалах
             </Button>

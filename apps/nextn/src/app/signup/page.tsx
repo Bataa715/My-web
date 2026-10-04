@@ -1,18 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useAuth, useFirestore } from '@/firebase';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useAuth, useFirestore, useUser } from '@/supabase';
+import { createUserWithEmailAndPassword } from '@/supabase/auth';
 import {
   doc,
   setDoc,
   collection,
   addDoc,
   serverTimestamp,
-} from 'firebase/firestore';
+} from '@/supabase/db';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -32,7 +32,6 @@ import type {
   Skill,
   Hobby,
 } from '@/lib/types';
-import Link from 'next/link';
 import {
   User,
   Mail,
@@ -42,18 +41,47 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import AuthShell from '@/components/auth/AuthShell';
+import AuthShell from '@/features/auth/AuthShell';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import OnboardingDialog from '@/components/OnboardingDialog';
+import OnboardingDialog from '@/features/auth/OnboardingDialog';
 import { useRouter } from 'next/navigation';
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: 'Нэр дор хаяж 2 тэмдэгттэй байх ёстой.' }),
-  email: z.string().email({ message: 'И-мэйл хаяг буруу байна.' }),
-  password: z
-    .string()
-    .min(6, { message: 'Нууц үг дор хаяж 6 тэмдэгттэй байх ёстой.' }),
-});
+const formSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(2, { message: 'Нэр дор хаяж 2 тэмдэгттэй байх ёстой.' }),
+    email: z.string().trim().email({ message: 'И-мэйл хаяг буруу байна.' }),
+    password: z
+      .string()
+      .min(6, { message: 'Нууц үг дор хаяж 6 тэмдэгттэй байх ёстой.' }),
+    confirmPassword: z.string().min(1, { message: 'Нууц үгээ давтан оруулна уу.' }),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Нууц үг таарахгүй байна.',
+  });
+
+/** 0 (empty) – 4 (strong) */
+function passwordStrength(pw: string): number {
+  if (!pw) return 0;
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++;
+  if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++;
+  return Math.max(1, score);
+}
+
+const STRENGTH_LABELS = ['', 'Сул', 'Дунд', 'Сайн', 'Маш сайн'];
+const STRENGTH_COLORS = [
+  '',
+  'bg-red-500',
+  'bg-orange-500',
+  'bg-yellow-500',
+  'bg-green-500',
+];
 
 interface OnboardingData {
   bio: string;
@@ -81,6 +109,10 @@ export default function SignupPage() {
     name: string;
     email: string;
   } | null>(null);
+  const { user, isUserLoading } = useUser();
+  // Retrying after a failed save must not duplicate what already got written.
+  const profileSavedRef = useRef(false);
+  const samplesSeededRef = useRef(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -88,25 +120,45 @@ export default function SignupPage() {
       name: '',
       email: '',
       password: '',
+      confirmPassword: '',
     },
   });
+
+  const passwordValue = form.watch('password');
+  const strength = passwordStrength(passwordValue);
+
+  // Page was reloaded in the middle of onboarding: the account exists but the
+  // local state is gone, so the dialog would never reopen. Resume it.
+  useEffect(() => {
+    if (isUserLoading || !user || pendingUserData) return;
+    if (sessionStorage.getItem('signup-onboarding')) {
+      setPendingUserData({
+        uid: user.uid,
+        name: user.displayName || user.email?.split('@')[0] || '',
+        email: user.email || '',
+      });
+      setShowOnboarding(true);
+    }
+  }, [isUserLoading, user, pendingUserData]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     if (!firestore || !auth) {
       toast({
         title: 'Алдаа',
-        description: 'Firebase-д холбогдож чадсангүй.',
+        description: 'Supabase-д холбогдож чадсангүй.',
         variant: 'destructive',
       });
       setIsLoading(false);
       return;
     }
     try {
+      sessionStorage.setItem('signup-onboarding', '1');
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         values.email,
-        values.password
+        values.password,
+        { name: values.name }
       );
       const user = userCredential.user;
 
@@ -121,6 +173,7 @@ export default function SignupPage() {
       setShowOnboarding(true);
       setIsLoading(false);
     } catch (error: any) {
+      sessionStorage.removeItem('signup-onboarding');
       const errorCode = error?.code;
       let errorMessage = error?.message || 'Бүртгүүлэхэд алдаа гарлаа.';
 
@@ -130,6 +183,8 @@ export default function SignupPage() {
         errorMessage = 'И-мэйл хаяг буруу байна.';
       } else if (errorCode === 'auth/weak-password') {
         errorMessage = 'Нууц үг хэтэрхий сул байна.';
+      } else if (errorCode === 'auth/setup-required') {
+        errorMessage = error.message;
       } else if (errorCode === 'auth/network-request-failed') {
         errorMessage = 'Интернэт холболтыг шалгана үү.';
       }
@@ -252,7 +307,7 @@ export default function SignupPage() {
         .join(', ');
 
       const userProfile: UserProfile = {
-        appName: 'Kaizen',
+        appName: '進撃の巨人',
         name: pendingUserData.name,
         email: pendingUserData.email,
         bio:
@@ -289,7 +344,10 @@ export default function SignupPage() {
         onboardingCompleted: true,
       };
 
-      await setDoc(doc(firestore, 'users', pendingUserData.uid), userProfile);
+      if (!profileSavedRef.current) {
+        await setDoc(doc(firestore, 'users', pendingUserData.uid), userProfile);
+        profileSavedRef.current = true;
+      }
 
       // Create default sample data for new user
       const userId = pendingUserData.uid;
@@ -372,27 +430,30 @@ export default function SignupPage() {
         },
       ];
 
-      // Add default education
-      for (const edu of defaultEducation) {
-        await addDoc(collection(firestore, `users/${userId}/education`), edu);
-      }
+      if (!samplesSeededRef.current) {
+        // Add default education
+        for (const edu of defaultEducation) {
+          await addDoc(collection(firestore, `users/${userId}/education`), edu);
+        }
 
-      // Add default projects
-      for (const project of defaultProjects) {
-        await addDoc(
-          collection(firestore, `users/${userId}/projects`),
-          project
-        );
-      }
+        // Add default projects
+        for (const project of defaultProjects) {
+          await addDoc(
+            collection(firestore, `users/${userId}/projects`),
+            project
+          );
+        }
 
-      // Add default skills
-      for (const skill of defaultSkills) {
-        await addDoc(collection(firestore, `users/${userId}/skills`), skill);
-      }
+        // Add default skills
+        for (const skill of defaultSkills) {
+          await addDoc(collection(firestore, `users/${userId}/skills`), skill);
+        }
 
-      // Add default hobbies
-      for (const hobby of defaultHobbies) {
-        await addDoc(collection(firestore, `users/${userId}/hobbies`), hobby);
+        // Add default hobbies
+        for (const hobby of defaultHobbies) {
+          await addDoc(collection(firestore, `users/${userId}/hobbies`), hobby);
+        }
+        samplesSeededRef.current = true;
       }
 
       toast({
@@ -404,6 +465,7 @@ export default function SignupPage() {
       });
 
       setShowOnboarding(false);
+      sessionStorage.removeItem('signup-onboarding');
       router.push('/');
     } catch (error) {
       console.error('Error saving user profile:', error);
@@ -442,6 +504,8 @@ export default function SignupPage() {
                         <Input
                           autoComplete="name"
                           placeholder="Таны нэр"
+                          autoFocus
+                          disabled={isLoading}
                           className="h-12 pl-10 pr-3 rounded-xl bg-muted/30 border-border/60 focus-visible:border-primary/60 focus-visible:ring-primary/30"
                           {...field}
                         />
@@ -467,6 +531,7 @@ export default function SignupPage() {
                           type="email"
                           autoComplete="email"
                           placeholder="name@example.com"
+                          disabled={isLoading}
                           className="h-12 pl-10 pr-3 rounded-xl bg-muted/30 border-border/60 focus-visible:border-primary/60 focus-visible:ring-primary/30"
                           {...field}
                         />
@@ -492,6 +557,7 @@ export default function SignupPage() {
                           type={showPassword ? 'text' : 'password'}
                           autoComplete="new-password"
                           placeholder="Дор хаяж 6 тэмдэгт"
+                          disabled={isLoading}
                           className="h-12 pl-10 pr-11 rounded-xl bg-muted/30 border-border/60 focus-visible:border-primary/60 focus-visible:ring-primary/30"
                           {...field}
                         />
@@ -507,6 +573,51 @@ export default function SignupPage() {
                             <Eye className="w-4 h-4" />
                           )}
                         </button>
+                      </div>
+                    </FormControl>
+                    {passwordValue && (
+                      <div className="flex items-center gap-2 pt-1" aria-live="polite">
+                        <div className="flex flex-1 gap-1">
+                          {[1, 2, 3, 4].map(level => (
+                            <div
+                              key={level}
+                              className={`h-1 flex-1 rounded-full transition-colors ${
+                                level <= strength
+                                  ? STRENGTH_COLORS[strength]
+                                  : 'bg-muted'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="text-[11px] text-muted-foreground w-16 text-right">
+                          {STRENGTH_LABELS[strength]}
+                        </span>
+                      </div>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+            <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Нууц үг давтах
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative input-group rounded-xl">
+                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                          type={showPassword ? 'text' : 'password'}
+                          autoComplete="new-password"
+                          placeholder="Нууц үгээ дахин оруулна уу"
+                          disabled={isLoading}
+                          className="h-12 pl-10 pr-3 rounded-xl bg-muted/30 border-border/60 focus-visible:border-primary/60 focus-visible:ring-primary/30"
+                          {...field}
+                        />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -529,17 +640,6 @@ export default function SignupPage() {
                 )}
               </Button>
 
-            <p className="text-[11px] text-center text-muted-foreground/80 leading-relaxed">
-              Бүртгүүлснээр та манай{' '}
-              <Link href="/" className="underline hover:text-foreground">
-                үйлчилгээний нөхцөл
-              </Link>{' '}
-              болон{' '}
-              <Link href="/" className="underline hover:text-foreground">
-                нууцлалын бодлого
-              </Link>
-              -г зөвшөөрч байна.
-            </p>
           </form>
         </Form>
       </AuthShell>

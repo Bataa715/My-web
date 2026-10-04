@@ -1,4 +1,4 @@
-import type { Timestamp } from 'firebase/firestore';
+import type { Timestamp } from '@/supabase/db';
 
 export interface EnglishWord {
   id?: string;
@@ -56,22 +56,6 @@ export interface GrammarRule {
   structure: GrammarRuleStructure;
   timeExpressions: GrammarTimeExpression[];
   practice: GrammarPracticeQuestion[];
-  createdAt?: Date | Timestamp;
-}
-
-export interface ReadingMaterial {
-  id?: string;
-  title: string;
-  content: string;
-  source?: string;
-  createdAt?: Date | Timestamp;
-}
-
-export interface ReadingNote {
-  id?: string;
-  readingMaterialId: string;
-  selectedText: string;
-  note: string;
   createdAt?: Date | Timestamp;
 }
 

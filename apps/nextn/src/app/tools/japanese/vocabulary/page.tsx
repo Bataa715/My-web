@@ -1,7 +1,8 @@
 'use client';
 
-import VocabularyManager from '@/components/shared/VocabularyManager';
+import VocabularyManager from '@/features/language/components/VocabularyManager';
 import type { JapaneseWord } from '@/lib/types';
+import ToolPageShell from '@/features/tools/ToolPageShell';
 
 const columns: { key: keyof JapaneseWord; header: string }[] = [
   { key: 'word', header: 'Япон үг' },
@@ -11,12 +12,19 @@ const columns: { key: keyof JapaneseWord; header: string }[] = [
 
 export default function JapaneseVocabularyPage() {
   return (
-    <div className="space-y-8">
+    <ToolPageShell
+      title="Vocabulary"
+      breadcrumbs={[
+        { label: 'Хэрэгслүүд', href: '/#tools' },
+        { label: 'Япон хэл', href: '/tools/japanese' },
+        { label: 'Үгс' },
+      ]}
+    >
       <VocabularyManager<JapaneseWord>
         wordType="japanese"
         columns={columns}
         title="Япон үгс"
       />
-    </div>
+    </ToolPageShell>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,7 @@ import {
   Target,
   ChevronRight,
 } from 'lucide-react';
-import { KanaCharacter, hiraganaData, katakanaData } from '@/data/kana';
+import { KanaCharacter, hiraganaData, katakanaData } from '@/features/language/data/kana';
 import {
   Dialog,
   DialogContent,
@@ -35,6 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useSyncedState } from '@/hooks/use-synced-state';
 
 interface CardData extends KanaCharacter {
   id: string;
@@ -51,7 +52,12 @@ interface FlashcardGameProps {
 }
 
 export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
-  const [cards, setCards] = useState<CardData[]>([]);
+  // SRS progress is stored in Supabase (localStorage cache) so it survives
+  // redeploys and follows you across devices.
+  const [storedCards, setStoredCards, cardsLoaded] = useSyncedState<
+    CardData[] | null
+  >(`anki-${type}`, null);
+  const cards = useMemo(() => storedCards ?? [], [storedCards]);
   const [currentCard, setCurrentCard] = useState<CardData | null>(null);
   const [isFlipped, setIsFlipped] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
@@ -73,14 +79,10 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
   const [inputMode, setInputMode] = useState<'buttons' | 'typing'>('buttons');
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
-  // Initialize cards from localStorage or create new
+  // Create the deck the first time (nothing stored locally or remotely yet)
   useEffect(() => {
-    const storageKey = `anki-${type}`;
-    const savedCards = localStorage.getItem(storageKey);
-
-    if (savedCards) {
-      setCards(JSON.parse(savedCards));
-    } else {
+    if (!cardsLoaded || storedCards !== null) return;
+    {
       let kanaData: KanaCharacter[] = [];
       if (type === 'hiragana') {
         kanaData = hiraganaData;
@@ -100,10 +102,9 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
         reviews: 0,
       }));
 
-      setCards(initialCards);
-      localStorage.setItem(storageKey, JSON.stringify(initialCards));
+      setStoredCards(initialCards);
     }
-  }, [type]);
+  }, [type, cardsLoaded, storedCards, setStoredCards]);
 
   // Prepare session cards
   useEffect(() => {
@@ -153,11 +154,9 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
 
   const saveCards = useCallback(
     (updatedCards: CardData[]) => {
-      const storageKey = `anki-${type}`;
-      localStorage.setItem(storageKey, JSON.stringify(updatedCards));
-      setCards(updatedCards);
+      setStoredCards(updatedCards);
     },
-    [type]
+    [setStoredCards]
   );
 
   const playSound = (text: string) => {
@@ -294,9 +293,6 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
   };
 
   const resetProgress = () => {
-    const storageKey = `anki-${type}`;
-    localStorage.removeItem(storageKey);
-
     let kanaData: KanaCharacter[] = [];
     if (type === 'hiragana') {
       kanaData = hiraganaData;
@@ -316,8 +312,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
       reviews: 0,
     }));
 
-    setCards(initialCards);
-    localStorage.setItem(storageKey, JSON.stringify(initialCards));
+    setStoredCards(initialCards);
     restartSession();
   };
 
@@ -326,11 +321,11 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
 
   const getLevelColor = (level: number) => {
     const colors = [
-      'bg-gray-500',
-      'bg-red-500',
-      'bg-orange-500',
-      'bg-yellow-500',
-      'bg-green-500',
+      'bg-[#111]/40',
+      'bg-[#c41212]',
+      'bg-[#111]/70',
+      'bg-[#111]',
+      'bg-[#111]',
     ];
     return colors[level] || colors[0];
   };
@@ -346,25 +341,25 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', delay: 0.2 }}
-          className="w-24 h-24 rounded-full bg-linear-to-br from-rose-400 to-pink-500 flex items-center justify-center"
+          className="flex h-24 w-24 items-center justify-center bg-[#c41212]"
         >
           <Trophy className="w-12 h-12 text-white" />
         </motion.div>
 
-        <h2 className="text-3xl font-bold bg-linear-to-r from-rose-400 to-pink-500 bg-clip-text text-transparent">
+        <h2 className="text-3xl">
           Session Complete!
         </h2>
 
         <div className="grid grid-cols-3 gap-4 text-center">
-          <Card className="bg-card/50 backdrop-blur-xl border-0">
+          <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
             <CardContent className="p-4">
-              <div className="text-3xl font-bold text-rose-400">
+              <div className="text-3xl text-[#c41212]">
                 {stats.reviewed}
               </div>
               <div className="text-xs text-muted-foreground">Reviewed</div>
             </CardContent>
           </Card>
-          <Card className="bg-card/50 backdrop-blur-xl border-0">
+          <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
             <CardContent className="p-4">
               <div className="text-3xl font-bold text-green-400">
                 {stats.correct}
@@ -372,7 +367,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
               <div className="text-xs text-muted-foreground">Correct</div>
             </CardContent>
           </Card>
-          <Card className="bg-card/50 backdrop-blur-xl border-0">
+          <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
             <CardContent className="p-4">
               <div className="text-3xl font-bold text-amber-400">
                 {stats.bestStreak}
@@ -385,7 +380,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
         <div className="flex gap-4">
           <Button
             onClick={restartSession}
-            className="bg-linear-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600"
+            className="rounded-none bg-[#c41212] text-white hover:bg-[#a10f0f]"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Practice Again
@@ -425,7 +420,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
         <div className="flex items-center gap-4">
           <Badge
             variant="outline"
-            className="bg-rose-500/10 text-rose-400 border-rose-500/30"
+            className="rounded-none border-[#c41212] bg-transparent text-[#c41212]"
           >
             <Target className="w-3 h-3 mr-1" />
             {stats.reviewed} / {sessionCards.length}
@@ -447,7 +442,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
               <Settings className="w-5 h-5" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-card/95 backdrop-blur-xl border-white/10">
+          <DialogContent className="rounded-none border border-[#111] bg-[#f3f1ee]">
             <DialogHeader>
               <DialogTitle>Settings</DialogTitle>
             </DialogHeader>
@@ -541,7 +536,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
           >
             {/* Front of card */}
             <div
-              className="absolute inset-0 backface-hidden rounded-3xl bg-linear-to-br from-rose-500/20 to-pink-500/20 backdrop-blur-xl border border-white/10 flex flex-col items-center justify-center p-6 shadow-2xl"
+              className="absolute inset-0 flex flex-col items-center justify-center border border-[#111] bg-[#f3f1ee] p-6 backface-hidden"
               style={{ backfaceVisibility: 'hidden' }}
             >
               <Badge
@@ -567,7 +562,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
               ) : (
                 <>
                   <motion.span
-                    className="text-5xl font-bold mb-4 text-rose-400"
+                    className="mb-4 text-5xl text-[#c41212]"
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
                     key={currentCard.id}
@@ -588,7 +583,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
 
             {/* Back of card */}
             <div
-              className="absolute inset-0 backface-hidden rounded-3xl bg-linear-to-br from-pink-500/20 to-rose-500/20 backdrop-blur-xl border border-white/10 flex flex-col items-center justify-center p-6 shadow-2xl"
+              className="absolute inset-0 flex flex-col items-center justify-center border border-[#111] bg-[#f3f1ee] p-6 backface-hidden"
               style={{
                 backfaceVisibility: 'hidden',
                 transform: 'rotateY(180deg)',
@@ -615,7 +610,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
               </motion.span>
 
               <motion.span
-                className="text-3xl font-semibold text-rose-400 mb-2"
+                className="mb-2 text-3xl text-[#c41212]"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -665,12 +660,12 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
             placeholder={
               gameMode === 'character' ? 'Type romaji...' : 'Type character...'
             }
-            className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-center text-xl w-48 focus:outline-hidden focus:border-rose-500/50"
+            className="w-48 border border-[#111]/30 bg-transparent px-4 py-3 text-center text-xl focus:border-[#c41212] focus:outline-hidden"
             autoFocus
           />
           <Button
             onClick={handleTypingSubmit}
-            className="bg-linear-to-r from-rose-500 to-pink-500"
+            className="rounded-none bg-[#c41212] text-white"
           >
             Check
           </Button>
@@ -688,26 +683,26 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
           >
             <Button
               onClick={() => handleGrade(0)}
-              className="bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30"
+              className="rounded-none border border-[#c41212] bg-transparent text-[#c41212] hover:bg-[#c41212] hover:text-white"
             >
               <X className="w-4 h-4 mr-1" />
               Again
             </Button>
             <Button
               onClick={() => handleGrade(1)}
-              className="bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border border-orange-500/30"
+              className="rounded-none border border-[#111]/40 bg-transparent text-[#111] hover:border-[#111]"
             >
               Hard
             </Button>
             <Button
               onClick={() => handleGrade(2)}
-              className="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 border border-blue-500/30"
+              className="rounded-none border border-[#111] bg-transparent text-[#111] hover:bg-[#111] hover:text-white"
             >
               Good
             </Button>
             <Button
               onClick={() => handleGrade(3)}
-              className="bg-green-500/20 hover:bg-green-500/30 text-green-400 border border-green-500/30"
+              className="rounded-none border border-[#111] bg-[#111] text-white hover:bg-[#111]"
             >
               <Zap className="w-4 h-4 mr-1" />
               Easy
@@ -718,7 +713,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-3 gap-4 mt-8">
-        <Card className="bg-card/30 backdrop-blur-xl border-0">
+        <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-blue-400">
               {stats.newCards}
@@ -726,7 +721,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
             <div className="text-xs text-muted-foreground">New</div>
           </CardContent>
         </Card>
-        <Card className="bg-card/30 backdrop-blur-xl border-0">
+        <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-amber-400">
               {stats.learning}
@@ -734,7 +729,7 @@ export default function FlashcardGame({ type, onClose }: FlashcardGameProps) {
             <div className="text-xs text-muted-foreground">Learning</div>
           </CardContent>
         </Card>
-        <Card className="bg-card/30 backdrop-blur-xl border-0">
+        <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-green-400">
               {stats.mastered}

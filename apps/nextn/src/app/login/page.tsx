@@ -2,12 +2,10 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-
-export const dynamic = 'force-dynamic';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useAuth } from '@/firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useAuth } from '@/supabase';
+import { signInWithEmailAndPassword } from '@/supabase/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -28,10 +26,10 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import AuthShell from '@/components/auth/AuthShell';
+import AuthShell from '@/features/auth/AuthShell';
 
 const formSchema = z.object({
-  email: z.string().email({ message: 'И-мэйл хаяг буруу байна.' }),
+  email: z.string().trim().email({ message: 'И-мэйл хаяг буруу байна.' }),
   password: z.string().min(1, { message: 'Нууц үгээ оруулна уу.' }),
 });
 
@@ -51,7 +49,7 @@ export default function LoginPage() {
     if (!auth) {
       toast({
         title: 'Алдаа',
-        description: 'Firebase-д холбогдож чадсангүй.',
+        description: 'Supabase-д холбогдож чадсангүй.',
         variant: 'destructive',
       });
       setIsLoading(false);
@@ -74,8 +72,12 @@ export default function LoginPage() {
         errorMessage = 'И-мэйл эсвэл нууц үг буруу байна.';
       } else if (error?.code === 'auth/too-many-requests') {
         errorMessage = 'Хэт олон оролдлого хийсэн байна. Хэсэг хүлээнэ үү.';
+      } else if (error?.code === 'auth/setup-required') {
+        errorMessage = error.message;
       } else if (error?.code === 'auth/network-request-failed') {
         errorMessage = 'Интернэт холболтыг шалгана үү.';
+      } else if (error?.message) {
+        errorMessage = error.message;
       }
       toast({
         title: 'Нэвтрэхэд алдаа гарлаа',
@@ -112,6 +114,8 @@ export default function LoginPage() {
                         type="email"
                         autoComplete="email"
                         placeholder="name@example.com"
+                        autoFocus
+                        disabled={isLoading}
                         className="h-12 pl-10 pr-3 rounded-xl bg-muted/30 border-border/60 focus-visible:border-primary/60 focus-visible:ring-primary/30"
                         {...field}
                       />
@@ -137,6 +141,7 @@ export default function LoginPage() {
                         type={showPassword ? 'text' : 'password'}
                         autoComplete="current-password"
                         placeholder="••••••••"
+                        disabled={isLoading}
                         className="h-12 pl-10 pr-11 rounded-xl bg-muted/30 border-border/60 focus-visible:border-primary/60 focus-visible:ring-primary/30"
                         {...field}
                       />

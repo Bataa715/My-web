@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useEffect, useState, use } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { useFirebase } from '@/firebase';
+import { doc, getDoc } from '@/supabase/db';
+import { useSupabase } from '@/supabase';
 import type { GrammarRule } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import BackButton from '@/components/shared/BackButton';
-import GrammarRuleDetail from '@/components/shared/GrammarRuleDetail';
+import GrammarRuleDetail from '@/features/language/components/GrammarRuleDetail';
+import ToolPageShell from '@/features/tools/ToolPageShell';
 
 export default function EnglishGrammarRulePage({
   params,
@@ -14,7 +14,7 @@ export default function EnglishGrammarRulePage({
   params: Promise<{ ruleId: string }>;
 }) {
   const { ruleId } = use(params);
-  const { firestore, user } = useFirebase();
+  const { firestore, user } = useSupabase();
   const [rule, setRule] = useState<GrammarRule | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,33 +57,30 @@ export default function EnglishGrammarRulePage({
   };
 
   const handleDeleteRule = () => {
-    // Since we are on the detail page, we can just navigate back after deletion.
-    // The list on the previous page will refetch.
-    // For simplicity, we can let the user navigate back manually.
     setRule(null);
     setError('Энэ дүрэм устгагдсан.');
   };
 
   return (
-    <div className="space-y-8">
-      <BackButton />
-
+    <ToolPageShell
+      title={rule?.title || 'Grammar'}
+      breadcrumbs={[
+        { label: 'Хэрэгслүүд', href: '/#tools' },
+        { label: 'Англи хэл', href: '/tools/english' },
+        { label: 'Дүрэм', href: '/tools/english/grammar' },
+        { label: rule?.title || 'Дүрэм' },
+      ]}
+    >
       {loading && (
-        <div className="space-y-4 pt-8">
-          <Skeleton className="h-12 w-3/4 mx-auto" />
-          <Skeleton className="h-8 w-1/4 mx-auto" />
-          <div className="space-y-6 pt-8">
-            <Skeleton className="h-48 w-full" />
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-48 w-full" />
-          </div>
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-2/3" />
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-40 w-full" />
         </div>
       )}
 
       {error && (
-        <div className="text-center py-10">
-          <p className="text-destructive">{error}</p>
-        </div>
+        <p className="py-16 text-center text-sm text-[#c41212]">{error}</p>
       )}
 
       {!loading && !error && rule && (
@@ -94,6 +91,6 @@ export default function EnglishGrammarRulePage({
           collectionPath="englishGrammar"
         />
       )}
-    </div>
+    </ToolPageShell>
   );
 }

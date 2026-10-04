@@ -26,35 +26,43 @@ import {
   ArrowRight,
   Mail,
 } from 'lucide-react';
-import { useFirebase } from '@/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useSupabase } from '@/supabase';
+import { doc, getDoc, setDoc } from '@/supabase/db';
 import { useToast } from '@/hooks/use-toast';
-import { useEditMode } from '@/contexts/EditModeContext';
-import HomeProviders from './providers/HomeProviders';
+import { useEditMode } from '@/providers/EditModeContext';
+import HomeProviders from '@/features/portfolio/context/HomeProviders';
 import type {
   SectionMeta,
   SectionSettings,
-} from '@/components/sections/SectionSettingsDialog';
+} from '@/features/portfolio/sections/SectionSettingsDialog';
 
 // Lazy load heavy components for better performance
-const Hero = dynamic(() => import('@/components/sections/hero'), {
-  loading: () => <div className="w-full min-h-[calc(100vh-120px)]" />,
+const OfficialHero = dynamic(() => import('@/features/home/OfficialHero'), {
+  loading: () => <div className="w-full min-h-[100svh] bg-[#0a1410]" />,
 });
-
-
-const Education = dynamic(() => import('@/components/sections/Education'), {
+const FeaturedGrid = dynamic(() => import('@/features/home/FeaturedGrid'), {
+  loading: () => <div className="w-full min-h-[280px]" />,
+});
+const About = dynamic(() => import('@/features/portfolio/sections/About'), {
   loading: () => <div className="w-full min-h-[400px]" />,
 });
-const Skills = dynamic(() => import('@/components/sections/skills'), {
+const ToolsSection = dynamic(() => import('@/features/home/ToolsSection'), {
+  loading: () => <div className="w-full min-h-[280px]" />,
+});
+
+const Education = dynamic(() => import('@/features/portfolio/sections/Education'), {
   loading: () => <div className="w-full min-h-[400px]" />,
 });
-const Projects = dynamic(() => import('@/components/sections/projects'), {
+const Skills = dynamic(() => import('@/features/portfolio/sections/Skills'), {
+  loading: () => <div className="w-full min-h-[400px]" />,
+});
+const Projects = dynamic(() => import('@/features/portfolio/sections/Projects'), {
   loading: () => <div className="w-full min-h-[400px]" />,
 });
 
 // Edit-only dialog: load only when isEditMode === true
 const SectionSettingsDialog = dynamic(
-  () => import('@/components/sections/SectionSettingsDialog'),
+  () => import('@/features/portfolio/sections/SectionSettingsDialog'),
   { ssr: false, loading: () => null }
 );
 
@@ -67,7 +75,7 @@ export default function HomePage() {
 }
 
 function HomePageInner() {
-  const { firestore, user } = useFirebase();
+  const { firestore, user } = useSupabase();
   const { toast } = useToast();
   const { isEditMode } = useEditMode();
   const [sectionSettings, setSectionSettings] = useState<SectionSettings>({});
@@ -215,24 +223,42 @@ function HomePageInner() {
 
   const hiddenCount = allSections.length - visibleSections.length;
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash.replace('#', '');
+    if (!hash) return;
+
+    let tries = 0;
+    const id = window.setInterval(() => {
+      const el = document.getElementById(hash);
+      tries += 1;
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        window.clearInterval(id);
+      } else if (tries > 30) {
+        window.clearInterval(id);
+      }
+    }, 100);
+
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
     <HomeShell>
       <ScrollProgressBar />
 
-      {/* HERO — floats directly over the 3D cosmos, planet horizon below */}
-      <section
-        id="hero"
-        className="relative"
-        data-section="hero"
-      >
-        <div className="relative z-10 min-h-[80vh]">
-          <Suspense
-            fallback={<div className="w-full min-h-[80vh] bg-transparent" />}
-          >
-            <Hero />
-          </Suspense>
-        </div>
+      <section id="hero" className="relative" data-section="hero">
+        <Suspense fallback={<div className="w-full min-h-[100svh] bg-[#0a1410]" />}>
+          <OfficialHero />
+        </Suspense>
       </section>
+      <Suspense fallback={<div className="w-full min-h-[280px]" />}>
+        <FeaturedGrid />
+      </Suspense>
+
+      <Suspense fallback={<div className="w-full min-h-[400px]" />}>
+        <About />
+      </Suspense>
 
       {isEditMode && (
         <SectionSettingsDialog
@@ -263,6 +289,10 @@ function HomePageInner() {
         ))}
       </div>
 
+      <Suspense fallback={<div className="w-full min-h-[280px]" />}>
+        <ToolsSection />
+      </Suspense>
+
       {visibleSections.length === 0 && !isLoading && (
         <div className="container mx-auto px-4 text-center py-24">
           <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card/40 backdrop-blur-xl p-10">
@@ -286,7 +316,9 @@ function HomePageInner() {
       <SectionDots
         sections={[
           { id: 'hero', label: 'Нүүр' },
+          { id: 'about', label: 'Миний тухай' },
           ...visibleSections.map(s => ({ id: s.id, label: s.title })),
+          { id: 'tools', label: 'Хэрэгслүүд' },
         ]}
       />
     </HomeShell>
@@ -300,12 +332,6 @@ function HomePageInner() {
 function HomeShell({ children }: { children: ReactNode }) {
   return (
     <div className="relative isolate overflow-x-clip">
-      {/* The 3D cosmos canvas (global, z −10) is the real backdrop.
-          Here we only add a soft aurora light sweep above it. */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden aurora-sweep"
-      />
       {children}
     </div>
   );
@@ -371,54 +397,9 @@ function SectionFrame({
   isFirst: boolean;
   children: ReactNode;
 }) {
-  const reduce = useReducedMotion();
   return (
-    <div
-      id={id}
-      data-section={id}
-      className="relative scroll-mt-24"
-    >
-      {!isFirst && (
-        <div className="container mx-auto px-4">
-          <SectionOrnament />
-        </div>
-      )}
-
-      {/* Numbered gradient badge floating above the section */}
-      <div className="container mx-auto px-4">
-        <motion.div
-          initial={reduce ? false : { opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="flex items-center gap-3 pt-8"
-        >
-          <span
-            className={cn(
-              'inline-flex h-9 items-center gap-2 rounded-full border border-border/60 bg-card/60 px-3 text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground backdrop-blur-md',
-              'shadow-sm shadow-black/5'
-            )}
-          >
-            <span
-              className={cn(
-                'inline-block h-1.5 w-1.5 rounded-full bg-linear-to-r',
-                gradient ?? 'from-primary to-primary'
-              )}
-            />
-            №{String(index).padStart(2, '0')}
-          </span>
-          <div className="h-px flex-1 bg-linear-to-r from-border/60 to-transparent" />
-        </motion.div>
-      </div>
-
-      <motion.div
-        initial={reduce ? false : { opacity: 0, y: 24, scale: 0.99 }}
-        whileInView={{ opacity: 1, y: 0, scale: 1 }}
-        viewport={{ once: true, amount: 0.12 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      >
-        {children}
-      </motion.div>
+    <div id={id} data-section={id} className="relative scroll-mt-24">
+      {children}
     </div>
   );
 }
@@ -525,7 +506,7 @@ function BackToTop() {
       }
       aria-label="Дээш буцах"
       className={cn(
-        'fixed bottom-24 sm:bottom-6 right-6 z-40 group inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/30 bg-primary/15 backdrop-blur-xl text-primary shadow-lg shadow-primary/20 transition-all duration-300',
+        'fixed bottom-6 right-6 z-40 group inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/30 bg-primary/15 backdrop-blur-xl text-primary shadow-lg shadow-primary/20 transition-all duration-300',
         'hover:bg-primary hover:text-primary-foreground hover:scale-110 hover:shadow-xl hover:shadow-primary/30 hover:border-primary',
         show
           ? 'opacity-100 translate-y-0 pointer-events-auto'

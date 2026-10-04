@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Timer from '@/app/tools/pomodoro/components/Timer';
 import { Timer as TimerIcon } from 'lucide-react';
-import ToolPageShell from '@/components/shared/ToolPageShell';
+import ToolPageShell from '@/features/tools/ToolPageShell';
 
 export default function PomodoroPage() {
   return (
@@ -12,7 +12,7 @@ export default function PomodoroPage() {
       eyebrow="Бүтээмж"
       icon={<TimerIcon className="h-8 w-8" />}
       breadcrumbs={[
-        { label: 'Хэрэгслүүд', href: '/tools' },
+        { label: 'Хэрэгслүүд', href: '/#tools' },
         { label: 'Pomodoro' },
       ]}
     >

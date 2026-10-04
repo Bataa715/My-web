@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
-import { FirebaseClientProvider } from '@/firebase/client-provider';
-import { EditModeProvider } from '@/contexts/EditModeContext';
-import MainLayout from '@/components/MainLayout';
-import PageTransition from '@/components/PageTransition';
-import { I18nProvider } from '@/contexts/I18nContext';
-import MotionProvider from '@/app/providers/MotionProvider';
-import CosmosBackground from '@/components/cosmos/CosmosBackground';
-import { JetBrains_Mono, Exo_2 } from 'next/font/google';
+import { SupabaseClientProvider } from '@/supabase/client-provider';
+import { EditModeProvider } from '@/providers/EditModeContext';
+import MainLayout from '@/components/layout/MainLayout';
+import PageTransition from '@/components/layout/PageTransition';
+import { I18nProvider } from '@/providers/I18nContext';
+import MotionProvider from '@/providers/MotionProvider';
+import SiteBackground from '@/components/background/SiteBackground';
+import { JetBrains_Mono, Exo_2, Cormorant_Garamond, Noto_Serif_JP } from 'next/font/google';
+import { SITE_NAME } from '@/lib/brand';
 
 // Code / numeric contexts only (kept for pre, code, kbd, samp)
 const jetbrainsMono = JetBrains_Mono({
@@ -27,49 +28,52 @@ const exo2 = Exo_2({
   preload: true,
 });
 
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin', 'cyrillic'],
+  variable: '--font-display-face',
+  weight: ['400', '600', '700'],
+  display: 'swap',
+});
+
+const notoSerifJp = Noto_Serif_JP({
+  weight: ['600', '700'],
+  subsets: ['latin'],
+  variable: '--font-jp',
+  display: 'swap',
+});
+
 // Display headlines use Exo 2 as well (bold weights) — a separate latin-only
 // display face made Mongolian Cyrillic headings fall back to Arial and look
 // like a completely different font.
 
 export const metadata: Metadata = {
   title: {
-    default: 'PersonalWeb — Portfolio',
-    template: '%s · PersonalWeb',
+    default: SITE_NAME,
+    template: `%s · ${SITE_NAME}`,
   },
-  description:
-    'Хувийн , англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
-  keywords: [
-    'portfolio',
-    'developer',
-    'Mongolia',
-    'англи хэл',
-    'япон хэл',
-    'программчлал',
-  ],
+  description: 'Хувийн систем — англи · япон · программчлалын хэрэгслүүд.',
+  keywords: [SITE_NAME, 'Attack on Titan', 'англи хэл', 'япон хэл', 'программчлал'],
   icons: {
-    icon: '/favicon.ico',
-    apple: '/icons/apple-touch-icon.png',
+    icon: '/icons/icon-512.jpg',
+    apple: '/icons/apple-touch-icon.jpg',
   },
   manifest: '/manifest.webmanifest',
-  // iPhone: Safari → Share → "Add to Home Screen" installs this as an app
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'PersonalWeb',
+    title: SITE_NAME,
   },
   metadataBase: new URL('https://personalweb.com'),
   openGraph: {
-    title: 'PersonalWeb — Portfolio',
-    description:
-      'Хувийн , англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
+    title: SITE_NAME,
+    description: 'Хувийн систем — англи · япон · программчлалын хэрэгслүүд.',
     type: 'website',
     locale: 'mn_MN',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PersonalWeb — Portfolio',
-    description:
-      'Хувийн , англи · япон · программчлалын хэрэгслүүд бүхий нэгдсэн систем.',
+    title: SITE_NAME,
+    description: 'Хувийн систем — англи · япон · программчлалын хэрэгслүүд.',
   },
   robots: {
     index: true,
@@ -83,8 +87,8 @@ export const viewport = {
   maximumScale: 5,
   viewportFit: 'cover',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#05050a' },
-    { media: '(prefers-color-scheme: dark)', color: '#05050a' },
+    { media: '(prefers-color-scheme: light)', color: '#f3f1ee' },
+    { media: '(prefers-color-scheme: dark)', color: '#f3f1ee' },
   ],
 };
 
@@ -97,26 +101,32 @@ export default function RootLayout({
     <html
       lang="mn"
       suppressHydrationWarning
-      className={`${exo2.variable} ${jetbrainsMono.variable}`}
+      className={`${exo2.variable} ${jetbrainsMono.variable} ${cormorant.variable} ${notoSerifJp.variable}`}
     >
       <head>
         {/* Preconnect to critical external resources */}
         <link rel="dns-prefetch" href="https://cdn.simpleicons.org" />
         <link
           rel="dns-prefetch"
-          href="https://firebasestorage.googleapis.com"
+          href="https://rhytjlzvowjrwwchkoao.supabase.co"
+        />
+        {/* Apply the saved palette before first paint to avoid a theme flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.documentElement.setAttribute('data-theme','aot');`,
+          }}
         />
       </head>
       <body className={`min-h-screen font-sans antialiased`}>
-        {/* Persistent 3D deep-space backdrop — lives behind every page */}
-        <CosmosBackground />
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
-          <FirebaseClientProvider>
+          {/* Palette-aware persistent backdrop — lives behind every page */}
+          <SiteBackground />
+          <SupabaseClientProvider>
             <EditModeProvider>
               <I18nProvider>
                 <MotionProvider>
@@ -126,7 +136,7 @@ export default function RootLayout({
                 <Toaster />
               </I18nProvider>
             </EditModeProvider>
-          </FirebaseClientProvider>
+          </SupabaseClientProvider>
         </ThemeProvider>
       </body>
     </html>

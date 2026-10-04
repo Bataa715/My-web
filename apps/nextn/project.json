@@ -37,12 +37,6 @@
         }
       }
     },
-    "export": {
-      "executor": "@nx/next:export",
-      "options": {
-        "buildTarget": "nextn:build:production"
-      }
-    },
     "deploy": {
       "executor": "nx:run-commands",
       "options": {

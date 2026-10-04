@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { GraduationCap } from 'lucide-react';
-import ToolPageShell from '@/components/shared/ToolPageShell';
-import SubToolCard from '@/components/tools/SubToolCard';
+import ToolPageShell from '@/features/tools/ToolPageShell';
+import SubToolCard from '@/features/tools/SubToolCard';
 
 const englishSkillsConfig = [
   {
@@ -43,19 +43,21 @@ const englishSkillsConfig = [
 export default function EnglishDashboardPage() {
   return (
     <ToolPageShell
-      title="English Dashboard"
+      title="English"
       eyebrow="Хэл сурах"
       icon={<GraduationCap className="h-8 w-8" />}
       breadcrumbs={[
-        { label: 'Хэрэгслүүд', href: '/tools' },
+        { label: 'Хэрэгслүүд', href: '/#tools' },
         { label: 'Англи хэл' },
       ]}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 max-w-4xl mx-auto">
-        {englishSkillsConfig.map((skill, index) => (
-          <SubToolCard key={skill.id} {...skill} index={index} />
+      <ul className="divide-y divide-[#111]">
+        {englishSkillsConfig.map(skill => (
+          <li key={skill.id}>
+            <SubToolCard {...skill} tag="English" />
+          </li>
         ))}
-      </div>
+      </ul>
     </ToolPageShell>
   );
 }

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import type { Language } from '@/lib/types';
 import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
+import { ArrowRight, Trash2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,9 +15,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { useEditMode } from '@/contexts/EditModeContext';
-import { motion } from 'framer-motion';
-import TechIcon from '@/components/shared/TechIcon';
+import { useEditMode } from '@/providers/EditModeContext';
+import TechIcon from '@/components/common/TechIcon';
 
 interface LanguageCardProps {
   language: Language;
@@ -27,79 +26,41 @@ interface LanguageCardProps {
 
 export default function LanguageCard({
   language,
-  index,
   onDelete,
 }: LanguageCardProps) {
   const { isEditMode } = useEditMode();
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 30, scale: 0.9 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -30, scale: 0.9 }}
-      transition={{
-        duration: 0.4,
-        delay: index * 0.05,
-        type: 'spring',
-        stiffness: 100,
-      }}
-      className="group relative"
-    >
-      <Link href={`/tools/programming/${language.id}`}>
-        <div
-          className="bg-card/50 backdrop-blur-xl border-0 p-6 rounded-2xl h-full flex flex-col justify-between hover:scale-105 transition-all cursor-pointer overflow-hidden relative"
-          style={{
-            boxShadow: `0 0 30px rgba(${language.primaryColor}, 0.15), 0 0 60px rgba(${language.primaryColor}, 0.05)`,
-          }}
-        >
-          {/* Gradient overlay */}
-          <div
-            className="absolute inset-0 opacity-10"
-            style={{
-              background: `linear-gradient(135deg, rgba(${language.primaryColor}, 0.3), transparent)`,
-            }}
+    <li className="relative">
+      <Link
+        href={`/tools/programming/${language.id}`}
+        className="group flex items-center gap-4 py-6 sm:gap-8"
+      >
+        <TechIcon techName={language.iconUrl} className="h-8 w-8 shrink-0" />
+        <span className="w-20 shrink-0 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">
+          Code
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-lg">{language.name}</span>
+          <span className="block text-xs text-[#111]/50">
+            {language.progress}% дууссан
+          </span>
+        </span>
+        <span className="hidden h-px w-24 bg-[#111]/15 sm:block">
+          <span
+            className="block h-px bg-[#c41212]"
+            style={{ width: `${language.progress}%` }}
           />
-
-          <div className="relative z-10">
-            <div
-              className="w-16 h-16 mb-4 mx-auto relative flex items-center justify-center rounded-2xl"
-              style={{
-                color: `rgb(${language.primaryColor})`,
-                backgroundColor: `rgba(${language.primaryColor}, 0.1)`,
-                boxShadow: `0 0 20px rgba(${language.primaryColor}, 0.2)`,
-              }}
-            >
-              <TechIcon techName={language.iconUrl} className="w-8 h-8" />
-            </div>
-            <h3 className="text-xl font-bold text-center mb-2">
-              {language.name}
-            </h3>
-          </div>
-
-          <div className="mt-4 relative z-10">
-            <div className="w-full bg-muted/50 h-2 rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${language.progress}%` }}
-                transition={{ duration: 1, delay: index * 0.1 }}
-                className="h-full rounded-full"
-                style={{ backgroundColor: `rgb(${language.primaryColor})` }}
-              />
-            </div>
-            <p className="text-muted-foreground text-xs mt-2 text-right">
-              {language.progress}% дууссан
-            </p>
-          </div>
-        </div>
+        </span>
+        <ArrowRight className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-1" />
       </Link>
       {isEditMode && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
-              variant="destructive"
+              variant="ghost"
               size="icon"
-              className="absolute -top-3 -right-3 h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute right-0 top-1/2 h-8 w-8 -translate-y-1/2 hover:text-destructive"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
@@ -108,8 +69,7 @@ export default function LanguageCard({
             <AlertDialogHeader>
               <AlertDialogTitle>Устгахдаа итгэлтэй байна уу?</AlertDialogTitle>
               <AlertDialogDescription>
-                "{language.name}" хэлийг устгах гэж байна. Энэ үйлдэл
-                буцаагдахгүй.
+                "{language.name}" хэлийг устгах гэж байна.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -123,6 +83,6 @@ export default function LanguageCard({
           </AlertDialogContent>
         </AlertDialog>
       )}
-    </motion.div>
+    </li>
   );
 }

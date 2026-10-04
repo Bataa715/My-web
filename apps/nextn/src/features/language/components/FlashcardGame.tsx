@@ -1,0 +1,365 @@
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  X,
+  Check,
+  Repeat,
+  ArrowLeft,
+  Lightbulb,
+  CheckCircle2,
+  ArrowRight,
+  Volume2,
+} from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
+import type { EnglishWord, JapaneseWord } from '@/lib/types';
+
+type Word = EnglishWord | JapaneseWord;
+
+interface FlashcardGameProps {
+  words: Word[];
+  wordType: 'english' | 'japanese';
+  onComplete: (memorizedIds: string[]) => void;
+  onSaveProgress: (memorizedIds: string[]) => void;
+  onExit: () => void;
+}
+
+export default function FlashcardGame({
+  words,
+  wordType,
+  onComplete,
+  onSaveProgress,
+  onExit,
+}: FlashcardGameProps) {
+  const [deck, setDeck] = useState<Word[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [knownWords, setKnownWords] = useState<string[]>([]);
+  const [unknownWords, setUnknownWords] = useState<Word[]>([]);
+  const [isFinished, setIsFinished] = useState(false);
+
+  const [answeredCorrectly, setAnsweredCorrectly] = useState(0);
+  const [answeredIncorrectly, setAnsweredIncorrectly] = useState(0);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Text-to-speech function
+  const speakWord = (text: string, lang: 'en-US' | 'ja-JP') => {
+    if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.9;
+
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  useEffect(() => {
+    // Shuffle the words to start
+    setDeck([...words].sort(() => Math.random() - 0.5));
+    setAnsweredCorrectly(0);
+    setAnsweredIncorrectly(0);
+  }, [words]);
+
+  if (deck.length === 0 && !isFinished) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[50vh]">
+        <p className="text-muted-foreground mb-4">
+          Тоглоом эхлүүлэхэд үг сонгогдоогүй байна.
+        </p>
+        <Button onClick={onExit}>
+          <ArrowLeft className="mr-2" /> Буцах
+        </Button>
+      </div>
+    );
+  }
+
+  const currentWord = deck[currentIndex];
+
+  const handleNextCard = (known: boolean) => {
+    if (known) {
+      if (currentWord.id && !knownWords.includes(currentWord.id)) {
+        if (!currentWord.memorized) {
+          setKnownWords(prev => [...prev, currentWord.id!]);
+        }
+      }
+      setAnsweredCorrectly(prev => prev + 1);
+    } else {
+      if (!unknownWords.some(w => w.id === currentWord.id)) {
+        setUnknownWords(prev => [...prev, currentWord]);
+      }
+      setAnsweredIncorrectly(prev => prev + 1);
+    }
+
+    setIsFlipped(false);
+
+    if (currentIndex < deck.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      // End of the deck
+      setIsFinished(true);
+    }
+  };
+
+  const handleRestart = (onlyUnknown: boolean) => {
+    const wordsToPractice = onlyUnknown ? unknownWords : words;
+    setDeck([...wordsToPractice].sort(() => Math.random() - 0.5));
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setKnownWords([]);
+    setUnknownWords([]);
+    setIsFinished(false);
+    setAnsweredCorrectly(0);
+    setAnsweredIncorrectly(0);
+  };
+
+  const getCardContent = (word: Word, side: 'front' | 'back') => {
+    if (wordType === 'english') {
+      const w = word as EnglishWord;
+      if (side === 'front')
+        return (
+          <div className="flex flex-col items-center gap-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center text-foreground">
+              {w.word}
+            </h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                'rounded-full hover:bg-primary/20',
+                isSpeaking && 'animate-pulse text-[#c41212]'
+              )}
+              onClick={e => {
+                e.stopPropagation();
+                speakWord(w.word, 'en-US');
+              }}
+            >
+              <Volume2 className="h-6 w-6" />
+            </Button>
+          </div>
+        );
+      return (
+        <div className="text-center">
+          <p className="text-3xl text-[#c41212]">{w.translation}</p>
+          {w.definition && (
+            <p className="text-base text-foreground/70 mt-4">{w.definition}</p>
+          )}
+        </div>
+      );
+    } else {
+      const w = word as JapaneseWord;
+      if (side === 'front')
+        return (
+          <div className="text-center">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground">
+              {w.word}
+            </h2>
+            <p className="text-lg text-foreground/70 mt-2">{w.romaji}</p>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                'rounded-full hover:bg-primary/20 mt-3',
+                isSpeaking && 'animate-pulse text-[#c41212]'
+              )}
+              onClick={e => {
+                e.stopPropagation();
+                speakWord(w.word, 'ja-JP');
+              }}
+            >
+              <Volume2 className="h-6 w-6" />
+            </Button>
+          </div>
+        );
+      return (
+        <div className="text-center">
+          <p className="text-3xl text-[#c41212]">{w.meaning}</p>
+        </div>
+      );
+    }
+  };
+
+  if (isFinished) {
+    return (
+      <Card className="mx-auto w-full max-w-2xl rounded-none border border-[#111] bg-transparent p-8 text-center shadow-none">
+        <CardContent className="p-0">
+          <CheckCircle2 className="mx-auto mb-4 h-16 w-16 text-[#c41212]" />
+          <h2 className="mb-4 text-3xl">Баяр хүргэе!</h2>
+          <p className="mb-6 text-lg text-[#111]/50">
+            Та энэ удаагийн давтлагыг дуусгалаа.
+          </p>
+          <div className="mb-8 grid grid-cols-2 gap-4">
+            <div className="border border-[#111] p-4">
+              <p className="text-4xl">{answeredCorrectly}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111]/45">
+                Мэдсэн
+              </p>
+            </div>
+            <div className="border border-[#111] p-4">
+              <p className="text-4xl text-[#c41212]">{answeredIncorrectly}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#111]/45">
+                Мэдээгүй
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              onClick={() => {
+                // Save memorized words before restarting
+                if (knownWords.length > 0) {
+                  onSaveProgress(knownWords);
+                }
+                handleRestart(false);
+              }}
+            >
+              <Repeat className="mr-2 h-4 w-4" />{' '}
+              <span className="text-sm">Бүгдийг давтах</span>
+            </Button>
+            {unknownWords.length > 0 && (
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => {
+                  // Save memorized words before restarting
+                  if (knownWords.length > 0) {
+                    onSaveProgress(knownWords);
+                  }
+                  handleRestart(true);
+                }}
+              >
+                <Repeat className="mr-2 h-4 w-4" />{' '}
+                <span className="text-sm">Алдсан үгсээ давтах</span>
+              </Button>
+            )}
+            <Button
+              variant="secondary"
+              className="w-full sm:w-auto"
+              onClick={() => onComplete(knownWords)}
+            >
+              <Check className="mr-2 h-4 w-4" />{' '}
+              <span className="text-sm">Дуусгах</span>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const progress = (currentIndex / deck.length) * 100;
+
+  return (
+    <div className="w-full max-w-2xl mx-auto px-2 sm:px-4">
+      <div className="flex items-center gap-2 sm:gap-4 mb-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="shrink-0"
+          onClick={onExit}
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div className="grow flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1 text-[#c41212]">
+            <X className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="text-sm sm:text-lg">
+              {answeredIncorrectly}
+            </span>
+          </div>
+          <Progress value={progress} className="h-1 w-full" />
+          <div className="flex items-center gap-1 text-[#111]">
+            <Check className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="font-bold text-sm sm:text-lg">
+              {answeredCorrectly}
+            </span>
+          </div>
+        </div>
+        <span className="text-xs sm:text-sm text-muted-foreground font-mono whitespace-nowrap">
+          {currentIndex + 1}/{deck.length}
+        </span>
+      </div>
+
+      <div
+        className="w-full h-[280px] sm:h-[320px] md:h-[350px] perspective-distant cursor-pointer"
+        onClick={() => setIsFlipped(!isFlipped)}
+      >
+        <AnimatePresence initial={false}>
+          <motion.div
+            key={currentIndex}
+            className="relative w-full h-full transform-3d"
+            initial={{ opacity: 0, scale: 0.8, y: 50 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              y: 0,
+              rotateY: isFlipped ? 180 : 0,
+            }}
+            exit={{ opacity: 0, scale: 0.8, y: -50 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+          >
+            {/* Front of Card */}
+            <div className="absolute w-full h-full backface-hidden">
+              <div className="card-face card-front flex items-center justify-center p-6">
+                {currentWord && getCardContent(currentWord, 'front')}
+              </div>
+            </div>
+            {/* Back of Card */}
+            <div
+              className="absolute w-full h-full backface-hidden"
+              style={{ transform: 'rotateY(180deg)' }}
+            >
+              <div className="card-face card-back flex items-center justify-center p-6">
+                {currentWord && getCardContent(currentWord, 'back')}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {isFlipped && (
+        <motion.div className="mt-4 md:mt-6 grid grid-cols-2 gap-4 md:gap-6">
+          <Button
+            variant="outline"
+            size="icon"
+            className="mx-auto h-16 w-16 rounded-none border border-[#c41212] bg-transparent text-[#c41212] hover:bg-[#c41212] hover:text-white sm:h-20 sm:w-20 md:h-24 md:w-24"
+            onClick={() => handleNextCard(false)}
+          >
+            <X className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="mx-auto h-16 w-16 rounded-none border border-[#111] bg-transparent text-[#111] hover:bg-[#111] hover:text-white sm:h-20 sm:w-20 md:h-24 md:w-24"
+            onClick={() => handleNextCard(true)}
+          >
+            <Check className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10" />
+          </Button>
+        </motion.div>
+      )}
+
+      <style jsx>{`
+        .card-face {
+          width: 100%;
+          height: 100%;
+          border: 1px solid #111;
+          background: #f3f1ee;
+          position: relative;
+          overflow: hidden;
+        }
+        .card-front,
+        .card-back {
+          background: #f3f1ee;
+        }
+      `}</style>
+    </div>
+  );
+}

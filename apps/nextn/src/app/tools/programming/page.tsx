@@ -11,8 +11,8 @@ import {
   serverTimestamp,
   deleteDoc,
   doc,
-} from 'firebase/firestore';
-import { useFirebase } from '@/firebase';
+} from '@/supabase/db';
+import { useSupabase } from '@/supabase';
 import type { Language } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -20,7 +20,7 @@ import LanguageCard from './components/LanguageCard';
 import { AddLanguageDialog } from './components/AddLanguageDialog';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Code } from 'lucide-react';
-import ToolPageShell from '@/components/shared/ToolPageShell';
+import ToolPageShell from '@/features/tools/ToolPageShell';
 import { AnimatePresence } from 'framer-motion';
 
 const colorCycle = [
@@ -32,7 +32,7 @@ const colorCycle = [
 ];
 
 export default function ProgrammingPage() {
-  const { firestore, user } = useFirebase();
+  const { firestore, user } = useSupabase();
   const { toast } = useToast();
   const [languages, setLanguages] = useState<Language[]>([]);
   const [loading, setLoading] = useState(true);
@@ -118,18 +118,18 @@ export default function ProgrammingPage() {
 
   return (
     <ToolPageShell
-      title="Програмчлалын хэл"
+      title="Programming"
       eyebrow="Код бичиж сур"
       icon={<Code className="h-8 w-8" />}
       breadcrumbs={[
-        { label: 'Хэрэгслүүд', href: '/tools' },
+        { label: 'Хэрэгслүүд', href: '/#tools' },
         { label: 'Програмчлал' },
       ]}
     >
       <div className="space-y-6 pt-2">
         <div className="flex justify-end">
           <AddLanguageDialog onAddLanguage={handleAddLanguage}>
-            <Button className="bg-primary text-primary-foreground border-0 shadow-lg gap-2">
+            <Button variant="outline" className="gap-2 rounded-none border-[#111]">
               <PlusCircle className="h-4 w-4" />
               Шинэ хэл нэмэх
             </Button>
@@ -137,16 +137,16 @@ export default function ProgrammingPage() {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <div className="space-y-4">
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-48 rounded-2xl bg-card/50" />
+              <Skeleton key={i} className="h-16 bg-[#111]/5" />
             ))}
           </div>
         ) : !user ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-20 bg-card/50 backdrop-blur-xl rounded-2xl"
+            className="border border-[#111] py-20 text-center"
           >
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
               <Code className="h-8 w-8 text-primary" />
@@ -156,31 +156,28 @@ export default function ProgrammingPage() {
             </p>
           </motion.div>
         ) : (
-          <motion.div
-            layout
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
-          >
-            <AnimatePresence>
-              {languages.map((lang, index) => (
-                <LanguageCard
-                  key={lang.id}
-                  language={lang}
-                  index={index}
-                  onDelete={handleDeleteLanguage}
-                />
-              ))}
-            </AnimatePresence>
+          <>
+            <ul className="divide-y divide-[#111]">
+              <AnimatePresence>
+                {languages.map((lang, index) => (
+                  <LanguageCard
+                    key={lang.id}
+                    language={lang}
+                    index={index}
+                    onDelete={handleDeleteLanguage}
+                  />
+                ))}
+              </AnimatePresence>
+            </ul>
             {languages.length === 0 && (
-              <div className="col-span-full text-center py-20">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/50 mb-4">
-                  <Code className="h-8 w-8 text-muted-foreground" />
-                </div>
-                <p className="text-muted-foreground">
+              <div className="py-20 text-center">
+                <Code className="mx-auto mb-4 h-8 w-8 text-[#111]/40" />
+                <p className="text-sm text-[#111]/50">
                   Та одоогоор ямар ч хэл нэмээгүй байна.
                 </p>
               </div>
             )}
-          </motion.div>
+          </>
         )}
       </div>
     </ToolPageShell>

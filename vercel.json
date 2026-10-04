@@ -3,5 +3,5 @@
   "devCommand": "nx serve nextn",
   "installCommand": "npm install --legacy-peer-deps",
   "outputDirectory": "apps/nextn/.next",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./apps/nextn"
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- apps package.json package-lock.json vercel.json nx.json"
 }

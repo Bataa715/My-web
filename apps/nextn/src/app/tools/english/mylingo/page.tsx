@@ -9,14 +9,14 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { useFirebase } from '@/firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import ToolPageShell from '@/components/shared/ToolPageShell';
-import { WORDS, LEVEL_LABELS, getDistractors, type MLWord } from '@/lib/mylingo-words';
+import { useSupabase } from '@/supabase';
+import { doc, getDoc, updateDoc } from '@/supabase/db';
+import ToolPageShell from '@/features/tools/ToolPageShell';
+import { WORDS, LEVEL_LABELS, getDistractors, type MLWord } from '@/features/language/data/mylingo-words';
 import {
-  GRAMMAR_LESSONS, GRAMMAR_SECTION_LABELS, GRAMMAR_SECTION_ORDER, GRAMMAR_SECTION_EMOJIS,
+  GRAMMAR_LESSONS, GRAMMAR_SECTION_LABELS, GRAMMAR_SECTION_ORDER,
   type GrammarSectionId,
-} from '@/lib/mylingo-grammar';
+} from '@/features/language/data/mylingo-grammar';
 import { cn } from '@/lib/utils';
 
 // ── Lesson definitions ────────────────────────────────────────────────────────
@@ -71,29 +71,6 @@ const GRAMMAR_LESSON_REFS: GrammarLessonRef[] = GRAMMAR_LESSONS.map(l => ({
 const VOCAB_SECTION_ORDER: MLWord['level'][] = ['A1', 'A2', 'B1', 'B2', 'C1'];
 
 // ── Styles ────────────────────────────────────────────────────────────────────
-
-const VOCAB_STYLES: Record<MLWord['level'], { bg: string; ring: string; glow: string }> = {
-  A1: { bg:'from-emerald-500 to-teal-500',  ring:'ring-emerald-500', glow:'shadow-[0_0_24px_hsl(142_71%_45%/0.6)]' },
-  A2: { bg:'from-sky-500 to-blue-500',      ring:'ring-sky-500',     glow:'shadow-[0_0_24px_hsl(199_89%_48%/0.6)]' },
-  B1: { bg:'from-violet-500 to-purple-500', ring:'ring-violet-500',  glow:'shadow-[0_0_24px_hsl(263_70%_50%/0.6)]' },
-  B2: { bg:'from-orange-500 to-amber-500',  ring:'ring-orange-500',  glow:'shadow-[0_0_24px_hsl(25_95%_53%/0.6)]'  },
-  C1: { bg:'from-rose-500 to-pink-500',     ring:'ring-rose-500',    glow:'shadow-[0_0_24px_hsl(347_77%_50%/0.6)]' },
-};
-
-const GRAMMAR_STYLES: Record<GrammarSectionId, { bg: string; ring: string; glow: string }> = {
-  G_BASIC:  { bg:'from-yellow-500 to-amber-400',  ring:'ring-yellow-400',  glow:'shadow-[0_0_24px_hsl(48_96%_53%/0.6)]'  },
-  G_PAST:   { bg:'from-red-500 to-orange-500',    ring:'ring-red-500',     glow:'shadow-[0_0_24px_hsl(0_84%_60%/0.6)]'   },
-  G_FUTURE: { bg:'from-blue-500 to-indigo-500',   ring:'ring-blue-500',    glow:'shadow-[0_0_24px_hsl(217_91%_60%/0.6)]' },
-  G_MODAL:  { bg:'from-purple-500 to-violet-500', ring:'ring-purple-500',  glow:'shadow-[0_0_24px_hsl(271_91%_65%/0.6)]' },
-  G_STRUCT: { bg:'from-teal-500 to-cyan-500',     ring:'ring-teal-500',    glow:'shadow-[0_0_24px_hsl(174_60%_51%/0.6)]' },
-};
-
-function getLessonStyle(entry: LessonEntry) {
-  if (entry.kind === 'vocab') return VOCAB_STYLES[entry.section];
-  return GRAMMAR_STYLES[entry.gs];
-}
-
-const ZIGZAG = [-80, -40, 0, 40, 80, 40, 0, -40];
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -350,7 +327,7 @@ function SentenceBuildAnswer({ initialWords, onSubmit, disabled, isCorrect, corr
       <Button
         onClick={() => onSubmit(chosen.join(' '))}
         disabled={disabled || chosen.length === 0}
-        className="w-full h-11 sm:h-12 text-sm font-bold bg-primary text-primary-foreground border-0 shadow-[0_0_20px_hsl(var(--primary)/0.3)]"
+        className="h-11 w-full rounded-none border-0 bg-[#c41212] text-sm font-bold text-white hover:bg-[#c41212]/90 sm:h-12"
       >
         Шалгах
       </Button>
@@ -373,43 +350,34 @@ function LessonView({ entry, onStart, onBack }: { entry: GrammarLessonRef; onSta
   const full = GRAMMAR_LESSONS.find(l => l.id === entry.id);
   if (!full) return null;
   const { content } = full;
-  const style = GRAMMAR_STYLES[entry.gs];
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-      className="max-w-xl mx-auto pt-2 pb-8 sm:pb-10 space-y-4 sm:space-y-5"
+      className="mx-auto max-w-2xl space-y-8 pb-10 pt-2 text-[#111]"
     >
-      <div className="flex items-center gap-3">
-        <button onClick={onBack} className="p-2.5 rounded-xl hover:bg-muted/60 transition-colors shrink-0">
-          <ChevronLeft className="h-5 w-5 text-muted-foreground" />
+      <div className="flex items-center gap-3 border-b border-[#111] pb-4">
+        <button onClick={onBack} className="shrink-0 p-2">
+          <ChevronLeft className="h-5 w-5" />
         </button>
         <div className="flex-1">
-          <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Хичээл</p>
-          <h2 className="text-lg font-black text-foreground leading-tight">{entry.title}</h2>
-        </div>
-        <div className={cn('w-12 h-12 rounded-2xl flex items-center justify-center text-2xl bg-linear-to-br', style.bg)}>
-          {entry.emoji}
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">Хичээл</p>
+          <h2 className="text-xl leading-tight">{entry.title}</h2>
         </div>
       </div>
 
-      <div className={cn('rounded-xl px-4 py-2.5 bg-linear-to-r text-white text-sm font-bold', style.bg)}>
-        {full.rule}
-      </div>
+      <p className="text-sm font-medium">{full.rule}</p>
 
-      <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-4 sm:p-5 space-y-3">
-        <div className="flex items-center gap-2">
-          <Lightbulb className="h-4 w-4 text-amber-400" />
-          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Тайлбар</p>
-        </div>
-        <p className="text-sm text-foreground/80 leading-relaxed">{content.explanation}</p>
+      <div className="space-y-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">Тайлбар</p>
+        <p className="text-sm leading-relaxed text-[#111]/70">{content.explanation}</p>
       </div>
 
       {content.table && (
-        <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 overflow-hidden">
+        <div className="overflow-hidden border-t border-[#111]">
           <div className="overflow-x-auto">
           <table className="w-full text-sm min-w-[320px]">
             <thead>
-              <tr className={cn('bg-linear-to-r text-white', style.bg)}>
+              <tr className="border-b border-[#111] text-[#111]">
                 {content.table.headers.map((h, i) => (
                   <th key={i} className="px-4 py-2.5 text-left font-bold text-xs uppercase tracking-wider opacity-90">{h}</th>
                 ))}
@@ -429,8 +397,8 @@ function LessonView({ entry, onStart, onBack }: { entry: GrammarLessonRef; onSta
         </div>
       )}
 
-      <div className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-4 sm:p-5 space-y-3">
-        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Жишээнүүд</p>
+      <div className="space-y-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">Жишээнүүд</p>
         <div className="space-y-3">
           {content.examples.map((ex, i) => (
             <div key={i} className="border-l-2 border-primary/30 pl-3 space-y-0.5">
@@ -442,11 +410,8 @@ function LessonView({ entry, onStart, onBack }: { entry: GrammarLessonRef; onSta
       </div>
 
       {content.tips && content.tips.length > 0 && (
-        <div className="rounded-2xl bg-amber-500/10 border border-amber-500/20 p-4 sm:p-5 space-y-2">
-          <div className="flex items-center gap-2">
-            <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
-            <p className="text-xs font-bold uppercase tracking-widest text-amber-600 dark:text-amber-400">Санамж</p>
-          </div>
+        <div className="space-y-2 border-t border-[#111] pt-6">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">Санамж</p>
           <ul className="space-y-1.5">
             {content.tips.map((tip, i) => (
               <li key={i} className="text-sm text-foreground/80 flex gap-2">
@@ -458,7 +423,7 @@ function LessonView({ entry, onStart, onBack }: { entry: GrammarLessonRef; onSta
         </div>
       )}
 
-      <Button onClick={onStart} className="w-full bg-primary text-primary-foreground border-0 gap-2 h-14 text-base font-black shadow-[0_0_24px_hsl(var(--primary)/0.4)]">
+      <Button onClick={onStart} className="h-12 w-full gap-2 rounded-none border-0 bg-[#c41212] text-white hover:bg-[#c41212]/90">
         <ChevronRight className="h-5 w-5" />
         Тест эхлэх
       </Button>
@@ -491,97 +456,54 @@ interface NodeProps {
 }
 
 function LessonNode({ entry, localIdx, stars, unlocked, isCurrent, onTap }: NodeProps) {
-  const style = getLessonStyle(entry);
   const completed = stars > 0;
-  const xOffset = ZIGZAG[localIdx % ZIGZAG.length];
+  void localIdx;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: localIdx * 0.04, duration: 0.4 }}
-      className="flex flex-col items-center gap-1.5 absolute"
-      style={{ left: `calc(50% + ${xOffset}px - 36px)`, top: 0 }}
-    >
-      {isCurrent && (
-        <motion.div
-          className={cn('absolute w-[88px] h-[88px] rounded-full ring-4 opacity-40', style.ring)}
-          animate={{ scale: [1, 1.18, 1], opacity: [0.4, 0.15, 0.4] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ marginTop: -6 }}
-        />
+    <button
+      onClick={unlocked ? onTap : undefined}
+      disabled={!unlocked}
+      className={cn(
+        'group flex w-full items-center gap-4 border-b border-[#111]/15 py-5 text-left sm:gap-8',
+        !unlocked && 'cursor-not-allowed opacity-35',
+        isCurrent && 'bg-[#c41212]/5'
       )}
-
-      <button
-        onClick={unlocked ? onTap : undefined}
-        disabled={!unlocked}
-        className={cn(
-          'relative w-[72px] h-[72px] rounded-full flex items-center justify-center text-2xl transition-all duration-300 border-2',
-          unlocked && !completed && `bg-linear-to-br ${style.bg} border-white/25 text-white hover:scale-110 active:scale-95`,
-          unlocked && !completed && isCurrent && style.glow,
-          completed && `bg-linear-to-br ${style.bg} border-amber-400/60 text-white hover:scale-105 active:scale-95 shadow-[0_0_20px_hsl(45_93%_47%/0.4)]`,
-          !unlocked && 'bg-card/40 border-border/30 text-muted-foreground/40 cursor-not-allowed',
-        )}
-      >
-        {/* Planet shading — specular highlight + dark limb turn the disc
-            into a little 3D sphere floating in the galaxy map */}
-        {unlocked && (
-          <span
-            aria-hidden
-            className="absolute inset-0 rounded-full pointer-events-none"
-            style={{
-              background:
-                'radial-gradient(circle at 32% 26%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.1) 30%, transparent 48%), radial-gradient(circle at 68% 80%, rgba(3,3,12,0.5) 0%, transparent 55%)',
-            }}
-          />
-        )}
-        <span className="relative z-10">
-          {!unlocked ? <Lock className="h-6 w-6" /> : entry.emoji}
-        </span>
-        {completed && (
-          <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-400 flex items-center justify-center">
-            <CheckCircle2 className="h-3 w-3 text-white" />
-          </div>
-        )}
-        {entry.kind === 'grammar' && (
-          <div className="absolute -bottom-1 -left-1 w-4 h-4 rounded-full bg-white/90 flex items-center justify-center text-[8px] font-black text-gray-700">G</div>
-        )}
-      </button>
-
-      <StarRow stars={stars} />
-      <span className={cn(
-        'text-[11px] font-semibold text-center leading-tight max-w-[80px]',
-        unlocked ? 'text-foreground/80' : 'text-muted-foreground/40',
-      )}>
-        {entry.title}
+    >
+      <span className="w-16 shrink-0 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">
+        {entry.kind === 'grammar' ? 'Rule' : 'Word'}
       </span>
-    </motion.div>
+      <span className="min-w-0 flex-1">
+        <span className="block text-lg">{entry.title}</span>
+        <span className="mt-1 block">
+          <StarRow stars={stars} />
+        </span>
+      </span>
+      {!unlocked ? (
+        <Lock className="h-4 w-4 shrink-0 text-[#111]/30" />
+      ) : completed ? (
+        <CheckCircle2 className="h-4 w-4 shrink-0 text-[#c41212]" />
+      ) : (
+        <ChevronRight className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1" />
+      )}
+    </button>
   );
 }
 
 // ── SectionBanner ─────────────────────────────────────────────────────────────
 
 function VocabBanner({ level }: { level: MLWord['level'] }) {
-  const s = VOCAB_STYLES[level];
-  const em = level === 'A1' ? '🌱' : level === 'A2' ? '🌿' : level === 'B1' ? '🌳' : level === 'B2' ? '🏔️' : '⭐';
   return (
-    <div className={cn('flex items-center justify-between rounded-2xl px-5 py-3 bg-linear-to-r text-white', s.bg)}>
-      <div><p className="text-xs font-bold uppercase tracking-widest opacity-80">{level} · {LEVEL_LABELS[level]}</p></div>
-      <span className="text-3xl opacity-80">{em}</span>
-    </div>
+    <p className="border-b border-[#111] pb-3 pt-10 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">
+      {level} · {LEVEL_LABELS[level]}
+    </p>
   );
 }
 
 function GrammarBanner({ section }: { section: GrammarSectionId }) {
-  const s = GRAMMAR_STYLES[section];
   return (
-    <div className={cn('flex items-center justify-between rounded-2xl px-5 py-3 bg-linear-to-r text-white', s.bg)}>
-      <div>
-        <p className="text-xs font-bold uppercase tracking-widest opacity-80">Дүрэм</p>
-        <p className="text-base font-black">{GRAMMAR_SECTION_LABELS[section]}</p>
-      </div>
-      <span className="text-3xl opacity-80">{GRAMMAR_SECTION_EMOJIS[section]}</span>
-    </div>
+    <p className="border-b border-[#111] pb-3 pt-10 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">
+      {GRAMMAR_SECTION_LABELS[section]}
+    </p>
   );
 }
 
@@ -630,7 +552,7 @@ function ChoiceButton({
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function MyLingoPage() {
-  const { firestore, user } = useFirebase();
+  const { firestore, user } = useSupabase();
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState<UserData>({ xp: 0, streak: 0, lastPlayed: '', lessons: {} });
 
@@ -749,9 +671,15 @@ export default function MyLingoPage() {
                 const unlocked = isVocabUnlocked(globalIdx, userData.lessons);
                 const isCurrent = globalIdx === vocabCurrentIdx;
                 return (
-                  <div key={lesson.id} className="relative" style={{ height: 108 }}>
-                    <LessonNode entry={lesson} localIdx={secIdx} stars={stars} unlocked={unlocked} isCurrent={isCurrent} onTap={() => startLesson(lesson, globalIdx)} />
-                  </div>
+                  <LessonNode
+                    key={lesson.id}
+                    entry={lesson}
+                    localIdx={secIdx}
+                    stars={stars}
+                    unlocked={unlocked}
+                    isCurrent={isCurrent}
+                    onTap={() => startLesson(lesson, globalIdx)}
+                  />
                 );
               })}
             </div>
@@ -775,9 +703,15 @@ export default function MyLingoPage() {
                 const unlocked = isGrammarUnlocked(globalIdx, userData.lessons);
                 const isCurrent = globalIdx === grammarCurrentIdx;
                 return (
-                  <div key={ref.id} className="relative" style={{ height: 108 }}>
-                    <LessonNode entry={ref} localIdx={secIdx} stars={stars} unlocked={unlocked} isCurrent={isCurrent} onTap={() => startLesson(ref, globalIdx)} />
-                  </div>
+                  <LessonNode
+                    key={ref.id}
+                    entry={ref}
+                    localIdx={secIdx}
+                    stars={stars}
+                    unlocked={unlocked}
+                    isCurrent={isCurrent}
+                    onTap={() => startLesson(ref, globalIdx)}
+                  />
                 );
               })}
             </div>
@@ -790,7 +724,7 @@ export default function MyLingoPage() {
   // ── Quiz card ──────────────────────────────────────────────────────────────
 
   function renderQuizCard(q: QuizQuestion) {
-    const cardCls = 'rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-5 sm:p-8 text-center space-y-3';
+    const cardCls = 'space-y-3 border-y border-[#111] py-8 text-center';
     const anim = { initial: { opacity: 0, scale: 0.96 }, animate: { opacity: 1, scale: 1 } };
 
     if (q.type === 'vocab') return (
@@ -827,7 +761,7 @@ export default function MyLingoPage() {
     );
 
     if (q.type === 'sentence_build') return (
-      <motion.div key={qIdx} {...anim} className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-5 sm:p-6 text-center space-y-2">
+      <motion.div key={qIdx} {...anim} className="space-y-2 border-y border-[#111] py-8 text-center">
         <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Өгүүлбэр үүсгэх</p>
         <div className="flex items-center justify-center gap-2 flex-wrap">
           <span className="text-xl sm:text-2xl font-black text-foreground">{q.word.word}</span>
@@ -871,10 +805,10 @@ export default function MyLingoPage() {
     }
 
     if (q.type === 'grammar_build') return (
-      <motion.div key={qIdx} {...anim} className="rounded-2xl bg-card/70 backdrop-blur-xl border border-border/40 p-5 sm:p-6 text-center space-y-2">
-        <p className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Өгүүлбэр үүсгэх</p>
-        <p className="text-xs text-muted-foreground">Үгүүдийг зөв дарааллаар байрлуул</p>
-        <p className="text-xs text-primary/70 font-mono bg-primary/5 rounded-lg px-3 py-1.5">{q.explain}</p>
+      <motion.div key={qIdx} {...anim} className="space-y-2 border-y border-[#111] py-8 text-center">
+        <p className="text-xs font-mono uppercase tracking-widest text-[#111]/45">Өгүүлбэр үүсгэх</p>
+        <p className="text-xs text-[#111]/45">Үгүүдийг зөв дарааллаар байрлуул</p>
+        <p className="text-xs font-mono text-[#c41212]">{q.explain}</p>
       </motion.div>
     );
 
@@ -892,7 +826,7 @@ export default function MyLingoPage() {
       eyebrow="Vocabulary & Grammar Map"
       icon={<Zap className="h-8 w-8" />}
       breadcrumbs={[
-        { label: 'Хэрэгслүүд', href: '/tools' },
+        { label: 'Хэрэгслүүд', href: '/#tools' },
         { label: 'Англи хэл', href: '/tools/english' },
         { label: 'MyLingo' },
       ]}
@@ -902,56 +836,35 @@ export default function MyLingoPage() {
         {/* ── MAP ── */}
         {view === 'map' && (
           <motion.div key="map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="flex flex-col gap-0 pt-2 w-full max-w-sm mx-auto"
+            className="flex w-full flex-col gap-0 pt-2"
           >
-            {/* Stats bar — cosmic glass capsule (no longer sticky) */}
-            <div className="relative z-20 flex items-center justify-between gap-2 sm:gap-3 rounded-full glass-panel px-5 py-2.5 sm:px-6 sm:py-3 mb-4 shadow-[0_0_30px_-12px_hsl(var(--primary)/0.5)]">
-              {loading ? <Loader2 className="h-5 w-5 animate-spin text-primary mx-auto" /> : (
+            <div className="mb-8 flex items-center justify-center gap-8 border-b border-[#111] pb-4 text-[11px] font-semibold uppercase tracking-[0.16em]">
+              {loading ? <Loader2 className="h-5 w-5 animate-spin text-[#c41212]" /> : (
                 <>
-                  <div className="flex items-center gap-1.5">
-                    <Zap className="h-4 w-4 text-primary" />
-                    <span className="font-black text-sm sm:text-base text-foreground">{userData.xp.toLocaleString()}</span>
-                    <span className="text-xs text-muted-foreground">XP</span>
-                  </div>
-                  <div className="h-4 w-px bg-border/50" />
-                  <div className="flex items-center gap-1.5">
-                    <Flame className="h-4 w-4 text-orange-500" />
-                    <span className="font-black text-sm sm:text-base text-foreground">{userData.streak}</span>
-                  </div>
-                  <div className="h-4 w-px bg-border/50" />
-                  <div className="flex items-center gap-1.5">
-                    <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
-                    <span className="font-black text-sm sm:text-base text-foreground">{completedCount}</span>
-                    <span className="text-xs text-muted-foreground">/{totalLessons}</span>
-                  </div>
+                  <span className="text-[#111]">{userData.xp.toLocaleString()} XP</span>
+                  <span className="text-[#c41212]">{userData.streak} streak</span>
+                  <span className="text-[#111]/45">{completedCount}/{totalLessons}</span>
                 </>
               )}
             </div>
 
-            {/* Tab switcher */}
-            <div className="flex gap-2 mb-5">
+            <div className="mb-6 flex justify-center gap-8">
               <button
                 onClick={() => setMapTab('vocab')}
                 className={cn(
-                  'flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition-all duration-200',
-                  mapTab === 'vocab'
-                    ? 'bg-primary text-primary-foreground shadow-[0_0_16px_hsl(var(--primary)/0.4)]'
-                    : 'bg-card/60 text-muted-foreground hover:text-foreground border border-border/40',
+                  'text-[11px] font-semibold uppercase tracking-[0.22em]',
+                  mapTab === 'vocab' ? 'text-[#c41212]' : 'text-[#111]/40'
                 )}
               >
-                <BookOpen className="h-4 w-4" />
                 Үгийн сан
               </button>
               <button
                 onClick={() => setMapTab('grammar')}
                 className={cn(
-                  'flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition-all duration-200',
-                  mapTab === 'grammar'
-                    ? 'bg-primary text-primary-foreground shadow-[0_0_16px_hsl(var(--primary)/0.4)]'
-                    : 'bg-card/60 text-muted-foreground hover:text-foreground border border-border/40',
+                  'text-[11px] font-semibold uppercase tracking-[0.22em]',
+                  mapTab === 'grammar' ? 'text-[#c41212]' : 'text-[#111]/40'
                 )}
               >
-                <Trophy className="h-4 w-4" />
                 Дүрэм
               </button>
             </div>
@@ -1183,24 +1096,21 @@ export default function MyLingoPage() {
             </motion.div>
 
             <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              <div className="rounded-2xl bg-card/60 border border-border/40 p-3 sm:p-4 space-y-1">
-                <Zap className="h-5 w-5 text-primary mx-auto" />
-                <p className="text-xl sm:text-2xl font-black text-primary">+{xpEarned}</p>
-                <p className="text-xs text-muted-foreground">XP олов</p>
+              <div className="space-y-1 border-t border-[#111] py-4">
+                <p className="text-xl font-medium text-[#c41212]">+{xpEarned}</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-[#111]/45">XP олов</p>
               </div>
-              <div className="rounded-2xl bg-card/60 border border-border/40 p-3 sm:p-4 space-y-1">
-                <Trophy className="h-5 w-5 text-amber-400 mx-auto" />
-                <p className="text-xl sm:text-2xl font-black">{sessionCorrect.filter(Boolean).length}</p>
-                <p className="text-xs text-muted-foreground">Зөв хариулт</p>
+              <div className="space-y-1 border-t border-[#111] py-4">
+                <p className="text-xl font-medium">{sessionCorrect.filter(Boolean).length}</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-[#111]/45">Зөв хариулт</p>
               </div>
-              <div className="rounded-2xl bg-card/60 border border-border/40 p-3 sm:p-4 space-y-1">
-                <Flame className="h-5 w-5 text-orange-500 mx-auto" />
-                <p className="text-xl sm:text-2xl font-black">{userData.streak}</p>
-                <p className="text-xs text-muted-foreground">Streak</p>
+              <div className="space-y-1 border-t border-[#111] py-4">
+                <p className="text-xl font-medium">{userData.streak}</p>
+                <p className="text-[10px] uppercase tracking-[0.16em] text-[#111]/45">Streak</p>
               </div>
             </div>
 
-            <div className="rounded-2xl bg-card/60 border border-border/40 p-4 text-left space-y-2">
+            <div className="space-y-2 border-t border-[#111] pt-4 text-left">
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground/60">Дэлгэрэнгүй</p>
               <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
                 {questions.slice(0, sessionCorrect.length).map((q, i) => (
@@ -1227,11 +1137,11 @@ export default function MyLingoPage() {
             </div>
 
             <div className="flex gap-3">
-              <Button onClick={goToQuiz} className="flex-1 bg-primary text-primary-foreground border-0 gap-2">
+              <Button onClick={goToQuiz} className="flex-1 gap-2 rounded-none border-0 bg-[#c41212] text-white hover:bg-[#c41212]/90">
                 <RotateCcw className="h-4 w-4" /> Дахин
               </Button>
-              <Button onClick={goToMap} variant="outline" className="flex-1 gap-2">
-                <BookOpen className="h-4 w-4" /> Газрын зураг
+              <Button onClick={goToMap} variant="outline" className="flex-1 gap-2 rounded-none border-[#111]/30 bg-transparent">
+                <BookOpen className="h-4 w-4" /> Жагсаалт
               </Button>
             </div>
           </motion.div>

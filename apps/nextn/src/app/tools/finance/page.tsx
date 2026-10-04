@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ToolPageShell from '@/components/shared/ToolPageShell';
-import { useFirebase } from '@/firebase';
+import ToolPageShell from '@/features/tools/ToolPageShell';
+import { useSupabase } from '@/supabase';
 import {
   collection,
   query,
@@ -14,7 +14,7 @@ import {
   doc,
   serverTimestamp,
   Timestamp,
-} from 'firebase/firestore';
+} from '@/supabase/db';
 import { useToast } from '@/hooks/use-toast';
 import {
   TrendingUp,
@@ -150,7 +150,7 @@ function StatCard({
   sub?: string;
 }) {
   return (
-    <Card className="border-border/50 hover:border-primary/20 transition-colors">
+    <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
       <CardContent className="pt-4 pb-4 px-4">
         <div className={cn('inline-flex p-1.5 rounded-lg mb-2', COLOR[color])}>
           {icon}
@@ -166,7 +166,7 @@ function StatCard({
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function FinancePage() {
-  const { firestore, user, isUserLoading } = useFirebase();
+  const { firestore, user, isUserLoading } = useSupabase();
   const { toast } = useToast();
 
   // ── State ──────────────────────────────────────────────────────────────────
@@ -326,7 +326,7 @@ export default function FinancePage() {
       description="Орлого, зарлагаа хянаж хадгаламжаа нэмэгдүүл"
       eyebrow="FINANCE"
       icon={<Wallet className="h-6 w-6" />}
-      breadcrumbs={[{ label: 'Хэрэгслүүд', href: '/tools' }, { label: 'Санхүү' }]}
+      breadcrumbs={[{ label: 'Хэрэгслүүд', href: '/#tools' }, { label: 'Санхүү' }]}
     >
       {/* Loading skeleton */}
       {loading && user && (
@@ -450,7 +450,7 @@ export default function FinancePage() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.18 }}
-                    className="flex items-center gap-3 p-3 rounded-xl border border-border/40 bg-card/50 hover:bg-card transition-colors group"
+                    className="group flex items-center gap-3 border border-[#111]/25 p-3 hover:border-[#111]"
                   >
                     {/* Icon */}
                     <div
@@ -499,7 +499,7 @@ export default function FinancePage() {
                       <button
                         onClick={() => handleDelete(tx.id)}
                         disabled={deleting === tx.id}
-                        className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+                        className="opacity-0 group-hover:opacity-100 touch-visible focus:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
                         aria-label="Устгах"
                       >
                         {deleting === tx.id ? (
@@ -516,7 +516,7 @@ export default function FinancePage() {
           </div>
 
           {/* ── 6-month Bar Chart ─────────────────────────────────────── */}
-          <Card className="border-border/50">
+          <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
             <CardHeader className="pb-1 pt-4 px-4">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
                 <BarChart3 className="h-4 w-4 text-primary" />
@@ -564,7 +564,7 @@ export default function FinancePage() {
 
           {/* ── Expense category breakdown ────────────────────────────── */}
           {categoryBreakdown.length > 0 && (
-            <Card className="border-border/50">
+            <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
               <CardHeader className="pb-2 pt-4 px-4">
                 <CardTitle className="text-sm font-medium">Зарлагын ангилал</CardTitle>
               </CardHeader>

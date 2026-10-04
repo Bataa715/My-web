@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import ToolPageShell from '@/components/shared/ToolPageShell';
-import { useFirebase, useMemoFirebase } from '@/firebase';
+import ToolPageShell from '@/features/tools/ToolPageShell';
+import { useSupabase, useMemoSupabase } from '@/supabase';
 import {
   collection,
   doc,
@@ -14,7 +14,7 @@ import {
   serverTimestamp,
   deleteDoc,
   limit,
-} from 'firebase/firestore';
+} from '@/supabase/db';
 import type { Exercise, WorkoutLog, BodyStats } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -73,7 +73,7 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
-import { Timestamp } from 'firebase/firestore';
+import { Timestamp } from '@/supabase/db';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -111,7 +111,7 @@ const StatCard = ({
   trend?: 'up' | 'down' | 'stable';
 }) => (
   <motion.div variants={itemVariants}>
-    <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl overflow-hidden">
+    <Card className="rounded-none border border-[#111] bg-transparent shadow-none overflow-hidden">
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -160,7 +160,7 @@ const AddBodyStatsDialog = ({ onAdd, latestStats }: { onAdd: (stats: Omit<BodySt
           Жин бүртгэх
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-card/95 backdrop-blur-xl border-0 rounded-2xl">
+      <DialogContent className="rounded-none border border-[#111] bg-[#f3f1ee]">
         <DialogHeader>
           <DialogTitle className="text-xl">Биеийн үзүүлэлт бүртгэх</DialogTitle>
           <DialogDescription>Өнөөдрийн жин болон өндрөө оруулна уу</DialogDescription>
@@ -216,7 +216,7 @@ const AddExerciseDialog = ({ onAdd }: { onAdd: (exercise: Omit<Exercise, 'id' | 
           Шинэ дасгал нэмэх
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-card/95 backdrop-blur-xl border-0 rounded-2xl">
+      <DialogContent className="rounded-none border border-[#111] bg-[#f3f1ee]">
         <DialogHeader>
           <DialogTitle className="text-xl">Шинэ дасгал нэмэх</DialogTitle>
         </DialogHeader>
@@ -269,7 +269,7 @@ const LogWorkoutDialog = ({ exercise, onLog }: { exercise: Exercise; onLog: (log
           Бүртгэх
         </Button>
       </DialogTrigger>
-      <DialogContent className="bg-card/95 backdrop-blur-xl border-0 rounded-2xl">
+      <DialogContent className="rounded-none border border-[#111] bg-[#f3f1ee]">
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
             <Dumbbell className="h-5 w-5 text-primary" />
@@ -333,7 +333,7 @@ const WeeklyActivityChart = ({ logs }: { logs: WorkoutLog[] }) => {
   }, [logs]);
 
   return (
-    <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl">
+    <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
           <CalendarDays className="h-4 w-4 text-primary" />
@@ -372,7 +372,7 @@ const WeightProgressChart = ({ stats }: { stats: BodyStats[] }) => {
   if (data.length < 2) return null;
 
   return (
-    <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl">
+    <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
           <TrendingUp className="h-4 w-4 text-primary" />
@@ -398,7 +398,7 @@ const ExerciseCard = ({ exercise, onLog, onDelete, recentLog }: { exercise: Exer
   const getCategoryIcon = (cat: string) => ({ 'Цээж': '🏋️', 'Нуруу': '💪', 'Мөр': '🦾', 'Гар': '💪', 'Хөл': '🦵', 'Хэвлий': '🔥', 'Кардио': '🏃', 'Уян хатан': '🧘' }[cat] || '💪');
 
   return (
-    <motion.div variants={itemVariants} className="group bg-card/50 backdrop-blur-xs rounded-2xl p-4 hover:bg-card/70 transition-all">
+    <motion.div variants={itemVariants} className="group border border-[#111]/25 p-4 hover:border-[#111]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-2xl">{getCategoryIcon(exercise.category)}</span>
@@ -411,11 +411,11 @@ const ExerciseCard = ({ exercise, onLog, onDelete, recentLog }: { exercise: Exer
           <LogWorkoutDialog exercise={exercise} onLog={onLog} />
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive">
+              <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 touch-visible transition-opacity text-destructive hover:text-destructive">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="bg-card/95 backdrop-blur-xl border-0 rounded-2xl">
+            <AlertDialogContent className="rounded-none border border-[#111] bg-[#f3f1ee]">
               <AlertDialogHeader>
                 <AlertDialogTitle>Дасгал устгах уу?</AlertDialogTitle>
               </AlertDialogHeader>
@@ -437,7 +437,7 @@ const ExerciseCard = ({ exercise, onLog, onDelete, recentLog }: { exercise: Exer
 };
 
 const WorkoutHistory = ({ logs }: { logs: WorkoutLog[] }) => (
-  <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl">
+  <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
     <CardHeader className="pb-2">
       <div className="flex items-center gap-2">
         <History className="h-4 w-4 text-primary" />
@@ -481,16 +481,16 @@ const WorkoutHistory = ({ logs }: { logs: WorkoutLog[] }) => (
 );
 
 export default function FitnessPage() {
-  const { firestore, user } = useFirebase();
+  const { firestore, user } = useSupabase();
   const { toast } = useToast();
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [workoutLogs, setWorkoutLogs] = useState<WorkoutLog[]>([]);
   const [bodyStats, setBodyStats] = useState<BodyStats[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const exercisesRef = useMemoFirebase(() => user && firestore ? collection(firestore, `users/${user.uid}/fitnessExercises`) : null, [user, firestore]);
-  const logsRef = useMemoFirebase(() => user && firestore ? collection(firestore, `users/${user.uid}/workoutLogs`) : null, [user, firestore]);
-  const statsRef = useMemoFirebase(() => user && firestore ? collection(firestore, `users/${user.uid}/bodyStats`) : null, [user, firestore]);
+  const exercisesRef = useMemoSupabase(() => user && firestore ? collection(firestore, `users/${user.uid}/fitnessExercises`) : null, [user, firestore]);
+  const logsRef = useMemoSupabase(() => user && firestore ? collection(firestore, `users/${user.uid}/workoutLogs`) : null, [user, firestore]);
+  const statsRef = useMemoSupabase(() => user && firestore ? collection(firestore, `users/${user.uid}/bodyStats`) : null, [user, firestore]);
 
   const fetchData = useCallback(async () => {
     if (!exercisesRef || !logsRef || !statsRef) { setLoading(false); return; }
@@ -590,7 +590,7 @@ export default function FitnessPage() {
       description="Дасгал хөдөлгөөнөө бүртгэж, хянаарай"
       icon={<Dumbbell className="h-8 w-8" />}
       breadcrumbs={[
-        { label: 'Хэрэгслүүд', href: '/tools' },
+        { label: 'Хэрэгслүүд', href: '/#tools' },
         { label: 'Fitness' },
       ]}
     >
@@ -618,7 +618,7 @@ export default function FitnessPage() {
           </motion.div>
 
           {bmi && bmiCategory && (
-            <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl">
+            <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
               <CardContent className="py-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -647,7 +647,7 @@ export default function FitnessPage() {
             <div className="lg:col-span-2 space-y-6">
               <WeeklyActivityChart logs={workoutLogs} />
               <WeightProgressChart stats={bodyStats} />
-              <Card className="bg-card/50 backdrop-blur-xl border-0 rounded-2xl">
+              <Card className="rounded-none border border-[#111] bg-transparent shadow-none">
                 <CardContent className="py-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-4 rounded-xl bg-muted/30">
@@ -668,11 +668,11 @@ export default function FitnessPage() {
             <div className="space-y-6">
               <AddExerciseDialog onAdd={handleAddExercise} />
               <Tabs defaultValue="exercises" className="w-full">
-                <TabsList className="bg-card/50 backdrop-blur-xl border-0 rounded-xl p-1 w-full">
-                  <TabsTrigger value="exercises" className="flex-1 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-1.5">
+                <TabsList className="w-full rounded-none border border-[#111] bg-transparent p-1">
+                  <TabsTrigger value="exercises" className="flex-1 rounded-none data-[state=active]:bg-[#c41212] data-[state=active]:text-white gap-1.5">
                     <Dumbbell className="h-4 w-4" /> Дасгалууд
                   </TabsTrigger>
-                  <TabsTrigger value="history" className="flex-1 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-1.5">
+                  <TabsTrigger value="history" className="flex-1 rounded-none data-[state=active]:bg-[#c41212] data-[state=active]:text-white gap-1.5">
                     <History className="h-4 w-4" /> Түүх
                   </TabsTrigger>
                 </TabsList>
