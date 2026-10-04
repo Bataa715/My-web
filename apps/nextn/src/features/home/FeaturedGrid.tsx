@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, ImagePlus, Loader2, RotateCcw, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ImagePlus, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEditMode } from '@/providers/EditModeContext';
 import { useGallery } from './useGallery';
@@ -69,8 +69,11 @@ export default function FeaturedGrid() {
         </ul>
       </section>
 
+      {(galleryImages.length > 0 || isEditMode) && (
       <section className="px-4 pb-24 sm:px-8">
         <h2 className="portal-title">Gallery</h2>
+        {galleryImages.length > 0 && (
+        <>
         <div
           className={cn(
             'mx-auto mt-16 grid max-w-6xl grid-cols-1 gap-0',
@@ -104,6 +107,8 @@ export default function FeaturedGrid() {
             />
           ))}
         </div>
+        </>
+        )}
 
         {isEditMode && (
           <div className="mx-auto mt-10 max-w-6xl border border-dashed border-[#111]/40 p-5">
@@ -112,15 +117,6 @@ export default function FeaturedGrid() {
                 Gallery зураг засах
               </p>
               <div className="flex flex-wrap items-center gap-3">
-                {gallery.isCustom && (
-                  <button
-                    type="button"
-                    onClick={gallery.resetToDefault}
-                    className="flex items-center gap-1.5 text-xs text-[#111]/55 hover:text-[#c41212]"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" aria-hidden /> Анхны зургууд руу буцаах
-                  </button>
-                )}
                 <button
                   type="button"
                   disabled={gallery.busy}
@@ -152,9 +148,9 @@ export default function FeaturedGrid() {
                 {gallery.error}
               </p>
             )}
-            {!gallery.isCustom && (
+            {galleryImages.length === 0 && (
               <p className="mb-3 text-xs text-[#111]/55">
-                Одоогоор анхны зургууд харагдаж байна. Өөрийн зургийг оруулбал тэдгээрийг орлоно.
+                Gallery хоосон байна. "Зураг оруулах" товчоор өөрийн зургийг нэм — оруулсан зураг бүрийг дараа нь устгаж болно.
               </p>
             )}
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -164,7 +160,7 @@ export default function FeaturedGrid() {
                     className="absolute inset-0 bg-cover bg-center"
                     style={{ backgroundImage: `url(${img.url})` }}
                   />
-                  {gallery.isCustom && (
+                  {(
                     <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-[#111]/75 px-1.5 py-1 text-white">
                       <button
                         type="button"
@@ -200,6 +196,7 @@ export default function FeaturedGrid() {
           </div>
         )}
       </section>
+      )}
     </div>
   );
 }

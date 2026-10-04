@@ -55,8 +55,11 @@ export const metadata: Metadata = {
   description: 'Хувийн систем — англи · япон · программчлалын хэрэгслүүд.',
   keywords: [SITE_NAME, 'Attack on Titan', 'англи хэл', 'япон хэл', 'программчлал'],
   icons: {
-    icon: '/icons/icon-512.jpg',
-    apple: '/icons/apple-touch-icon.jpg',
+    icon: [
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: '/icons/apple-touch-icon.png',
   },
   manifest: '/manifest.webmanifest',
   appleWebApp: {

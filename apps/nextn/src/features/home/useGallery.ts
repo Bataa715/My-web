@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSupabase } from '@/supabase';
 import { doc, getDoc, setDoc } from '@/supabase/db';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from '@/supabase/storage';
-import { AOT_IMAGES } from '@/lib/aot-images';
 
 export interface GalleryImage {
   id: string;
@@ -12,17 +11,6 @@ export interface GalleryImage {
   /** Storage path for uploaded images (absent for the built-in defaults) */
   path?: string;
 }
-
-const DEFAULT_IMAGES: GalleryImage[] = [
-  AOT_IMAGES.portal,
-  AOT_IMAGES.sky,
-  AOT_IMAGES.walls,
-  AOT_IMAGES.flowers,
-  AOT_IMAGES.meadow,
-  AOT_IMAGES.pair,
-  AOT_IMAGES.end,
-  AOT_IMAGES.home,
-].map((url, i) => ({ id: `default-${i}`, url }));
 
 const MAX_EDGE = 2000;
 
@@ -46,8 +34,7 @@ async function prepareImage(file: File): Promise<Blob> {
 
 /**
  * Home-page gallery images: the owner can upload, reorder and remove them from
- * edit mode. Saved per account; the built-in pictures show until the owner
- * uploads their own.
+ * edit mode. Saved per account. The gallery starts empty.
  */
 export function useGallery() {
   const { firestore, storage, user } = useSupabase();
@@ -74,8 +61,8 @@ export function useGallery() {
     };
   }, [firestore, user]);
 
-  const images = saved && saved.length > 0 ? saved : DEFAULT_IMAGES;
-  const isCustom = !!saved && saved.length > 0;
+  // Starts empty — only what the owner uploads is shown
+  const images = saved ?? [];
 
   const persist = useCallback(
     async (next: GalleryImage[]) => {
@@ -104,8 +91,7 @@ export function useGallery() {
           await uploadBytes(ref(storage, path), blob, { contentType: 'image/jpeg' });
           added.push({ id, url: await getDownloadURL(ref(storage, path)), path });
         }
-        // First upload replaces the built-in set; later uploads append
-        await persist([...(isCustom ? images : []), ...added]);
+        await persist([...images, ...added]);
       } catch (e) {
         console.error('Gallery upload failed:', e);
         setError('Зураг оруулахад алдаа гарлаа. Дахин оролдоно уу.');
@@ -113,7 +99,7 @@ export function useGallery() {
         setBusy(false);
       }
     },
-    [storage, user, persist, images, isCustom]
+    [storage, user, persist, images]
   );
 
   const remove = useCallback(
@@ -146,15 +132,5 @@ export function useGallery() {
     [images, persist]
   );
 
-  const resetToDefault = useCallback(async () => {
-    try {
-      const paths = images.map(i => i.path).filter((x): x is string => !!x);
-      await persist([]);
-      if (storage) await Promise.allSettled(paths.map(pa => deleteObject(ref(storage, pa))));
-    } catch (e) {
-      console.error('Gallery reset failed:', e);
-    }
-  }, [persist, images, storage]);
-
-  return { images, isCustom, busy, error, addFiles, remove, move, resetToDefault };
+  return { images, busy, error, addFiles, remove, move };
 }
