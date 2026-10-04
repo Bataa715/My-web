@@ -50,3 +50,10 @@ export async function getDownloadURL(storageRef: StorageReference): Promise<stri
     .getPublicUrl(storageRef.fullPath);
   return data.publicUrl;
 }
+
+export async function deleteObject(storageRef: StorageReference): Promise<void> {
+  const { error } = await storageRef.storage.client.storage
+    .from(STORAGE_BUCKET)
+    .remove([storageRef.fullPath]);
+  if (error) throw error;
+}

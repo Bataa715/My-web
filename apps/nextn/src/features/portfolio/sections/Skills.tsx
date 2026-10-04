@@ -92,6 +92,12 @@ export default function Skills() {
   const { skills, loading, deleteSkillGroup } = useSkills();
   const { isEditMode } = useEditMode();
 
+  // Smallest group first (03 → 04 → 05 …); equal sizes keep their original order
+  const orderedSkills = useMemo(
+    () => [...skills].sort((a, b) => a.items.length - b.items.length),
+    [skills]
+  );
+
   const totalSkills = useMemo(
     () => skills.reduce((n, g) => n + g.items.length, 0),
     [skills]
@@ -127,7 +133,7 @@ export default function Skills() {
             </p>
           ) : (
             <ul className="divide-y divide-[#111]">
-              {skills.map(group => (
+              {orderedSkills.map(group => (
                 <SkillGroupRow
                   key={group.id}
                   group={group}

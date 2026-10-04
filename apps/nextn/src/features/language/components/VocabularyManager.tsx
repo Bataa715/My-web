@@ -69,6 +69,13 @@ import FlashcardGame from '@/features/language/components/FlashcardGame';
 import TestGame from '@/features/language/components/TestGame';
 import MatchingGame from '@/features/language/components/MatchingGame';
 import { motion } from 'framer-motion';
+import { packsFor, type WordPack } from '@/features/language/data/packs';
+import {
+  PackList,
+  PracticeModes,
+  VocabOverview,
+  type GameMode,
+} from '@/features/language/components/VocabularyExtras';
 
 type Word = EnglishWord | JapaneseWord;
 
@@ -425,6 +432,60 @@ export default function VocabularyManager<T extends Word>({
     }
   };
 
+  const counts = useMemo(
+    () => ({
+      all: words.length,
+      memorized: words.filter(w => w.memorized).length,
+      notMemorized: words.filter(w => !w.memorized).length,
+      favorite: words.filter(w => w.favorite).length,
+    }),
+    [words]
+  );
+
+  const scopeLabel =
+    [
+      filter === 'memorized' && 'Цээжилсэн үгс',
+      filter === 'not-memorized' && 'Цээжлээгүй үгс',
+      filter === 'favorite' && 'Онцолсон үгс',
+      alphabetFilter !== 'all' && `"${alphabetFilter}" үсгээр эхэлсэн`,
+      searchQuery.trim() && 'Хайлтын үр дүн',
+    ]
+      .filter(Boolean)
+      .join(' · ') || 'Бүх үг';
+
+  const wordKey = (w: { word?: string }) => (w.word ?? '').trim().toLowerCase();
+  const existingKeys = useMemo(() => new Set(words.map(w => wordKey(w))), [words]);
+  const packs = useMemo(() => packsFor(wordType), [wordType]);
+
+  const addPack = async (
+    pack: WordPack<EnglishWord | JapaneseWord>,
+    fresh: WordPack<EnglishWord | JapaneseWord>['words']
+  ) => {
+    if (!user || !firestore) {
+      toast({ title: 'Алдаа', description: 'Үг хадгалахын тулд нэвтэрнэ үү.', variant: 'destructive' });
+      return;
+    }
+    try {
+      const col = collection(firestore, `users/${user.uid}/${collectionPath}`);
+      const added: T[] = [];
+      for (let i = 0; i < fresh.length; i += 200) {
+        const batch = writeBatch(firestore);
+        for (const w of fresh.slice(i, i + 200)) {
+          const ref = doc(col);
+          const data = { ...w, favorite: false, memorized: false };
+          batch.set(ref, data);
+          added.push({ ...data, id: ref.id } as unknown as T);
+        }
+        await batch.commit();
+      }
+      setWords(prev => [...prev, ...added]);
+      toast({ title: 'Амжилттай', description: `"${pack.title}" — ${added.length} шинэ үг нэмэгдлээ.` });
+    } catch (error) {
+      console.error('Error adding word pack:', error);
+      toast({ title: 'Алдаа гарлаа', description: 'Сан нэмэхэд алдаа гарлаа.', variant: 'destructive' });
+    }
+  };
+
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   if (loading) {
@@ -479,15 +540,39 @@ export default function VocabularyManager<T extends Word>({
 
   return (
     <div className="space-y-12 text-[#111]">
+      <div className="space-y-8">
+        <VocabOverview
+          total={counts.all}
+          memorized={counts.memorized}
+          favorites={counts.favorite}
+        />
+        {words.length === 0 && (
+          <p className="border-l-2 border-[#c41212] pl-4 text-sm text-[#111]/70">
+            Үгсийн сан хоосон байна. Доорх "Бэлэн сангууд"-аас сэдэв сонгож нэм, эсвэл "Шинэ үг" товчоор өөрийн үгээ нэм.
+          </p>
+        )}
+        <PracticeModes
+          available={filteredWords.length}
+          scopeLabel={scopeLabel}
+          onStart={(mode: GameMode) => setGameMode(mode)}
+        />
+        <PackList
+          packs={packs}
+          hasWord={w => existingKeys.has(wordKey(w as { word?: string }))}
+          onAdd={addPack}
+          defaultOpen={words.length === 0}
+        />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">
-                  {title}
-                </p>
+                <h2 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">
+                  {title} <span className="tabular-nums text-[#111]/40">({filteredWords.length})</span>
+                </h2>
                 <div className="flex w-full sm:w-auto items-center gap-2">
                   <Input
                     placeholder="Үг хайх..."
@@ -561,7 +646,7 @@ export default function VocabularyManager<T extends Word>({
                 <div className="overflow-x-auto -mx-2 px-2">
                   <ToggleGroup
                     type="single"
-                    defaultValue="all"
+                    value={filter}
                     variant="outline"
                     size="sm"
                     className="flex-nowrap gap-1 rounded-none bg-transparent p-0"
@@ -571,25 +656,25 @@ export default function VocabularyManager<T extends Word>({
                       value="all"
                       className="rounded-none border-[#111]/25 text-[11px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap data-[state=on]:bg-[#c41212] data-[state=on]:text-white"
                     >
-                      Бүгд
+                      Бүгд {counts.all}
                     </ToggleGroupItem>
                     <ToggleGroupItem
                       value="memorized"
                       className="rounded-none border-[#111]/25 text-[11px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap data-[state=on]:bg-[#c41212] data-[state=on]:text-white"
                     >
-                      Цээжилсэн
+                      Цээжилсэн {counts.memorized}
                     </ToggleGroupItem>
                     <ToggleGroupItem
                       value="not-memorized"
                       className="rounded-none border-[#111]/25 text-[11px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap data-[state=on]:bg-[#c41212] data-[state=on]:text-white"
                     >
-                      Цээжлээгүй
+                      Цээжлээгүй {counts.notMemorized}
                     </ToggleGroupItem>
                     <ToggleGroupItem
                       value="favorite"
                       className="rounded-none border-[#111]/25 text-[11px] font-semibold uppercase tracking-[0.14em] whitespace-nowrap data-[state=on]:bg-[#c41212] data-[state=on]:text-white"
                     >
-                      Онцолсон
+                      Онцолсон {counts.favorite}
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
@@ -724,6 +809,7 @@ export default function VocabularyManager<T extends Word>({
                             }}
                             className="rounded-lg hover:text-primary"
                             title="Сонсох"
+                            aria-label="Сонсох"
                           >
                             <Volume2 className="h-4 w-4" />
                           </Button>
@@ -838,67 +924,6 @@ export default function VocabularyManager<T extends Word>({
               )}
       </motion.div>
 
-      <section>
-        <h2 className="portal-title portal-title--sm mb-10">Practice</h2>
-        <ul className="divide-y divide-[#111]">
-          <li>
-            <button
-              type="button"
-              onClick={() => setGameMode('flashcard')}
-              disabled={filteredWords.length === 0}
-              className="group flex w-full items-center gap-4 py-6 text-left disabled:opacity-40 sm:gap-8"
-            >
-              <span className="w-20 shrink-0 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">
-                Cards
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-lg">Flashcard</span>
-                <span className="block text-xs text-[#111]/50">
-                  Картаар эргүүлж цээжилсэн үгээ бататгах
-                </span>
-              </span>
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => setGameMode('test')}
-              disabled={filteredWords.length < 4}
-              className="group flex w-full items-center gap-4 py-6 text-left disabled:opacity-40 sm:gap-8"
-            >
-              <span className="w-20 shrink-0 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">
-                Test
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-lg">Тест</span>
-                <span className="block text-xs text-[#111]/50">
-                  Орчуулга, утга зэргийг сонголтот тестээр шалгуулах
-                </span>
-              </span>
-            </button>
-          </li>
-          <li>
-            <button
-              type="button"
-              onClick={() => setGameMode('matching')}
-              disabled={filteredWords.length < 5}
-              className="group flex w-full items-center gap-4 py-6 text-left disabled:opacity-40 sm:gap-8"
-            >
-              <span className="w-20 shrink-0 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c41212]">
-                Match
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-lg">Холбох арга</span>
-                <span className="block text-xs text-[#111]/50">
-                  {wordType === 'english'
-                    ? 'Англи болон Монгол үгсийг зөв хооронд нь холбох'
-                    : 'Япон болон Монгол үгсийг зөв хооронд нь холбох'}
-                </span>
-              </span>
-            </button>
-          </li>
-        </ul>
-      </section>
     </div>
   );
 }

@@ -73,6 +73,39 @@
   --animate-spin-slow: spin-slow 8s linear infinite;
   --animate-pulse-glow: pulse-glow 3s ease-in-out infinite;
 
+  /* ── Cyber-learning tool (ported CSP) — scoped palette + motion ── */
+  --color-ink-900: #f3f1ee;
+  --color-ink-800: #ffffff;
+  --color-ink-700: #f8f6f2;
+  --color-ink-600: #ece8e1;
+  --color-line: #cfc9bd;
+  --color-line-bright: #111111;
+  --color-txt: #111111;
+  --color-txt-dim: #6b675f;
+  --color-cspc: #c41212;
+  --color-cspv: #111111;
+  --color-state-ok: #15803d;
+  --color-state-warn: #b45309;
+  --color-state-err: #b91c1c;
+  --animate-fade-in: fadeIn 0.25s ease-out;
+  --animate-pulse-fast: pulse2 0.7s infinite;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes pulse2 {
+    50% {
+      opacity: 0.2;
+    }
+  }
+
   @keyframes accordion-down {
     from {
       height: 0;

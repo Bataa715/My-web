@@ -14,6 +14,7 @@ export default function JapaneseVocabularyPage() {
   return (
     <ToolPageShell
       title="Vocabulary"
+      description="N5–N4 түвшний бэлэн сангаас үг нэм, өөрийн үгээ бич, дараа нь карт, тест, холбох тоглоомоор цээжил."
       breadcrumbs={[
         { label: 'Хэрэгслүүд', href: '/#tools' },
         { label: 'Япон хэл', href: '/tools/japanese' },

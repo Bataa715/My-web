@@ -40,14 +40,17 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setLanguage = (lang: string) => {
-    console.log('Setting language to:', lang);
     setLanguageState(lang);
     if (i18n.isInitialized) {
       i18n.changeLanguage(lang);
     }
-    localStorage.setItem('i18nextLng', lang);
-    // Force a re-render by reloading
-    window.location.reload();
+    try {
+      localStorage.setItem('i18nextLng', lang);
+    } catch {
+      /* storage unavailable — language still applies for this session */
+    }
+    // UiTranslator re-translates the whole page — no reload needed
+    window.dispatchEvent(new Event('ui-language-change'));
   };
 
   if (!mounted) {

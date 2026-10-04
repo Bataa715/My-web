@@ -7,14 +7,14 @@ import ToolPageShell from '@/features/tools/ToolPageShell';
 const columns: { key: keyof EnglishWord; header: string }[] = [
   { key: 'word', header: 'English Word' },
   { key: 'translation', header: 'Монгол орчуулга' },
-  { key: 'definition', header: 'Утга' },
+  { key: 'definition', header: 'Жишээ өгүүлбэр' },
 ];
 
 export default function EnglishVocabularyPage() {
   return (
     <ToolPageShell
       title="Vocabulary"
-      description="Үгсийн санг цэгцлэх, шинэ үг нэмэх, цээжлэх"
+      description="Бэлэн сангаас үг нэм, өөрийн үгээ бич, дараа нь карт, тест, холбох тоглоомоор цээжил."
       breadcrumbs={[
         { label: 'Хэрэгслүүд', href: '/#tools' },
         { label: 'Англи хэл', href: '/tools/english' },

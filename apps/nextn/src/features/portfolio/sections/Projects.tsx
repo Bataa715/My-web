@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -122,6 +122,12 @@ export default function Projects() {
   const { projects, deleteProject, loading } = useProjects();
   const { isEditMode } = useEditMode();
 
+  // Smaller projects first: fewest technologies → most. Equal sizes keep their order.
+  const orderedProjects = useMemo(
+    () => [...projects].sort((a, b) => a.technologies.length - b.technologies.length),
+    [projects]
+  );
+
   return (
     <section id="projects" className="bg-[#f3f1ee] py-16 text-[#111] sm:py-20">
       <div className="mx-auto max-w-5xl px-4 sm:px-8">
@@ -143,7 +149,7 @@ export default function Projects() {
 
         {!loading && (
           <ul className="mt-16 divide-y divide-[#111]">
-            {projects.map(project => (
+            {orderedProjects.map(project => (
               <li key={project.id} className="relative">
                 <ProjectRow project={project} />
                 {isEditMode && (

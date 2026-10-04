@@ -15,26 +15,9 @@ import {
   useSpring,
   useReducedMotion,
 } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import {
-  Settings,
-  EyeOff,
-  GraduationCap,
-  FolderKanban,
-  ArrowUp,
-  ArrowRight,
-  Mail,
-} from 'lucide-react';
-import { useSupabase } from '@/supabase';
-import { doc, getDoc, setDoc } from '@/supabase/db';
-import { useToast } from '@/hooks/use-toast';
-import { useEditMode } from '@/providers/EditModeContext';
+import { ArrowUp } from 'lucide-react';
 import HomeProviders from '@/features/portfolio/context/HomeProviders';
-import type {
-  SectionMeta,
-  SectionSettings,
-} from '@/features/portfolio/sections/SectionSettingsDialog';
 
 // Lazy load heavy components for better performance
 const OfficialHero = dynamic(() => import('@/features/home/OfficialHero'), {
@@ -60,11 +43,6 @@ const Projects = dynamic(() => import('@/features/portfolio/sections/Projects'),
   loading: () => <div className="w-full min-h-[400px]" />,
 });
 
-// Edit-only dialog: load only when isEditMode === true
-const SectionSettingsDialog = dynamic(
-  () => import('@/features/portfolio/sections/SectionSettingsDialog'),
-  { ssr: false, loading: () => null }
-);
 
 export default function HomePage() {
   return (
@@ -74,155 +52,38 @@ export default function HomePage() {
   );
 }
 
+/** Fixed order — the home page no longer has a per-section visibility setting. */
+const SECTIONS: { id: string; title: string; component: ReactNode }[] = [
+  {
+    id: 'education',
+    title: 'Боловсрол',
+    component: (
+      <Suspense fallback={<div className="w-full min-h-[400px]" />}>
+        <Education />
+      </Suspense>
+    ),
+  },
+  {
+    id: 'skills',
+    title: 'Ур чадвар',
+    component: (
+      <Suspense fallback={<div className="w-full min-h-[400px]" />}>
+        <Skills />
+      </Suspense>
+    ),
+  },
+  {
+    id: 'projects',
+    title: 'Миний төслүүд',
+    component: (
+      <Suspense fallback={<div className="w-full min-h-[400px]" />}>
+        <Projects />
+      </Suspense>
+    ),
+  },
+];
+
 function HomePageInner() {
-  const { firestore, user } = useSupabase();
-  const { toast } = useToast();
-  const { isEditMode } = useEditMode();
-  const [sectionSettings, setSectionSettings] = useState<SectionSettings>({});
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const allSections: (SectionMeta & { component: React.ReactNode })[] = useMemo(
-    () => [
-      {
-        id: 'education',
-        title: 'Боловсрол',
-        icon: <GraduationCap className="h-5 w-5" />,
-        component: (
-          <Suspense fallback={<div className="w-full min-h-[400px]" />}>
-            <Education />
-          </Suspense>
-        ),
-        gradient: 'from-blue-500 to-cyan-400',
-      },
-      {
-        id: 'skills',
-        title: 'Ур чадвар',
-        icon: null,
-        component: (
-          <Suspense fallback={<div className="w-full min-h-[400px]" />}>
-            <Skills />
-          </Suspense>
-        ),
-        gradient: 'from-purple-500 to-pink-400',
-      },
-      {
-        id: 'projects',
-        title: 'Миний төслүүд',
-        icon: <FolderKanban className="h-5 w-5" />,
-        component: (
-          <Suspense fallback={<div className="w-full min-h-[400px]" />}>
-            <Projects />
-          </Suspense>
-        ),
-        gradient: 'from-orange-500 to-amber-400',
-      },
-    ],
-    []
-  );
-
-  useEffect(() => {
-    const defaultSettings: SectionSettings = {};
-    allSections.forEach((section, index) => {
-      defaultSettings[section.id] = { visible: true, order: index };
-    });
-    setSectionSettings(defaultSettings);
-  }, [allSections]);
-
-  useEffect(() => {
-    async function loadSettings() {
-      if (!firestore || !user) {
-        setIsLoading(false);
-        return;
-      }
-      try {
-        const settingsRef = doc(
-          firestore,
-          `users/${user.uid}/settings/sections`
-        );
-        const settingsSnap = await getDoc(settingsRef);
-        if (settingsSnap.exists()) {
-          const savedSettings = settingsSnap.data() as SectionSettings;
-          const mergedSettings: SectionSettings = {};
-          allSections.forEach((section, index) => {
-            mergedSettings[section.id] = savedSettings[section.id] || {
-              visible: true,
-              order: index,
-            };
-          });
-          setSectionSettings(mergedSettings);
-        }
-      } catch (error) {
-        console.error('Error loading section settings:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadSettings();
-  }, [firestore, user, allSections]);
-
-  const saveSettings = async (newSettings: SectionSettings) => {
-    setSectionSettings(newSettings);
-    if (!firestore || !user) return;
-    try {
-      const settingsRef = doc(firestore, `users/${user.uid}/settings/sections`);
-      await setDoc(settingsRef, newSettings);
-      toast({
-        title: 'Амжилттай',
-        description: 'Хэсгийн тохиргоо хадгалагдлаа.',
-      });
-    } catch (error) {
-      console.error('Error saving section settings:', error);
-      toast({
-        title: 'Алдаа',
-        description: 'Тохиргоо хадгалахад алдаа гарлаа.',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const toggleSectionVisibility = (sectionId: string) => {
-    saveSettings({
-      ...sectionSettings,
-      [sectionId]: {
-        ...sectionSettings[sectionId],
-        visible: !sectionSettings[sectionId]?.visible,
-      },
-    });
-  };
-
-  const showAllSections = () => {
-    const newSettings: SectionSettings = {};
-    allSections.forEach((section, index) => {
-      newSettings[section.id] = {
-        visible: true,
-        order: sectionSettings[section.id]?.order ?? index,
-      };
-    });
-    saveSettings(newSettings);
-  };
-
-  const hideAllSections = () => {
-    const newSettings: SectionSettings = {};
-    allSections.forEach((section, index) => {
-      newSettings[section.id] = {
-        visible: false,
-        order: sectionSettings[section.id]?.order ?? index,
-      };
-    });
-    saveSettings(newSettings);
-  };
-
-  const visibleSections = allSections
-    .filter(section => sectionSettings[section.id]?.visible !== false)
-    .sort(
-      (a, b) =>
-        (sectionSettings[a.id]?.order ?? 0) -
-        (sectionSettings[b.id]?.order ?? 0)
-    );
-
-  const hiddenCount = allSections.length - visibleSections.length;
-
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const hash = window.location.hash.replace('#', '');
@@ -260,28 +121,14 @@ function HomePageInner() {
         <About />
       </Suspense>
 
-      {isEditMode && (
-        <SectionSettingsDialog
-          open={isSettingsOpen}
-          onOpenChange={setIsSettingsOpen}
-          allSections={allSections}
-          sectionSettings={sectionSettings}
-          visibleCount={visibleSections.length}
-          hiddenCount={hiddenCount}
-          onToggle={toggleSectionVisibility}
-          onShowAll={showAllSections}
-          onHideAll={hideAllSections}
-        />
-      )}
 
       {/* DYNAMIC SECTIONS */}
       <div className="relative">
-        {visibleSections.map((section, idx) => (
+        {SECTIONS.map((section, idx) => (
           <SectionFrame
             key={section.id}
             id={section.id}
             index={idx + 1}
-            gradient={section.gradient}
             isFirst={idx === 0}
           >
             {section.component}
@@ -293,22 +140,6 @@ function HomePageInner() {
         <ToolsSection />
       </Suspense>
 
-      {visibleSections.length === 0 && !isLoading && (
-        <div className="container mx-auto px-4 text-center py-24">
-          <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card/40 backdrop-blur-xl p-10">
-            <EyeOff className="h-14 w-14 mx-auto text-muted-foreground/60 mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Бүх хэсэг нуугдсан</h3>
-            <p className="text-muted-foreground mb-6">
-              Баруун доод буланд байгаа тохиргооны товчийг дарж хэсгүүдийг
-              харуулна уу.
-            </p>
-            <Button onClick={() => setIsSettingsOpen(true)} className="rounded-xl">
-              <Settings className="h-4 w-4 mr-2" />
-              Тохиргоо нээх
-            </Button>
-          </div>
-        </div>
-      )}
 
       {/* BACK TO TOP */}
       <BackToTop />
@@ -317,7 +148,7 @@ function HomePageInner() {
         sections={[
           { id: 'hero', label: 'Нүүр' },
           { id: 'about', label: 'Миний тухай' },
-          ...visibleSections.map(s => ({ id: s.id, label: s.title })),
+          ...SECTIONS.map(s => ({ id: s.id, label: s.title })),
           { id: 'tools', label: 'Хэрэгслүүд' },
         ]}
       />

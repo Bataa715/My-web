@@ -1,53 +1,47 @@
 'use client';
 
-import React from 'react';
 import ToolPageShell from '@/features/tools/ToolPageShell';
-import SubToolCard from '@/features/tools/SubToolCard';
-
-const japaneseTools = [
-  {
-    id: 'kana',
-    title: 'Кана үсэг',
-    description: 'Хирагана, Катакана сурах',
-    href: '/tools/japanese/kana',
-    accent: '#f43f5e',
-    glow: '244, 63, 94',
-  },
-  {
-    id: 'vocabulary',
-    title: 'Үгсийн сан',
-    description: 'Үгсийн сангаа баяжуулах',
-    href: '/tools/japanese/vocabulary',
-    accent: '#a855f7',
-    glow: '168, 85, 247',
-  },
-  {
-    id: 'grammar',
-    title: 'Дүрэм',
-    description: 'Дүрмийн мэдлэгээ бататгах',
-    href: '/tools/japanese/grammar',
-    accent: '#3b82f6',
-    glow: '59, 130, 246',
-  },
-];
+import { CURRICULA } from '@/features/language/curriculum';
+import LanguageHub from '@/features/language/components/curriculum/LanguageHub';
 
 export default function JapaneseToolsPage() {
   return (
     <ToolPageShell
       title="Япон хэл"
-      eyebrow="Хэл сурах"
+      description="Кана → дүрэм → үгсийн сан дарааллаар сур."
       breadcrumbs={[
         { label: 'Хэрэгслүүд', href: '/#tools' },
         { label: 'Япон хэл' },
       ]}
     >
-      <ul className="divide-y divide-[#111]">
-        {japaneseTools.map(tool => (
-          <li key={tool.id}>
-            <SubToolCard {...tool} tag="Japanese" />
-          </li>
-        ))}
-      </ul>
+      <LanguageHub
+        lang="japanese"
+        intro="Япон хэлийг эхнээс нь сурч байгаа бол эхлээд кана үсгээ (хирагана, катакана) цээжил, дараа нь дүрмийн хичээлүүдээр өгүүлбэр бүтээж сур. Хичээл бүр ромажи уншлагатай."
+        steps={[
+          {
+            id: 'kana',
+            title: 'Кана үсэг',
+            what: 'Хирагана ба катакана — бичих, таних, дасгал.',
+            why: 'Бусад бүх хичээлийн үндэс. Эхлээд энийг сур.',
+            href: '/tools/japanese/kana',
+          },
+          {
+            id: 'grammar',
+            title: 'Дүрэм',
+            what: `JLPT N5 (анхан) ба N4 (дунд) шатны ${CURRICULA.japanese.lessons.length} хичээл.`,
+            why: 'です/ます, бөөм, үйл үг, тэмдэг нэр, て-хэлбэр, нөхцөл, эелдэг хэл.',
+            href: '/tools/japanese/grammar',
+            grammar: true,
+          },
+          {
+            id: 'vocabulary',
+            title: 'Үгсийн сан',
+            what: 'N5 түвшний ~150 үг бэлэн орсон; өөрийнхөө үгийг нэмж болно.',
+            why: 'Карт, тест, тааруулах тоглоомоор давтана.',
+            href: '/tools/japanese/vocabulary',
+          },
+        ]}
+      />
     </ToolPageShell>
   );
 }

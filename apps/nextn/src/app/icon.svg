@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#132019"/>
+      <stop offset="100%" stop-color="#0a120d"/>
+    </linearGradient>
+    <linearGradient id="wTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0dca8"/>
+      <stop offset="100%" stop-color="#d7a85c"/>
+    </linearGradient>
+    <linearGradient id="wBot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4fbd86"/>
+      <stop offset="100%" stop-color="#2f8d5f"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="48" height="48" rx="11" fill="url(#bg)"/>
+  <rect x="1.2" y="1.2" width="45.6" height="45.6" rx="10" fill="none" stroke="#3a5244" stroke-width="1.2"/>
+  <g transform="translate(-0.3,7) scale(0.243)">
+    <g fill="url(#wBot)">
+      <path d="M100 74 C78 70 52 74 26 92 C48 84 66 84 84 88 C64 88 46 94 30 108 C54 98 78 96 100 92 Z"/>
+      <path d="M100 74 C122 70 148 74 174 92 C152 84 134 84 116 88 C136 88 154 94 170 108 C146 98 122 96 100 92 Z"/>
+    </g>
+    <g fill="url(#wTop)">
+      <path d="M100 46 C82 40 60 40 40 54 C60 48 76 50 92 56 C74 54 58 58 44 70 C66 60 84 60 100 62 Z"/>
+      <path d="M100 46 C118 40 140 40 160 54 C140 48 124 50 108 56 C126 54 142 58 156 70 C134 60 116 60 100 62 Z"/>
+    </g>
+    <path d="M100 38 L105 66 L100 100 L95 66 Z" fill="#f3e7c6"/>
+  </g>
+</svg>

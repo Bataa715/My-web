@@ -19,10 +19,17 @@ export const homeTools = [
     tag: 'LANGUAGE',
   },
   {
-    id: 'programming',
-    title: 'Програмчлал',
-    description: 'Алгоритм · HTML · JS',
-    href: '/tools/programming',
+    id: 'cyber',
+    title: 'Cyber Security',
+    description: 'Хичээл · Тест · Дадлага',
+    href: '/tools/cyber',
+    tag: 'SECURITY',
+  },
+  {
+    id: 'fullstack',
+    title: 'Full Stack',
+    description: 'IBM · Аялал · Хичээл · Дасгал',
+    href: '/tools/fullstack',
     tag: 'CODE',
   },
   {

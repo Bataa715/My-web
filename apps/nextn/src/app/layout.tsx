@@ -8,6 +8,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import PageTransition from '@/components/layout/PageTransition';
 import { I18nProvider } from '@/providers/I18nContext';
 import MotionProvider from '@/providers/MotionProvider';
+import UiTranslator from '@/providers/UiTranslator';
 import SiteBackground from '@/components/background/SiteBackground';
 import { JetBrains_Mono, Exo_2, Cormorant_Garamond, Noto_Serif_JP } from 'next/font/google';
 import { SITE_NAME } from '@/lib/brand';
@@ -134,6 +135,7 @@ export default function RootLayout({
                   <PageTransition />
                 </MotionProvider>
                 <Toaster />
+                <UiTranslator />
               </I18nProvider>
             </EditModeProvider>
           </SupabaseClientProvider>
